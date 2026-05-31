@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+/tmp/
+dump.rdb
+.DS_Store
+*.swp
+*.swo
+*~

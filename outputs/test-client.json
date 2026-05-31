@@ -1,0 +1,26 @@
+{
+  "id": "test-client",
+  "client_id": "test-client",
+  "keyword": "manual approval test",
+  "title": "Test Blog Post",
+  "slug": "test-blog-post",
+  "content_md": "# Test\n\nContent here.\n\n## Section\n\nMore content.\n\n---\n\n## FAQ\n\n### Q?\nA\n\n---\n\n### Ready to Get Professional Help?\n\n[Contact us today for professional service](/contact)",
+  "content_html": "<p># Test\n\nContent here.\n\n## Section\n\nMore content.</p>",
+  "meta_title": "Test Blog Post",
+  "meta_description": "A test blog post for unit testing.",
+  "tags": [
+    "test",
+    "maintenance"
+  ],
+  "word_count": 8,
+  "seo_score": 72,
+  "quality_score": 85,
+  "fact_check_confidence": 0.95,
+  "brand_voice_score": 100,
+  "requires_human_review": false,
+  "pipeline_stage": "enterprise_complete",
+  "status": "generated",
+  "trace_id": "130f1d565e5f4e4a940eb9527940f4f0",
+  "created_at": "2026-05-31T13:31:29.995Z",
+  "api_url": "/api/articles/test-client"
+}

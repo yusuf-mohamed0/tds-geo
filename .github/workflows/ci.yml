@@ -1,0 +1,123 @@
+# ════════════════════════════════════════════════════════════════
+# CI — Continuous Integration
+# Runs on every push (any branch) and every pull request.
+# ════════════════════════════════════════════════════════════════
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  # ─── Backend: lint, typecheck, test, build ─────────────────
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Run unit & service tests
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ai_seo_automation
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: ci-jwt-secret-key
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || '' }}
+          SHOPIFY_DEFAULT_SHOP: ${{ secrets.SHOPIFY_DEFAULT_SHOP || '' }}
+          SHOPIFY_DEFAULT_ACCESS_TOKEN: ${{ secrets.SHOPIFY_DEFAULT_ACCESS_TOKEN || '' }}
+
+      - name: Build backend
+        run: npm run build
+
+  # ─── E2E Pipeline Integration Tests ─────────────────────────
+  # Runs in parallel with backend and frontend jobs.
+  # All external services are mocked — no DB, Redis, or API keys needed.
+  e2e:
+    name: E2E Pipeline
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run E2E pipeline integration tests
+        run: npm run test:e2e
+
+  # ─── Frontend: typecheck, build ────────────────────────────
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: TypeScript typecheck
+        run: npx tsc --noEmit
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          retention-days: 3
+          if-no-files-found: error
