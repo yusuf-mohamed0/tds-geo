@@ -207,6 +207,43 @@ docker compose down
 
 Nginx serves the app at `http://localhost:80`.
 
+## Production Deployment
+
+### Manual (without Docker)
+
+```bash
+# 1. Build backend TypeScript
+npm run build
+
+# 2. Build frontend
+cd frontend && npm run build && cd ..
+
+# 3. Start with PM2
+npx pm2 start ecosystem.config.cjs
+
+# 4. (Optional) Save PM2 config to restart on reboot
+npx pm2 save
+npx pm2 startup
+```
+
+### Docker (Recommended for Production)
+
+```bash
+# Build and start all services
+docker compose up -d --build
+
+# View logs
+docker compose logs -f api worker
+
+# Stop
+docker compose down
+```
+
+For production, make sure to:
+- Use strong `JWT_SECRET` and database passwords
+- Enable HTTPS behind a reverse proxy
+- Set up regular database backups
+
 ## Project Structure
 
 ```
