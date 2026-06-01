@@ -82,86 +82,130 @@ Multi-tenant SaaS platform that automates SEO content generation and publishing 
               └─────────────────────┘
 ```
 
-## Quick Start
+## Quick Start (for New Users)
+
+Follow these steps to set up Vireon on your own machine. No private data from the original author is included — everything uses placeholder examples.
 
 ### Prerequisites
 
-- Node.js 20+
-- PostgreSQL 14+
-- Redis 7+ (optional — BullMQ degrades gracefully)
-- OpenAI API key
-- Shopify store with Admin API access token
+You'll need these installed on your computer:
 
-### 1. Clone & Install
+| Software | Version | Why you need it | Get it here |
+|----------|---------|-----------------|-------------|
+| **Node.js** | 20+ | Runs the backend & frontend | [nodejs.org](https://nodejs.org/) |
+| **PostgreSQL** | 14+ | Stores all data | [postgresql.org](https://www.postgresql.org/download/) |
+| **Redis** | 7+ | Background job queue (optional) | [redis.io](https://redis.io/download/) |
+| **Git** | Any | To clone the repo | [git-scm.com](https://git-scm.com/) |
+
+### API Keys You'll Need
+
+| Service | Required? | What it's for | How to get it |
+|---------|-----------|---------------|---------------|
+| **OpenAI** | ✅ Yes | AI content generation (GPT-4o) | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| **Shopify** | ✅ Yes | Publishing articles to your store | Shopify Admin → Apps → Develop apps |
+| **SerpAPI** | ❌ No | Keyword research data | [serpapi.com](https://serpapi.com/) |
+| **Pexels** | ❌ No | Free stock photos for articles | [pexels.com/api](https://www.pexels.com/api/) |
+
+> **Tip:** If you don't have an OpenAI key yet, you can still try the app! Leave `OPENAI_API_KEY` empty and the system runs in **mock mode** — all AI features return realistic sample data.
+
+---
+
+### Step 1: Clone the Project
 
 ```bash
 git clone https://github.com/yusuf-mohamed0/Vireon.git
 cd Vireon
+```
+
+### Step 2: Install Dependencies
+
+```bash
+# Install backend dependencies
 npm install
+
+# Install frontend dependencies
 cd frontend && npm install && cd ..
 ```
 
-### 2. Configure Environment
+### Step 3: Create Your Environment File
 
 ```bash
+# Copy the example config (no real secrets included)
 cp .env.example .env
 ```
 
-Edit `.env` with your credentials:
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OPENAI_API_KEY` | OpenAI API key | ✅ |
-| `SHOPIFY_DEFAULT_SHOP` | Shopify store URL | ✅ |
-| `SHOPIFY_DEFAULT_ACCESS_TOKEN` | Shopify Admin API token | ✅ |
-| `DATABASE_URL` | PostgreSQL connection string | ✅ |
-| `JWT_SECRET` | Secret key for JWT signing | ✅ |
-| `SERPAPI_API_KEY` | SerpAPI key for keyword data | Optional |
-| `REDIS_URL` | Redis connection for BullMQ | Optional |
-| `PEXELS_API_KEY` | Pexels API key for images | Optional |
-
-> **Note:** Leave `OPENAI_API_KEY` empty to enable **dev mock mode** — all AI methods return realistic mock data.
-
-### 3. Initialize Database
+Now edit `.env` with your own credentials. Open the file in any text editor:
 
 ```bash
+nano .env   # or use VS Code: code .env
+```
+
+Fill in these values:
+- `OPENAI_API_KEY` — Your OpenAI key (or leave blank for mock mode)
+- `SHOPIFY_DEFAULT_SHOP` — Your shop's `.myshopify.com` URL
+- `SHOPIFY_DEFAULT_ACCESS_TOKEN` — Your Shopify Admin API token
+- `DATABASE_URL` — Your PostgreSQL connection string
+- `JWT_SECRET` — A random string for security (generate one with `openssl rand -hex 32`)
+
+### Step 4: Set Up the Database
+
+```bash
+# Create the database
 createdb ai_seo_automation
+
+# Create all tables
 psql -d ai_seo_automation -f backend/database/schema.sql
+
+# (Optional) Load sample data for testing
+# This creates example users and demo content — no real data
 psql -d ai_seo_automation -f backend/database/seed.sql
 ```
 
-### 4. Start Development
+> The seed data includes demo accounts: `admin@example.com` / `admin123`
 
+### Step 5: Start the App
+
+Open **three terminal windows**:
+
+**Terminal 1 — Backend API:**
 ```bash
-# Terminal 1: Backend (with hot reload)
 npm run dev
+```
 
-# Terminal 2: Frontend
+**Terminal 2 — Frontend UI:**
+```bash
 cd frontend && npm run dev
+```
 
-# Terminal 3: (Optional) BullMQ workers
+**Terminal 3 — Background Workers (optional):**
+```bash
 npm run worker
 ```
 
-API at `http://localhost:3000` • Frontend at `http://localhost:5173`
+### Step 6: Open the App
 
-### 5. Production Build
+- **Frontend:** http://localhost:5173
+- **API:** http://localhost:3000
+- **Login:** `admin@example.com` / `admin123`
+
+---
+
+### Docker Setup (Alternative)
+
+If you prefer Docker over manual setup:
 
 ```bash
-npm run build
-cd frontend && npm run build && cd ..
-npx pm2 start ecosystem.config.cjs
-```
-
-## Docker Deployment
-
-```bash
+# Start everything (PostgreSQL, Redis, API, workers)
 docker compose up -d
+
+# View logs
 docker compose logs -f api worker
+
+# Stop everything
 docker compose down
 ```
 
-Nginx serves the SPA at `http://localhost:80` and proxies `/api/*` to the backend.
+Nginx serves the app at `http://localhost:80`.
 
 ## Project Structure
 
