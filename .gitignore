@@ -1,10 +1,33 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+
+# Environment files
 .env
+.env.backup
+.env.local
+.env.*.local
+
+# Logs
 *.log
+logs/
+
+# Pipeline artifacts
+outputs/
+
+# Temp files
 /tmp/
 dump.rdb
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Editor files
 *.swp
 *.swo
 *~
+.vscode/
+.idea/
