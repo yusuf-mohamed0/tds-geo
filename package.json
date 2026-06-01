@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/backend/index.js",
     "dev": "tsx watch backend/index.ts",
-    "dev:full": "./start-dev.sh",
+    "dev:full": "./scripts/start-dev.sh",
     "worker": "tsx backend/workers/index.ts",
     "migrate": "psql $DATABASE_URL -f backend/database/schema.sql",
     "migrate:upgrade": "psql $DATABASE_URL -f backend/database/migration_v2.sql",

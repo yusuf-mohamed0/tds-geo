@@ -202,6 +202,7 @@ Nginx serves the SPA at `http://localhost:80` and proxies `/api/*` to the backen
 │   │   │   └── Layout.tsx
 │   │   └── pages/                   # 24 route pages
 │   └── index.html
+├── scripts/                      # Utility & pipeline scripts
 ├── docker/nginx.conf
 ├── n8n/workflows/
 ├── .github/workflows/
