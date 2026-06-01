@@ -1,8 +1,6 @@
-<div align="center">
+# Vireon — AI SEO Automation System
 
-# 🚀 Vireon — AI SEO Automation System
-
-**Multi-tenant SaaS platform that automates SEO content generation and publishing for Shopify stores.**
+Multi-tenant SaaS platform that automates SEO content generation and publishing for Shopify stores. Uses AI (OpenAI GPT-4o) to research keywords, generate high-quality blog posts, optimize for SEO, and publish directly to Shopify — all with per-client rate limiting, cost tracking, and a full admin dashboard.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-22-green?style=flat-square&logo=node.js)](https://nodejs.org/)
@@ -11,16 +9,6 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql)](https://postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?style=flat-square&logo=openai)](https://openai.com/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow?style=flat-square)]()
-
-[Features](#features) • [Quick Start](#quick-start) • [Architecture](#architecture) • [API Reference](#api-reference) • [Testing](#testing) • [Deployment](#deployment)
-
----
-
-</div>
-
-## About
-
-Vireon uses AI (OpenAI GPT-4o) to research keywords, generate high-quality blog posts, optimize for SEO, and publish directly to Shopify — all with per-client rate limiting, cost tracking, and a full admin dashboard. The system features a **24-stage enterprise pipeline**, plugin architecture, content safety checks, quality scoring, and natural language command interface.
 
 ## Features
 
@@ -92,36 +80,6 @@ Vireon uses AI (OpenAI GPT-4o) to research keywords, generate high-quality blog 
               │  BullMQ Workers     │
               │ (separate process)  │
               └─────────────────────┘
-```
-
-### Pipeline Flow
-
-```
-Client Manager → Keyword Discovery → Pipeline Orchestrator
-                                         │
-                    ┌────────────────────┼────────────────────┐
-                    │                    │                    │
-            ┌───────▼───────┐   ┌───────▼───────┐   ┌───────▼───────┐
-            │  Queue-based   │   │   Direct      │   │   Plugin      │
-            │  (BullMQ)      │   │   (sync/dev)  │   │   Hooks       │
-            └───────┬───────┘   └───────┬───────┘   └───────┬───────┘
-                    │                    │                    │
-                    └────────────────────┼────────────────────┘
-                                         ▼
-                              ┌──────────────────────┐
-                              │  Article Generation   │
-                              │  24-stage pipeline    │
-                              └──────────┬───────────┘
-                                         ▼
-                              ┌──────────────────────┐
-                              │  Review / Approve     │
-                              │  Dashboard → Manual   │
-                              └──────────┬───────────┘
-                                         ▼
-                              ┌──────────────────────┐
-                              │  Shopify Publishing   │
-                              │  images → publish     │
-                              └──────────────────────┘
 ```
 
 ## Quick Start
@@ -198,13 +156,8 @@ npx pm2 start ecosystem.config.cjs
 ## Docker Deployment
 
 ```bash
-# Start full stack
 docker compose up -d
-
-# View logs
 docker compose logs -f api worker
-
-# Stop
 docker compose down
 ```
 
@@ -249,13 +202,12 @@ Nginx serves the SPA at `http://localhost:80` and proxies `/api/*` to the backen
 │   │   │   └── Layout.tsx
 │   │   └── pages/                   # 24 route pages
 │   └── index.html
-├── docker/
-│   └── nginx.conf
-├── n8n/workflows/                   # n8n automation workflow
-├── .github/workflows/               # CI/CD pipelines
+├── docker/nginx.conf
+├── n8n/workflows/
+├── .github/workflows/
 ├── docker-compose.yml
 ├── Dockerfile
-└── ecosystem.config.cjs             # PM2 configuration
+└── ecosystem.config.cjs
 ```
 
 ## API Reference
@@ -268,7 +220,7 @@ Content-Type: application/json
 
 { "email": "admin@example.com", "password": "admin123" }
 
-# → { "token": "eyJhbGci...", "user": { ... } }
+# Response: { "token": "eyJhbGci...", "user": { ... } }
 ```
 
 All other endpoints require: `Authorization: Bearer <token>`
@@ -293,66 +245,35 @@ All other endpoints require: `Authorization: Bearer <token>`
 | `POST` | `/api/chat/sessions/:id/messages` | Send chat message |
 | `GET` | `/api/admin/summary` | Platform-wide stats |
 | `GET` | `/api/admin/errors` | Recent errors |
-| `POST` | `/api/plugins/clients/:clientId/register` | Register plugin |
 
 ## Testing
 
 ```bash
-# Run all unit/service tests (183+ tests)
-npm test
-
-# Run E2E integration tests (10 tests)
-npm run test:e2e
-
-# Watch mode
-npm run test:watch
-
-# TypeScript typecheck
-npm run typecheck
-
-# Frontend typecheck
-cd frontend && npx tsc --noEmit
+npm test                      # Run all unit/service tests (183+ tests)
+npm run test:e2e              # Run E2E integration tests (10 tests)
+npm run test:watch            # Watch mode
+npm run typecheck             # TypeScript typecheck
+cd frontend && npx tsc --noEmit  # Frontend typecheck
 ```
 
-**Test coverage:** 193 tests across 8 test files — orchestrator, services, and E2E integration with full mock support. All tests pass with zero type errors.
+**193 tests across 8 test files** — all passing with zero type errors.
 
 ## CI/CD
 
 GitHub Actions workflows:
-- **CI** — Lint, TypeScript typecheck (frontend + backend), run all tests, build frontend & backend
-- **Docker Deploy** — Build multi-arch Docker image, push to GitHub Container Registry, deploy via SSH
-
-## Example Pipeline Run
-
-```bash
-# Login & get token
-TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"admin123"}' | jq -r '.token')
-
-# Create a client
-CLIENT_ID=$(curl -s -X POST http://localhost:3000/api/clients \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"My Store","slug":"my-store","shopifyShop":"my-store.myshopify.com","shopifyToken":"shpat_..."}' | jq -r '.id')
-
-# Run the pipeline
-curl -X POST "http://localhost:3000/api/clients/$CLIENT_ID/pipeline/run" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"keyword": "gutter cleaning tips", "publish": true}'
-```
+- **CI** — Lint, TypeScript typecheck, run all tests, build frontend & backend
+- **Docker Deploy** — Build multi-arch Docker image, push to GHCR, deploy via SSH
 
 ## Key Design Decisions
 
-1. **Singleton services with `initialize(pool)`** — All services share one DB pool, avoiding redundant connections
-2. **Graceful degradation** — Redis, pgvector, and plugin tables are optional; services degrade gracefully
-3. **Stage-level error isolation** — Pipeline wraps each stage in try/catch; a single failure never stops the pipeline
-4. **Async batch logging** — LogBuffer batches DB writes every 2 seconds (non-blocking)
-5. **Plugin system via hooks** — Plugins register for named hooks (before/after stages) and execute dynamically
-6. **Natural language CLI** — Chat engine uses regex-based pattern matching (not AI) for fast, deterministic commands
-7. **Cost-first routing** — Routes tasks to the most cost-effective AI model based on complexity
-8. **TypeScript strict mode** — Both frontend and backend, zero type errors in CI
+1. **Singleton services with `initialize(pool)`** — All services share one DB pool
+2. **Graceful degradation** — Redis, pgvector, and plugin tables are optional
+3. **Stage-level error isolation** — Pipeline wraps each stage in try/catch
+4. **Async batch logging** — LogBuffer batches DB writes every 2 seconds
+5. **Plugin system via hooks** — Pluggable architecture for before/after stages
+6. **Natural language CLI** — Regex-based pattern matching for fast command parsing
+7. **Cost-first routing** — Routes tasks to optimal AI model based on complexity
+8. **TypeScript strict mode** — Zero type errors across frontend and backend
 
 ## License
 
