@@ -1,6 +1,5 @@
 // ──────────────────────────────────────────────
-// AI Service - Multi-Provider Content & Image Generation
-// Supports: OpenAI (default) and DeepSeek
+// AI Service - OpenAI Content & Image Generation
 // ──────────────────────────────────────────────
 
 import OpenAI from 'openai';
@@ -8,90 +7,41 @@ import { logger } from '../utils/logger';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
-
-type AIProvider = 'openai' | 'deepseek';
 
 class OpenAIService {
   private openaiClient: OpenAI | null = null;
-  private deepseekClient: OpenAI | null = null;
-  private _provider: AIProvider = 'openai';
   public defaultModel: string = process.env.OPENAI_MODEL || 'gpt-4o';
   public maxTokens: number = parseInt(process.env.OPENAI_MAX_TOKENS || '4096', 10);
   public temperature: number = parseFloat(process.env.OPENAI_TEMPERATURE || '0.7');
 
   get isMockMode(): boolean {
-    return !OPENAI_API_KEY && !DEEPSEEK_API_KEY;
+    return !OPENAI_API_KEY;
   }
 
-  get provider(): AIProvider {
-    return this._provider;
-  }
-
-  setProvider(provider: AIProvider): void {
-    this._provider = provider;
-    logger.info(`AI provider set to: ${provider}`);
+  get provider(): string {
+    return 'openai';
   }
 
   initialize(): void {
-    const hasOpenAI = !!OPENAI_API_KEY;
-    const hasDeepSeek = !!DEEPSEEK_API_KEY;
-
-    if (!hasOpenAI && !hasDeepSeek) {
-      logger.warn('No AI API keys set — operating in DEV MOCK mode with generated content');
+    if (!OPENAI_API_KEY) {
+      logger.warn('No OpenAI API key set — operating in DEV MOCK mode with generated content');
       this.openaiClient = null;
-      this.deepseekClient = null;
       return;
     }
 
-    // Initialize OpenAI client
-    if (hasOpenAI) {
-      this.openaiClient = new OpenAI({ apiKey: OPENAI_API_KEY });
-      logger.info('OpenAI client initialized', { model: this.defaultModel });
-    }
-
-    // Initialize DeepSeek client (OpenAI-compatible)
-    if (hasDeepSeek) {
-      this.deepseekClient = new OpenAI({
-        apiKey: DEEPSEEK_API_KEY,
-        baseURL: 'https://api.deepseek.com',
-      });
-      logger.info('DeepSeek client initialized', { model: process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash' });
-    }
-
-    // Auto-select DeepSeek if it's available and no OpenAI key
-    if (!hasOpenAI && hasDeepSeek) {
-      this._provider = 'deepseek';
-      this.defaultModel = process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash';
-    } else if (hasOpenAI && hasDeepSeek) {
-      // Both available — check config for preferred provider (default: deepseek)
-      const preferred = process.env.AI_PROVIDER || 'deepseek';
-      this._provider = preferred === 'deepseek' ? 'deepseek' : 'openai';
-      if (this._provider === 'deepseek') {
-        this.defaultModel = process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash';
-      }
-    }
-
-    logger.info('AI service initialized', {
-      provider: this._provider,
-      model: this.defaultModel,
-      hasOpenAI,
-      hasDeepSeek
-    });
+    this.openaiClient = new OpenAI({ apiKey: OPENAI_API_KEY });
+    logger.info('OpenAI client initialized', { model: this.defaultModel });
   }
 
   /**
-   * Get the active AI client based on current provider setting.
+   * Get the active AI client.
    */
   private getClient(): OpenAI | null {
-    if (this._provider === 'deepseek' && this.deepseekClient) {
-      return this.deepseekClient;
-    }
     return this.openaiClient;
   }
 
   private ensureInitialized(): void {
-    if (!this.getClient() && (OPENAI_API_KEY || DEEPSEEK_API_KEY)) {
+    if (!this.openaiClient && OPENAI_API_KEY) {
       this.initialize();
     }
   }
@@ -115,6 +65,10 @@ class OpenAIService {
     const ctaText = (clientSettings as any).ctaText || process.env.CTA_DEFAULT_TEXT;
     const ctaUrl = (clientSettings as any).ctaUrl || process.env.CTA_DEFAULT_URL;
 
+    // Extract website intelligence from clientSettings if available
+    const websiteIntelligence = (clientSettings as any).websiteIntelligence as string || '';
+    const brandVoiceGuidance = (clientSettings as any).brandVoiceGuidance as string || '';
+
     const systemPrompt = promptTemplate || this.defaultSystemPrompt({
       tone,
       avoidKeywords,
@@ -124,29 +78,42 @@ class OpenAIService {
       maxWords
     });
 
-    const userPrompt = `Generate a complete SEO-optimized blog post about: "${keyword}"
+    // Build an enriched user prompt with website intelligence
+    let enrichedPrompt = `Generate a complete SEO-optimized blog post about: "${keyword}"\n\n`;
 
-Requirements:
-- Write in an ${tone} tone suitable for a maintenance/property care company
-- Minimum ${minWords} words, maximum ${maxWords} words
-- Structure: H2 main sections with H3 subsections where appropriate
-- Include a compelling meta title (max 60 chars) and meta description (max 160 chars)
-- Include 3-5 relevant tags
-- Include an FAQ section with 3-5 questions and answers
-- Include a natural Call-to-Action at the end
-- Do NOT include any DIY repair instructions that could be dangerous
-- Focus on: warning signs, educational content, and preventative maintenance
-- Use E-E-A-T principles: demonstrate Experience, Expertise, Authoritativeness, Trustworthiness
+    // Inject website-scraped intelligence if available
+    if (websiteIntelligence) {
+      enrichedPrompt += `## CLIENT CONTEXT (from website intelligence)\n${websiteIntelligence}\n\n`;
+    }
 
-Format your response as JSON with the following keys:
-{
-  "title": "The article title",
-  "metaTitle": "SEO meta title (max 60 chars)",
-  "metaDescription": "SEO meta description (max 160 chars)",
-  "tags": ["tag1", "tag2", "tag3"],
-  "faqSection": "## Frequently Asked Questions\\n\\n### Question 1?\\nAnswer 1...",
-  "content": "The full article content in markdown"
-}`;
+    // Inject brand voice guidance if available
+    if (brandVoiceGuidance) {
+      enrichedPrompt += `## BRAND VOICE GUIDANCE\n${brandVoiceGuidance}\n\n`;
+    }
+
+    enrichedPrompt += `## CONTENT REQUIREMENTS\n`;
+    enrichedPrompt += `- Write in an ${tone} tone\n`;
+    enrichedPrompt += `- Minimum ${minWords} words, maximum ${maxWords} words\n`;
+    enrichedPrompt += `- Structure: H2 main sections with H3 subsections where appropriate\n`;
+    enrichedPrompt += `- Include a compelling meta title (max 60 chars) and meta description (max 160 chars)\n`;
+    enrichedPrompt += `- Include 3-5 relevant tags\n`;
+    enrichedPrompt += `- Include an FAQ section with 3-5 questions and answers\n`;
+    enrichedPrompt += `- Include a natural Call-to-Action at the end\n`;
+
+    // Add industry-specific instructions based on intelligence
+    if (websiteIntelligence && websiteIntelligence.includes('Client Intelligence')) {
+      enrichedPrompt += `- REFERENCE the specific services and value propositions listed in the Client Intelligence section\n`;
+      enrichedPrompt += `- Use the key terms naturally throughout the article\n`;
+      enrichedPrompt += `- Mirror the company's tone and voice as described\n`;
+      enrichedPrompt += `- Tailor content for the target audience described\n`;
+    } else {
+      enrichedPrompt += `- NEVER include dangerous DIY repair instructions\n`;
+      enrichedPrompt += `- Focus on: warning signs, educational content, and preventative maintenance\n`;
+    }
+
+    enrichedPrompt += `- Use E-E-A-T principles: demonstrate Experience, Expertise, Authoritativeness, Trustworthiness\n\n`;
+
+    enrichedPrompt += `Format your response as JSON with the following keys:\n{\n  "title": "The article title",\n  "metaTitle": "SEO meta title (max 60 chars)",\n  "metaDescription": "SEO meta description (max 160 chars)",\n  "tags": ["tag1", "tag2", "tag3"],\n  "faqSection": "## Frequently Asked Questions\\n\\n### Question 1?\\nAnswer 1...",\n  "content": "The full article content in markdown"\n}`;
 
     try {
       logger.info('Generating blog post via OpenAI', { keyword, model: this.defaultModel });
@@ -155,7 +122,7 @@ Format your response as JSON with the following keys:
         model: this.defaultModel,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: 'user', content: enrichedPrompt }
         ],
         max_tokens: this.maxTokens,
         temperature: this.temperature,
@@ -274,9 +241,8 @@ Respond with a JSON array of strings only.`
     keyword: string,
     tone: string = 'professional'
   ): Promise<{ imageUrl: string; altText: string; prompt: string }> {
-    // DeepSeek doesn't support image generation — return mock directly
-    if (this.isMockMode || this._provider === 'deepseek') {
-      logger.info(`${this.isMockMode ? 'Mock' : 'DeepSeek'}: Skipping image generation`);
+    if (this.isMockMode) {
+      logger.info('Mock: Skipping image generation');
       return {
         imageUrl: 'https://via.placeholder.com/1792x1024?text=' + encodeURIComponent(keyword),
         altText: `${keyword} professional maintenance service`,
@@ -664,20 +630,27 @@ FORMATTING:
 
     logger.info('Mock: Generating blog post content', { keyword, wordTarget });
 
-    const content = this.buildMockArticleContent(keyword, tone, wordTarget);
+    // Generate a unique title based on the keyword's industry
+    const industry = this.inferIndustry(keyword);
+    const title = this.generateUniqueTitle(keyword, industry);
+
+    // Build content tailored to the keyword's industry
+    const content = this.buildMockArticleContent(keyword, industry, tone, wordTarget);
     const wordCount = content.split(/\s+/).length;
 
-    const title = `${keyword}: Essential Guide for Homeowners`.slice(0, 60);
     const faq = this.buildMockFAQSection(keyword, 4);
-    const metaTitle = `${keyword}: Essential Guide for Homeowners`;
-    const metaDescription = `Learn everything you need to know about ${keyword}. Expert tips, warning signs, and when to call a professional.`;
+    const metaTitle = title.slice(0, 60);
+    const metaDescription = this.generateMetaDescription(keyword, industry).slice(0, 160);
+
+    // Industry-relevant tags
+    const tags = this.generateTags(keyword, industry);
 
     return {
       title,
       content: content + '\n\n---\n\n' + faq,
-      metaTitle: metaTitle.slice(0, 60),
-      metaDescription: metaDescription.slice(0, 160),
-      tags: [keyword, 'home maintenance', 'professional service', 'property care'],
+      metaTitle,
+      metaDescription,
+      tags,
       faqSection: faq,
       metadata: {
         model: 'mock-gpt-4o',
@@ -689,48 +662,255 @@ FORMATTING:
     };
   }
 
-  private buildMockArticleContent(keyword: string, tone: string, targetWords: number): string {
+  private inferIndustry(keyword: string): string {
+    const kw = keyword.toLowerCase();
+    if (kw.includes('account') || kw.includes('tax') || kw.includes('audit') || kw.includes('cpa') || kw.includes('bookkeeping') || kw.includes('financial')) return 'accounting';
+    if (kw.includes('social media') || kw.includes('marketing') || kw.includes('brand') || kw.includes('advertis') || kw.includes('content')) return 'marketing';
+    if (kw.includes('customer') || kw.includes('cx') || kw.includes('bpo') || kw.includes('call center') || kw.includes('outsourc')) return 'cx';
+    if (kw.includes('digital') || kw.includes('web') || kw.includes('seo') || kw.includes('ecommerce') || kw.includes('it consulting')) return 'digital';
+    if (kw.includes('pharma') || kw.includes('medicine') || kw.includes('drug') || kw.includes('healthcare') || kw.includes('gmp')) return 'pharma';
+    if (kw.includes('vet') || kw.includes('veterinary') || kw.includes('pet') || kw.includes('animal') || kw.includes('dog') || kw.includes('cat')) return 'veterinary';
+    if (kw.includes('architect') || kw.includes('interior') || kw.includes('design') || kw.includes('villa') || kw.includes('residential')) return 'architecture';
+    if (kw.includes('sustainable') || kw.includes('business solution') || kw.includes('consulting') || kw.includes('infrastructure')) return 'consulting';
+    if (kw.includes('graphic') || kw.includes('branding') || kw.includes('logo') || kw.includes('visual') || kw.includes('packaging')) return 'design';
+    if (kw.includes('cosmetic') || kw.includes('makeup') || kw.includes('beauty') || kw.includes('skincare') || kw.includes('lipstick') || kw.includes('foundation')) return 'cosmetics';
+    if (kw.includes('insurance') || kw.includes('broker') || kw.includes('coverage')) return 'insurance';
+    if (kw.includes('laboratory') || kw.includes('lab') || kw.includes('scientific') || kw.includes('fume') || kw.includes('workstation')) return 'laboratory';
+    if (kw.includes('fitness') || kw.includes('trainer') || kw.includes('workout') || kw.includes('nutrition') || kw.includes('weight loss') || kw.includes('gym')) return 'fitness';
+    if (kw.includes('skincare') || kw.includes('beauty') || kw.includes('serum') || kw.includes('moisturizer') || kw.includes('organic')) return 'skincare';
+    if (kw.includes('ui') || kw.includes('ux') || kw.includes('website') || kw.includes('responsive')) return 'webdesign';
+    return 'general';
+  }
+
+  private generateUniqueTitle(keyword: string, industry: string): string {
+    const kw = this.capitalize(keyword);
+    const titles: Record<string, string[]> = {
+      'accounting': [
+        `${kw}: A Complete Guide for Business Owners`,
+        `Expert ${kw} Tips for Your Business`,
+        `Everything You Need to Know About ${kw}`,
+        `${kw} Explained: A Business Owner's Handbook`,
+        `The Ultimate Guide to ${kw} in 2026`,
+      ],
+      'marketing': [
+        `${kw}: Strategies That Drive Results`,
+        `How to Master ${kw} for Your Brand`,
+        `The Complete ${kw} Playbook`,
+        `${kw} Trends Every Business Should Know`,
+        `Unlock Growth with ${kw}`,
+      ],
+      'cx': [
+        `${kw}: Elevate Your Customer Experience`,
+        `The Ultimate Guide to ${kw}`,
+        `How ${kw} Transforms Your Business`,
+        `${kw} Best Practices for 2026`,
+        `Why ${kw} Matters for Your Brand`,
+      ],
+      'digital': [
+        `${kw}: Transform Your Online Presence`,
+        `The Complete ${kw} Guide`,
+        `How ${kw} Drives Business Growth`,
+        `Expert ${kw} Strategies for Success`,
+        `${kw} Explained: A Practical Guide`,
+      ],
+      'pharma': [
+        `${kw}: Quality Healthcare Solutions`,
+        `Advancing Healthcare with ${kw}`,
+        `The Essential Guide to ${kw}`,
+        `${kw}: Commitment to Quality`,
+        `Innovation in ${kw}: What You Need to Know`,
+      ],
+      'veterinary': [
+        `${kw}: Caring for Your Beloved Pet`,
+        `The Complete Guide to ${kw}`,
+        `Essential ${kw} Tips for Pet Owners`,
+        `Keep Your Pet Healthy with ${kw}`,
+        `${kw}: A Pet Owner's Guide`,
+      ],
+      'architecture': [
+        `${kw}: Designing Beautiful Spaces`,
+        `The Art and Science of ${kw}`,
+        `${kw}: Transform Your Property`,
+        `Expert ${kw} Solutions for Your Home`,
+        `A Complete Guide to ${kw}`,
+      ],
+      'consulting': [
+        `${kw}: Building for the Future`,
+        `Strategic ${kw} for Sustainable Growth`,
+        `${kw}: Solutions That Make a Difference`,
+        `The Expert Guide to ${kw}`,
+        `How ${kw} Drives Success`,
+      ],
+      'design': [
+        `${kw}: Bring Your Vision to Life`,
+        `Creative ${kw} Solutions for Your Brand`,
+        `The Art of ${kw}: A Complete Guide`,
+        `${kw}: Make Your Brand Stand Out`,
+        `Expert ${kw} Services You Can Trust`,
+      ],
+      'cosmetics': [
+        `${kw}: Discover Your Perfect Look`,
+        `The Ultimate ${kw} Guide`,
+        `${kw}: Beauty That Empowers`,
+        `Elevate Your Beauty Routine with ${kw}`,
+        `${kw}: Quality You Can Trust`,
+      ],
+      'insurance': [
+        `${kw}: Protect What Matters Most`,
+        `The Complete Guide to ${kw}`,
+        `${kw}: Smart Coverage for Your Needs`,
+        `Understanding ${kw}: A Practical Guide`,
+        `Expert ${kw} Advice You Can Rely On`,
+      ],
+      'laboratory': [
+        `${kw}: Precision Solutions for Science`,
+        `The Complete Guide to ${kw}`,
+        `${kw}: Designing the Perfect Lab`,
+        `Expert ${kw} Solutions for Research`,
+        `${kw}: Quality You Can Measure`,
+      ],
+      'fitness': [
+        `${kw}: Achieve Your Fitness Goals`,
+        `Transform Your Health with ${kw}`,
+        `${kw}: A Personal Journey to Wellness`,
+        `The Complete ${kw} Program`,
+        `Expert ${kw} Coaching for Results`,
+      ],
+      'skincare': [
+        `${kw}: Radiant Skin Starts Here`,
+        `The Ultimate ${kw} Routine`,
+        `${kw}: Nourish Your Natural Beauty`,
+        `Discover the Power of ${kw}`,
+        `${kw}: Your Path to Glowing Skin`,
+      ],
+      'webdesign': [
+        `${kw}: Create a Stunning Online Presence`,
+        `The Complete Guide to ${kw}`,
+        `${kw}: Design That Captivates`,
+        `Expert ${kw} Solutions for Your Business`,
+        `${kw}: Where Creativity Meets Function`,
+      ],
+      'general': [
+        `${kw}: The Complete Guide`,
+        `Everything You Need to Know About ${kw}`,
+        `${kw}: Expert Tips and Insights`,
+        `The Ultimate Resource for ${kw}`,
+        `${kw}: A Comprehensive Overview`,
+      ]
+    };
+    const industryTitles = titles[industry] || titles.general;
+    return industryTitles[Math.floor(Math.random() * industryTitles.length)].slice(0, 60);
+  }
+
+  private generateMetaDescription(keyword: string, industry: string): string {
+    const descriptions: Record<string, string> = {
+      'accounting': `Expert ${keyword} services tailored for your business. Discover professional accounting solutions, tax tips, and financial strategies to help your business thrive.`,
+      'marketing': `Boost your brand with professional ${keyword}. Learn proven strategies and expert tips to grow your online presence and reach your target audience effectively.`,
+      'cx': `Enhance your customer experience with ${keyword}. Discover how professional CX solutions can transform your business and drive customer satisfaction.`,
+      'digital': `Transform your business with comprehensive ${keyword}. Expert digital solutions to help you grow, innovate, and succeed in today's competitive landscape.`,
+      'pharma': `Learn about ${keyword} and quality pharmaceutical solutions. Expert insights on healthcare products, manufacturing standards, and industry best practices.`,
+      'veterinary': `Expert ${keyword} services for your beloved pets. Compassionate care, professional treatment, and essential health tips from trusted veterinarians.`,
+      'architecture': `Professional ${keyword} services to transform your space. Expert architectural and interior design solutions tailored to your vision and needs.`,
+      'consulting': `Strategic ${keyword} solutions for sustainable growth. Expert consulting services to help your organization achieve its goals and build a better future.`,
+      'design': `Creative ${keyword} solutions that make your brand stand out. Professional design services to bring your vision to life and captivate your audience.`,
+      'cosmetics': `Discover premium ${keyword} products. High-quality beauty solutions that celebrate your unique style and enhance your natural beauty.`,
+      'insurance': `Comprehensive ${keyword} solutions tailored to your needs. Protect what matters most with expert guidance and reliable coverage options.`,
+      'laboratory': `Professional ${keyword} solutions for scientific excellence. Quality laboratory furniture and design services for research and education.`,
+      'fitness': `Achieve your fitness goals with expert ${keyword}. Personalized training programs and nutrition coaching to transform your health and wellness.`,
+      'skincare': `Discover radiant beauty with premium ${keyword}. Quality skincare products designed to nourish, protect, and enhance your natural glow.`,
+      'webdesign': `Create a stunning online presence with professional ${keyword}. Expert web design and UI/UX solutions that captivate and convert.`,
+      'general': `Learn everything you need to know about ${keyword}. Expert tips, professional insights, and comprehensive guidance for your needs.`,
+    };
+    return descriptions[industry] || descriptions.general;
+  }
+
+  private generateTags(keyword: string, industry: string): string[] {
+    const tagMap: Record<string, string[]> = {
+      'accounting': ['accounting', 'tax services', 'financial consulting', 'business finance'],
+      'marketing': ['digital marketing', 'social media', 'brand strategy', 'content marketing'],
+      'cx': ['customer experience', 'BPO services', 'call center', 'customer support'],
+      'digital': ['digital solutions', 'web development', 'SEO', 'digital transformation'],
+      'pharma': ['pharmaceutical', 'healthcare', 'medicine', 'quality manufacturing'],
+      'veterinary': ['veterinary care', 'pet health', 'animal hospital', 'pet wellness'],
+      'architecture': ['architecture', 'interior design', 'home design', 'architectural services'],
+      'consulting': ['business consulting', 'sustainable development', 'project management', 'strategy'],
+      'design': ['graphic design', 'branding', 'creative design', 'visual identity'],
+      'cosmetics': ['cosmetics', 'beauty products', 'makeup', 'skincare'],
+      'insurance': ['insurance', 'brokerage', 'coverage', 'risk management'],
+      'laboratory': ['laboratory furniture', 'lab design', 'scientific equipment', 'research'],
+      'fitness': ['fitness training', 'personal trainer', 'workout', 'nutrition'],
+      'skincare': ['skincare', 'beauty', 'natural products', 'skin health'],
+      'webdesign': ['web design', 'UI UX', 'creative design', 'brand identity'],
+      'general': [keyword, 'professional service', 'expert guide', 'quality solutions'],
+    };
+    const base = tagMap[industry] || tagMap.general;
+    return [...new Set([keyword, ...base])].slice(0, 5);
+  }
+
+  private buildMockArticleContent(keyword: string, industry: string, tone: string, targetWords: number): string {
+    const kw = this.capitalize(keyword);
+    const industryContext = this.getIndustryContext(industry, keyword);
+
     const sections = [
       {
         heading: `Introduction`,
-        body: `When it comes to maintaining your home, understanding ${keyword} is essential for every homeowner. Whether you're a new property owner or have years of experience, knowing the fundamentals can save you time, money, and stress. This comprehensive guide will walk you through everything you need to know about ${keyword}, including common warning signs, preventative measures, and when it's time to call in the professionals.`
+        body: `When it comes to ${industryContext.intro}, understanding ${kw} is essential for success. Whether you're a seasoned professional or just getting started, knowing the fundamentals can make all the difference. This comprehensive guide will walk you through everything you need to know about ${kw}, including key insights, best practices, and expert recommendations.`
       },
       {
-        heading: `Understanding ${this.capitalize(keyword)}`,
-        body: `${this.capitalize(keyword)} is a critical aspect of home maintenance that many homeowners overlook until problems arise. Regular attention to ${keyword} can prevent costly repairs down the line. In this section, we'll explore the key components and what every property owner should be aware of.`
+        heading: `Understanding ${kw}`,
+        body: `${kw} plays a vital role in ${industryContext.context}. ${industryContext.detail} In this section, we'll explore the key aspects and what you should know to make informed decisions.`
       },
       {
-        heading: `Common Warning Signs to Watch For`,
-        body: `Being proactive about ${keyword} means knowing what to look for. Here are the most common warning signs that indicate you may need professional assistance:\n\n1. **Unusual sounds or odors** — If you notice strange noises or smells, it could indicate an underlying issue related to ${keyword}.\n2. **Visible wear and tear** — Regular inspections can help catch problems early.\n3. **Increased utility bills** — A sudden spike in your energy or water bills often signals inefficiency.\n4. **Age of your system** — Most systems have a lifespan of 10-15 years.\n5. **Inconsistent performance** — If things aren't working as well as they used to, it's time to investigate.`
+        heading: `Key Benefits and Advantages`,
+        body: `Investing in quality ${kw} offers numerous benefits. Here are the most important advantages to consider:\n\n1. **Enhanced quality and reliability** — Professional ${industryContext.subject} ensures consistent, high-quality results.\n2. **Cost-effective solutions** — Proper ${kw} saves money in the long run by preventing issues.\n3. **Expert guidance** — Work with experienced professionals who understand your unique needs.\n4. **Peace of mind** — Know that your ${industryContext.subject} is in capable hands.\n5. **Long-term value** — Quality ${kw} delivers lasting results that protect your investment.`
       },
       {
-        heading: `Preventative Maintenance Tips`,
-        body: `Regular maintenance is the key to extending the life of your home's systems and avoiding emergency repairs. Here are practical tips every homeowner should follow:\n\n**Schedule annual inspections** — Having a professional inspect your ${keyword} related systems annually can catch minor issues before they become major problems.\n\n**Keep it clean** — Regular cleaning and upkeep can prevent many common issues. Follow manufacturer guidelines for best results.\n\n**Address small problems quickly** — Don't ignore minor issues. What starts as a small problem can quickly escalate into a costly repair.\n\n**Maintain proper documentation** — Keep records of all maintenance and repairs. This helps with warranty claims and provides valuable history for future service.`
+        heading: `Best Practices to Follow`,
+        body: `Following established best practices is key to getting the most out of ${kw}. Here are essential guidelines to keep in mind:\n\n**Work with qualified professionals** — Always choose experienced, reputable providers for your ${industryContext.subject} needs. Check credentials, read reviews, and ask for references.\n\n**Stay informed** — Keep up with the latest trends and developments in ${industryContext.context}. Knowledge is power when making decisions about ${kw}.\n\n**Plan ahead** — Proactive planning prevents problems. Regular ${industryContext.maintenance} helps avoid costly issues down the line.\n\n**Communicate clearly** — Clearly articulate your needs and expectations. Good communication ensures better outcomes and satisfaction.`
       },
       {
-        heading: `When to Call a Professional`,
-        body: `While some maintenance tasks can be handled by homeowners, certain situations require professional expertise. Contact a qualified service provider if you encounter:\n\n- **Complex technical issues** that require specialized training\n- **Safety concerns** involving electrical, gas, or structural components\n- **Recurring problems** that don't resolve with basic maintenance\n- **System replacements** that require proper installation and permitting\n\nProfessional service providers have the training, tools, and experience to diagnose and resolve issues safely and effectively. They can also provide valuable advice on extending the life of your systems.`
+        heading: `How to Choose the Right Provider`,
+        body: `Selecting the right ${industryContext.subject} provider is one of the most important decisions you'll make. Consider these factors:\n\n- **Experience and expertise** — Look for providers with a proven track record in ${kw}.\n- **Reputation** — Check reviews, testimonials, and references from past clients.\n- **Range of services** — Choose a provider that offers comprehensive solutions to meet all your needs.\n- **Pricing and value** — Compare quotes and understand what's included. The cheapest option isn't always the best value.\n- **Customer service** — Responsive, helpful support makes a significant difference in your experience.\n\nTake your time to evaluate options and don't hesitate to ask questions. The right partner will be transparent, communicative, and committed to your success.`
       },
       {
-        heading: `Cost Considerations`,
-        body: `Understanding the costs associated with ${keyword} maintenance and repair can help you budget effectively. While preventative maintenance requires an upfront investment, it typically costs significantly less than major repairs or replacements. Many service providers offer maintenance plans that provide regular inspections at a discounted rate.\n\n**Factors affecting costs include:**\n- The complexity of the issue\n- Required parts and materials\n- Labor rates in your area\n- Whether it's a routine visit or emergency service\n\nAlways request a detailed quote before authorizing any work, and don't hesitate to ask questions about recommended services.`
+        heading: `Looking Ahead: Future Trends`,
+        body: `The landscape of ${industryContext.context} is constantly evolving. Staying ahead of emerging trends ensures you're always getting the best possible ${industryContext.subject} solutions. Key trends to watch include:\n\n- **Technological innovation** — New tools and technologies are transforming how ${industryContext.subject} is delivered.\n- **Sustainability** — Environmentally conscious practices are becoming increasingly important.\n- **Personalization** — Tailored solutions that address specific needs are replacing one-size-fits-all approaches.\n- **Digital transformation** — Online platforms and digital tools are making ${industryContext.subject} more accessible than ever.\n\nPartner with a forward-thinking provider who embraces these trends and can help you navigate the future of ${kw}.`
       }
     ];
 
-    // Build content with enough repetition to hit target word count
     let content = '';
     for (const section of sections) {
       content += `## ${section.heading}\n\n${section.body}\n\n`;
     }
 
-    // Add extra content to reach target words
     const currentWords = content.split(/\s+/).length;
     if (currentWords < targetWords) {
-      const extraSection = `## Additional Considerations\n\nWhen evaluating ${keyword} for your property, there are several additional factors to keep in mind. Every home is unique, and what works for one property may not be the best approach for another. Consulting with a qualified professional who can assess your specific situation is always the recommended course of action.\n\nRemember that investing in quality service and maintenance for ${keyword} pays dividends in the long run through improved efficiency, extended lifespan, and fewer emergency repairs. Your home is one of your most valuable assets, and proper care of ${keyword} is an essential part of protecting that investment.\n\nStay informed about the latest best practices for ${keyword} by following industry publications, attending home maintenance workshops, and building a relationship with trusted local service providers who understand your property's unique needs.\n\n`;
-      content += extraSection;
+      content += `## Additional Insights\n\nWhen evaluating ${kw} for your needs, there are several additional factors to consider. Every situation is unique, and what works for one may not be the best approach for another. Consulting with a qualified professional who can assess your specific circumstances is always the recommended course of action.\n\nRemember that investing in quality ${industryContext.subject} pays dividends in the long run through improved outcomes, greater efficiency, and fewer challenges. Your ${industryContext.stakeholder} deserves the best possible care and attention, and ${kw} is an essential part of achieving that goal.\n\nStay informed about the latest developments in ${industryContext.context} by following industry publications, attending relevant events, and building relationships with trusted providers who understand your unique needs.\n\n`;
     }
 
     return content;
+  }
+
+  private getIndustryContext(industry: string, keyword?: string): { intro: string; context: string; detail: string; subject: string; maintenance: string; stakeholder: string } {
+    const contexts: Record<string, { intro: string; context: string; detail: string; subject: string; maintenance: string; stakeholder: string }> = {
+      'accounting': { intro: 'managing your business finances', context: 'financial management and business operations', detail: 'Professional financial services help businesses maintain accurate records, optimize tax strategies, and make informed decisions.', subject: 'financial services', maintenance: 'financial reviews', stakeholder: 'business' },
+      'marketing': { intro: 'growing your brand online', context: 'digital marketing and brand building', detail: 'Effective marketing strategies help businesses connect with their target audience, build brand awareness, and drive measurable results.', subject: 'marketing services', maintenance: 'performance reviews', stakeholder: 'brand' },
+      'cx': { intro: 'delivering exceptional customer experiences', context: 'customer experience and support services', detail: 'Outstanding customer experience is the cornerstone of business success, driving loyalty, satisfaction, and growth.', subject: 'CX solutions', maintenance: 'quality assessments', stakeholder: 'business' },
+      'digital': { intro: 'navigating the digital landscape', context: 'digital solutions and technology services', detail: 'Comprehensive digital solutions help businesses leverage technology to improve operations, reach customers, and drive innovation.', subject: 'digital services', maintenance: 'system updates', stakeholder: 'organization' },
+      'pharma': { intro: 'advancing healthcare and medicine', context: 'pharmaceutical manufacturing and healthcare', detail: 'Quality pharmaceutical manufacturing is essential for delivering safe, effective healthcare products to patients worldwide.', subject: 'pharmaceutical solutions', maintenance: 'quality controls', stakeholder: 'community' },
+      'veterinary': { intro: 'caring for your beloved pets', context: 'veterinary medicine and pet care', detail: 'Compassionate veterinary care ensures your pets live healthy, happy lives with proper medical attention and preventive treatments.', subject: 'veterinary services', maintenance: 'health checkups', stakeholder: 'pet' },
+      'architecture': { intro: 'designing beautiful and functional spaces', context: 'architecture and interior design', detail: 'Professional architectural and interior design services transform spaces into beautiful, functional environments that inspire and delight.', subject: 'design services', maintenance: 'design reviews', stakeholder: 'property' },
+      'consulting': { intro: 'building sustainable solutions', context: 'business consulting and development', detail: 'Expert consulting services help organizations develop strategies, optimize operations, and achieve sustainable growth.', subject: 'consulting services', maintenance: 'strategy reviews', stakeholder: 'organization' },
+      'design': { intro: 'creating compelling visual identities', context: 'creative design and branding', detail: 'Professional design services help businesses create memorable brand identities that resonate with their target audience.', subject: 'design solutions', maintenance: 'brand audits', stakeholder: 'brand' },
+      'cosmetics': { intro: 'enhancing natural beauty', context: 'cosmetics and beauty products', detail: 'Premium cosmetics and beauty products help people express their unique style and enhance their natural features with confidence.', subject: 'beauty products', maintenance: 'product updates', stakeholder: 'customer' },
+      'insurance': { intro: 'protecting what matters most', context: 'insurance and risk management', detail: 'Comprehensive insurance solutions provide peace of mind by protecting individuals and businesses against unexpected events.', subject: 'insurance coverage', maintenance: 'policy reviews', stakeholder: 'client' },
+      'laboratory': { intro: 'equipping scientific excellence', context: 'laboratory equipment and design', detail: 'Quality laboratory furniture and design solutions create safe, efficient workspaces for scientific research and education.', subject: 'lab solutions', maintenance: 'equipment checks', stakeholder: 'institution' },
+      'fitness': { intro: 'achieving your fitness goals', context: 'fitness training and wellness', detail: 'Personalized fitness training and nutrition coaching help individuals transform their health, build strength, and achieve lasting results.', subject: 'fitness programs', maintenance: 'progress assessments', stakeholder: 'client' },
+      'skincare': { intro: 'nurturing radiant, healthy skin', context: 'skincare and beauty', detail: 'Premium skincare products nourish and protect your skin, helping you maintain a healthy, youthful glow with natural ingredients.', subject: 'skincare products', maintenance: 'routine updates', stakeholder: 'skin' },
+      'webdesign': { intro: 'creating stunning digital experiences', context: 'web design and user experience', detail: 'Professional web design and UI/UX services create engaging digital experiences that captivate users and drive business results.', subject: 'design services', maintenance: 'design iterations', stakeholder: 'brand' },
+      'general': { intro: `making the most of ${this.capitalize(keyword || 'your keyword')}`, context: `${keyword || 'your keyword'} and related services`, detail: `Professional ${keyword || 'your keyword'} services provide quality solutions tailored to your specific needs and requirements.`, subject: `${keyword || 'your keyword'} services`, maintenance: 'regular reviews', stakeholder: 'organization' },
+    };
+    return contexts[industry] || contexts.general;
   }
 
   private capitalize(str: string): string {

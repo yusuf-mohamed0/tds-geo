@@ -7,6 +7,7 @@ import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable, Column } from '../components/DataTable'
 import { InputField, SelectField, CheckboxField, FormRow } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 const STATUS_BADGE: Record<string, string> = {
   published: 'green', draft: 'gray', generated: 'yellow',
@@ -243,7 +244,7 @@ function GenerateForm({ onGenerated }: { onGenerated: () => void }) {
       </FormRow>
 
       <button type="submit" className="btn btn-primary" disabled={loading || !clientId}>
-        {loading ? '⏳ Generating...' : '🚀 Generate Article'}
+        {loading ? <><Icon name="loading" spin /> Generating...</> : <><Icon name="publish" /> Generate Article</>}
       </button>
     </form>
   )

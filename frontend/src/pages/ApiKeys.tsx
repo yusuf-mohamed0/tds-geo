@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
-import { apiKeysApi } from '../services/api'
+import { apiKeysApi, metaApi } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable } from '../components/DataTable'
 import { InputField, SelectField, FormRow } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 import type { ApiKey } from '../types'
 
-const SERVICES = ['openai', 'serpapi', 'shopify', 'google_trends', 'google_search_console', 'anthropic', 'stability_ai', 'custom']
+const FALLBACK_SERVICES = ['openai', 'serpapi', 'shopify', 'google_trends', 'google_search_console', 'anthropic', 'stability_ai', 'custom']
 
 export default function ApiKeys() {
   const { user } = useAuth()
@@ -15,12 +16,24 @@ export default function ApiKeys() {
   const { addToast } = useToast()
   const [keys, setKeys] = useState<ApiKey[]>([])
   const [loading, setLoading] = useState(true)
+  const [services, setServices] = useState<string[]>(FALLBACK_SERVICES)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ service: 'openai', label: '', keyValue: '', permissions: '' })
   const [error, setError] = useState('')
   const [clientIdInput, setClientIdInput] = useState(clientId)
 
   useEffect(() => { loadKeys() }, [clientIdInput])
+
+  // Fetch available services from server (prompt hardening)
+  useEffect(() => {
+    metaApi.getServices().then(data => {
+      if (data?.services?.length) {
+        setServices(data.services.map((s: { id: string }) => s.id));
+      }
+    }).catch(() => {
+      // Fallback services already set
+    });
+  }, [])
 
   async function loadKeys() {
     if (!clientIdInput) { setLoading(false); return }
@@ -109,7 +122,7 @@ export default function ApiKeys() {
     <div className="page">
       <div className="page-header">
         <div>
-          <h1>🔑 API Keys</h1>
+          <h1><Icon name="api-keys" /> API Keys</h1>
           <p className="text-secondary">Manage API keys for external services</p>
         </div>
         <div className="page-actions">
@@ -137,7 +150,7 @@ export default function ApiKeys() {
             <form onSubmit={handleCreate}>
               <FormRow>
                 <SelectField label="Service" value={form.service} onChange={e => setForm({ ...form, service: e.target.value })}
-                  options={SERVICES.map(s => ({ value: s, label: s }))} />
+                  options={services.map(s => ({ value: s, label: s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ') }))} />
                 <InputField label="Label" value={form.label} onChange={e => setForm({ ...form, label: e.target.value })}
                   placeholder="e.g., OpenAI Production" required />
               </FormRow>

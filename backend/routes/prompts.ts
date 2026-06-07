@@ -192,5 +192,73 @@ export function createPromptRoutes(pool: Pool): Router {
     } catch (err) { next(err); }
   });
 
+  // ══════════════════════════════════════════════
+  // Content Briefs (for copywriters)
+  // ══════════════════════════════════════════════
+
+  // ─── Submit a content brief ───────────────────
+  router.post('/briefs', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = (req as any).user;
+      const { keyword, topic, targetAudience, tone, keyPoints, references, notes, clientId } = req.body;
+
+      if (!keyword && !topic) {
+        res.status(400).json({ error: 'keyword or topic is required' });
+        return;
+      }
+
+      const result = await pool.query(
+        `INSERT INTO content_briefs (client_id, keyword, topic, target_audience, tone, key_points, ref_urls, notes, submitted_by, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending')
+         RETURNING *`,
+        [
+          clientId || user.clientId || null,
+          keyword || topic,
+          topic || keyword,
+          targetAudience || '',
+          tone || 'professional',
+          keyPoints || [],
+          references || [],
+          notes || '',
+          user.userId
+        ]
+      );
+
+      await logActivity(pool, {
+        clientId: result.rows[0].client_id || '',
+        action: 'content_brief_submitted',
+        entityType: 'content_brief',
+        entityId: result.rows[0].id,
+        level: 'info',
+        message: `Content brief submitted: ${result.rows[0].keyword}`
+      });
+
+      res.status(201).json(result.rows[0]);
+    } catch (err) { next(err); }
+  });
+
+  // ─── List content briefs ──────────────────────
+  router.get('/briefs', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = (req as any).user;
+      const { status, clientId } = req.query;
+      let query = `
+        SELECT cb.*, u.name as submitted_by_name
+        FROM content_briefs cb
+        LEFT JOIN users u ON u.id = cb.submitted_by
+        WHERE 1=1`;
+      const params: any[] = [];
+      let idx = 1;
+
+      if (status) { query += ` AND cb.status = $${idx++}`; params.push(status); }
+      if (clientId) { query += ` AND cb.client_id = $${idx++}`; params.push(clientId); }
+      else if (user.clientId) { query += ` AND cb.client_id = $${idx++}`; params.push(user.clientId); }
+
+      query += ' ORDER BY cb.created_at DESC LIMIT 50';
+      const result = await pool.query(query, params);
+      res.json({ briefs: result.rows, total: result.rows.length });
+    } catch (err) { next(err); }
+  });
+
   return router;
 }

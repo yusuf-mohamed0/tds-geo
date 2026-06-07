@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody } from '../components/Card'
 import { Modal } from '../components/Modal'
 import { InputField, SelectField, TextareaField, ToggleField, FormRow } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 import type { Plugin } from '../types'
 
 export default function Plugins() {
@@ -80,7 +81,7 @@ export default function Plugins() {
   if (!clientIdInput) {
     return (
       <div className="page">
-        <div className="page-header"><h1>🧩 Plugins</h1></div>
+        <div className="page-header"><h1><Icon name="plugins" /> Plugins</h1></div>
         <CardBody><p className="text-secondary">Select a client to manage plugins.</p></CardBody>
       </div>
     )
@@ -90,7 +91,7 @@ export default function Plugins() {
     <div className="page">
       <div className="page-header">
         <div>
-          <h1>🧩 Plugin System</h1>
+          <h1><Icon name="plugins" /> Plugin System</h1>
           <p className="text-secondary">Extend platform capabilities with plugins</p>
         </div>
         {!user?.client_id && (

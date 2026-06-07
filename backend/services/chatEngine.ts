@@ -642,9 +642,10 @@ Respond with JSON ONLY:
       }
     }
 
-    // Step 2: Try AI conversation (requires API key)
+    // Step 2: Search database for relevant context and try AI conversation
     if (!openaiService.isMockMode) {
-      const aiResponse = await this.aiConversation(trimmed, history, user);
+      const dbContext = await this.searchDatabase(trimmed, user);
+      const aiResponse = await this.aiConversation(trimmed, history, user, dbContext);
       if (aiResponse) {
         return aiResponse;
       }
@@ -675,20 +676,154 @@ Respond with JSON ONLY:
   }
 
   /**
-   * Conversational AI via DeepSeek (or OpenAI fallback).
-   * Builds a comprehensive system prompt covering ALL platform features.
+   * Search the database for context relevant to the user's query.
+   * Searches clients, articles, keywords, and activity logs.
+   */
+  private async searchDatabase(
+    input: string,
+    user: { userId: string; role: string; clientId?: string }
+  ): Promise<string> {
+    if (!this.pool) return '';
+
+    const lower = input.toLowerCase();
+
+    // Extract meaningful search terms (remove common stop words and chat filler)
+    const stopWords = new Set([
+      'tell', 'me', 'what', 'we', 'did', 'for', 'about', 'the', 'a', 'an', 'is', 'are',
+      'was', 'were', 'show', 'give', 'get', 'find', 'list', 'all', 'how', 'many', 'any',
+      'some', 'can', 'you', 'they', 'them', 'this', 'that', 'with', 'from', 'have', 'has',
+      'been', 'being', 'does', 'done', 'doing', 'make', 'made', 'need', 'know',
+      'want', 'like', 'just', 'will', 'would', 'could', 'should', 'has', 'had', 'its'
+    ]);
+
+    const terms = lower
+      .replace(/[^a-z0-9\s-]/g, ' ')
+      .split(/\s+/)
+      .filter(t => t.length > 2 && !stopWords.has(t))
+      .map(t => t.trim());
+
+    if (terms.length === 0) return '';
+
+    try {
+      const contextParts: string[] = [];
+      const seenClientIds = new Set<string>();
+
+      // ── Search clients by name ──
+      const likeClauses = terms.map((_, i) => `LOWER(c.name) LIKE $${i + 1}`).join(' OR ');
+      const clientResult = await this.pool.query(
+        `SELECT c.id, c.name, c.slug, c.is_active, c.created_at,
+                (SELECT COUNT(*) FROM articles a WHERE a.client_id = c.id) as article_count
+         FROM clients c
+         WHERE c.is_active = true AND (${likeClauses})
+         ORDER BY c.name LIMIT 10`,
+        terms.map(t => `%${t}%`)
+      );
+
+      if (clientResult.rows.length > 0) {
+        const clientLines: string[] = ['📋 **CLIENTS FOUND:**'];
+        for (const c of clientResult.rows) {
+          seenClientIds.add(c.id);
+          clientLines.push(`  • ${c.name} (slug: ${c.slug}) — ${c.article_count} articles`);
+        }
+        contextParts.push(clientLines.join('\n'));
+      }
+
+      // ── Search articles by title ──
+      const articleLikeClauses = terms.map((_, i) => `LOWER(a.title) LIKE $${i + 1}`).join(' OR ');
+      const articleResult = await this.pool.query(
+        `SELECT a.id, a.title, a.status, a.seo_score, a.created_at, c.name as client_name, c.id as client_id
+         FROM articles a
+         JOIN clients c ON c.id = a.client_id
+         WHERE (${articleLikeClauses})
+         ORDER BY a.created_at DESC
+         LIMIT 15`,
+        terms.map(t => `%${t}%`)
+      );
+
+      if (articleResult.rows.length > 0) {
+        const articleLines: string[] = ['\n📄 **ARTICLES FOUND:**'];
+        for (const a of articleResult.rows) {
+          seenClientIds.add(a.client_id);
+          const seo = a.seo_score != null ? `SEO: ${a.seo_score}` : 'No score';
+          articleLines.push(`  • "${a.title}" — ${a.client_name} | Status: ${a.status} | ${seo} | ${new Date(a.created_at).toLocaleDateString()}`);
+        }
+        contextParts.push(articleLines.join('\n'));
+      }
+
+      // ── Search keywords ──
+      const kwLikeClauses = terms.map((_, i) => `LOWER(k.keyword) LIKE $${i + 1}`).join(' OR ');
+      const kwResult = await this.pool.query(
+        `SELECT k.keyword, k.search_volume, k.relevance_score, k.intent, c.name as client_name
+         FROM keywords k
+         JOIN clients c ON c.id = k.client_id
+         WHERE k.is_active = true AND (${kwLikeClauses})
+         ORDER BY k.relevance_score DESC NULLS LAST
+         LIMIT 10`,
+        terms.map(t => `%${t}%`)
+      );
+
+      if (kwResult.rows.length > 0) {
+        const kwLines: string[] = ['\n🔑 **KEYWORDS FOUND:**'];
+        for (const k of kwResult.rows) {
+          const vol = k.search_volume != null ? `Vol: ${k.search_volume}` : 'No volume data';
+          const score = k.relevance_score != null ? `Relevance: ${k.relevance_score}` : '';
+          kwLines.push(`  • "${k.keyword}" — ${k.client_name} | ${vol}${score ? ` | ${score}` : ''} | Intent: ${k.intent || 'N/A'}`);
+        }
+        contextParts.push(kwLines.join('\n'));
+      }
+
+      // ── Activity logs for matched clients ──
+      if (seenClientIds.size > 0) {
+        const logResult = await this.pool.query(
+          `SELECT al.action, al.message, al.level, al.created_at, c.name as client_name
+           FROM activity_logs al
+           JOIN clients c ON c.id = al.client_id
+           WHERE al.client_id = ANY($1::uuid[])
+           ORDER BY al.created_at DESC
+           LIMIT 15`,
+          [Array.from(seenClientIds)]
+        );
+
+        if (logResult.rows.length > 0) {
+          const logLines: string[] = ['\n📋 **RECENT ACTIVITY:**'];
+          for (const l of logResult.rows) {
+            const icon = l.level === 'error' ? '🔴' : l.level === 'warn' ? '🟡' : '🟢';
+            logLines.push(`  ${icon} [${l.client_name}] ${l.action}: ${l.message} — ${new Date(l.created_at).toLocaleDateString()}`);
+          }
+          contextParts.push(logLines.join('\n'));
+        }
+      }
+
+      if (contextParts.length === 0) return '';
+
+    const fullContext = contextParts.join('\n');
+    // Limit context to 2000 chars to avoid overflowing the AI prompt
+    return fullContext.length > 2000 ? fullContext.slice(0, 2000) + '\n... (results truncated)' : fullContext;
+    } catch (err) {
+      logger.warn('Database context search failed', { input, error: (err as Error).message });
+      return '';
+    }
+  }
+
+  /**
+   * Conversational AI via OpenAI.
+   * Builds a comprehensive system prompt covering ALL platform features,
+   * enriched with real database context when available.
    */
   private async aiConversation(
     input: string,
     history: Array<{ role: string; content: string }>,
-    user: { userId: string; role: string; clientId?: string }
+    user: { userId: string; role: string; clientId?: string },
+    dbContext: string = ''
   ): Promise<CommandResult | null> {
-    const providerName = openaiService.provider === 'deepseek' ? 'DeepSeek' : 'OpenAI';
+    const providerName = 'OpenAI';
     const systemPrompt = `You are Buffy, a strategic full-stack AI assistant powered by ${providerName} Intelligence. You manage an entire AI SEO Automation SaaS platform. You are professional, direct, concise, and proactive.
 
-## YOUR CAPABILITIES (Full Platform Control)
+## YOUR CAPABILITIES
 
-You have complete access to manage **every feature** of this SaaS platform through natural language commands. Here is everything you can do:
+You can manage platform features by executing natural language commands (listed below). **Important: you only see data that the system returns from these commands — you do NOT have direct database access.** Never fabricate data you haven't received from a command execution.
+
+Here is everything you can do:
 
 ### 📝 Content Management
 - **Generate Articles**: "generate 5 articles about [topic] for client [id]" — Queues article generation via AI writing engine. Supports tone, word count, and target keywords.
@@ -711,7 +846,7 @@ You have complete access to manage **every feature** of this SaaS platform throu
 
 ### 🔑 API Key Management
 - **List API Keys**: "list api keys" or "list api keys for client [id]"
-- **Add API Key**: "add [service] api key for client [id]" — For OpenAI, DeepSeek, Shopify, SERP, Google, etc.
+- **Add API Key**: "add [service] api key for client [id]" — For OpenAI, Shopify, SERP, Google, etc.
 - **Toggle/Troubleshoot**: Check if API keys are active and working.
 
 ### 🧩 Plugin System
@@ -748,6 +883,18 @@ You have complete access to manage **every feature** of this SaaS platform throu
 - **List Users**: "list users" — All platform users with roles.
 - **Permissions**: Built-in RBAC — admin, editor, client roles.
 
+## REAL-TIME DATABASE CONTEXT
+
+The following data was **actually queried from your database** in real-time based on the user's message. Use this to answer accurately. If this section says "No relevant data found", tell the user honestly what you found (or didn't find).
+
+${
+  dbContext
+    ? dbContext
+    : 'No relevant data found in the database matching your query.'
+}
+
+---
+
 ## BEHAVIOR RULES
 
 1. When the user asks to DO something (generate, publish, list, create, analyze, etc.), identify the matching command and respond with clear confirmation. If you can execute the command pattern, start your response with the result.
@@ -759,10 +906,20 @@ You have complete access to manage **every feature** of this SaaS platform throu
 7. **Cross-reference data**: When the user asks about one feature, consider showing related analytics. E.g., when listing articles, note the SEO trends. When showing costs, mention efficiency improvements.
 8. Use the user's role appropriately. If they're an editor, don't suggest admin-only actions.
 
+9. ⚠️ **HONESTY ABOVE ALL — NEVER FABRICATE DATA.** The database context above is REAL data. You MUST:
+   - ✅ Reference the data above to answer questions specifically and accurately.
+   - ✅ If no data was found, say directly: "I searched the database but didn't find anything matching that."
+   - ✅ When showing data, present it in a clean, readable format.
+   - ❌ NEVER add extra clients, articles, or stats beyond what's shown above.
+   - ❌ NEVER guess additional details about a client or article you don't have.
+   - ❌ NEVER pretend to have retrieved data when the database context section shows no data.
+
+10. **Clarify your capabilities honestly.** If you're asked about something outside your scope, say so directly — don't make up a capability you don't have.
+
 User info: role=${user.role}, clientId=${user.clientId || 'none (admin — full access)'}
 AI Provider: ${providerName}
 
-IMPORTANT: Your responses ARE the assistant messages shown in the chat. Be natural, helpful, and thorough.`;
+IMPORTANT: Your responses ARE the assistant messages shown in the chat. Use the REAL DATABASE CONTEXT above to answer accurately. If no relevant data was found, say so honestly. HONESTY is your most important trait — it's better to say "I don't know" than to make something up.`;
 
     // Build message history (last 20 messages)
     const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [

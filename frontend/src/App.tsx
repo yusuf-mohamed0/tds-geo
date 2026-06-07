@@ -25,12 +25,14 @@ import FactChecking from './pages/FactChecking'
 import CmsConnections from './pages/CmsConnections'
 import CostOptimization from './pages/CostOptimization'
 import Observability from './pages/Observability'
+import WorkerPerformance from './pages/WorkerPerformance'
 import QueueDashboard from './pages/QueueDashboard'
 import ContentIntelligence from './pages/ContentIntelligence'
 import AiEvaluation from './pages/AiEvaluation'
 import Security from './pages/Security'
 import Pexels from './pages/Pexels'
 import ShopifyWelcome from './pages/ShopifyWelcome'
+import CopywriterDashboard from './pages/CopywriterDashboard'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth()
@@ -57,11 +59,13 @@ export default function App() {
         <Route path="articles/:id" element={<ArticleDetail />} />
         <Route path="pipeline" element={<PipelineDashboard />} />
         <Route path="editorial" element={<EditorialWorkflow />} />
+        <Route path="copywriter" element={<CopywriterDashboard />} />
         <Route path="brand-voice" element={<BrandVoice />} />
         <Route path="fact-check" element={<FactChecking />} />
         <Route path="cms" element={<CmsConnections />} />
         <Route path="cost" element={<CostOptimization />} />
         <Route path="observability" element={<Observability />} />
+        <Route path="worker-performance" element={<WorkerPerformance />} />
         <Route path="queue" element={<QueueDashboard />} />
         <Route path="content-intel" element={<ContentIntelligence />} />
         <Route path="evaluation" element={<AiEvaluation />} />

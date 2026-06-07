@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { DashboardOverview, AdminDashboard, Article, EnterpriseDashboardData, EditorialReviewAssignment, SystemAlert } from '../types'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable, Column } from '../components/DataTable'
+import Icon from '../components/Icon'
 
 export default function Dashboard() {
   const { isAdmin, user } = useAuth()
@@ -35,22 +36,14 @@ export default function Dashboard() {
           ])
           mainData = { ...overviewData, recentArticles: articles.data || [] }
         } else {
-          const articles = await articlesApi.list({ limit: 5 })
+          // No client_id or admin role — server-side aggregation not available.
+          // Return an empty state rather than constructing data client-side.
           mainData = {
-            articles: {
-              total: articles.total || 0,
-              published: articles.data?.filter((a: Article) => a.status === 'published').length || 0,
-              pending: articles.data?.filter((a: Article) => a.status === 'generated' || a.status === 'draft').length || 0,
-              approved: articles.data?.filter((a: Article) => a.status === 'approved').length || 0,
-              rejected: articles.data?.filter((a: Article) => a.status === 'rejected').length || 0,
-              failed: articles.data?.filter((a: Article) => a.status === 'failed').length || 0,
-              avg_word_count: 0,
-              avg_seo_score: 0,
-            },
-            keywords: { total: 0, unused: 0, used_30d: 0 },
-            publishing: { total: 0, last_30d: 0 },
-            recentArticles: articles.data || [],
-            costs: { total_cost: 0, total_tokens: 0, api_calls: 0 },
+            articles: null,
+            keywords: null,
+            publishing: null,
+            costs: null,
+            recentArticles: [],
           }
         }
         setOverview(mainData)
@@ -156,8 +149,8 @@ export default function Dashboard() {
           <p>AI automation overview with editorial, observability, and content intelligence</p>
         </div>
         <div className="card-actions">
-          <Link to="/pipeline" className="btn btn-primary">🚀 Run Pipeline</Link>
-          <Link to="/articles?action=generate" className="btn btn-outline">+ Generate Article</Link>
+          <Link to="/pipeline" className="btn btn-primary"><Icon name="publish" size="sm" /> Run Pipeline</Link>
+          <Link to="/articles?action=generate" className="btn btn-outline"><Icon name="add" size="sm" /> Generate Article</Link>
         </div>
       </div>
 
@@ -165,42 +158,42 @@ export default function Dashboard() {
         {/* Main Stats Grid */}
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon purple">📝</div>
+            <div className="stat-icon purple"><Icon name="articles" size="lg" /></div>
             <div>
               <div className="stat-value">{stats.articles?.total ?? 0}</div>
               <div className="stat-label">Total Articles</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon green">✅</div>
+            <div className="stat-icon green"><Icon name="check" size="lg" /></div>
             <div>
               <div className="stat-value">{stats.articles?.published || 0}</div>
               <div className="stat-label">Published</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon yellow">⏳</div>
+            <div className="stat-icon yellow"><Icon name="pending" size="lg" /></div>
             <div>
               <div className="stat-value">{stats.articles?.pending || stats.articles?.pending_review || 0}</div>
               <div className="stat-label">Pending Review</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon purple">🔑</div>
+            <div className="stat-icon purple"><Icon name="keyword" size="lg" /></div>
             <div>
               <div className="stat-value">{stats.keywords?.total || 0}</div>
               <div className="stat-label">Keywords Tracked</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon blue">🚀</div>
+            <div className="stat-icon blue"><Icon name="publish" size="lg" /></div>
             <div>
               <div className="stat-value">{stats.publishing?.total ?? 0}</div>
               <div className="stat-label">Total Published</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon red">💰</div>
+            <div className="stat-icon red"><Icon name="api-usage" size="lg" /></div>
             <div>
               <div className="stat-value">${Number(stats.costs?.total_cost ?? stats.costs?.total_cost_mtd ?? 0).toFixed(2)}</div>
               <div className="stat-label">Cost (Month)</div>
@@ -213,7 +206,7 @@ export default function Dashboard() {
           {/* Editorial Queue */}
           <Link to="/editorial" className="dashboard-widget">
             <div className="dashboard-widget-header">
-              <span className="dashboard-widget-icon">👥</span>
+              <span className="dashboard-widget-icon"><Icon name="editorial" size="lg" /></span>
               <span className="dashboard-widget-title">Editorial Queue</span>
             </div>
             <div className="dashboard-widget-body">
@@ -223,7 +216,7 @@ export default function Dashboard() {
               </div>
               {enterpriseData.overdueReviews > 0 && (
                 <div className="dashboard-widget-alert">
-                  ⚠️ {enterpriseData.overdueReviews} overdue
+                  <Icon name="warning" /> {enterpriseData.overdueReviews} overdue
                 </div>
               )}
               {enterpriseData.pendingReviews === 0 && (
@@ -235,7 +228,7 @@ export default function Dashboard() {
           {/* Observability */}
           <Link to="/observability" className="dashboard-widget">
             <div className="dashboard-widget-header">
-              <span className="dashboard-widget-icon">📊</span>
+              <span className="dashboard-widget-icon"><Icon name="observability" size="lg" /></span>
               <span className="dashboard-widget-title">System Health</span>
             </div>
             <div className="dashboard-widget-body">
@@ -247,7 +240,7 @@ export default function Dashboard() {
               </div>
               {enterpriseData.criticalAlerts > 0 && (
                 <div className="dashboard-widget-alert" style={{ background: '#fee2e2', color: '#991b1b' }}>
-                  🚨 {enterpriseData.criticalAlerts} critical
+                  <Icon name="bell" /> {enterpriseData.criticalAlerts} critical
                 </div>
               )}
               {enterpriseData.activeAlerts === 0 && (
@@ -259,7 +252,7 @@ export default function Dashboard() {
           {/* Pipeline */}
           <Link to="/pipeline" className="dashboard-widget">
             <div className="dashboard-widget-header">
-              <span className="dashboard-widget-icon">🔧</span>
+              <span className="dashboard-widget-icon"><Icon name="pipeline" size="lg" /></span>
               <span className="dashboard-widget-title">Pipeline</span>
             </div>
             <div className="dashboard-widget-body">
@@ -276,7 +269,7 @@ export default function Dashboard() {
           {/* Content Intel */}
           <Link to="/content-intel" className="dashboard-widget">
             <div className="dashboard-widget-header">
-              <span className="dashboard-widget-icon">🧠</span>
+              <span className="dashboard-widget-icon"><Icon name="content-intel" size="lg" /></span>
               <span className="dashboard-widget-title">Content Intelligence</span>
             </div>
             <div className="dashboard-widget-body">
@@ -294,7 +287,7 @@ export default function Dashboard() {
           {/* Brand Voice */}
           <Link to="/brand-voice" className="dashboard-widget">
             <div className="dashboard-widget-header">
-              <span className="dashboard-widget-icon">🎙️</span>
+              <span className="dashboard-widget-icon"><Icon name="brand-voice" size="lg" /></span>
               <span className="dashboard-widget-title">Brand Voice</span>
             </div>
             <div className="dashboard-widget-body">
@@ -314,7 +307,7 @@ export default function Dashboard() {
           {/* Queues */}
           <Link to="/queue" className="dashboard-widget">
             <div className="dashboard-widget-header">
-              <span className="dashboard-widget-icon">📋</span>
+              <span className="dashboard-widget-icon"><Icon name="queues" size="lg" /></span>
               <span className="dashboard-widget-title">Job Queues</span>
             </div>
             <div className="dashboard-widget-body">

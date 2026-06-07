@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { promptsApi } from '../services/api'
+import { promptsApi, metaApi } from '../services/api'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { InputField, SelectField, TextareaField, FormRow } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 import type { PromptTemplate } from '../types'
 
 export default function Prompts() {
@@ -11,12 +12,27 @@ export default function Prompts() {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<PromptTemplate | null>(null)
   const [editMode, setEditMode] = useState(false)
+  const [availableModels, setAvailableModels] = useState<{ id: string; label: string; provider: string }[]>([
+    { id: 'gpt-4o', label: 'GPT-4o', provider: 'openai' },
+    { id: 'gpt-4o-mini', label: 'GPT-4o Mini', provider: 'openai' },
+  ])
   const [editForm, setEditForm] = useState({ systemPrompt: '', userTemplate: '', model: '', temperature: 0.7, maxTokens: 2048 })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showVersions, setShowVersions] = useState(false)
 
   useEffect(() => { loadTemplates() }, [])
+
+  // Fetch available models from server (prompt hardening)
+  useEffect(() => {
+    metaApi.getModels().then(data => {
+      if (data?.models?.length) {
+        setAvailableModels(data.models);
+      }
+    }).catch(() => {
+      // Fallback models already set
+    });
+  }, [])
 
   async function loadTemplates() {
     try {
@@ -75,7 +91,7 @@ export default function Prompts() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1>📋 Prompt Editor</h1>
+        <h1><Icon name="prompts" /> Prompt Editor</h1>
         <p className="text-secondary">Edit AI behavior templates live — changes apply immediately</p>
       </div>
 
@@ -149,13 +165,7 @@ export default function Prompts() {
                     <FormRow>
                       <SelectField label="Model" value={editForm.model}
                         onChange={e => setEditForm({ ...editForm, model: e.target.value })}
-                        options={[
-                          { value: 'gpt-4o', label: 'GPT-4o' },
-                          { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
-                          { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
-                          { value: 'claude-3-opus', label: 'Claude 3 Opus' },
-                          { value: 'claude-3-sonnet', label: 'Claude 3 Sonnet' },
-                        ]} />
+                        options={availableModels.map(m => ({ value: m.id, label: m.label }))} />
                       <div className="form-group">
                         <label>Temperature ({editForm.temperature})</label>
                         <input type="range" className="form-input"

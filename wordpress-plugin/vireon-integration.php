@@ -1,0 +1,174 @@
+<?php
+/**
+ * Plugin Name:     Vireon WordPress Integration
+ * Plugin URI:      https://vireon.io/wordpress
+ * Description:     Connect your WordPress site to Vireon — AI-powered SEO content automation. Receive, manage, and publish AI-generated articles directly from the Vireon platform.
+ * Version:         1.0.0
+ * Requires PHP:    7.4
+ * Requires WP:     5.6
+ * Author:          Vireon
+ * Author URI:      https://vireon.io
+ * License:         GPL v2 or later
+ * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:     vireon-integration
+ * Domain Path:     /languages
+ *
+ * @package Vireon_Integration
+ */
+
+// ──────────────────────────────────────────────
+// SECURITY: Prevent direct access
+// ──────────────────────────────────────────────
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// ──────────────────────────────────────────────
+// PLUGIN CONSTANTS
+// ──────────────────────────────────────────────
+define('VIREON_VERSION', '1.0.0');
+define('VIREON_PLUGIN_FILE', __FILE__);
+define('VIREON_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('VIREON_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('VIREON_API_NAMESPACE', 'vireon/v1');
+define('VIREON_DB_VERSION', '1.0.0');
+define('VIREON_LOG_TABLE', 'vireon_logs');
+define('VIREON_SETTINGS_OPTION', 'vireon_settings');
+
+// ──────────────────────────────────────────────
+// AUTOLOADER
+// ──────────────────────────────────────────────
+spl_autoload_register(function ($class) {
+    $prefix = 'Vireon_';
+    $base_dir = VIREON_PLUGIN_DIR . 'includes/';
+
+    if (strncmp($prefix, $class, strlen($prefix)) !== 0) {
+        return;
+    }
+
+    $relative_class = substr($class, strlen($prefix));
+    $file = $base_dir . 'class-' . strtolower(str_replace('_', '-', $relative_class)) . '.php';
+
+    if (file_exists($file)) {
+        require_once $file;
+    }
+});
+
+// ──────────────────────────────────────────────
+// HOOKS: Activation, Deactivation, Uninstall
+// ──────────────────────────────────────────────
+register_activation_hook(__FILE__, 'vireon_activate');
+register_deactivation_hook(__FILE__, 'vireon_deactivate');
+
+/**
+ * Plugin activation — creates DB tables and default settings.
+ */
+function vireon_activate(): void {
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    global $wpdb;
+
+    $charset_collate = $wpdb->get_charset_collate();
+
+    // Logs table
+    $log_table = $wpdb->prefix . VIREON_LOG_TABLE;
+    $sql_log = "CREATE TABLE IF NOT EXISTS {$log_table} (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        level VARCHAR(20) NOT NULL DEFAULT 'info',
+        message TEXT NOT NULL,
+        context LONGTEXT DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_level (level),
+        INDEX idx_created (created_at)
+    ) {$charset_collate};";
+
+    dbDelta($sql_log);
+
+    // API keys table
+    $keys_table = $wpdb->prefix . 'vireon_api_keys';
+    $sql_keys = "CREATE TABLE IF NOT EXISTS {$keys_table} (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        api_key VARCHAR(64) NOT NULL UNIQUE,
+        label VARCHAR(100) DEFAULT NULL,
+        permissions VARCHAR(255) NOT NULL DEFAULT 'read,write',
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        last_used_at DATETIME DEFAULT NULL,
+        expires_at DATETIME DEFAULT NULL,
+        created_by BIGINT UNSIGNED DEFAULT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_api_key (api_key),
+        INDEX idx_is_active (is_active)
+    ) {$charset_collate};";
+
+    dbDelta($sql_keys);
+
+    // Default settings
+    $defaults = [
+        'api_enabled'      => 'yes',
+        'log_level'        => 'error',
+        'auto_import_tags' => 'yes',
+        'auto_import_cats' => 'yes',
+        'default_status'   => 'draft',
+        'default_author'   => get_current_user_id(),
+        'enable_webhooks'  => 'no',
+        'webhook_secret'   => '',
+        'debug_mode'       => 'no',
+    ];
+
+    if (!get_option(VIREON_SETTINGS_OPTION)) {
+        add_option(VIREON_SETTINGS_OPTION, $defaults, '', 'yes');
+    }
+
+    // Generate an initial API key
+    if (!get_option('vireon_initial_api_key')) {
+        $api_key = 'vrn_' . bin2hex(random_bytes(24));
+        add_option('vireon_initial_api_key', $api_key, '', 'no');
+
+        $wpdb->insert(
+            $keys_table,
+            [
+                'api_key'     => $api_key,
+                'label'       => 'Auto-generated (activation)',
+                'permissions' => 'read,write',
+                'is_active'   => 1,
+                'created_by'  => get_current_user_id(),
+            ],
+            ['%s', '%s', '%s', '%d', '%d']
+        );
+    }
+
+    add_option('vireon_db_version', VIREON_DB_VERSION);
+}
+
+/**
+ * Plugin deactivation — cleanup if needed.
+ */
+function vireon_deactivate(): void {
+    // Optionally flush rewrite rules
+    flush_rewrite_rules();
+}
+
+// ──────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────
+add_action('plugins_loaded', 'vireon_init');
+
+function vireon_init(): void {
+    // Load text domain for translations
+    load_plugin_textdomain('vireon-integration', false, dirname(plugin_basename(__FILE__)) . '/languages');
+
+    // Initialize components
+    Vireon_Logger::init();
+    Vireon_Auth::init();
+    Vireon_Admin::init();
+    Vireon_API::init();
+    Vireon_Sync::init();
+}
+
+/**
+ * On activation, ensure rewrite rules are flushed.
+ */
+add_action('activated_plugin', function ($plugin) {
+    if ($plugin === plugin_basename(__FILE__)) {
+        flush_rewrite_rules();
+    }
+});

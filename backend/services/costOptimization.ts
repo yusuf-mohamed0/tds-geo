@@ -38,8 +38,7 @@ class CostOptimizationService {
     { model: 'gpt-4o-mini', provider: 'openai', inputCostPer1K: 0.0015, outputCostPer1K: 0.006, maxTokens: 16384, supportsReasoning: true, supportsImages: true, quality: 85, speedScore: 85 },
     { model: 'gpt-4', provider: 'openai', inputCostPer1K: 0.03, outputCostPer1K: 0.06, maxTokens: 8192, supportsReasoning: true, supportsImages: false, quality: 90, speedScore: 50 },
     { model: 'gpt-3.5-turbo', provider: 'openai', inputCostPer1K: 0.001, outputCostPer1K: 0.002, maxTokens: 16384, supportsReasoning: false, supportsImages: false, quality: 70, speedScore: 95 },
-    { model: 'deepseek-v4-flash', provider: 'deepseek', inputCostPer1K: 0.0003, outputCostPer1K: 0.001, maxTokens: 32768, supportsReasoning: false, supportsImages: false, quality: 80, speedScore: 95 },
-    { model: 'deepseek-v3', provider: 'deepseek', inputCostPer1K: 0.0005, outputCostPer1K: 0.001, maxTokens: 65536, supportsReasoning: true, supportsImages: false, quality: 90, speedScore: 80 },
+
     { model: 'text-embedding-3-small', provider: 'openai', inputCostPer1K: 0.00002, outputCostPer1K: 0, maxTokens: 8191, supportsReasoning: false, supportsImages: false, quality: 85, speedScore: 100 }
   ];
 
@@ -335,12 +334,7 @@ class CostOptimizationService {
       recommendations.push(`Use gpt-4o-mini for simple tasks to save ~$${savings.toFixed(2)}/month`);
     }
 
-    // If using OpenAI for everything, suggest DeepSeek for some tasks
-    if (byModel['gpt-4o'] && byModel['gpt-4o'] > 50) {
-      const savings = byModel['gpt-4o'] * 0.3;
-      amount += savings;
-      recommendations.push(`Route some tasks to DeepSeek to save ~$${savings.toFixed(2)}/month`);
-    }
+
 
     return { amount, recommendations };
   }

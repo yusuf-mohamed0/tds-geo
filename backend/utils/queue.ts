@@ -56,7 +56,14 @@ export enum QueueNames {
   EDITORIAL_WORKFLOW = 'editorial-workflow',
   CONTENT_INTELLIGENCE = 'content-intelligence',
   AI_EVALUATION = 'ai-evaluation',
-  OBSERVABILITY = 'observability'
+  OBSERVABILITY = 'observability',
+  // ── Client Scraper Queues ──
+  CLIENT_SCAN = 'client-scan',
+  BATCH_CLIENT_SCAN = 'batch-client-scan',
+  // ── Odoo ERP Integration Queues ──
+  ODOO_SYNC = 'odoo-sync',
+  ODOO_BATCH_SYNC = 'odoo-batch-sync',
+  ODOO_WEBHOOK = 'odoo-webhook'
 }
 
 const defaultJobOptions: JobsOptions = {

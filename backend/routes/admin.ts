@@ -17,7 +17,7 @@ export function createAdminRoutes(pool: Pool): Router {
   // ─── System Overview ─────────────────────────
   router.get('/dashboard', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const [clientStats, articleStats, keywordStats, publishStats, costStats, userStats] = await Promise.all([
+      const [clientStats, articleStats, keywordStats, publishStats, costStats, userStats, recentArticles] = await Promise.all([
         pool.query(
           `SELECT COUNT(*)::int as total,
                   COUNT(*) FILTER (WHERE is_active)::int as active,
@@ -53,6 +53,13 @@ export function createAdminRoutes(pool: Pool): Router {
                   COUNT(*) FILTER (WHERE role = 'editor')::int as editors,
                   COUNT(*) FILTER (WHERE role = 'client')::int as clients
            FROM users WHERE is_active = true`
+        ),
+        pool.query(
+          `SELECT a.*, k.keyword
+           FROM articles a
+           LEFT JOIN keywords k ON k.id = a.keyword_id
+           ORDER BY a.created_at DESC
+           LIMIT 10`
         )
       ]);
 
@@ -71,7 +78,8 @@ export function createAdminRoutes(pool: Pool): Router {
         publishing: publishStats.rows[0],
         costs: costStats.rows[0],
         users: userStats.rows[0],
-        activity: activity.rows
+        activity: activity.rows,
+        recentArticles: recentArticles.rows
       });
     } catch (err) {
       next(err);

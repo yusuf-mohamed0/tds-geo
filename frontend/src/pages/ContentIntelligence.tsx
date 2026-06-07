@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable, Column } from '../components/DataTable'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 import { ContentCannibalization, TopicSaturation, KnowledgeGraphEntity, LinkingOpportunity } from '../types'
 
 type Tab = 'cannibalization' | 'saturation' | 'knowledge_graph' | 'linking'
@@ -210,7 +211,7 @@ export default function ContentIntelligence() {
                   <textarea className="form-textarea" rows={6} value={entityContent} onChange={e => setEntityContent(e.target.value)} placeholder="Paste content to extract entities..." />
                 </div>
                 <button className="btn btn-primary" onClick={extractEntities} disabled={!entityContent.trim() || extractingEntities}>
-                  {extractingEntities ? '⏳ Extracting...' : '🔍 Extract Entities'}
+                  {extractingEntities ? <><Icon name="loading" spin /> Extracting...</> : <><Icon name="search" /> Extract Entities</>}
                 </button>
                 {extractedEntities.length > 0 && (
                   <div style={{ marginTop: 16 }}>

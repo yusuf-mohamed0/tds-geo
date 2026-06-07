@@ -1,34 +1,36 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useState } from 'react'
+import Icon from './Icon'
 
 const allNavItems = [
-  { to: '/', label: 'Dashboard', icon: '📊', end: true },
-  { to: '/articles', label: 'Articles', icon: '📝' },
-  { to: '/pipeline', label: 'Pipeline', icon: '🔧' },
-  { to: '/editorial', label: 'Editorial', icon: '👥' },
-  { to: '/analytics', label: 'Analytics', icon: '📈' },
-  { to: '/api-usage', label: 'API Usage', icon: '💰' },
-  { to: '/observability', label: 'Observability', icon: '📊' },
-  { to: '/queue', label: 'Queues', icon: '📋' },
-  { to: '/evaluation', label: 'AI Eval', icon: '⭐' },
-  { to: '/content-intel', label: 'Content Intel', icon: '🧠' },
-  { to: '/brand-voice', label: 'Brand Voice', icon: '🎙️' },
-  { to: '/fact-check', label: 'Fact Check', icon: '✅' },
-  { to: '/security', label: 'Security', icon: '🔒' },
-  { to: '/chat', label: 'AI Chat', icon: '💬' },
-  { to: '/clients', label: 'Clients', icon: '🏢' },
-  { to: '/cms', label: 'CMS', icon: '🌐' },
-  { to: '/cost', label: 'Costs', icon: '💰' },
-  { to: '/pexels', label: 'Pexels', icon: '🖼️' },
-  { to: '/api-keys', label: 'API Keys', icon: '🔑' },
-  { to: '/plugins', label: 'Plugins', icon: '🧩' },
-  { to: '/prompts', label: 'Prompts', icon: '📋' },
-  { to: '/config', label: 'Config', icon: '⚙️' },
-  { to: '/improvements', label: 'AI Insights', icon: '🤖' },
-  { to: '/webhooks', label: 'Webhooks', icon: '🔗' },
-  { to: '/settings', label: 'Settings', icon: '⚙️' },
-  { to: '/admin', label: 'Admin', icon: '🛡️' },
+  { to: '/', label: 'Dashboard', icon: 'dashboard' as const, end: true },
+  { to: '/articles', label: 'Articles', icon: 'articles' as const },
+  { to: '/pipeline', label: 'Pipeline', icon: 'pipeline' as const },
+  { to: '/copywriter', label: 'Copywriter', icon: 'copywriter' as const },
+  { to: '/editorial', label: 'Editorial', icon: 'editorial' as const },
+  { to: '/analytics', label: 'Analytics', icon: 'analytics' as const },
+  { to: '/api-usage', label: 'API Usage', icon: 'api-usage' as const },
+  { to: '/observability', label: 'Observability', icon: 'observability' as const },
+  { to: '/queue', label: 'Queues', icon: 'queues' as const },
+  { to: '/evaluation', label: 'AI Eval', icon: 'evaluation' as const },
+  { to: '/content-intel', label: 'Content Intel', icon: 'content-intel' as const },
+  { to: '/brand-voice', label: 'Brand Voice', icon: 'brand-voice' as const },
+  { to: '/fact-check', label: 'Fact Check', icon: 'fact-check' as const },
+  { to: '/security', label: 'Security', icon: 'security' as const },
+  { to: '/chat', label: 'AI Chat', icon: 'chat' as const },
+  { to: '/clients', label: 'Clients', icon: 'clients' as const },
+  { to: '/cms', label: 'CMS', icon: 'cms' as const },
+  { to: '/cost', label: 'Costs', icon: 'api-usage' as const },
+  { to: '/pexels', label: 'Pexels', icon: 'pexels' as const },
+  { to: '/api-keys', label: 'API Keys', icon: 'api-keys' as const },
+  { to: '/plugins', label: 'Plugins', icon: 'plugins' as const },
+  { to: '/prompts', label: 'Prompts', icon: 'prompts' as const },
+  { to: '/config', label: 'Config', icon: 'config' as const },
+  { to: '/improvements', label: 'AI Insights', icon: 'improvements' as const },
+  { to: '/webhooks', label: 'Webhooks', icon: 'webhooks' as const },
+  { to: '/settings', label: 'Settings', icon: 'settings' as const },
+  { to: '/admin', label: 'Admin', icon: 'admin' as const },
 ]
 
 export default function Layout() {
@@ -38,13 +40,13 @@ export default function Layout() {
 
   // Client-role users (shopify store owners) see only their relevant pages
   const clientNavItems = [
-    { to: '/', label: 'Dashboard', icon: '📊', end: true },
-    { to: '/articles', label: 'Articles', icon: '📝' },
-    { to: '/pipeline', label: 'Pipeline', icon: '🔧' },
-    { to: '/analytics', label: 'Analytics', icon: '📈' },
-    { to: '/chat', label: 'AI Chat', icon: '💬' },
-    { to: '/api-usage', label: 'API Usage', icon: '💰' },
-    { to: '/settings', label: 'Settings', icon: '⚙️' },
+    { to: '/', label: 'Dashboard', icon: 'dashboard' as const, end: true },
+    { to: '/articles', label: 'Articles', icon: 'articles' as const },
+    { to: '/pipeline', label: 'Pipeline', icon: 'pipeline' as const },
+    { to: '/analytics', label: 'Analytics', icon: 'analytics' as const },
+    { to: '/chat', label: 'AI Chat', icon: 'chat' as const },
+    { to: '/api-usage', label: 'API Usage', icon: 'api-usage' as const },
+    { to: '/settings', label: 'Settings', icon: 'settings' as const },
   ]
 
   const isClient = user?.role === 'client'
@@ -83,7 +85,7 @@ export default function Layout() {
               className={({ isActive }) => isActive ? 'active' : ''}
               onClick={() => setSidebarOpen(false)}
             >
-              <span className="icon">{item.icon}</span>
+              <span className="icon"><Icon name={item.icon} size="lg" /></span>
               {item.label}
             </NavLink>
           ))}
@@ -100,7 +102,7 @@ export default function Layout() {
             </div>
           </div>
           <button className="logout-btn" onClick={handleLogout}>
-            🚪 Log out
+            <Icon name="logout" /> Log out
           </button>
         </div>
       </aside>

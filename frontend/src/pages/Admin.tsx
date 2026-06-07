@@ -6,6 +6,7 @@ import { DataTable, Column } from '../components/DataTable'
 import { Modal } from '../components/Modal'
 import { InputField, SelectField, CheckboxField, FormRow } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 interface UserRow {
   id: string
@@ -281,42 +282,42 @@ export default function Admin() {
         {stats && (
           <div className="stats-grid" style={{ marginBottom: 24 }}>
             <div className="stat-card">
-              <div className="stat-icon purple">👥</div>
+              <div className="stat-icon purple"><Icon name="users" /></div>
               <div>
                 <div className="stat-value">{stats.users?.total || 0}</div>
                 <div className="stat-label">Total Users</div>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon red">🛡️</div>
+              <div className="stat-icon red"><Icon name="admin" /></div>
               <div>
                 <div className="stat-value">{stats.users?.admins || 0}</div>
                 <div className="stat-label">Admins</div>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon blue">✏️</div>
+              <div className="stat-icon blue"><Icon name="edit" /></div>
               <div>
                 <div className="stat-value">{stats.users?.editors || 0}</div>
                 <div className="stat-label">Editors</div>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon green">🏢</div>
+              <div className="stat-icon green"><Icon name="clients" /></div>
               <div>
                 <div className="stat-value">{stats.users?.clients || 0}</div>
                 <div className="stat-label">Client Users</div>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon blue">📝</div>
+              <div className="stat-icon blue"><Icon name="articles" /></div>
               <div>
                 <div className="stat-value">{stats.articles?.total || 0}</div>
                 <div className="stat-label">Articles</div>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon red">💰</div>
+              <div className="stat-icon red"><Icon name="api-usage" /></div>
               <div>
                 <div className="stat-value">${Number(stats.costs?.total_cost_mtd || 0).toFixed(2)}</div>
                 <div className="stat-label">Costs MTD</div>

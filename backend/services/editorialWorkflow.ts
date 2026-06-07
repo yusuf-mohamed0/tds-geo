@@ -36,6 +36,7 @@ class EditorialWorkflowService {
     const statusMap: Record<EditorialStatus, ArticleStatus> = {
       'draft': 'draft',
       'generated': 'generated',
+      'in_review': 'reviewed',
       'in_seo_review': 'reviewed',
       'seo_reviewed': 'reviewed',
       'in_editor_review': 'reviewed',

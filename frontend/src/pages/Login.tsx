@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { Card, CardBody } from '../components/Card'
 import { InputField } from '../components/FormField'
+import Icon from '../components/Icon'
 
 export default function Login() {
   const { login } = useAuth()
@@ -32,7 +33,7 @@ export default function Login() {
       <Card style={{ maxWidth: 420, margin: '0 auto' }}>
         <CardBody>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ fontSize: 48, marginBottom: 8, lineHeight: 1 }}>🤖</div>
+            <div style={{ fontSize: 48, marginBottom: 8, lineHeight: 1 }}><Icon name="improvements" size="4x" /></div>
             <h1 style={{ margin: '0 0 4px' }}>AI SEO Agent</h1>
             <p className="text-muted">Sign in to your automation dashboard</p>
           </div>

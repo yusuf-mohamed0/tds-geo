@@ -4,6 +4,7 @@ import { DashboardMetrics, SystemAlert, TraceSpan } from '../types'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable, Column } from '../components/DataTable'
 import { SelectField } from '../components/FormField'
+import Icon from '../components/Icon'
 
 type Tab = 'dashboard' | 'alerts' | 'traces' | 'health'
 
@@ -110,11 +111,11 @@ export default function Observability() {
         ) : activeTab === 'dashboard' && (
           <div>
             <div className="stats-grid">
-              <div className="stat-card"><div className="stat-icon red">🔔</div><div><div className="stat-value">{metrics?.active_alerts || 0}</div><div className="stat-label">Active Alerts</div></div></div>
-              <div className="stat-card"><div className="stat-icon red">🚨</div><div><div className="stat-value">{metrics?.critical_alerts || 0}</div><div className="stat-label">Critical</div></div></div>
-              <div className="stat-card"><div className="stat-icon blue">📊</div><div><div className="stat-value">{metrics?.total_traces_today || 0}</div><div className="stat-label">Traces Today</div></div></div>
-              <div className="stat-card"><div className={`stat-icon ${(metrics?.error_rate || 0) > 5 ? 'red' : 'green'}`}>📈</div><div><div className="stat-value">{(metrics?.error_rate || 0).toFixed(1)}%</div><div className="stat-label">Error Rate</div></div></div>
-              <div className="stat-card"><div className={`stat-icon ${(metrics?.p95_latency || 0) > 5000 ? 'red' : (metrics?.p95_latency || 0) > 2000 ? 'yellow' : 'green'}`}>⏱️</div><div><div className="stat-value">{metrics?.p95_latency ? `${(metrics.p95_latency / 1000).toFixed(1)}s` : '—'}</div><div className="stat-label">P95 Latency</div></div></div>
+              <div className="stat-card"><div className="stat-icon red"><Icon name="bell" /></div><div><div className="stat-value">{metrics?.active_alerts || 0}</div><div className="stat-label">Active Alerts</div></div></div>
+              <div className="stat-card"><div className="stat-icon red"><Icon name="warning" /></div><div><div className="stat-value">{metrics?.critical_alerts || 0}</div><div className="stat-label">Critical</div></div></div>
+              <div className="stat-card"><div className="stat-icon blue"><Icon name="metric" /></div><div><div className="stat-value">{metrics?.total_traces_today || 0}</div><div className="stat-label">Traces Today</div></div></div>
+              <div className="stat-card"><div className={`stat-icon ${(metrics?.error_rate || 0) > 5 ? 'red' : 'green'}`}><Icon name="seo-enhance" /></div><div><div className="stat-value">{(metrics?.error_rate || 0).toFixed(1)}%</div><div className="stat-label">Error Rate</div></div></div>
+              <div className="stat-card"><div className={`stat-icon ${(metrics?.p95_latency || 0) > 5000 ? 'red' : (metrics?.p95_latency || 0) > 2000 ? 'yellow' : 'green'}`}><Icon name="clock" /></div><div><div className="stat-value">{metrics?.p95_latency ? `${(metrics.p95_latency / 1000).toFixed(1)}s` : '—'}</div><div className="stat-label">P95 Latency</div></div></div>
             </div>
 
             <div className="grid-2" style={{ marginTop: 16 }}>
@@ -248,7 +249,7 @@ export default function Observability() {
                     {Object.entries(health).map(([key, val]: [string, any]) => (
                       <div key={key} className="stat-card">
                         <div className={`stat-icon ${val?.status === 'healthy' || val === true ? 'green' : val === false || val?.status === 'unhealthy' ? 'red' : 'yellow'}`}>
-                          {val?.status === 'healthy' || val === true ? '✅' : val?.status === 'unhealthy' || val === false ? '❌' : '⚠️'}
+                          {val?.status === 'healthy' || val === true ? <Icon name="completed" /> : val === false || val?.status === 'unhealthy' ? <Icon name="failed" /> : <Icon name="warning" />}
                         </div>
                         <div>
                           <div className="stat-value" style={{ textTransform: 'capitalize', fontSize: 18 }}>{key.replace(/_/g, ' ')}</div>

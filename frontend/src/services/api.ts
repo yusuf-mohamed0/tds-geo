@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import { getCachedFingerprint, fingerprintToHeaders } from '../hooks/useDeviceFingerprint';
 
 const TOKEN_KEY = 'ai_seo_auth_token';
 
@@ -16,12 +17,24 @@ function isShopifyEmbedded(): boolean {
   return !!(window as any).shopify;
 }
 
-// Attach auth token to requests
+// Attach auth token and device fingerprint to requests
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem(TOKEN_KEY);
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Inject device fingerprint headers
+  try {
+    const fp = getCachedFingerprint();
+    if (fp && config.headers) {
+      const fpHeaders = fingerprintToHeaders(fp);
+      Object.entries(fpHeaders).forEach(([key, value]) => {
+        config.headers[key] = value;
+      });
+    }
+  } catch { /* non-critical */ }
+
   return config;
 });
 
@@ -197,6 +210,9 @@ export const promptsApi = {
   update: (id: string, data: any) => api.put(`/prompts/${id}`, data).then(r => r.data),
   rollback: (id: string, version: number) => api.post(`/prompts/${id}/rollback/${version}`).then(r => r.data),
   performance: (id: string) => api.get(`/prompts/${id}/performance`).then(r => r.data),
+  // Copywriter briefs
+  submitBrief: (data: any) => api.post('/prompts/briefs', data).then(r => r.data),
+  getBriefs: (params?: { status?: string; clientId?: string }) => api.get('/prompts/briefs', { params }).then(r => r.data),
 };
 
 export const chatApi = {
@@ -379,6 +395,20 @@ export const evaluationApi = {
     api.patch(`/evaluation/ab-tests/${testId}/complete`, { winner, metrics }).then(r => r.data),
 };
 
+// ═══ Worker Performance Scoring API ════════════
+
+export const workerScoringApi = {
+  getHierarchy: () => api.get('/worker-scoring/hierarchy').then(r => r.data),
+  getWorkerScores: (workerName: string) => api.get(`/worker-scoring/workers/${encodeURIComponent(workerName)}/scores`).then(r => r.data),
+  getPromotions: (limit?: number) => api.get('/worker-scoring/promotions', { params: { limit } }).then(r => r.data),
+  getThresholds: () => api.get('/worker-scoring/thresholds').then(r => r.data),
+  updateThresholds: (tierName: string, data: any) => api.put(`/worker-scoring/thresholds/${tierName}`, data).then(r => r.data),
+  setWorkerTier: (workerName: string, data: any) => api.post(`/worker-scoring/workers/${encodeURIComponent(workerName)}/tier`, data).then(r => r.data),
+  runEvaluation: () => api.post('/worker-scoring/evaluate').then(r => r.data),
+  evaluateWorker: (workerName: string, jobType: string) => api.post(`/worker-scoring/evaluate/${encodeURIComponent(workerName)}`, { jobType }).then(r => r.data),
+  getOrgChart: () => api.get('/worker-scoring/org-chart').then(r => r.data),
+}
+
 // ═══ Enterprise Pexels API ════════════════════
 
 export const pexelsApi = {
@@ -395,6 +425,15 @@ export const pipelineApi = {
   run: (data: any) => api.post('/pipeline/run', data).then(r => r.data),
   getStatus: (pipelineId: string) => api.get(`/pipeline/status/${pipelineId}`).then(r => r.data),
   getHistory: (clientId: string) => api.get(`/pipeline/history/${clientId}`).then(r => r.data),
+};
+
+// ═══ Meta API (Prompt Hardening) ═══════════════
+
+export const metaApi = {
+  getQuickActions: () => api.get('/meta/quick-actions').then(r => r.data),
+  getServices: () => api.get('/meta/services').then(r => r.data),
+  getModels: () => api.get('/meta/models').then(r => r.data),
+  getPermissions: () => api.get('/meta/permissions').then(r => r.data),
 };
 
 // ═══ Shopify API ════════════════════════════

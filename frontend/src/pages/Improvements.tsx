@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { improvementsApi } from '../services/api'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 import type { ImprovementSuggestion } from '../types'
 
 export default function Improvements() {
@@ -48,22 +49,22 @@ export default function Improvements() {
 
   const categories = [...new Set(suggestions.map(s => s.category))]
 
-  function getPriorityIcon(s: ImprovementSuggestion): string {
-    if (s.implemented) return '✅'
-    if (s.value > 80) return '🔴'
-    if (s.value > 50) return '🟡'
-    return '🟢'
+  function getPriorityIcon(s: ImprovementSuggestion) {
+    if (s.implemented) return <Icon name="completed" />
+    if (s.value > 80) return <Icon name="failed" />
+    if (s.value > 50) return <Icon name="warning" />
+    return <Icon name="pending" />
   }
 
   return (
     <div className="page">
       <div className="page-header">
         <div>
-          <h1>🤖 AI Self-Improvement</h1>
+          <h1><Icon name="improvements" /> AI Self-Improvement</h1>
           <p className="text-secondary">System automatically analyzes performance and suggests optimizations</p>
         </div>
         <button className="btn btn-primary" onClick={runAnalysis} disabled={analyzing}>
-          {analyzing ? 'Analyzing...' : '🔍 Run Analysis'}
+          {analyzing ? <><Icon name="loading" spin /> Analyzing...</> : <><Icon name="search" /> Run Analysis</>}
         </button>
       </div>
 

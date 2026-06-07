@@ -4,11 +4,14 @@ import { CmsConnection, CmsProviderInfo } from '../types'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { SelectField, InputField } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
-const PROVIDER_ICONS: Record<string, string> = {
-  shopify: '🛒', wordpress: '📝', webflow: '🌐', ghost: '👻',
-  medium: '📰', headless_cms: '⚡', notion: '📚', custom_rest: '🔌',
+const PROVIDER_ICON_MAP: Record<string, string> = {
+  shopify: 'shopify', wordpress: 'articles', webflow: 'globe', ghost: 'ghost',
+  medium: 'medium', headless_cms: 'bolt', notion: 'notion', custom_rest: 'plugin',
 }
+
+const FALLBACK_PROVIDER_ICON = 'puzzle-piece'
 
 export default function CmsConnections() {
   const [clients, setClients] = useState<any[]>([])
@@ -52,7 +55,7 @@ export default function CmsConnections() {
     setTesting(conn.id)
     try {
       const r = await cmsApi.testConnection(conn.id, selectedClientId)
-      addToast(r.data?.connected ? 'success' : 'warning', r.data?.connected ? 'Connection successful! ✅' : 'Connection failed ❌')
+      addToast(r.data?.connected ? 'success' : 'warning', r.data?.connected ? 'Connection successful!' : 'Connection failed')
     } catch { addToast('error', 'Test failed') }
     finally { setTesting(null) }
   }
@@ -91,7 +94,7 @@ export default function CmsConnections() {
                   <CardBody>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span style={{ fontSize: 24 }}>{PROVIDER_ICONS[conn.provider] || '🔌'}</span>
+                        <span style={{ fontSize: 24 }}><Icon name={PROVIDER_ICON_MAP[conn.provider] || 'plugin'} size="2x" /></span>
                         <div>
                           <div style={{ fontWeight: 600, fontSize: 15 }}>{conn.label || conn.provider}</div>
                           <div className="flex gap-2" style={{ marginTop: 4 }}>
@@ -103,7 +106,7 @@ export default function CmsConnections() {
                       </div>
                       <div className="flex gap-2">
                         <button className="btn btn-outline btn-sm" onClick={() => testConnection(conn)} disabled={testing === conn.id}>
-                          {testing === conn.id ? '⏳ Testing...' : '🔍 Test'}
+                          {testing === conn.id ? <><Icon name="loading" spin /> Testing...</> : <><Icon name="search" /> Test</>}
                         </button>
                       </div>
                     </div>
@@ -132,17 +135,17 @@ export default function CmsConnections() {
                 <label>Provider</label>
                 <select className="form-select" value={formData.provider} onChange={e => setFormData({ ...formData, provider: e.target.value })}>
                   {providers.length > 0 ? providers.map(p => (
-                    <option key={p.provider} value={p.provider}>{PROVIDER_ICONS[p.provider] || '🔌'} {p.name}</option>
+                    <option key={p.provider} value={p.provider}><Icon name={PROVIDER_ICON_MAP[p.provider] || 'plugin'} /> {p.name}</option>
                   )) : (
                     <>
-                      <option value="shopify">🛒 Shopify</option>
-                      <option value="wordpress">📝 WordPress</option>
-                      <option value="webflow">🌐 Webflow</option>
-                      <option value="ghost">👻 Ghost</option>
-                      <option value="medium">📰 Medium</option>
-                      <option value="headless_cms">⚡ Headless CMS</option>
-                      <option value="notion">📚 Notion</option>
-                      <option value="custom_rest">🔌 Custom REST API</option>
+                      <option value="shopify"><Icon name="store" /> Shopify</option>
+                      <option value="wordpress"><Icon name="articles" /> WordPress</option>
+                      <option value="webflow"><Icon name="globe" /> Webflow</option>
+                      <option value="ghost"><Icon name="globe" /> Ghost</option>
+                      <option value="medium"><Icon name="copywriter" /> Medium</option>
+                      <option value="headless_cms"><Icon name="bolt" /> Headless CMS</option>
+                      <option value="notion"><Icon name="book" /> Notion</option>
+                      <option value="custom_rest"><Icon name="plugin" /> Custom REST API</option>
                     </>
                   )}
                 </select>

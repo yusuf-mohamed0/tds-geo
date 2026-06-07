@@ -386,7 +386,7 @@ Authenticated with Layout wrapper:
 
 #### `openai.ts` — OpenAI Integration
 - **Methods:** `generateBlogPost(params)`, `generateTitle(keyword)`, `generateOutline(keyword, title, blacklist)`, `generateFAQ(keyword, count)`, `generateMetadata(title, content, keyword)`, `enhanceSEO(content, keyword)`, `moderateContent(content)`, `generateArticleImage(title, keyword)`, `analyzeSEO(content, keyword)`, `generateKeywordVariations(seed, count)`, `chat(messages, options)`
-- **Model management:** GPT-4o default, configurable via `setProvider()` and env vars
+- **Model management:** GPT-4o default, configurable via `OPENAI_MODEL`, `OPENAI_MAX_TOKENS`, `OPENAI_TEMPERATURE` env vars
 - **Mock mode:** When `OPENAI_API_KEY` is empty, all methods return realistic mock data
 - **Error handling:** All API errors caught and logged, graceful fallback to heuristic methods
 

@@ -9,6 +9,9 @@ import { logger } from '../utils/logger';
 import { Article, PublishResult, CmsProvider, CmsConnection, PublisherAdapter } from '../types';
 import shopifyService from './shopify';
 
+// Vireon WP Plugin REST API namespace
+const VIREON_API_NAMESPACE = 'vireon/v1';
+
 interface PublisherCapabilities {
   supportsMedia: boolean;
   supportsTags: boolean;
@@ -22,6 +25,14 @@ interface PublisherCapabilities {
 class MultiCmsPublisherService {
   private adapters: Map<CmsProvider, PublisherAdapter> = new Map();
   private pool: Pool | null = null;
+
+  // Per-connection config store for WordPress adapter update/delete operations
+  // Keyed by articleId → connection config
+  private wpConnectionConfigs: Map<string, Record<string, unknown>> = new Map();
+
+  // Config store for Custom REST (Next.js Vireon Plugin) adapter update/delete operations
+  // Keyed by articleId → connection config
+  private customRestConnectionConfigs: Map<string, Record<string, unknown>> = new Map();
 
   initialize(pool: Pool): void {
     this.pool = pool;
@@ -68,7 +79,10 @@ class MultiCmsPublisherService {
       }
     });
 
-    // WordPress adapter
+    // WordPress adapter — now supports two authentication modes:
+    // 1. Vireon WP Plugin (API key): Uses the Vireon WP plugin's custom REST endpoints (vireon/v1)
+    // 2. WP Core REST API (Basic Auth): Falls back to native WP REST API with Basic Auth (App Password)
+    // Detection is automatic based on which credentials are provided in the config.
     this.adapters.set('wordpress', {
       provider: 'wordpress',
       name: 'WordPress',
@@ -125,6 +139,39 @@ class MultiCmsPublisherService {
       },
       delete: async (articleId: string) => { return true; },
       getBlogs: async () => { return []; }
+    });
+
+    // ── Custom REST (Next.js Vireon Plugin) adapter ──
+    // Publishes articles to any site running @vireon/nextjs-integration
+    // via its /api/vireon/* REST endpoints.
+    // Auth: X-Vireon-Key header
+    this.adapters.set('custom_rest', {
+      provider: 'custom_rest',
+      name: 'Vireon Next.js Integration (Custom REST)',
+      capabilities: {
+        supportsMedia: true,
+        supportsTags: true,
+        supportsCustomFields: true,
+        supportsScheduling: false,
+        supportsMultipleAuthors: true,
+        maxTitleLength: 255,
+        contentFormat: 'markdown'
+      },
+      testConnection: async () => {
+        return this.testCustomRestConnection();
+      },
+      publish: async (article: Article, config: Record<string, unknown>) => {
+        return this.publishToCustomRest(article, config);
+      },
+      update: async (articleId: string, article: Partial<Article>) => {
+        return this.updateCustomRestPost(articleId, article);
+      },
+      delete: async (articleId: string) => {
+        return this.deleteCustomRestPost(articleId);
+      },
+      getBlogs: async () => {
+        return [{ id: 1, title: 'Blog', handle: 'blog' }];
+      }
     });
   }
 
@@ -208,6 +255,7 @@ class MultiCmsPublisherService {
 
   /**
    * Publish article through a specific CMS connection.
+   * Stores the connection config for use by subsequent update/delete operations.
    */
   async publishViaConnection(
     article: Article,
@@ -216,6 +264,18 @@ class MultiCmsPublisherService {
     const adapter = this.adapters.get(connection.provider);
     if (!adapter) {
       throw new Error(`No adapter registered for provider: ${connection.provider}`);
+    }
+
+    // Store connection config for adapter update/delete operations
+    if (article.id) {
+      if (connection.provider === 'wordpress') {
+        this.wpConnectionConfigs.set(article.id, connection.config || {});
+      } else if (connection.provider === 'custom_rest') {
+        // For custom_rest, the result.id is set to 0 (since localId is UUID not numeric).
+        // Store the connection config keyed by the original Vireon article UUID,
+        // so update/delete can look it up when the pipeline passes the article UUID.
+        this.customRestConnectionConfigs.set(article.id, connection.config || {});
+      }
     }
 
     const result = await adapter.publish(article, connection.config || {});
@@ -254,93 +314,269 @@ class MultiCmsPublisherService {
   // PROVIDER-SPECIFIC ADAPTERS
   // ══════════════════════════════════════════════════════════════
 
+  /**
+   * Detect whether to use the Vireon WP Plugin API (vireon/v1) or native WP REST API.
+   * Vireon API is preferred when an apiKey is provided in the config.
+   */
+  private useVireonApi(config: Record<string, unknown>): boolean {
+    const apiKey = (config.apiKey as string) || (config.vireon_api_key as string) || '';
+    return !!apiKey;
+  }
+
+  /**
+   * Build headers and base URL for WordPress requests.
+   * Supports two modes:
+   *   1. Vireon WP Plugin: X-Vireon-Key header + /vireon/v1/ endpoints
+   *   2. Native WP REST API: Basic Auth (App Passwords) + /wp/v2/ endpoints
+   */
+  private buildWordPressRequest(
+    config: Record<string, unknown>
+  ): { baseUrl: string; headers: Record<string, string>; mode: 'vireon' | 'native' } {
+    const wpUrl = (config.wpUrl as string) || (config.endpoint_url as string) || process.env.WORDPRESS_API_URL || '';
+    const apiKey = (config.apiKey as string) || (config.vireon_api_key as string) || '';
+    const wpToken = (config.wpToken as string) || (config.wpAppPassword as string) || process.env.WORDPRESS_APP_PASSWORD || '';
+
+    // Strip trailing slash and any path segment to get base site URL
+    const baseSiteUrl = wpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
+
+    if (apiKey) {
+      // Mode 1: Vireon WP Plugin API
+      return {
+        baseUrl: `${baseSiteUrl}/wp-json/${VIREON_API_NAMESPACE}`,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Vireon-Key': apiKey,
+        },
+        mode: 'vireon',
+      };
+    }
+
+    // Mode 2: Native WP REST API with Basic Auth (App Passwords)
+    return {
+      baseUrl: `${baseSiteUrl}/wp-json/wp/v2`,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}`,
+      },
+      mode: 'native',
+    };
+  }
+
   private async testWordPressConnection(): Promise<boolean> {
+    // First try the env-var-based approach (legacy)
     const wpUrl = process.env.WORDPRESS_API_URL;
     const wpToken = process.env.WORDPRESS_APP_PASSWORD;
-    if (!wpUrl || !wpToken) {
-      logger.warn('WordPress credentials not configured');
-      return false;
+    if (wpUrl && wpToken) {
+      try {
+        const response = await fetch(`${wpUrl}/wp-json/wp/v2/`, {
+          headers: { Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}` },
+          signal: AbortSignal.timeout(5000)
+        });
+        if (response.ok) return true;
+      } catch {
+        // Fall through
+      }
     }
-    try {
-      const response = await fetch(`${wpUrl}/wp-json/wp/v2/`, {
-        headers: { Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}` },
-        signal: AbortSignal.timeout(5000)
-      });
-      return response.ok;
-    } catch {
-      return false;
+
+    // Try Vireon API env vars
+    const vireonWpUrl = process.env.VIREON_WORDPRESS_URL;
+    const vireonApiKey = process.env.VIREON_WORDPRESS_API_KEY;
+    if (vireonWpUrl && vireonApiKey) {
+      try {
+        const baseSiteUrl = vireonWpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
+        const response = await fetch(`${baseSiteUrl}/wp-json/vireon/v1/status`, {
+          headers: { 'X-Vireon-Key': vireonApiKey },
+          signal: AbortSignal.timeout(5000)
+        });
+        return response.ok;
+      } catch {
+        return false;
+      }
     }
+
+    logger.warn('WordPress credentials not configured (set WORDPRESS_API_URL + WORDPRESS_APP_PASSWORD, or VIREON_WORDPRESS_URL + VIREON_WORDPRESS_API_KEY)');
+    return false;
   }
 
   private async publishToWordPress(article: Article, config: Record<string, unknown>): Promise<PublishResult> {
-    const wpUrl = (config.wpUrl as string) || process.env.WORDPRESS_API_URL || '';
-    const wpToken = (config.wpToken as string) || process.env.WORDPRESS_APP_PASSWORD || '';
+    const req = this.buildWordPressRequest(config);
 
-    const response = await fetch(`${wpUrl}/wp-json/wp/v2/posts`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}`
-      },
-      body: JSON.stringify({
+    // Build the payload — different format for Vireon API vs native WP
+    let endpoint: string;
+    let body: Record<string, unknown>;
+
+    if (req.mode === 'vireon') {
+      // Vireon WP Plugin: uses vireon/v1/posts endpoint
+      endpoint = `${req.baseUrl}/posts`;
+      body = {
+        title: article.title,
+        content: article.content_html || article.content_md,
+        content_html: article.content_html || article.content_md,
+        slug: article.slug || article.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        status: (config.status as string) || 'draft',
+        tags: article.tags || [],
+        categories: (config.categories as string[]) || [],
+        meta_title: article.meta_title || '',
+        meta_description: article.meta_description || '',
+        focus_keyword: (config.focus_keyword as string) || '',
+        featured_image_url: (config.featured_image_url as string) || '',
+        publish_date: (config.publish_date as string) || '',
+        author_id: (config.author_id as number) || 0,
+        vireon_article_id: article.id,
+        custom_fields: (config.custom_fields as Record<string, unknown>) || {},
+      };
+    } else {
+      // Native WP REST API
+      endpoint = `${req.baseUrl}/posts`;
+      body = {
         title: article.title,
         content: article.content_html || article.content_md,
         slug: article.slug,
-        status: config.status || 'draft',
+        status: (config.status as string) || 'draft',
         tags: article.tags,
         meta: {
           meta_title: article.meta_title,
-          meta_description: article.meta_description
-        }
-      })
+          meta_description: article.meta_description,
+        },
+      };
+    }
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: req.headers,
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000),
     });
 
     if (!response.ok) {
-      throw new Error(`WordPress publish failed: ${response.status} ${await response.text()}`);
+      const errorText = await response.text();
+      logger.error('WordPress publish failed', {
+        status: response.status,
+        error: errorText.slice(0, 500),
+        mode: req.mode,
+        title: article.title,
+      });
+      throw new Error(`WordPress publish failed (${req.mode}): ${response.status} ${errorText.slice(0, 200)}`);
     }
 
     const data: any = await response.json();
-    return { id: data.id, blogId: 1, url: data.link, handle: data.slug };
+
+    // Vireon API returns { success, data: { post_id, post_url } }
+    // Native WP API returns { id, link, slug }
+    if (req.mode === 'vireon' && data.data) {
+      return {
+        id: data.data.post_id,
+        blogId: 1,
+        url: data.data.post_url || '',
+        handle: data.data.post_id?.toString() || '',
+      };
+    }
+
+    return { id: data.id, blogId: 1, url: data.link || '', handle: data.slug || '' };
   }
 
   private async updateWordPressPost(articleId: string, article: Partial<Article>): Promise<PublishResult> {
-    const wpUrl = process.env.WORDPRESS_API_URL || '';
-    const wpToken = process.env.WORDPRESS_APP_PASSWORD || '';
+    // Retrieve stored connection config for this article (set during publishViaConnection)
+    const config = this.wpConnectionConfigs.get(articleId) || {};
+    const req = this.buildWordPressRequest(config);
 
-    const response = await fetch(`${wpUrl}/wp-json/wp/v2/posts/${articleId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}`
-      },
-      body: JSON.stringify({
+    let endpoint: string;
+    let body: Record<string, unknown>;
+
+    if (req.mode === 'vireon') {
+      endpoint = `${req.baseUrl}/posts/${articleId}`;
+      body = {
         title: article.title,
         content: article.content_html || article.content_md,
         slug: article.slug,
-        tags: article.tags
-      })
+        status: (config.status as string) || undefined,
+        tags: article.tags,
+        meta_title: article.meta_title,
+        meta_description: article.meta_description,
+      };
+      // Remove undefined values
+      Object.keys(body).forEach(key => {
+        if (body[key] === undefined) delete body[key];
+      });
+    } else {
+      endpoint = `${req.baseUrl}/posts/${articleId}`;
+      body = {
+        title: article.title,
+        content: article.content_html || article.content_md,
+        slug: article.slug,
+        tags: article.tags,
+      };
+      Object.keys(body).forEach(key => {
+        if (body[key] === undefined) delete body[key];
+      });
+    }
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: req.headers,
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000),
     });
 
     if (!response.ok) {
-      throw new Error(`WordPress update failed: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`WordPress update failed (${req.mode}): ${response.status} ${errorText.slice(0, 200)}`);
     }
 
+    // Clean up stored config on success
+    this.wpConnectionConfigs.delete(articleId);
+
     const data: any = await response.json();
-    return { id: data.id, blogId: 1, url: data.link, handle: data.slug };
+
+    if (req.mode === 'vireon' && data.data) {
+      return { id: data.data.post_id, blogId: 1, url: '', handle: '' };
+    }
+
+    return { id: data.id, blogId: 1, url: data.link || '', handle: data.slug || '' };
   }
 
   private async deleteWordPressPost(articleId: string): Promise<boolean> {
+    // Retrieve stored connection config for this article (set during publishViaConnection)
+    const config = this.wpConnectionConfigs.get(articleId) || {};
+
+    if (Object.keys(config).length > 0) {
+      const req = this.buildWordPressRequest(config);
+      try {
+        const response = await fetch(`${req.baseUrl}/posts/${articleId}`, {
+          method: 'DELETE',
+          headers: req.headers,
+          signal: AbortSignal.timeout(15000),
+        });
+        if (response.ok) {
+          this.wpConnectionConfigs.delete(articleId);
+          return true;
+        }
+      } catch {
+        // Fall through to env-var approach
+      }
+    }
+
+    // Try env vars as fallback
     const wpUrl = process.env.WORDPRESS_API_URL || '';
     const wpToken = process.env.WORDPRESS_APP_PASSWORD || '';
 
-    const response = await fetch(`${wpUrl}/wp-json/wp/v2/posts/${articleId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}`
+    if (wpUrl && wpToken) {
+      try {
+        const response = await fetch(`${wpUrl}/wp-json/wp/v2/posts/${articleId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}`,
+          },
+          signal: AbortSignal.timeout(15000),
+        });
+        return response.ok;
+      } catch {
+        return false;
       }
-    });
+    }
 
-    return response.ok;
+    logger.warn('WordPress credentials not configured for delete');
+    return false;
   }
 
   private async testWebflowConnection(): Promise<boolean> {
@@ -419,6 +655,289 @@ class MultiCmsPublisherService {
     const data: any = await response.json();
     const post = data.posts?.[0] || data;
     return { id: post.id, blogId: 1, url: `/${post.slug}`, handle: post.slug };
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // CUSTOM REST (Next.js Vireon Plugin) ADAPTER
+  // ══════════════════════════════════════════════════════════════
+
+  /**
+   * Vireon API base path on the Next.js site.
+   * The @vireon/nextjs-integration package registers routes under /api/vireon.
+   */
+  private static readonly VIREON_NEXTJS_API_PATH = '/api/vireon';
+
+  /**
+   * Build the request config for the Next.js Vireon Plugin API.
+   * Config is read from the CMS connection's config object.
+   *
+   * Required config keys:
+   *   endpoint_url (or siteUrl): The base URL of the Next.js site (e.g. https://example.com)
+   *   apiKey (or vireon_api_key): The shared API key
+   */
+  private buildCustomRestRequest(
+    config: Record<string, unknown>
+  ): { baseUrl: string; headers: Record<string, string> } {
+    const siteUrl = (config.endpoint_url as string) || (config.siteUrl as string) || '';
+    const apiKey = (config.apiKey as string) || (config.vireon_api_key as string) || '';
+
+    const baseUrl = siteUrl.replace(/\/$/, '');
+
+    return {
+      baseUrl: `${baseUrl}${MultiCmsPublisherService.VIREON_NEXTJS_API_PATH}`,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Vireon-Key': apiKey,
+        'User-Agent': 'Vireon-Backend/2.0',
+      },
+    };
+  }
+
+  /**
+   * Test connection to the Next.js Vireon Plugin.
+   * Pings the /api/vireon/posts endpoint to verify credentials.
+   */
+  private async testCustomRestConnection(): Promise<boolean> {
+    // Try env-var-based approach first (legacy single-site)
+    const envUrl = process.env.VIREON_NEXTJS_URL;
+    const envKey = process.env.VIREON_NEXTJS_API_KEY;
+
+    if (envUrl && envKey) {
+      try {
+        const req = this.buildCustomRestRequest({ endpoint_url: envUrl, apiKey: envKey });
+        const response = await fetch(`${req.baseUrl}/posts?limit=1`, {
+          headers: req.headers,
+          signal: AbortSignal.timeout(8000),
+        });
+        return response.ok;
+      } catch {
+        return false;
+      }
+    }
+
+    // If no env vars set, the connection config will be provided per-client
+    // This is fine — testConnection is also called with per-connection config
+    // via the adapter's testConnection wrapper in the routes.
+    logger.warn('Custom REST (Next.js) not configured globally. Set VIREON_NEXTJS_URL + VIREON_NEXTJS_API_KEY for global connection testing.');
+    return false;
+  }
+
+  /**
+   * Publish an article to the Next.js Vireon Plugin.
+   * POST /api/vireon/posts
+   */
+  private async publishToCustomRest(
+    article: Article,
+    config: Record<string, unknown>
+  ): Promise<PublishResult> {
+    const req = this.buildCustomRestRequest(config);
+    const endpoint = `${req.baseUrl}/posts`;
+
+    // Build the payload matching the @vireon/nextjs-integration VireonArticle schema
+    const body: Record<string, unknown> = {
+      title: article.title,
+      content: article.content_md,
+      contentHtml: article.content_html || '',
+      slug: article.slug || article.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      excerpt: (article.meta_description || '').slice(0, 300),
+      metaTitle: article.meta_title || '',
+      metaDescription: article.meta_description || '',
+      tags: article.tags || [],
+      categories: (config.categories as string[]) || [],
+      featuredImageUrl: (config.featured_image_url as string) || '',
+      featuredImageAlt: (config.featured_image_alt as string) || '',
+      focusKeyword: (config.focus_keyword as string) || '',
+      status: (config.status as string) || 'published',
+      id: article.id,
+      createdAt: article.created_at?.toISOString?.() || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      wordCount: article.word_count || 0,
+      customFields: (config.custom_fields as Record<string, unknown>) || {},
+    };
+
+    // Add author info if available in config
+    if (config.author) {
+      body.author = config.author;
+    }
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: req.headers,
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error('Custom REST publish failed (Next.js Vireon Plugin)', {
+        status: response.status,
+        error: errorText.slice(0, 500),
+        title: article.title,
+        siteUrl: config.endpoint_url as string || 'env',
+      });
+      throw new Error(`Next.js Vireon Plugin publish failed: ${response.status} ${errorText.slice(0, 200)}`);
+    }
+
+    const data: any = await response.json();
+
+    // Vireon plugin returns { success, data: { localId, slug, url } }
+    // localId is a UUID string (not a number), so PublishResult.id is set to 0.
+    // The localId is stored in the connection config map for update/delete operations.
+    if (data.data) {
+      const localId = data.data.localId || '';
+      const slug = data.data.slug || '';
+      const url = data.data.url || `/${slug}`;
+
+      // Store the localId in a way that update/delete can retrieve it.
+      // The connection config was already stored in customRestConnectionConfigs
+      // keyed by article.id (Vireon UUID) in publishViaConnection().
+      // We also store the localId/slug for the API call.
+      // Note: publishViaConnection already stored the config under article.id
+      // before calling this method, so we can look it up and augment it.
+      const configKey = article.id;
+      if (configKey) {
+        const existing = this.customRestConnectionConfigs.get(configKey) || {};
+        this.customRestConnectionConfigs.set(configKey, {
+          ...existing,
+          _postLocalId: localId,
+          _postSlug: slug,
+        });
+      }
+
+      return {
+        id: 0, // localId is a UUID, can't fit in PublishResult's number type
+        blogId: 1,
+        url,
+        handle: slug,
+      };
+    }
+
+    throw new Error('Next.js Vireon Plugin returned unexpected response format: missing data');
+  }
+
+  /**
+   * Get the effective post identifier for API calls.
+   * Uses the stored _postLocalId (UUID from Next.js plugin) as the canonical
+   * API identifier. Falls back to the original articleId parameter.
+   */
+  private getCustomRestPostId(articleId: string): { postId: string; config: Record<string, unknown> } {
+    const config = this.customRestConnectionConfigs.get(articleId) || {};
+    // Use the stored localId if available; otherwise fall back to articleId
+    const postId = (config._postLocalId as string) || articleId;
+    return { postId, config };
+  }
+
+  /**
+   * Update an article on the Next.js Vireon Plugin.
+   * PUT /api/vireon/posts/{postId}
+   *
+   * The postId is resolved from:
+   *   1. _postLocalId stored in the connection config (UUID from initial publish)
+   *   2. Fallback to the articleId parameter (works if it's a slug or Vireon UUID)
+   */
+  private async updateCustomRestPost(
+    articleId: string,
+    article: Partial<Article>
+  ): Promise<PublishResult> {
+    const { postId, config } = this.getCustomRestPostId(articleId);
+    const req = this.buildCustomRestRequest(config);
+    const endpoint = `${req.baseUrl}/posts/${postId}`;
+
+    const body: Record<string, unknown> = {
+      title: article.title,
+      content: article.content_md,
+      contentHtml: article.content_html,
+      slug: article.slug,
+      metaTitle: article.meta_title,
+      metaDescription: article.meta_description,
+      tags: article.tags,
+    };
+
+    // Remove undefined values so we don't overwrite with empty
+    Object.keys(body).forEach(key => {
+      if (body[key] === undefined) delete body[key];
+    });
+
+    const response = await fetch(endpoint, {
+      method: 'PUT',
+      headers: req.headers,
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Next.js Vireon Plugin update failed: ${response.status} ${errorText.slice(0, 200)}`);
+    }
+
+    // Clean up stored config on success
+    this.customRestConnectionConfigs.delete(articleId);
+
+    const data: any = await response.json();
+
+    if (data.data) {
+      return {
+        id: 0,
+        blogId: 1,
+        url: data.data.url || '',
+        handle: data.data.slug || '',
+      };
+    }
+
+    return { id: 0, blogId: 1, url: '', handle: '' };
+  }
+
+  /**
+   * Delete an article from the Next.js Vireon Plugin.
+   * DELETE /api/vireon/posts/{postId}
+   */
+  private async deleteCustomRestPost(articleId: string): Promise<boolean> {
+    const { postId, config } = this.getCustomRestPostId(articleId);
+
+    if (Object.keys(config).length > 0) {
+      const req = this.buildCustomRestRequest(config);
+      try {
+        const response = await fetch(`${req.baseUrl}/posts/${postId}`, {
+          method: 'DELETE',
+          headers: req.headers,
+          signal: AbortSignal.timeout(15000),
+        });
+
+        if (response.ok) {
+          this.customRestConnectionConfigs.delete(articleId);
+          return true;
+        }
+
+        // 404 means already gone — treat as success
+        if (response.status === 404) {
+          this.customRestConnectionConfigs.delete(articleId);
+          return true;
+        }
+      } catch {
+        // Fall through to env-var approach
+      }
+    }
+
+    // Try env vars as fallback (legacy single-site support)
+    const envUrl = process.env.VIREON_NEXTJS_URL;
+    const envKey = process.env.VIREON_NEXTJS_API_KEY;
+
+    if (envUrl && envKey) {
+      try {
+        const req = this.buildCustomRestRequest({ endpoint_url: envUrl, apiKey: envKey });
+        const response = await fetch(`${req.baseUrl}/posts/${postId}`, {
+          method: 'DELETE',
+          headers: req.headers,
+          signal: AbortSignal.timeout(15000),
+        });
+        return response.ok || response.status === 404;
+      } catch {
+        return false;
+      }
+    }
+
+    logger.warn('Custom REST credentials not configured for delete — set VIREON_NEXTJS_URL + VIREON_NEXTJS_API_KEY or configure per-client CMS connection');
+    return false;
   }
 
   // ══════════════════════════════════════════════════════════════

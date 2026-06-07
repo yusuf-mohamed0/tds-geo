@@ -21,7 +21,7 @@ export function createClientRoutes(pool: Pool): Router {
       const user = (req as any).user;
 
       let result;
-      if (user.role === 'admin') {
+      if (user.role === 'admin' || user.role === 'super_admin') {
         result = await pool.query(
           `SELECT id, name, slug, shopify_shop, brand_voice, service_area,
                   timezone, publish_frequency, approval_mode, is_active, created_at, updated_at

@@ -11,7 +11,8 @@ import { Pool } from 'pg';
 import path from 'path';
 
 import { logger, initLogBuffer, closeLogBuffer } from './utils/logger';
-import { authenticate, authorize, authorizeClientAccess } from './middleware/auth';
+import { authenticate, authorize, authorizeClientAccess, requireDeviceAuth } from './middleware/auth';
+import { requireVpnAccess, ipWhitelist } from './middleware/network';
 import { validate, seoAnalyzeSchema } from './validators/index';
 import costTracker from './services/costTracker';
 
@@ -43,6 +44,7 @@ import internalLinksService from './services/internalLinks';
 import pluginService from './services/pluginService';
 import chatEngine from './services/chatEngine';
 import selfImprovementService from './services/selfImprovementService';
+import deviceAuthService from './services/deviceAuth';
 
 // ══════════════════════════════════════════════
 // ENTERPRISE SERVICE IMPORTS
@@ -52,6 +54,7 @@ import factCheckService from './services/factCheckService';
 import seoIntelligence from './services/seoIntelligence';
 import brandVoice from './services/brandVoice';
 import multiCmsPublisher from './services/multiCmsPublisher';
+import clientScraper from './services/clientScraper';
 import pexelsService from './services/pexelsService';
 import CostOptimizationService from './services/costOptimization';
 import editorialWorkflow from './services/editorialWorkflow';
@@ -67,6 +70,9 @@ import { createShopifyAuthRoutes } from './routes/shopifyAuth';
 // ═══ Shopify Store Info Route Factory ════════
 import { createShopifyStoreRoutes } from './routes/shopifyStore';
 
+// ═══ Device Auth Route Factory ═══════════════
+import { createDeviceRoutes } from './routes/devices';
+
 // ═══ Enterprise Route Factories ═══════════════
 import { createEditorialRoutes } from './routes/editorial';
 import { createFactCheckRoutes } from './routes/factCheck';
@@ -79,6 +85,22 @@ import { createContentIntelRoutes } from './routes/contentIntelligence';
 import { createEvaluationRoutes } from './routes/evaluation';
 import { createPexelsRoutes } from './routes/pexels';
 import { createEnterprisePipelineRoutes } from './routes/enterprisePipeline';
+
+// ═══ Worker Performance Scoring Route Factory ═════
+import { createWorkerScoringRoutes } from './routes/workerScoring';
+import workerScoringEngine from './services/workerScoringEngine';
+
+// ═══ CEO Orchestrator & Department Managers ══════
+import ceoOrchestrator from './orchestrators/CeoOrchestrator';
+
+// ═══ Client Scraper Route Factory ═════════════
+import { createClientScraperRoutes } from './routes/clientScraper';
+
+// ═══ Odoo ERP Connector ═══════════════════════
+import odooConnector from './services/odooConnector';
+
+// ═══ Prompt Hardening Routes ═════════════════
+import { createMetaRoutes } from './routes/meta';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -105,6 +127,11 @@ const globalLimiter = rateLimit({
   message: { error: 'Too many requests, please try again later' }
 });
 app.use(globalLimiter);
+
+// ─── Network Security ───────────────────────
+// VPN-only access and IP whitelist for production
+app.use(requireVpnAccess());
+app.use(ipWhitelist());
 
 // Auth-specific rate limiter
 const authLimiter = rateLimit({
@@ -150,6 +177,20 @@ pool.on('error', (err) => {
 // ══════════════════════════════════════════════
 // Routes
 // ══════════════════════════════════════════════
+
+// ─── Root Route (dev mode only - prod serves frontend) ──
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/', (_req: Request, res: Response) => {
+    res.json({
+      name: 'Vireon — AI SEO Automation System',
+      version: process.env.npm_package_version || '2.0.0',
+      status: 'running',
+      api: '/api',
+      health: '/health',
+      docs: 'https://github.com/yusuf-mohamed0/Vireon'
+    });
+  });
+}
 
 // ─── Health Check (unauthenticated) ───────────
 app.get('/health', async (_req: Request, res: Response) => {
@@ -215,7 +256,13 @@ app.get('/health', async (_req: Request, res: Response) => {
       },
       checks: {
         database: { status: 'healthy', response_time_ms: responseTime },
-        redis: { status: redisStatus }
+        redis: { status: redisStatus },
+        openai: {
+          status: process.env.OPENAI_API_KEY ? 'configured' : 'not_configured',
+          mode: openaiService.isMockMode ? 'mock' : 'live',
+          model: openaiService.defaultModel,
+          provider: openaiService.provider
+        }
       },
       stats
     });
@@ -300,6 +347,18 @@ app.use('/api/pexels', createPexelsRoutes(pool));
 
 // Enterprise pipeline orchestrator
 app.use('/api/pipeline', createEnterprisePipelineRoutes(pool));
+
+// ═══════ Device Auth Routes ═══════════════════
+app.use('/api/devices', authenticate, createDeviceRoutes(pool));
+
+// ═══════ Meta Routes (Prompt Hardening) ═══════
+app.use('/api/meta', createMetaRoutes(pool));
+
+// ═══════ Client Website Scanner Routes ═══════
+app.use('/api/scraper', createClientScraperRoutes(pool));
+
+// ═══════ Worker Performance Scoring Routes ═══════
+app.use('/api/worker-scoring', createWorkerScoringRoutes(pool));
 
 // ─── Self-Improvement Status ───────────────
 app.get('/api/improvements', authenticate, authorize('admin'), async (_req: Request, res: Response, next: NextFunction) => {
@@ -424,7 +483,7 @@ app.post('/api/seo/analyze', authenticate, validate(seoAnalyzeSchema), async (re
 
 // ─── Serve Frontend (production) ────────────
 if (process.env.NODE_ENV === 'production') {
-  const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+  const frontendDist = path.resolve(__dirname, '../frontend/dist');
   app.use(express.static(frontendDist));
   app.get('*', (_req: Request, res: Response) => {
     res.sendFile(path.join(frontendDist, 'index.html'));
@@ -476,6 +535,7 @@ async function start(): Promise<void> {
     pluginService.initialize(pool);
     chatEngine.initialize(pool);
     selfImprovementService.initialize(pool);
+    deviceAuthService.initialize(pool);
 
     // ════════════════════════════════════════════
     // ENTERPRISE SERVICE INITIALIZATION
@@ -492,6 +552,13 @@ async function start(): Promise<void> {
     contentIntelligence.initialize(pool);
     aiEvaluation.initialize(pool);
     resilience.initialize(pool);
+    workerScoringEngine.initialize(pool);
+    ceoOrchestrator.initialize(pool).catch(err => {
+      logger.error('CEO Orchestrator initialization failed', { error: (err as Error).message });
+    });
+
+    // ═══ Odoo ERP Integration ═══════════════════
+    odooConnector.initialize(pool);
 
     logger.info('All enterprise services initialized successfully');
 
@@ -525,6 +592,9 @@ async function shutdown(signal: string): Promise<void> {
   await observability.close().catch(() => {});
   await enterpriseSecurity.close().catch(() => {});
   await resilience.close().catch(() => {});
+  await workerScoringEngine.close().catch(() => {});
+  await odooConnector.close().catch(() => {});
+  await ceoOrchestrator.close().catch(() => {});
   await CostOptimizationService.getInstance().close().catch(() => {});
 
   logger.info('Server shut down');

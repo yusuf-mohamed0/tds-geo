@@ -4,6 +4,7 @@ import { ActivityLog } from '../types'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable, Column } from '../components/DataTable'
 import { SelectField } from '../components/FormField'
+import Icon from '../components/Icon'
 
 export default function Analytics() {
   const [clients, setClients] = useState<any[]>([])
@@ -155,28 +156,28 @@ export default function Analytics() {
               <>
                 <div className="stats-grid">
                   <div className="stat-card">
-                    <div className="stat-icon green">📄</div>
+                    <div className="stat-icon green"><Icon name="articles" /></div>
                     <div>
                       <div className="stat-value">{overview?.articles?.published || overview?.published || 0}</div>
                       <div className="stat-label">Published Articles</div>
                     </div>
                   </div>
                   <div className="stat-card">
-                    <div className="stat-icon purple">📊</div>
+                    <div className="stat-icon purple"><Icon name="metric" /></div>
                     <div>
                       <div className="stat-value">{overview?.articles?.avg_seo_score != null ? `${overview.articles.avg_seo_score}` : '—'}</div>
                       <div className="stat-label">Avg SEO Score</div>
                     </div>
                   </div>
                   <div className="stat-card">
-                    <div className="stat-icon blue">🔑</div>
+                    <div className="stat-icon blue"><Icon name="keyword" /></div>
                     <div>
                       <div className="stat-value">{overview?.keywords?.used_30d || 0}</div>
                       <div className="stat-label">Keywords (30d)</div>
                     </div>
                   </div>
                   <div className="stat-card">
-                    <div className="stat-icon yellow">📈</div>
+                    <div className="stat-icon yellow"><Icon name="seo-enhance" /></div>
                     <div>
                       <div className="stat-value">{overview?.publishing?.last_30d || 0}</div>
                       <div className="stat-label">Published (30d)</div>
@@ -269,7 +270,7 @@ export default function Analytics() {
                 <CardBody>
                   <div className="stats-grid">
                     <div className="stat-card">
-                      <div className="stat-icon red">💰</div>
+                      <div className="stat-icon red"><Icon name="api-usage" /></div>
                       <div>
                         <div className="stat-value">${(costs?.total_cost || costs?.total_cost_mtd || 0).toFixed(2)}</div>
                         <div className="stat-label">Total Cost (Month)</div>

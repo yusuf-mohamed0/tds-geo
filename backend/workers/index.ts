@@ -7,6 +7,7 @@ import 'dotenv/config';
 import { Job } from 'bullmq';
 import { Pool } from 'pg';
 import { logger, logActivity, initLogBuffer, closeLogBuffer } from '../utils/logger';
+import clientScraper from '../services/clientScraper';
 import {
   QueueNames,
   createWorker,
@@ -45,6 +46,7 @@ import enterpriseSecurity from '../services/enterpriseSecurity';
 import contentIntelligence from '../services/contentIntelligence';
 import aiEvaluationService from '../services/aiEvaluation';
 import circuitBreakerService from '../services/circuitBreaker';
+import odooConnector from '../services/odooConnector';
 
 // ─── Initialize Services ────────────────────
 function initializeServices(): void {
@@ -69,6 +71,7 @@ function initializeServices(): void {
   brandVoiceService.initialize(pool);
   multiCmsPublisher.initialize(pool);
   pexelsService.initialize(pool);
+  clientScraper.initialize(pool);
   costOptimization.getInstance().initialize(pool);
   editorialWorkflowService.initialize(pool);
   observabilityService.initialize(pool);
@@ -76,6 +79,7 @@ function initializeServices(): void {
   contentIntelligence.initialize(pool);
   aiEvaluationService.initialize(pool);
   circuitBreakerService.initialize(pool);
+  odooConnector.initialize(pool);
 
   logger.info('All enterprise services initialized for workers');
 
@@ -677,6 +681,8 @@ function registerWorkers(): void {
   createWorker(QueueNames.DEFAULT, handleDeadLetter, { concurrency: 1 });
 
   // ── Enterprise Workers ──
+  createWorker(QueueNames.CLIENT_SCAN, handleClientScan, { concurrency: 2 });
+  createWorker(QueueNames.BATCH_CLIENT_SCAN, handleBatchClientScan, { concurrency: 1 });
   createWorker(QueueNames.FACT_CHECK, handleFactCheck, { concurrency: 2 });
   createWorker(QueueNames.BRAND_VOICE, handleBrandVoice, { concurrency: 1 });
   createWorker(QueueNames.SEO_INTELLIGENCE, handleSeoIntelligence, { concurrency });
@@ -687,6 +693,73 @@ function registerWorkers(): void {
   createWorker(QueueNames.AI_EVALUATION, handleAiEvaluation, { concurrency: 1 });
 
   logger.info('All workers registered (core + enterprise)');
+}
+
+// ─── Client Scan Worker ─────────────────────
+async function handleClientScan(job: Job): Promise<Record<string, unknown>> {
+  const { clientId, url, force } = job.data;
+  logger.info('Worker: Scanning client website', { clientId, url });
+
+  if (!force && clientId) {
+    const existing = await clientScraper.getIntelligence(clientId);
+    if (existing) {
+      const daysOld = (Date.now() - new Date(existing.scraped_at).getTime()) / 86400000;
+      if (daysOld < 7) {
+        logger.info('Worker: Skipping client scan — recently scanned', { clientId, daysAgo: Math.round(daysOld) });
+        return { skipped: true, reason: 'recently_scanned', daysAgo: Math.round(daysOld) };
+      }
+    }
+  }
+
+  const intelligence = await clientScraper.scanWebsite(url, clientId);
+  return {
+    clientId,
+    url,
+    pagesScanned: intelligence.pages_scanned,
+    servicesFound: intelligence.services.length,
+    industriesFound: intelligence.industries.length,
+    primaryTone: intelligence.tone_analysis.primary_tone,
+  };
+}
+
+// ─── Batch Client Scan Worker ───────────────
+async function handleBatchClientScan(job: Job): Promise<Record<string, unknown>> {
+  const { force } = job.data;
+  logger.info('Worker: Starting batch scan of all clients');
+
+  const clients = force
+    ? await clientScraper.getAllActiveClients()
+    : await clientScraper.getClientsNeedingScan();
+
+  logger.info('Worker: Clients to scan in batch', { count: clients.length, force: !!force });
+
+  const results = [];
+  for (const client of clients) {
+    try {
+      const intelligence = await clientScraper.scanWebsite(client.domain, client.id);
+      results.push({
+        clientId: client.id,
+        name: client.name,
+        status: 'success',
+        pagesScanned: intelligence.pages_scanned,
+      });
+      await new Promise(r => setTimeout(r, 1500));
+    } catch (err) {
+      results.push({
+        clientId: client.id,
+        name: client.name,
+        status: 'failed',
+        error: (err as Error).message,
+      });
+    }
+  }
+
+  return {
+    total: clients.length,
+    scanned: results.filter(r => r.status === 'success').length,
+    failed: results.filter(r => r.status === 'failed').length,
+    results,
+  };
 }
 
 // ─── Dead Letter Handler ────────────────────

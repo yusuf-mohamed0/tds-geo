@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable, Column } from '../components/DataTable'
 import { SelectField, InputField } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 type Tab = 'factChecks' | 'sources' | 'topics'
 
@@ -101,7 +102,7 @@ export default function FactChecking() {
     { key: 'verification', header: 'Status', render: (f) => <span className={`badge badge-${VERIFICATION_BADGE[f.verification] || 'gray'}`}>{f.verification.replace('_', ' ')}</span> },
     { key: 'confidence', header: 'Confidence', render: (f) => <span style={{ fontWeight: 600, color: f.confidence >= 0.8 ? 'var(--success)' : f.confidence >= 0.5 ? 'var(--warning)' : 'var(--danger)' }}>{(f.confidence * 100).toFixed(0)}%</span> },
     { key: 'source_domain', header: 'Source', render: (f) => f.source_url ? <a href={f.source_url} target="_blank" className="text-sm">{f.source_domain || f.source_url}</a> : <span className="text-muted">—</span> },
-    { key: 'reviewed_by_human', header: 'Human Review', render: (f) => f.reviewed_by_human ? <span className="badge badge-green">✅ Reviewed</span> : <span className="badge badge-yellow">Pending</span> },
+    { key: 'reviewed_by_human', header: 'Human Review', render: (f) => f.reviewed_by_human ? <span className="badge badge-green"><Icon name="completed" /> Reviewed</span> : <span className="badge badge-yellow">Pending</span> },
   ]
 
   return (
@@ -141,7 +142,7 @@ export default function FactChecking() {
                 <div className="flex gap-2" style={{ alignItems: 'flex-end' }}>
                   <InputField label="Article ID" value={articleId} onChange={e => setArticleId(e.target.value)} placeholder="Enter article ID to verify..." />
                   <button className="btn btn-primary" onClick={verifyArticle} disabled={!articleId.trim() || verifying}>
-                    {verifying ? '⏳ Verifying...' : '🔍 Verify'}
+                    {verifying ? <><Icon name="loading" spin /> Verifying...</> : <><Icon name="search" /> Verify</>}
                   </button>
                 </div>
               </CardBody>

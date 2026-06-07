@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable, Column } from '../components/DataTable'
 import { SelectField, InputField } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 type Tab = 'overview' | 'budget' | 'routing'
 
@@ -105,8 +106,8 @@ export default function CostOptimization() {
             {report ? (
               <div>
                 <div className="stats-grid">
-                  <div className="stat-card"><div className="stat-icon red">💰</div><div><div className="stat-value">${report.total_cost?.toFixed(2)}</div><div className="stat-label">Total Cost</div></div></div>
-                  <div className="stat-card"><div className="stat-icon purple">🔤</div><div><div className="stat-value">{report.total_tokens?.toLocaleString()}</div><div className="stat-label">Total Tokens</div></div></div>
+                  <div className="stat-card"><div className="stat-icon red"><Icon name="api-usage" /></div><div><div className="stat-value">${report.total_cost?.toFixed(2)}</div><div className="stat-label">Total Cost</div></div></div>
+                  <div className="stat-card"><div className="stat-icon purple"><Icon name="keyword" /></div><div><div className="stat-value">{report.total_tokens?.toLocaleString()}</div><div className="stat-label">Total Tokens</div></div></div>
                 </div>
 
                 <div className="grid-2" style={{ marginTop: 16 }}>
@@ -163,13 +164,13 @@ export default function CostOptimization() {
               <div>
                 <div className="stats-grid">
                   <div className="stat-card">
-                    <div className={`stat-icon ${budget.within_budget ? 'green' : 'red'}`}>{budget.within_budget ? '✅' : '⚠️'}</div>
+                    <div className={`stat-icon ${budget.within_budget ? 'green' : 'red'}`}>{budget.within_budget ? <Icon name="completed" /> : <Icon name="warning" />}</div>
                     <div><div className="stat-value">{budget.within_budget ? 'Within Budget' : 'Over Budget'}</div><div className="stat-label">Budget Status</div></div>
                   </div>
                   {budget.budget && (
                     <>
-                      <div className="stat-card"><div className="stat-icon purple">🔤</div><div><div className="stat-value">{budget.budget.tokens_used?.toLocaleString()} / {budget.budget.token_limit?.toLocaleString()}</div><div className="stat-label">Tokens Used</div></div></div>
-                      <div className="stat-card"><div className="stat-icon red">💰</div><div><div className="stat-value">${budget.budget.cost_used?.toFixed(2)} / ${budget.budget.cost_limit?.toFixed(2)}</div><div className="stat-label">Cost Used</div></div></div>
+                      <div className="stat-card"><div className="stat-icon purple"><Icon name="keyword" /></div><div><div className="stat-value">{budget.budget.tokens_used?.toLocaleString()} / {budget.budget.token_limit?.toLocaleString()}</div><div className="stat-label">Tokens Used</div></div></div>
+                      <div className="stat-card"><div className="stat-icon red"><Icon name="api-usage" /></div><div><div className="stat-value">${budget.budget.cost_used?.toFixed(2)} / ${budget.budget.cost_limit?.toFixed(2)}</div><div className="stat-label">Cost Used</div></div></div>
                     </>
                   )}
                 </div>

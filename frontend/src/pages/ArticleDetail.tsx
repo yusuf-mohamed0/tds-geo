@@ -5,6 +5,7 @@ import { ArticleWithEditorial, SeoAnalysis, FactCheck, QualityReport } from '../
 import { Card, CardHeader, CardBody, CardFooter } from '../components/Card'
 import { InputField } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 const STATUS_COLORS: Record<string, string> = {
   published: 'green', draft: 'gray', generated: 'yellow', generated_approved: 'green',
@@ -111,7 +112,7 @@ export default function ArticleDetail() {
               url: result.publishResult?.url || result.url,
               shopifyArticleId: result.publishResult?.id || result.shopifyArticleId,
             })
-            addToast('success', 'Article published to Shopify! 🎉')
+            addToast('success', 'Article published to Shopify!')
           }
           break
         case 'save':
@@ -194,9 +195,9 @@ export default function ArticleDetail() {
         {/* Published Result Banner */}
         {publishResult?.url && (
           <div className="alert alert-success" style={{ marginBottom: 20 }}>
-            <strong>🎉 Published!</strong>
+            <strong><Icon name="success" /> Published!</strong>
             <a href={publishResult.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8 }}>
-              View on Shopify →
+              View on Shopify <Icon name="external-link" />
             </a>
           </div>
         )}
@@ -207,14 +208,14 @@ export default function ArticleDetail() {
             {(article.status === 'generated' || article.status === 'draft') && (
               <>
                 <button className="btn btn-success" onClick={() => performAction('approve')} disabled={!!actionLoading}>
-                  {actionLoading === 'approve' ? '⏳ Approving...' : '✓ Approve'}
+                  {actionLoading === 'approve' ? <><Icon name="loading" spin /> Approving...</> : <><Icon name="approve" /> Approve</>}
                 </button>
                 <button className="btn btn-warning" onClick={() => performAction('regenerate')} disabled={!!actionLoading}>
-                  {actionLoading === 'regenerate' ? '⏳ Regenerating...' : '↻ Regenerate'}
+                  {actionLoading === 'regenerate' ? <><Icon name="loading" spin /> Regenerating...</> : <><Icon name="regenerate" /> Regenerate</>}
                 </button>
                 {!showRejectInput ? (
                   <button className="btn btn-danger" onClick={() => setShowRejectInput(true)} disabled={!!actionLoading}>
-                    ✕ Reject
+                    <Icon name="reject" /> Reject
                   </button>
                 ) : (
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: 1, flexWrap: 'wrap' }}>
@@ -238,12 +239,12 @@ export default function ArticleDetail() {
                     setShowPublishInput(true)
                     if (article.client_id) fetchBlogs(article.client_id)
                   }} disabled={!!actionLoading}>
-                    🚀 Publish to Shopify
+                    <Icon name="publish" /> Publish to Shopify
                   </button>
                 ) : (
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                     {loadingBlogs ? (
-                      <span className="text-muted text-sm">Fetching blogs...</span>
+                      <span className="text-muted text-sm"><Icon name="loading" spin /> Fetching blogs...</span>
                     ) : availableBlogs.length > 0 ? (
                       <select className="form-select" value={blogId} onChange={e => setBlogId(e.target.value)} style={{ width: 200 }}>
                         {availableBlogs.map(b => (
@@ -256,19 +257,19 @@ export default function ArticleDetail() {
                     <button className="btn btn-success btn-sm"
                       onClick={() => performAction('publish', { blogId: parseInt(blogId) })}
                       disabled={!blogId || !!actionLoading}>
-                      {actionLoading === 'publish' ? '⏳ Publishing...' : 'Publish'}
+                      {actionLoading === 'publish' ? <><Icon name="loading" spin /> Publishing...</> : 'Publish'}
                     </button>
                     <button className="btn btn-outline btn-sm" onClick={() => { setShowPublishInput(false); setAvailableBlogs([]) }}>Cancel</button>
                   </div>
                 )}
                 <button className="btn btn-warning" onClick={() => performAction('regenerate')} disabled={!!actionLoading}>
-                  {actionLoading === 'regenerate' ? '⏳ Regenerating...' : '↻ Regenerate'}
+                  {actionLoading === 'regenerate' ? <><Icon name="loading" spin /> Regenerating...</> : <><Icon name="regenerate" /> Regenerate</>}
                 </button>
               </>
             )}
             {article.status === 'published' && (
               <span className="badge badge-green" style={{ fontSize: 14, padding: '6px 14px' }}>
-                ✅ Published — no further actions available
+                <Icon name="completed" /> Published — no further actions available
               </span>
             )}
             {article.status === 'rejected' && (
@@ -278,12 +279,12 @@ export default function ArticleDetail() {
             )}
             {article.status === 'failed' && (
               <span className="badge badge-red" style={{ fontSize: 14, padding: '6px 14px' }}>
-                ❌ Generation failed — try regenerating
+                <Icon name="failed" /> Generation failed — try regenerating
               </span>
             )}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
               <button className="btn btn-outline" onClick={() => setEditing(!editing)}>
-                {editing ? '✕ Cancel Edit' : '✏️ Edit'}
+                {editing ? <><Icon name="cancel" /> Cancel Edit</> : <><Icon name="edit" /> Edit</>}
               </button>
             </div>
           </CardBody>
@@ -307,7 +308,7 @@ export default function ArticleDetail() {
                     />
                   </div>
                   <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={() => performAction('save')} disabled={actionLoading === 'save'}>
-                    {actionLoading === 'save' ? 'Saving...' : 'Save Changes'}
+                    {actionLoading === 'save' ? <><Icon name="loading" spin /> Saving...</> : <><Icon name="save" /> Save Changes</>}
                   </button>
                 </CardBody>
               </Card>
@@ -488,7 +489,7 @@ export default function ArticleDetail() {
                     <div><strong>Keyword Density:</strong> {seoAnalysis.keywordDensity?.toFixed(2)}%</div>
                     <div><strong>Readability:</strong> {seoAnalysis.readabilityScore?.toFixed(0)}/100</div>
                     <div>
-                      <strong>Headings:</strong> {seoAnalysis.headingStructure?.h1 ? '✅ H1' : '❌ H1'} · {seoAnalysis.headingStructure?.h2 || 0} H2 · {seoAnalysis.headingStructure?.h3 || 0} H3
+                      <strong>Headings:</strong> {seoAnalysis.headingStructure?.h1 ? <><Icon name="completed" /> H1</> : <><Icon name="failed" /> H1</>} · {seoAnalysis.headingStructure?.h2 || 0} H2 · {seoAnalysis.headingStructure?.h3 || 0} H3
                     </div>
                     {seoAnalysis.suggestions?.length > 0 && (
                       <div>

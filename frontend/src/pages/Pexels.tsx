@@ -3,6 +3,7 @@ import { pexelsApi } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 interface CachedImage {
   id: number
@@ -96,7 +97,7 @@ export default function Pexels() {
                 <input className="form-input" value={sectionsInput} onChange={e => setSectionsInput(e.target.value)} placeholder="e.g., introduction, benefits, examples" />
               </div>
               <button className="btn btn-primary" onClick={searchImages} disabled={!articleTitle.trim() || !keyword.trim() || searching}>
-                {searching ? '⏳ Searching...' : '🖼️ Find Images'}
+                {searching ? <><Icon name="loading" spin /> Searching...</> : <><Icon name="pexels" /> Find Images</>}
               </button>
             </CardBody>
           </Card>
@@ -160,7 +161,7 @@ export default function Pexels() {
         <Card style={{ marginTop: 16 }}>
           <CardHeader>
             Cached Images
-            <button className="btn btn-outline btn-sm" onClick={loadCache}>🔄 Refresh</button>
+            <button className="btn btn-outline btn-sm" onClick={loadCache}><Icon name="refresh" /> Refresh</button>
           </CardHeader>
           <CardBody>
             {loadingCache ? (

@@ -1,16 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
-import { chatApi, analyticsApi } from '../services/api'
+import { chatApi, analyticsApi, metaApi } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 import type { ChatSession, ChatMessage } from '../types'
 
-const QUICK_ACTIONS = [
-  { label: '📋 List Articles', cmd: 'list articles' },
-  { label: '🔍 Research Keywords', cmd: 'research keywords for SEO tools' },
-  { label: '📊 Dashboard Stats', cmd: 'show analytics overview' },
-  { label: '⚙️ System Config', cmd: 'list config' },
-  { label: '🧩 List Plugins', cmd: 'list plugins' },
-  { label: '🤖 Run Analysis', cmd: 'analyze improvements' },
+const FALLBACK_ACTIONS = [
+  { id: 'list-articles', label: 'List Articles', actionId: 'list_articles' },
+  { id: 'dashboard-stats', label: 'Dashboard Stats', actionId: 'show_analytics' },
 ]
 
 function renderMessage(content: string): (string | JSX.Element)[] {
@@ -49,6 +46,7 @@ export default function Chat() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionsLoading, setSessionsLoading] = useState(true)
+  const [quickActions, setQuickActions] = useState<{ id: string; label: string; actionId: string }[]>(FALLBACK_ACTIONS)
   const [showQuickActions, setShowQuickActions] = useState(true)
   const [crossAnalytics, setCrossAnalytics] = useState<any>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -60,6 +58,17 @@ export default function Chat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Fetch quick actions from server (prompt hardening)
+  useEffect(() => {
+    metaApi.getQuickActions().then(data => {
+      if (data?.actions?.length) {
+        setQuickActions(data.actions);
+      }
+    }).catch(() => {
+      // Fallback actions already set
+    });
+  }, [])
 
   useEffect(() => {
     const loadAnalytics = async () => {
@@ -161,7 +170,7 @@ export default function Chat() {
         id: 'error-' + Date.now(),
         session_id: sessionId!,
         role: 'system',
-        content: `❌ ${msg}`,
+        content: `Error: ${msg}`,
         tool_calls: [],
         tool_results: [],
         metadata: {},
@@ -206,7 +215,7 @@ export default function Chat() {
       <aside className={`chat-drawer ${sidebarOpen ? 'open' : ''}`}>
         <div className="chat-drawer-header">
           <div className="chat-drawer-brand">
-            <span className="chat-brand-icon">💬</span>
+            <span className="chat-brand-icon"><Icon name="chat" size="2x" /></span>
             <div>
               <h2>AI Chat</h2>
               <span className="chat-status-badge">
@@ -243,7 +252,7 @@ export default function Chat() {
                 className={`chat-session-item ${activeSession?.id === s.id ? 'active' : ''}`}
                 onClick={() => loadSession(s)}
               >
-                <div className="chat-session-icon">💬</div>
+                <div className="chat-session-icon"><Icon name="chat" /></div>
                 <div className="chat-session-info">
                   <div className="chat-session-title">{s.title}</div>
                   <div className="chat-session-meta">
@@ -266,7 +275,7 @@ export default function Chat() {
 
         {analyticsContext && (
           <div className="chat-drawer-analytics">
-            <div className="chat-analytics-header">📊 Platform Overview</div>
+            <div className="chat-analytics-header"><Icon name="metric" /> Platform Overview</div>
             <div className="chat-analytics-grid">
               <div className="chat-analytics-item">
                 <span className="chat-analytics-value">{analyticsContext.totalArticles}</span>
@@ -321,23 +330,23 @@ export default function Chat() {
             <div className="chat-welcome">
               <div className="chat-welcome-graphic">
                 <div className="chat-welcome-orb" />
-                <div className="chat-welcome-icon">💬</div>
+                <div className="chat-welcome-icon"><Icon name="chat" size="3x" /></div>
               </div>
               <h1>How can I help you today?</h1>
               <p className="chat-welcome-subtitle">
                 I'm Buffy, your AI platform assistant powered by{' '}
-                <strong>DeepSeek Intelligence</strong>.
+                <strong>OpenAI Intelligence</strong>.
                 I can manage content, analytics, and system operations.
               </p>
 
               <div className="chat-quick-actions">
                 <span className="chat-quick-label">Try these:</span>
                 <div className="chat-quick-chips">
-                  {QUICK_ACTIONS.map((action, i) => (
+                  {quickActions.map((action, i) => (
                     <button
-                      key={i}
+                      key={action.id || i}
                       className="chat-action-chip"
-                      onClick={() => quickAction(action.cmd)}
+                      onClick={() => quickAction(action.actionId)}
                     >
                       {action.label}
                     </button>
@@ -347,7 +356,7 @@ export default function Chat() {
 
               {analyticsContext && (
                 <div className="chat-welcome-analytics">
-                  <div className="chat-welcome-analytics-header">📊 Platform at a Glance</div>
+                  <div className="chat-welcome-analytics-header"><Icon name="metric" /> Platform at a Glance</div>
                   <div className="chat-welcome-analytics-grid">
                     <div className="cwa-card">
                       <div className="cwa-value">{analyticsContext.totalArticles}</div>
@@ -373,8 +382,8 @@ export default function Chat() {
             <div className="chat-welcome chat-welcome-small">
               <p>Send a message to start the conversation.</p>
               <div className="chat-quick-chips" style={{ justifyContent: 'center' }}>
-                {QUICK_ACTIONS.slice(0, 4).map((action, i) => (
-                  <button key={i} className="chat-action-chip" onClick={() => quickAction(action.cmd)}>
+                {quickActions.slice(0, 4).map((action, i) => (
+                  <button key={action.id || i} className="chat-action-chip" onClick={() => quickAction(action.actionId)}>
                     {action.label}
                   </button>
                 ))}
@@ -399,7 +408,7 @@ export default function Chat() {
                         </svg>
                       </div>
                     ) : (
-                      <div className="chat-avatar-system">⚙️</div>
+                      <div className="chat-avatar-system"><Icon name="settings" size="lg" /></div>
                     )}
                   </div>
                   <div className="chat-msg-content">

@@ -6,20 +6,31 @@ import { Router, Request, Response, NextFunction, RequestHandler } from 'express
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { Pool } from 'pg';
-import { JwtPayload, UserRole } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { JwtPayload, UserRole, DeviceFingerprint } from '../types';
 import { logger } from '../utils/logger';
+import deviceAuthService from '../services/deviceAuth';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change-this-in-production-secret-key';
-const JWT_EXPIRES_IN = '24h';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
+const SESSION_TTL_HOURS = parseInt(process.env.SESSION_TTL_HOURS || '24', 10);
 
 // ─── Token Utilities ─────────────────────────
 
-export function generateToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+export function generateToken(payload: JwtPayload, deviceId?: string, jti?: string): string {
+  const tokenPayload: Record<string, unknown> = {
+    ...payload,
+    jti: jti || uuidv4(),
+    deviceId: deviceId || null,
+    iat: Math.floor(Date.now() / 1000),
+  };
+  return jwt.sign(tokenPayload, JWT_SECRET, {
+    expiresIn: SESSION_TTL_HOURS * 3600, // seconds
+  });
 }
 
-export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, JWT_SECRET) as JwtPayload;
+export function verifyToken(token: string): JwtPayload & { jti?: string; deviceId?: string } {
+  return jwt.verify(token, JWT_SECRET) as JwtPayload & { jti?: string; deviceId?: string };
 }
 
 // ─── Express Middleware ───────────────────────
@@ -97,6 +108,178 @@ export function authorize(...roles: UserRole[]): RequestHandler {
         yourRole: user.role
       });
       return;
+    }
+
+    next();
+  };
+}
+
+// ══════════════════════════════════════════════
+// DEVICE AUTHENTICATION MIDDLEWARE
+// ══════════════════════════════════════════════
+
+/**
+ * Extract device fingerprint from request headers.
+ * Client must send these headers on every authenticated request.
+ */
+export function extractDeviceFingerprint(req: Request): DeviceFingerprint | null {
+  try {
+    return {
+      cpuIdentifier: (req.headers['x-device-cpu'] as string) || '',
+      macHash: (req.headers['x-device-mac-hash'] as string) || '',
+      osSerialHash: (req.headers['x-device-os-serial'] as string) || '',
+      certThumbprint: (req.headers['x-device-cert'] as string) || undefined,
+      browserFingerprint: (req.headers['x-device-browser-fp'] as string) || '',
+      userAgent: req.headers['user-agent'] || '',
+      screenResolution: (req.headers['x-device-resolution'] as string) || undefined,
+      timezone: (req.headers['x-device-timezone'] as string) || undefined,
+      language: (req.headers['x-device-language'] as string) || undefined,
+      platform: (req.headers['x-device-platform'] as string) || '',
+      ipAddress: req.ip || req.socket.remoteAddress || '',
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Require device authorization AFTER authenticate middleware.
+ * Validates the device is registered, not revoked, and has sufficient trust.
+ * If auto-enrollment is enabled, unregistered devices will be enrolled automatically.
+ */
+export function requireDeviceAuth(pool: Pool): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user = (req as any).user as JwtPayload | undefined;
+      if (!user) {
+        res.status(401).json({ error: 'Authentication required' });
+        return;
+      }
+
+      // super_admin can bypass device auth unless explicitly required
+      const requireForAll = process.env.DEVICE_AUTH_REQUIRED_FOR_ALL === 'true';
+      if (user.role === 'super_admin' && !requireForAll) {
+        next();
+        return;
+      }
+
+      const fingerprint = extractDeviceFingerprint(req);
+      if (!fingerprint) {
+        res.status(401).json({
+          error: 'Device fingerprint missing',
+          message: 'Re-authenticate from a registered device.',
+          code: 'FINGERPRINT_MISSING',
+        });
+        return;
+      }
+
+      const fpHash = deviceAuthService.hashFingerprint(fingerprint);
+
+      // Verify device is registered and not revoked
+      const verification = await deviceAuthService.verifyDevice(user.userId, fpHash);
+
+      if (!verification.valid) {
+        // Auto-enroll if configured
+        if (process.env.DEVICE_AUTO_ENROLL === 'true' && verification.reason === 'Device not registered') {
+          await deviceAuthService.enrollDevice(
+            user.userId,
+            fingerprint,
+            `${fingerprint.platform || 'Unknown'} device`,
+            user.userId
+          );
+
+          // Re-verify after enrollment
+          const reVerification = await deviceAuthService.verifyDevice(user.userId, fpHash);
+          if (!reVerification.valid) {
+            res.status(403).json({
+              error: 'Device enrollment failed',
+              code: 'ENROLLMENT_FAILED',
+            });
+            return;
+          }
+
+          // Attach device info
+          (req as any).deviceId = reVerification.device!.id;
+          (req as any).deviceFingerprintHash = fpHash;
+          (req as any).deviceTrustScore = reVerification.device!.trustScore;
+          next();
+          return;
+        }
+
+        res.status(403).json({
+          error: verification.reason || 'Unregistered device',
+          message: 'This device is not authorized. Please contact your administrator.',
+          code: verification.device?.isRevoked ? 'DEVICE_REVOKED' : 'UNREGISTERED_DEVICE',
+        });
+        return;
+      }
+
+      if (verification.device!.isRevoked) {
+        // Log attempted use of revoked device
+        try {
+          await pool.query('SELECT log_device_activity($1, $2, $3, $4::jsonb, $5::inet)', [
+            user.userId,
+            verification.device!.id,
+            'revoked_device_attempt',
+            JSON.stringify({ path: req.originalUrl, method: req.method }),
+            req.ip || '0.0.0.0',
+          ]);
+        } catch { /* non-critical */ }
+
+        res.status(403).json({
+          error: 'Device has been revoked',
+          message: 'This device has been revoked. Contact your administrator.',
+          code: 'DEVICE_REVOKED',
+        });
+        return;
+      }
+
+      // Attach device context to request
+      (req as any).deviceId = verification.device!.id;
+      (req as any).deviceFingerprintHash = fpHash;
+      (req as any).deviceTrustScore = verification.device!.trustScore;
+
+      // Update last_seen asynchronously (non-blocking)
+      pool.query(
+        'UPDATE device_registry SET last_seen_at = NOW(), last_ip = $2::inet WHERE id = $1',
+        [verification.device!.id, req.ip || '0.0.0.0']
+      ).catch(() => {});
+
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
+}
+
+/**
+ * Optional device auth — logs fingerprint but doesn't reject.
+ * Useful for endpoints that should track device info but not enforce.
+ */
+export function optionalDeviceAuth(pool: Pool): RequestHandler {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+    const user = (req as any).user as JwtPayload | undefined;
+    if (!user) {
+      next();
+      return;
+    }
+
+    const fingerprint = extractDeviceFingerprint(req);
+    if (!fingerprint) {
+      next();
+      return;
+    }
+
+    try {
+      const fpHash = deviceAuthService.hashFingerprint(fingerprint);
+      const verification = await deviceAuthService.verifyDevice(user.userId, fpHash);
+      if (verification.valid && verification.device && !verification.device.isRevoked) {
+        (req as any).deviceId = verification.device.id;
+        (req as any).deviceFingerprintHash = fpHash;
+        (req as any).deviceTrustScore = verification.device.trustScore;
+      }
+    } catch {
+      // Non-blocking
     }
 
     next();
@@ -306,14 +489,62 @@ export function createAuthRouter(pool: Pool): Router {
       // Update last login
       await pool.query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [user.id]);
 
+      // ── Device Binding ──
+      let deviceId: string | undefined;
+      let trustScore = 80;
+      let deviceEnrolled = false;
+
+      const fingerprint = extractDeviceFingerprint(req);
+      if (fingerprint && process.env.DEVICE_ENABLED !== 'false') {
+        const fpHash = deviceAuthService.hashFingerprint(fingerprint);
+        const verification = await deviceAuthService.verifyDevice(user.id, fpHash);
+
+        if (verification.valid && verification.device) {
+          deviceId = verification.device.id;
+          trustScore = verification.device.trustScore;
+          deviceEnrolled = true;
+        } else if (process.env.DEVICE_AUTO_ENROLL === 'true') {
+          // Auto-register on first login from this device
+          const registration = await deviceAuthService.enrollDevice(
+            user.id,
+            fingerprint,
+            `${fingerprint.platform || 'Unknown'} device`,
+            user.id
+          );
+          deviceId = registration.id;
+          trustScore = registration.trustScore;
+          deviceEnrolled = true;
+        }
+      }
+
+      // Generate JWT with device binding
+      const jti = uuidv4();
       const token = generateToken({
         userId: user.id,
         email: user.email,
         role: user.role,
         clientId: user.client_id
-      });
+      }, deviceId, jti);
 
-      logger.info('User logged in', { userId: user.id, role: user.role });
+      // Create session record if device is bound
+      if (deviceId) {
+        try {
+          await deviceAuthService.createSession(
+            user.id,
+            deviceId,
+            jti,
+            req.ip || '0.0.0.0',
+            req.headers['user-agent'] || '',
+            SESSION_TTL_HOURS
+          );
+        } catch (sessionErr) {
+          logger.warn('Session creation failed (non-blocking)', {
+            error: (sessionErr as Error).message,
+          });
+        }
+      }
+
+      logger.info('User logged in', { userId: user.id, role: user.role, deviceEnrolled });
 
       res.json({
         token,
@@ -323,7 +554,12 @@ export function createAuthRouter(pool: Pool): Router {
           name: user.name,
           role: user.role,
           client_id: user.client_id
-        }
+        },
+        device: deviceId ? {
+          enrolled: deviceEnrolled,
+          trustScore,
+          deviceId,
+        } : null,
       });
     } catch (err) {
       next(err);

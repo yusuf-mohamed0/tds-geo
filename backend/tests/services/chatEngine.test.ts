@@ -24,7 +24,7 @@ vi.mock('../../services/openai', () => ({
     analyzeSEO: vi.fn(),
     generateKeywordVariations: vi.fn(),
     get provider() { return 'openai'; },
-    setProvider: vi.fn(),
+
     initialize: vi.fn(),
     defaultModel: 'mock-model',
     maxTokens: 4096,

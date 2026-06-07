@@ -3,6 +3,7 @@ import { evaluationApi } from '../services/api'
 import { QualityReport, BenchmarkResult } from '../types'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 type Tab = 'evaluate' | 'benchmarks' | 'ab_tests'
 
@@ -130,7 +131,7 @@ export default function AiEvaluation() {
                   <input className="form-input" value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="e.g., best SEO tools" />
                 </div>
                 <button className="btn btn-primary" onClick={evaluateContent} disabled={!content.trim() || !keyword.trim() || evaluating}>
-                  {evaluating ? '⏳ Evaluating...' : '⭐ Generate Quality Report'}
+                  {evaluating ? <><Icon name="loading" spin /> Evaluating...</> : <><Icon name="ai-evaluation" /> Generate Quality Report</>}
                 </button>
               </CardBody>
             </Card>
@@ -177,7 +178,7 @@ export default function AiEvaluation() {
                   <input className="form-input" value={datasetId} onChange={e => setDatasetId(e.target.value)} placeholder="Enter benchmark dataset ID" />
                 </div>
                 <button className="btn btn-primary" onClick={runBenchmark} disabled={!datasetId.trim() || runningBenchmark}>
-                  {runningBenchmark ? '⏳ Running...' : '▶️ Run Benchmark'}
+                  {runningBenchmark ? <><Icon name="loading" spin /> Running...</> : <><Icon name="play" /> Run Benchmark</>}
                 </button>
               </CardBody>
             </Card>
@@ -193,19 +194,19 @@ export default function AiEvaluation() {
                 <CardBody>
                   <div className="stats-grid" style={{ marginBottom: 16 }}>
                     <div className="stat-card" style={{ padding: 12 }}>
-                      <div className="stat-icon green">✅</div>
+                      <div className="stat-icon green"><Icon name="completed" /></div>
                       <div><div className="stat-value" style={{ fontSize: 20 }}>{benchmarkResult.passed}</div><div className="stat-label">Passed</div></div>
                     </div>
                     <div className="stat-card" style={{ padding: 12 }}>
-                      <div className="stat-icon red">❌</div>
+                      <div className="stat-icon red"><Icon name="failed" /></div>
                       <div><div className="stat-value" style={{ fontSize: 20 }}>{benchmarkResult.failed}</div><div className="stat-label">Failed</div></div>
                     </div>
                     <div className="stat-card" style={{ padding: 12 }}>
-                      <div className="stat-icon yellow">⚠️</div>
+                      <div className="stat-icon yellow"><Icon name="warning" /></div>
                       <div><div className="stat-value" style={{ fontSize: 20 }}>{benchmarkResult.errors}</div><div className="stat-label">Errors</div></div>
                     </div>
                     <div className="stat-card" style={{ padding: 12 }}>
-                      <div className="stat-icon purple">📊</div>
+                      <div className="stat-icon purple"><Icon name="metric" /></div>
                       <div><div className="stat-value" style={{ fontSize: 20 }}>{benchmarkResult.total_tests}</div><div className="stat-label">Total</div></div>
                     </div>
                   </div>
@@ -213,7 +214,7 @@ export default function AiEvaluation() {
                   {benchmarkResult.test_cases?.slice(0, 20).map((tc, i) => (
                     <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid var(--gray-100)', fontSize: 12 }}>
                       <div className="flex items-center gap-2">
-                        <span>{tc.score >= 0.7 ? '✅' : tc.score >= 0.4 ? '⚠️' : '❌'}</span>
+                        <Icon name={tc.score >= 0.7 ? 'completed' : tc.score >= 0.4 ? 'warning' : 'failed'} />
                         <span style={{ fontWeight: 500 }}>Test {i + 1}</span>
                         <span className="text-muted">Score: {(tc.score * 100).toFixed(0)}%</span>
                       </div>
@@ -246,7 +247,7 @@ export default function AiEvaluation() {
                 <input className="form-input" value={abTestForm.test_name} onChange={e => setAbTestForm({ ...abTestForm, test_name: e.target.value })} placeholder="e.g., Headline A/B test" />
               </div>
               <button className="btn btn-primary" onClick={createAbTest} disabled={!abTestForm.article_base_id || !abTestForm.article_variant_id || creatingAbTest}>
-                {creatingAbTest ? '⏳ Creating...' : '🧪 Create A/B Test'}
+                {creatingAbTest ? <><Icon name="loading" spin /> Creating...</> : <><Icon name="flask" /> Create A/B Test</>}
               </button>
             </CardBody>
           </Card>

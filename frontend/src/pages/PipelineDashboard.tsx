@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { pipelineApi, clientsApi } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 import { Card, CardHeader, CardBody } from '../components/Card'
+import Icon from '../components/Icon'
 
 interface PipelineStage {
   name: string
@@ -21,20 +22,20 @@ interface PipelineHistoryItem {
   created_at: string
 }
 
-const STAGE_ICONS: Record<string, string> = {
-  keyword_discovery: '🔑', search_intent: '🎯', serp_entity_analysis: '🔍',
-  semantic_dedup: '🧹', brand_voice: '🎙️', title_generation: '📝',
-  outline_generation: '📋', article_generation: '✍️', seo_enhancement: '📈',
-  quality_gate: '🛡️', fact_checking: '✅', brand_consistency: '🎯',
-  cannibalization_check: '⚠️', content_safety: '🛡️', html_conversion: '🔧',
-  internal_linking: '🔗', pexels_images: '🖼️', faq_schema: '❓',
-  cta_insertion: '📢', article_storage: '💾', vector_embedding: '🧠',
-  quality_evaluation: '⭐', topic_saturation: '📊', editorial_workflow: '👥',
-  publishing: '🚀', webhook_notification: '🔔',
+const STAGE_ICON_MAP: Record<string, string> = {
+  keyword_discovery: 'keyword-discovery', search_intent: 'search-intent', serp_entity_analysis: 'serp-analysis',
+  semantic_dedup: 'semantic-dedup', brand_voice: 'brand-voice', title_generation: 'title-gen',
+  outline_generation: 'outline-gen', article_generation: 'article-gen', seo_enhancement: 'seo-enhance',
+  quality_gate: 'quality-gate', fact_checking: 'fact-check', brand_consistency: 'brand-consistency',
+  cannibalization_check: 'cannibalization', content_safety: 'content-safety', html_conversion: 'html-conversion',
+  internal_linking: 'internal-linking', pexels_images: 'pexels-images', faq_schema: 'faq-schema',
+  cta_insertion: 'cta-insertion', article_storage: 'article-storage', vector_embedding: 'vector-embedding',
+  quality_evaluation: 'quality-eval', topic_saturation: 'topic-saturation', editorial_workflow: 'editorial-workflow',
+  publishing: 'publish', webhook_notification: 'webhook-notify',
 }
 
-const STATUS_ICONS: Record<string, string> = {
-  pending: '⏳', running: '🔄', completed: '✅', failed: '❌', skipped: '⏭️',
+const STATUS_ICON_MAP: Record<string, string> = {
+  pending: 'pending', running: 'running', completed: 'completed', failed: 'failed', skipped: 'skipped',
 }
 
 export default function PipelineDashboard() {
@@ -144,7 +145,7 @@ export default function PipelineDashboard() {
           )}
           <input className="form-input" placeholder="Keyword to generate..." value={keyword} onChange={e => setKeyword(e.target.value)} style={{ width: 280 }} />
           <button className="btn btn-primary" onClick={runPipeline} disabled={!keyword.trim() || !effectiveClientId || running}>
-            {running ? '⏳ Running...' : '🚀 Run Pipeline'}
+            {running ? <><Icon name="running" spin /> Running...</> : <><Icon name="publish" /> Run Pipeline</>}
           </button>
         </div>
       </div>
@@ -154,19 +155,19 @@ export default function PipelineDashboard() {
 
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon blue">🔄</div>
+            <div className="stat-icon blue"><Icon name="running" /></div>
             <div><div className="stat-value">{counts.running}</div><div className="stat-label">Running</div></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon green">✅</div>
+            <div className="stat-icon green"><Icon name="completed" /></div>
             <div><div className="stat-value">{counts.completed}</div><div className="stat-label">Completed</div></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon red">❌</div>
+            <div className="stat-icon red"><Icon name="failed" /></div>
             <div><div className="stat-value">{counts.failed}</div><div className="stat-label">Failed</div></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon purple">📊</div>
+            <div className="stat-icon purple"><Icon name="metric" /></div>
             <div><div className="stat-value">{counts.total}</div><div className="stat-label">Total Runs</div></div>
           </div>
         </div>
@@ -187,7 +188,7 @@ export default function PipelineDashboard() {
                       onClick={() => setExpandedPipeline(expandedPipeline === h.id ? null : h.id)}
                     >
                       <div className="flex items-center gap-2">
-                        <span style={{ fontSize: 18 }}>{h.success ? '✅' : '❌'}</span>
+                        <span style={{ fontSize: 18 }}><Icon name={h.success ? 'completed' : 'failed'} /></span>
                         <div>
                           <span style={{ fontWeight: 600 }}>{h.title || h.keyword}</span>
                           <span className="text-sm text-muted" style={{ marginLeft: 8 }}>{h.keyword}</span>
@@ -206,8 +207,8 @@ export default function PipelineDashboard() {
                           {h.stages.map((stage, i) => (
                             <div key={i} className="flex items-center justify-between" style={{ padding: '6px 8px', borderRadius: 6, background: stage.status === 'running' ? 'var(--primary-light)' : 'transparent' }}>
                               <div className="flex items-center gap-2">
-                                <span>{STATUS_ICONS[stage.status] || '⏳'}</span>
-                                <span style={{ fontSize: 13 }}>{STAGE_ICONS[stage.name] || ''} {stage.name.replace(/_/g, ' ')}</span>
+                                <Icon name={STATUS_ICON_MAP[stage.status] || 'pending'} />
+                                <span style={{ fontSize: 13 }}><Icon name={STAGE_ICON_MAP[stage.name] || 'pipeline'} /> {stage.name.replace(/_/g, ' ')}</span>
                               </div>
                               <div className="flex items-center gap-3">
                                 {stage.status === 'running' && <div className="spinner-sm" />}

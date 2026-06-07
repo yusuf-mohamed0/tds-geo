@@ -12,7 +12,7 @@
 -- Article editorial status: enum for precise workflow tracking
 DO $$ BEGIN
   CREATE TYPE article_editorial_status AS ENUM (
-    'draft', 'generated', 'in_seo_review', 'seo_reviewed',
+    'draft', 'generated', 'in_review', 'in_seo_review', 'seo_reviewed',
     'in_editor_review', 'editor_reviewed', 'approved',
     'scheduled', 'published', 'rejected', 'failed', 'archived'
   );
@@ -897,6 +897,7 @@ BEGIN
   NEW.editorial_status = CASE NEW.status
     WHEN 'draft' THEN 'draft'::article_editorial_status
     WHEN 'generated' THEN 'generated'::article_editorial_status
+    WHEN 'in_review' THEN 'in_review'::article_editorial_status
     WHEN 'reviewed' THEN 'seo_reviewed'::article_editorial_status
     WHEN 'approved' THEN 'approved'::article_editorial_status
     WHEN 'rejected' THEN 'rejected'::article_editorial_status

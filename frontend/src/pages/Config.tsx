@@ -3,6 +3,7 @@ import { configApi } from '../services/api'
 import type { SystemConfig } from '../types'
 import { Card, CardBody } from '../components/Card'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 export default function Config() {
   const [configs, setConfigs] = useState<SystemConfig[]>([])
@@ -51,7 +52,7 @@ export default function Config() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1>⚙️ System Configuration</h1>
+        <h1><Icon name="settings" /> System Configuration</h1>
         <p className="text-secondary">Live-editable platform settings</p>
       </div>
 

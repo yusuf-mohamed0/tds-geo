@@ -3,6 +3,7 @@ import { analyticsApi } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { DataTable, Column } from '../components/DataTable'
+import Icon from '../components/Icon'
 
 interface QueueJob {
   id: string
@@ -23,11 +24,11 @@ const STATUS_BADGE: Record<string, string> = {
   failed: 'red', delayed: 'yellow', dead_lettered: 'purple',
 }
 
-const JOB_ICONS: Record<string, string> = {
-  article_generation: '✍️', fact_check: '✅', brand_voice: '🎙️',
-  seo_intelligence: '📈', multi_cms_publish: '🚀', pexels_image: '🖼️',
-  cost_optimization: '💰', editorial_workflow: '👥', content_intelligence: '🧠',
-  ai_evaluation: '⭐', observability: '📊',
+const JOB_ICON_MAP: Record<string, string> = {
+  article_generation: 'article-generation', fact_check: 'fact-check', brand_voice: 'brand-voice',
+  seo_intelligence: 'seo-enhance', multi_cms_publish: 'multi-cms-publish', pexels_image: 'pexels-images',
+  cost_optimization: 'cost-optimization', editorial_workflow: 'editorial-workflow', content_intelligence: 'content-intelligence',
+  ai_evaluation: 'ai-evaluation', observability: 'observability',
 }
 
 export default function QueueDashboard() {
@@ -79,7 +80,7 @@ export default function QueueDashboard() {
       header: 'Type',
       render: (j) => (
         <span className="flex items-center gap-2">
-          <span>{JOB_ICONS[j.type] || '📋'}</span>
+          <Icon name={JOB_ICON_MAP[j.type] || 'queues'} />
           <span style={{ fontWeight: 500 }}>{j.type.replace(/_/g, ' ')}</span>
         </span>
       ),
@@ -124,7 +125,7 @@ export default function QueueDashboard() {
           <h2>Queue Dashboard</h2>
           <p>Monitor jobs, retries, and queue health</p>
         </div>
-        <button className="btn btn-outline" onClick={fetchJobs}>🔄 Refresh</button>
+        <button className="btn btn-outline" onClick={fetchJobs}><Icon name="refresh" /> Refresh</button>
       </div>
 
       <div className="page-body">
@@ -132,27 +133,27 @@ export default function QueueDashboard() {
 
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon blue">🔄</div>
+            <div className="stat-icon blue"><Icon name="running" /></div>
             <div><div className="stat-value">{counts.active}</div><div className="stat-label">Active</div></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon yellow">⏳</div>
+            <div className="stat-icon yellow"><Icon name="queued" /></div>
             <div><div className="stat-value">{counts.queued}</div><div className="stat-label">Queued</div></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon red">❌</div>
+            <div className="stat-icon red"><Icon name="failed" /></div>
             <div><div className="stat-value">{counts.failed}</div><div className="stat-label">Failed</div></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon purple">💀</div>
+            <div className="stat-icon purple"><Icon name="dead-lettered" /></div>
             <div><div className="stat-value">{counts.dead_lettered}</div><div className="stat-label">Dead Lettered</div></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon green">✅</div>
+            <div className="stat-icon green"><Icon name="completed" /></div>
             <div><div className="stat-value">{counts.completed}</div><div className="stat-label">Completed</div></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon purple">📊</div>
+            <div className="stat-icon purple"><Icon name="metric" /></div>
             <div><div className="stat-value">{counts.total}</div><div className="stat-label">Total</div></div>
           </div>
         </div>

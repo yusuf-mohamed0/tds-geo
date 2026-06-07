@@ -4,6 +4,7 @@ import { BrandVoiceProfile, BrandConsistencyResult, WritingFingerprint } from '.
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { useToast } from '../components/Toast'
 import { SelectField } from '../components/FormField'
+import Icon from '../components/Icon'
 
 export default function BrandVoice() {
   const [clients, setClients] = useState<any[]>([])
@@ -160,8 +161,8 @@ export default function BrandVoice() {
                   <div style={{ display: 'grid', gap: 8 }}>
                     <div><strong>Heading Style:</strong> {profile.formatting_preferences.heading_style}</div>
                     <div><strong>Paragraph Length:</strong> {profile.formatting_preferences.paragraph_length}</div>
-                    <div><strong>Use Bullets:</strong> {profile.formatting_preferences.use_bullets ? '✅' : '❌'}</div>
-                    <div><strong>Use Emphasis:</strong> {profile.formatting_preferences.use_emphasis ? '✅' : '❌'}</div>
+                    <div><strong>Use Bullets:</strong> {profile.formatting_preferences.use_bullets ? <Icon name="completed" /> : <Icon name="failed" />}</div>
+                    <div><strong>Use Emphasis:</strong> {profile.formatting_preferences.use_emphasis ? <Icon name="completed" /> : <Icon name="failed" />}</div>
                     <div><strong>Image Style:</strong> {profile.formatting_preferences.image_style}</div>
                   </div>
                 </CardBody>
@@ -206,7 +207,7 @@ export default function BrandVoice() {
                   <textarea className="form-textarea" rows={6} value={testContent} onChange={e => setTestContent(e.target.value)} placeholder="Paste content to check against brand voice..." />
                 </div>
                 <button className="btn btn-primary" onClick={checkConsistency} disabled={!testContent.trim() || checkingConsistency}>
-                  {checkingConsistency ? '⏳ Checking...' : 'Check Consistency'}
+                  {checkingConsistency ? <><Icon name="loading" spin /> Checking...</> : 'Check Consistency'}
                 </button>
               </CardBody>
             </Card>
@@ -221,9 +222,9 @@ export default function BrandVoice() {
                 </CardHeader>
                 <CardBody>
                   <div className="stats-grid" style={{ marginBottom: 16 }}>
-                    <div className="stat-card"><div className="stat-icon purple">🎯</div><div><div className="stat-value">{consistencyResult.tone_match}%</div><div className="stat-label">Tone Match</div></div></div>
-                    <div className="stat-card"><div className="stat-icon blue">📖</div><div><div className="stat-value">{consistencyResult.vocabulary_match}%</div><div className="stat-label">Vocabulary Match</div></div></div>
-                    <div className="stat-card"><div className="stat-icon green">✨</div><div><div className="stat-value">{consistencyResult.format_match}%</div><div className="stat-label">Format Match</div></div></div>
+                    <div className="stat-card"><div className="stat-icon purple"><Icon name="search-intent" /></div><div><div className="stat-value">{consistencyResult.tone_match}%</div><div className="stat-label">Tone Match</div></div></div>
+                    <div className="stat-card"><div className="stat-icon blue"><Icon name="book" /></div><div><div className="stat-value">{consistencyResult.vocabulary_match}%</div><div className="stat-label">Vocabulary Match</div></div></div>
+                    <div className="stat-card"><div className="stat-icon green"><Icon name="completed" /></div><div><div className="stat-value">{consistencyResult.format_match}%</div><div className="stat-label">Format Match</div></div></div>
                   </div>
                   {consistencyResult.issues?.length > 0 && (
                     <div>
@@ -235,7 +236,7 @@ export default function BrandVoice() {
                             <span style={{ fontWeight: 500, fontSize: 13 }}>{issue.type}</span>
                           </div>
                           <p className="text-sm">{issue.message}</p>
-                          {issue.suggestion && <p className="text-sm text-muted" style={{ marginTop: 4 }}>💡 {issue.suggestion}</p>}
+                          {issue.suggestion && <p className="text-sm text-muted" style={{ marginTop: 4 }}><Icon name="lightbulb" /> {issue.suggestion}</p>}
                         </div>
                       ))}
                     </div>
@@ -253,12 +254,12 @@ export default function BrandVoice() {
             <CardBody>
               {fingerprint ? (
                 <div className="grid-3">
-                  <div className="stat-card"><div className="stat-icon blue">📏</div><div><div className="stat-value">{fingerprint.avg_sentence_length?.toFixed(1)}</div><div className="stat-label">Avg Sentence Length</div></div></div>
-                  <div className="stat-card"><div className="stat-icon purple">📚</div><div><div className="stat-value">{fingerprint.vocabulary_richness?.toFixed(2)}</div><div className="stat-label">Vocabulary Richness</div></div></div>
-                  <div className="stat-card"><div className="stat-icon yellow">🔇</div><div><div className="stat-value">{(fingerprint.passive_voice_ratio * 100).toFixed(1)}%</div><div className="stat-label">Passive Voice</div></div></div>
-                  <div className="stat-card"><div className="stat-icon green">🔗</div><div><div className="stat-value">{(fingerprint.transition_word_ratio * 100).toFixed(1)}%</div><div className="stat-label">Transition Words</div></div></div>
-                  <div className="stat-card"><div className="stat-icon red">📊</div><div><div className="stat-value">{fingerprint.readability_score?.toFixed(0)}</div><div className="stat-label">Readability</div></div></div>
-                  <div className="stat-card"><div className="stat-icon purple">🔤</div><div><div className="stat-value">{fingerprint.common_phrases?.length || 0}</div><div className="stat-label">Common Phrases</div></div></div>
+                  <div className="stat-card"><div className="stat-icon blue"><Icon name="chart-line" /></div><div><div className="stat-value">{fingerprint.avg_sentence_length?.toFixed(1)}</div><div className="stat-label">Avg Sentence Length</div></div></div>
+                  <div className="stat-card"><div className="stat-icon purple"><Icon name="book" /></div><div><div className="stat-value">{fingerprint.vocabulary_richness?.toFixed(2)}</div><div className="stat-label">Vocabulary Richness</div></div></div>
+                  <div className="stat-card"><div className="stat-icon yellow"><Icon name="warning" /></div><div><div className="stat-value">{(fingerprint.passive_voice_ratio * 100).toFixed(1)}%</div><div className="stat-label">Passive Voice</div></div></div>
+                  <div className="stat-card"><div className="stat-icon green"><Icon name="link" /></div><div><div className="stat-value">{(fingerprint.transition_word_ratio * 100).toFixed(1)}%</div><div className="stat-label">Transition Words</div></div></div>
+                  <div className="stat-card"><div className="stat-icon red"><Icon name="metric" /></div><div><div className="stat-value">{fingerprint.readability_score?.toFixed(0)}</div><div className="stat-label">Readability</div></div></div>
+                  <div className="stat-card"><div className="stat-icon purple"><Icon name="keyword" /></div><div><div className="stat-value">{fingerprint.common_phrases?.length || 0}</div><div className="stat-label">Common Phrases</div></div></div>
                 </div>
               ) : (
                 <p className="text-muted">No writing fingerprint data available yet. Generate more articles to build a fingerprint.</p>

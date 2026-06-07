@@ -4,6 +4,7 @@ import { authApi, adminApi } from '../services/api'
 import { Card, CardHeader, CardBody } from '../components/Card'
 import { InputField } from '../components/FormField'
 import { useToast } from '../components/Toast'
+import Icon from '../components/Icon'
 
 export default function Settings() {
   const { user, isAdmin } = useAuth()
@@ -162,7 +163,7 @@ function AdminPanel() {
                 <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid var(--gray-100)' }}>
                   <span style={{ color: 'var(--gray-500)', fontFamily: 'monospace' }}>{key}</span>
                   <span style={{ fontWeight: 500, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>
-                    {typeof value === 'boolean' ? (value ? '✅' : '❌') : String(value)}
+                    {typeof value === 'boolean' ? (value ? <Icon name="completed" /> : <Icon name="failed" />) : String(value)}
                   </span>
                 </div>
               ))}
@@ -177,7 +178,7 @@ function AdminPanel() {
         <CardHeader>Recent Errors</CardHeader>
         <CardBody padding={false} style={{ maxHeight: 400, overflowY: 'auto' }}>
           {errors.length === 0 ? (
-            <div className="empty-state" style={{ padding: '20px' }}><p>No recent errors 🎉</p></div>
+            <div className="empty-state" style={{ padding: '20px' }}><p>No recent errors <Icon name="completed" /></p></div>
           ) : (
             <div style={{ padding: 12 }}>
               {errors.map((err: any, i: number) => (
@@ -233,7 +234,7 @@ function SystemHealth() {
             <div key={check.label} className="stat-card" style={{ padding: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                 <span style={{ fontWeight: 600, fontSize: 14 }}>{check.label}</span>
-                <span style={{ fontSize: 20 }}>{check.ok ? '✅' : '❌'}</span>
+                <span style={{ fontSize: 20 }}>{check.ok ? <Icon name="completed" /> : <Icon name="failed" />}</span>
               </div>
             </div>
           ))}

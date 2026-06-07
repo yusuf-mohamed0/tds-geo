@@ -293,6 +293,351 @@ export interface GenerateBlogParams {
   clientSettings?: Record<string, unknown>;
 }
 
+// ─── Device Authorization ───────────────────────
+export interface DeviceFingerprint {
+  cpuIdentifier: string;
+  macHash: string;
+  osSerialHash: string;
+  certThumbprint?: string;
+  browserFingerprint?: string;
+  userAgent: string;
+  screenResolution?: string;
+  timezone?: string;
+  language?: string;
+  platform?: string;
+  ipAddress?: string;
+}
+
+export interface DeviceRegistration {
+  id: string;
+  employeeId: string;
+  deviceFingerprintHash: string;
+  deviceName?: string;
+  deviceType: string;
+  trustScore: number;
+  isRevoked: boolean;
+  enrolledAt: Date;
+  lastSeenAt?: Date;
+}
+
+export interface EmployeeSession {
+  id: string;
+  userId: string;
+  deviceId: string;
+  tokenJti: string;
+  ipAddress: string;
+  riskScore: number;
+  isActive: boolean;
+  expiresAt: Date;
+}
+
+export interface DeviceAuthConfig {
+  requireDeviceAuth: boolean;
+  minTrustScore: number;
+  sessionTtlHours: number;
+  enrollmentRequired: boolean;
+  automaticEnrollment: boolean;
+}
+
+export interface QuickAction {
+  id: string;
+  label: string;
+  actionId: string;
+  icon: string;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 16. ODOO ERP INTEGRATION
+// ══════════════════════════════════════════════════════════════════
+
+// ─── Odoo Connection ───────────────────────────
+export interface OdooConnection {
+  id: string;
+  label: string;
+  base_url: string;
+  database: string;
+  username: string;
+  /** Encrypted at rest */
+  api_key_encrypted?: string;
+  /** Odoo user ID from authentication */
+  odoo_uid?: number;
+  is_active: boolean;
+  last_sync_at?: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// ─── Odoo Model Mappings ───────────────────────
+export type OdooModel =
+  | 'crm.lead'
+  | 'crm.team'
+  | 'project.project'
+  | 'project.task'
+  | 'res.partner'
+  | 'account.move'
+  | 'account.move.line'
+  | 'sale.order'
+  | 'sale.order.line'
+  | 'product.product'
+  | 'product.template'
+  | 'stock.picking'
+  | 'stock.move'
+  | 'hr.employee'
+  | 'helpdesk.ticket'
+  | 'helpdesk.ticket.category'
+  | 'website.blog'
+  | 'website.blog.post'
+  | 'mail.message'
+  | 'mail.channel'
+  | 'account.analytic.line'
+  | 'account.analytic.account'
+  | 'res.users'
+  | 'res.company';
+
+export type SyncDirection = 'bidirectional' | 'odoo_to_vireon' | 'vireon_to_odoo';
+export type ConflictStrategy = 'vireon_wins' | 'odoo_wins' | 'manual' | 'latest_wins';
+export type SyncOperation = 'create' | 'update' | 'delete' | 'read' | 'sync';
+export type SyncStatus = 'success' | 'failed' | 'pending' | 'conflict' | 'skipped';
+
+export interface OdooModelMapping {
+  id: string;
+  connection_id: string;
+  odoo_model: OdooModel;
+  vireon_entity: string;
+  /** JSON object: { "odoo_field": "vireon_field" } */
+  field_mappings: Record<string, string>;
+  sync_direction: SyncDirection;
+  conflict_strategy: ConflictStrategy;
+  is_active: boolean;
+  last_sync_at?: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// ─── Odoo Sync Log ─────────────────────────────
+export interface OdooSyncLog {
+  id: string;
+  connection_id: string;
+  model: OdooModel;
+  operation: SyncOperation;
+  odoo_record_id?: number;
+  vireon_record_id?: string;
+  status: SyncStatus;
+  /** Human-readable description of what changed */
+  change_summary?: string;
+  error_message?: string;
+  conflict_details?: Record<string, unknown>;
+  created_at: Date;
+}
+
+// ─── Odoo Sync Configuration (scheduling) ─────
+export interface OdooSyncConfig {
+  id: string;
+  connection_id: string;
+  model: OdooModel;
+  sync_interval_minutes: number;
+  last_sync_at?: Date;
+  next_sync_at?: Date;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// ─── Odoo Webhook Registrations ───────────────
+export interface OdooWebhookRegistration {
+  id: string;
+  connection_id: string;
+  model: OdooModel;
+  webhook_url: string;
+  events: string[];
+  secret: string;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// ─── Odoo Auth Response (JSON-RPC) ────────────
+export interface OdooAuthResponse {
+  uid: number;
+  name: string;
+  session_id: string;
+  is_admin: boolean;
+  company_id: number;
+  partner_id: number;
+  user_context: Record<string, unknown>;
+}
+
+// ─── Odoo API Error ────────────────────────────
+export interface OdooApiError {
+  code: number;
+  message: string;
+  data?: {
+    name: string;
+    debug: string;
+    message: string;
+    arguments: string[];
+  };
+}
+
+// ─── Odoo Field Definition ─────────────────────
+export interface OdooField {
+  name: string;
+  type: string;
+  relation?: string;
+  required: boolean;
+  readonly: boolean;
+  string: string;
+  help?: string;
+  selection?: Array<[string, string]>;
+  size?: number;
+  depends?: string[];
+  domain?: unknown[];
+  context?: Record<string, unknown>;
+}
+
+// ─── Odoo Record (generic) ─────────────────────
+export interface OdooRecord {
+  id: number;
+  [key: string]: unknown;
+}
+
+// ─── Odoo Search Read Result ───────────────────
+export interface OdooSearchReadResult {
+  records: OdooRecord[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// ─── Odoo Sync Job Payload ─────────────────────
+export interface OdooSyncPayload {
+  connectionId: string;
+  model: OdooModel;
+  operation: SyncOperation;
+  odooRecordId?: number;
+  vireonRecordId?: string;
+  data?: Record<string, unknown>;
+  fieldMappingId?: string;
+}
+
+export interface OdooBatchSyncPayload {
+  connectionId: string;
+  model: OdooModel;
+  syncConfigId: string;
+  fullSync: boolean;
+}
+
+export interface OdooWebhookEventPayload {
+  connectionId: string;
+  model: OdooModel;
+  operation: SyncOperation;
+  recordId: number;
+  data: Record<string, unknown>;
+}
+
+// ─── Odoo Dashboard Stats ──────────────────────
+export interface OdooDashboardStats {
+  connectionId: string;
+  model: OdooModel;
+  totalRecords: number;
+  syncedRecords: number;
+  pendingSync: number;
+  failedSync: number;
+  lastSyncAt?: Date;
+  syncLagMinutes?: number;
+}
+
+// ─── Odoo CRM Lead (typed convenience) ─────────
+export interface OdooCrmLead {
+  id: number;
+  name: string;
+  partner_id?: [number, string];
+  user_id?: [number, string];
+  team_id?: [number, string];
+  stage_id?: [number, string];
+  expected_revenue?: number;
+  probability?: number;
+  priority?: string;
+  description?: string;
+  contact_name?: string;
+  email_from?: string;
+  phone?: string;
+  mobile?: string;
+  country_id?: [number, string];
+  company_id?: [number, string];
+  create_date?: string;
+  write_date?: string;
+}
+
+// ─── Odoo Project / Task (typed convenience) ───
+export interface OdooProject {
+  id: number;
+  name: string;
+  partner_id?: [number, string];
+  user_id?: [number, string];
+  label_tasks?: string;
+  analytic_account_id?: [number, string];
+  allow_timesheets?: boolean;
+  allow_billable?: boolean;
+  privacy_visibility?: string;
+  create_date?: string;
+  write_date?: string;
+}
+
+export interface OdooTask {
+  id: number;
+  name: string;
+  project_id?: [number, string];
+  user_ids?: Array<[number, string]>;
+  stage_id?: [number, string];
+  priority?: string;
+  planned_hours?: number;
+  remaining_hours?: number;
+  effective_hours?: number;
+  deadline?: string;
+  description?: string;
+  create_date?: string;
+  write_date?: string;
+}
+
+// ─── Odoo Partner / Contact (typed convenience) ─
+export interface OdooPartner {
+  id: number;
+  name: string;
+  email?: string;
+  phone?: string;
+  mobile?: string;
+  street?: string;
+  city?: string;
+  state_id?: [number, string];
+  country_id?: [number, string];
+  zip?: string;
+  company_id?: [number, string];
+  category_id?: Array<[number, string]>;
+  is_company?: boolean;
+  parent_id?: [number, string];
+  lang?: string;
+  create_date?: string;
+  write_date?: string;
+}
+
+// ─── Odoo Invoice (account.move) ───────────────
+export interface OdooInvoice {
+  id: number;
+  name: string;
+  partner_id?: [number, string];
+  invoice_date?: string;
+  invoice_date_due?: string;
+  amount_untaxed?: number;
+  amount_tax?: number;
+  amount_total?: number;
+  state?: string;
+  invoice_line_ids?: number[];
+  user_id?: [number, string];
+  create_date?: string;
+  write_date?: string;
+}
+
 // ══════════════════════════════════════════════════════════════════
 // ENTERPRISE UPGRADE — TYPE DEFINITIONS
 // ══════════════════════════════════════════════════════════════════
@@ -300,7 +645,7 @@ export interface GenerateBlogParams {
 // ─── 1. HUMAN-IN-THE-LOOP EDITORIAL WORKFLOW ───
 
 export type EditorialStatus =
-  | 'draft' | 'generated' | 'in_seo_review' | 'seo_reviewed'
+  | 'draft' | 'generated' | 'in_review' | 'in_seo_review' | 'seo_reviewed'
   | 'in_editor_review' | 'editor_reviewed' | 'approved'
   | 'scheduled' | 'published' | 'rejected' | 'failed' | 'archived';
 
@@ -897,7 +1242,105 @@ export interface PluginExecutionLog {
   created_at: Date;
 }
 
-// ─── 13. CIRCUIT BREAKERS ───
+// ─── 14. WORKER PERFORMANCE SCORING ───
+
+export type WorkerTier = 'elite' | 'senior' | 'standard' | 'junior' | 'probation';
+export type ScoreTrend = 'rising' | 'stable' | 'declining';
+export type PromotionEventType = 'promotion' | 'demotion' | 'flag_review';
+
+// Composite performance score for a worker over a time period
+export interface WorkerScore {
+  id: string;
+  worker_name: string;
+  job_type: string;
+
+  // Raw metrics
+  total_jobs: number;
+  failed_jobs: number;
+  avg_latency_ms: number;
+  p95_latency_ms: number;
+  throughput_per_min: number;
+
+  // Dimension scores (0-100)
+  reliability_score: number;
+  throughput_score: number;
+  latency_score: number;
+  cost_efficiency_score: number;
+  quality_score: number;
+
+  // Composite
+  composite_score: number;
+  current_tier: WorkerTier;
+  tier_confidence: number;
+
+  period_start: Date;
+  period_end: Date;
+  recorded_at: Date;
+  created_at: Date;
+}
+
+// Current rank/title for a worker in the hierarchy
+export interface WorkerRank {
+  id: string;
+  worker_name: string;
+  job_type: string;
+  current_tier: WorkerTier;
+  title: string;
+  current_score: number;
+  highest_score: number;
+  lowest_score: number;
+  score_trend: ScoreTrend;
+  periods_at_tier: number;
+  total_promotions: number;
+  total_demotions: number;
+  is_active: boolean;
+  last_score_at?: Date;
+  last_promotion_at?: Date;
+  last_demotion_at?: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// A promotion or demotion event
+export interface PromotionEvent {
+  id: string;
+  worker_name: string;
+  job_type: string;
+  event_type: PromotionEventType;
+  from_tier: WorkerTier;
+  to_tier: WorkerTier;
+  from_score: number;
+  to_score: number;
+  reason: string;
+  trigger_metric?: string;
+  auto_applied: boolean;
+  metadata: Record<string, unknown>;
+  created_at: Date;
+}
+
+// Configurable thresholds for the scoring engine
+export interface PerformanceThreshold {
+  id: string;
+  tier_name: WorkerTier;
+  min_score: number;
+  max_score: number;
+  promotion_threshold: number;
+  demotion_threshold: number;
+  periods_for_promotion: number;
+  periods_for_demotion: number;
+  requires_approval: boolean;
+  default_title: string;
+  weight_reliability: number;
+  weight_throughput: number;
+  weight_latency: number;
+  weight_cost: number;
+  weight_quality: number;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// ─── 15. CIRCUIT BREAKERS ───
 
 export interface CircuitBreakerState {
   id: string;
@@ -924,6 +1367,88 @@ export interface DeadLetterJob {
   failed_at: Date;
   retry_later_at?: Date;
   is_resolved: boolean;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 14. WEBSITE INTELLIGENCE / CLIENT SCRAPER
+// ══════════════════════════════════════════════════════════════════
+
+export interface WebsiteIntelligence {
+  id: string;
+  client_id: string;
+
+  // Core site data
+  url: string;
+  domain?: string;
+  pages_scanned: number;
+  pages_found: string[];
+  site_name?: string;
+  description?: string;
+
+  // Meta & SEO
+  meta_keywords: string[];
+
+  // Business intelligence
+  services: Array<{ name: string; description?: string; page?: string }>;
+  industries: string[];
+  target_audience: string[];
+  unique_selling_points: string[];
+
+  // Tone analysis
+  tone_analysis: {
+    primary_tone: string;
+    secondary_tone: string;
+    tone_scores: Record<string, number>;
+    formality_estimate: number;
+  };
+
+  // Vocabulary
+  common_terms: string[];
+
+  // CTA & structure
+  cta_patterns: Array<{ text: string; url?: string; page?: string }>;
+  page_structure: {
+    h1: Array<{ text: string; page?: string }>;
+    h2: Array<{ text: string; page?: string }>;
+    h3: Array<{ text: string; page?: string }>;
+  };
+
+  // Contact & social
+  contact_info: {
+    email: string[];
+    phone: string[];
+    address: string[];
+  };
+  social_links: Array<{ platform: string; url: string }>;
+
+  // Tech stack
+  tech_stack_hints: string[];
+
+  // Content gap analysis
+  content_gaps: string[];
+
+  // Full raw data
+  raw_data: Record<string, unknown>;
+
+  // Metadata
+  is_stale?: boolean;
+  scraped_at: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// Intelligence formatted for AI prompt consumption
+// This is the condensed version passed to OpenAI for article generation
+export interface ClientIntelligencePrompt {
+  company_name: string;
+  description: string;
+  industry: string;
+  services: string;
+  target_audience: string;
+  tone: string;
+  unique_selling_points: string;
+  common_terms: string;
+  cta_style: string;
 }
 
 // ─── Extended Article (with enterprise fields) ───

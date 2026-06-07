@@ -48,7 +48,16 @@ export const JobTypes = {
   AI_EVALUATION: 'ai-evaluation',
   BENCHMARK_RUN: 'benchmark-run',
   OBSERVABILITY_FLUSH: 'observability-flush',
-  OBSERVABILITY_METRICS: 'observability-metrics'
+  OBSERVABILITY_METRICS: 'observability-metrics',
+  // ── Client Scraper Job Types ──
+  CLIENT_SCAN: 'client-scan',
+  BATCH_CLIENT_SCAN: 'batch-client-scan',
+  // ── Odoo ERP Integration Job Types ──
+  ODOO_SYNC: 'odoo-sync',
+  ODOO_BATCH_SYNC: 'odoo-batch-sync',
+  ODOO_WEBHOOK_EVENT: 'odoo-webhook-event',
+  ODOO_CONNECTION_TEST: 'odoo-connection-test',
+  ODOO_FULL_SYNC: 'odoo-full-sync'
 } as const;
 
 // ─── Queue Name to Job Types Mapping ─────────
@@ -73,6 +82,13 @@ export const QueueJobTypeMap: Record<QueueNames, string[]> = {
   [QueueNames.CONTENT_INTELLIGENCE]: [JobTypes.CONTENT_INTELLIGENCE, JobTypes.CANNIBALIZATION_CHECK, JobTypes.KNOWLEDGE_GRAPH_BUILD],
   [QueueNames.AI_EVALUATION]: [JobTypes.AI_EVALUATION, JobTypes.BENCHMARK_RUN],
   [QueueNames.OBSERVABILITY]: [JobTypes.OBSERVABILITY_FLUSH, JobTypes.OBSERVABILITY_METRICS],
+  // ── Client Scraper Queue Mappings ──
+  [QueueNames.CLIENT_SCAN]: [JobTypes.CLIENT_SCAN],
+  [QueueNames.BATCH_CLIENT_SCAN]: [JobTypes.BATCH_CLIENT_SCAN],
+  // ── Odoo Queue Mappings ──
+  [QueueNames.ODOO_SYNC]: [JobTypes.ODOO_SYNC, JobTypes.ODOO_CONNECTION_TEST],
+  [QueueNames.ODOO_BATCH_SYNC]: [JobTypes.ODOO_BATCH_SYNC, JobTypes.ODOO_FULL_SYNC],
+  [QueueNames.ODOO_WEBHOOK]: [JobTypes.ODOO_WEBHOOK_EVENT],
 };
 
 // ─── Job Priority Constants ──────────────────
@@ -265,5 +281,37 @@ export const QueueConfigs: Record<QueueNames, QueueConfig> = {
     concurrency: 2,
     maxAttempts: 2,
     description: 'Observability, metrics and tracing'
+  },
+  // ── Client Scraper Queue Configs ──
+  [QueueNames.CLIENT_SCAN]: {
+    name: QueueNames.CLIENT_SCAN,
+    concurrency: 2,
+    maxAttempts: 2,
+    description: 'Single client website intelligence scan'
+  },
+  [QueueNames.BATCH_CLIENT_SCAN]: {
+    name: QueueNames.BATCH_CLIENT_SCAN,
+    concurrency: 1,
+    maxAttempts: 1,
+    description: 'Batch scan all clients for website intelligence'
+  },
+  // ── Odoo Queue Configs ──
+  [QueueNames.ODOO_SYNC]: {
+    name: QueueNames.ODOO_SYNC,
+    concurrency: 3,
+    maxAttempts: 3,
+    description: 'Single Odoo record sync operation'
+  },
+  [QueueNames.ODOO_BATCH_SYNC]: {
+    name: QueueNames.ODOO_BATCH_SYNC,
+    concurrency: 1,
+    maxAttempts: 2,
+    description: 'Batch or full Odoo model sync'
+  },
+  [QueueNames.ODOO_WEBHOOK]: {
+    name: QueueNames.ODOO_WEBHOOK,
+    concurrency: 3,
+    maxAttempts: 3,
+    description: 'Odoo webhook event processing'
   },
 };

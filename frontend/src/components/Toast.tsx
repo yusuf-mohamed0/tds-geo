@@ -2,16 +2,22 @@ import { createContext, useContext, useState, useCallback, ReactNode } from 'rea
 
 type ToastType = 'success' | 'error' | 'warning' | 'info'
 
+interface ToastAction {
+  label: string
+  onClick: () => void
+}
+
 interface Toast {
   id: string
   type: ToastType
   message: string
   duration?: number
+  action?: ToastAction
 }
 
 interface ToastContextType {
   toasts: Toast[]
-  addToast: (type: ToastType, message: string, duration?: number) => void
+  addToast: (type: ToastType, message: string, duration?: number, action?: ToastAction) => void
   removeToast: (id: string) => void
 }
 
@@ -26,9 +32,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
-  const addToast = useCallback((type: ToastType, message: string, duration = 4000) => {
+  const addToast = useCallback((type: ToastType, message: string, duration = 4000, action?: ToastAction) => {
     const id = `toast-${++toastCounter}`
-    setToasts((prev) => [...prev, { id, type, message, duration }])
+    setToasts((prev) => [...prev, { id, type, message, duration, action }])
     if (duration > 0) {
       setTimeout(() => removeToast(id), duration)
     }
@@ -52,6 +58,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               {toast.type === 'info' && 'ℹ'}
             </span>
             <span className="toast-message">{toast.message}</span>
+            {toast.action && (
+              <button
+                className="toast-action"
+                onClick={() => {
+                  toast.action!.onClick()
+                  removeToast(toast.id)
+                }}
+              >
+                {toast.action.label}
+              </button>
+            )}
             <button
               className="toast-close"
               onClick={() => removeToast(toast.id)}
