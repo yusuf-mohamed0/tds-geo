@@ -1,0 +1,10 @@
+{
+  "version": "2.7.6",
+  "projectRoot": "/root/my-project",
+  "filesScanned": 520,
+  "filesAdded": 509,
+  "directories": 84,
+  "generatedAt": "2026-06-07T08:44:18.800Z",
+  "commit": "ec9a51fbddb971cbf384f1ca201c695c1b46c2e8",
+  "note": "Basic file scan. Run /understand in Claude Code with the full plugin pipeline for edges, layers, tours, and semantic analysis."
+}

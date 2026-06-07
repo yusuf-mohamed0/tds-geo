@@ -1,0 +1,3083 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "languages": [
+      "css",
+      "docker-compose",
+      "dockerfile",
+      "html",
+      "javascript",
+      "json",
+      "markdown",
+      "php",
+      "plaintext",
+      "python",
+      "shell",
+      "sql",
+      "typescript",
+      "yaml"
+    ],
+    "frameworks": [],
+    "description": "",
+    "analyzedAt": "2026-06-07T08:44:18.799Z"
+  },
+  "nodes": [
+    {
+      "id": "file:/root/my-project/.claude/CLAUDE.md",
+      "type": "file",
+      "name": "CLAUDE.md",
+      "filePath": "/root/my-project/.claude/CLAUDE.md"
+    },
+    {
+      "id": "file:/root/my-project/.claude/settings.json",
+      "type": "file",
+      "name": "settings.json",
+      "filePath": "/root/my-project/.claude/settings.json"
+    },
+    {
+      "id": "file:/root/my-project/.claude/skills/graphify/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/.claude/skills/graphify/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/.understand-anything/knowledge-graph.json",
+      "type": "file",
+      "name": "knowledge-graph.json",
+      "filePath": "/root/my-project/.understand-anything/knowledge-graph.json"
+    },
+    {
+      "id": "file:/root/my-project/.understand-anything/meta.json",
+      "type": "file",
+      "name": "meta.json",
+      "filePath": "/root/my-project/.understand-anything/meta.json"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_content_briefs.sql",
+      "type": "file",
+      "name": "migration_content_briefs.sql",
+      "filePath": "/root/my-project/backend/database/migration_content_briefs.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_device_auth.sql",
+      "type": "file",
+      "name": "migration_device_auth.sql",
+      "filePath": "/root/my-project/backend/database/migration_device_auth.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_enterprise_v4.sql",
+      "type": "file",
+      "name": "migration_enterprise_v4.sql",
+      "filePath": "/root/my-project/backend/database/migration_enterprise_v4.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_odoo_v1.sql",
+      "type": "file",
+      "name": "migration_odoo_v1.sql",
+      "filePath": "/root/my-project/backend/database/migration_odoo_v1.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_pipeline_runs.sql",
+      "type": "file",
+      "name": "migration_pipeline_runs.sql",
+      "filePath": "/root/my-project/backend/database/migration_pipeline_runs.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_platform_v1.sql",
+      "type": "file",
+      "name": "migration_platform_v1.sql",
+      "filePath": "/root/my-project/backend/database/migration_platform_v1.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_shopify_oauth.sql",
+      "type": "file",
+      "name": "migration_shopify_oauth.sql",
+      "filePath": "/root/my-project/backend/database/migration_shopify_oauth.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_v2.sql",
+      "type": "file",
+      "name": "migration_v2.sql",
+      "filePath": "/root/my-project/backend/database/migration_v2.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_website_intelligence.sql",
+      "type": "file",
+      "name": "migration_website_intelligence.sql",
+      "filePath": "/root/my-project/backend/database/migration_website_intelligence.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/migration_worker_scoring.sql",
+      "type": "file",
+      "name": "migration_worker_scoring.sql",
+      "filePath": "/root/my-project/backend/database/migration_worker_scoring.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/schema-comprehensive.sql",
+      "type": "file",
+      "name": "schema-comprehensive.sql",
+      "filePath": "/root/my-project/backend/database/schema-comprehensive.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/schema.sql",
+      "type": "file",
+      "name": "schema.sql",
+      "filePath": "/root/my-project/backend/database/schema.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/database/seed.sql",
+      "type": "file",
+      "name": "seed.sql",
+      "filePath": "/root/my-project/backend/database/seed.sql"
+    },
+    {
+      "id": "file:/root/my-project/backend/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/backend/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/middleware/auth.ts",
+      "type": "file",
+      "name": "auth.ts",
+      "filePath": "/root/my-project/backend/middleware/auth.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/middleware/network.ts",
+      "type": "file",
+      "name": "network.ts",
+      "filePath": "/root/my-project/backend/middleware/network.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/blogPipeline.ts",
+      "type": "file",
+      "name": "blogPipeline.ts",
+      "filePath": "/root/my-project/backend/orchestrators/blogPipeline.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/CeoOrchestrator.ts",
+      "type": "file",
+      "name": "CeoOrchestrator.ts",
+      "filePath": "/root/my-project/backend/orchestrators/CeoOrchestrator.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/CeoRoutingTable.ts",
+      "type": "file",
+      "name": "CeoRoutingTable.ts",
+      "filePath": "/root/my-project/backend/orchestrators/CeoRoutingTable.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/backend/orchestrators/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/AIContentManager.ts",
+      "type": "file",
+      "name": "AIContentManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/AIContentManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/ClientOperationsManager.ts",
+      "type": "file",
+      "name": "ClientOperationsManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/ClientOperationsManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/CostOptimizationManager.ts",
+      "type": "file",
+      "name": "CostOptimizationManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/CostOptimizationManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/DataAnalyticsManager.ts",
+      "type": "file",
+      "name": "DataAnalyticsManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/DataAnalyticsManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/DepartmentManager.ts",
+      "type": "file",
+      "name": "DepartmentManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/DepartmentManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/InfrastructureManager.ts",
+      "type": "file",
+      "name": "InfrastructureManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/InfrastructureManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/OdooManager.ts",
+      "type": "file",
+      "name": "OdooManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/OdooManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/QualityAssuranceManager.ts",
+      "type": "file",
+      "name": "QualityAssuranceManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/QualityAssuranceManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/SeoManager.ts",
+      "type": "file",
+      "name": "SeoManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/SeoManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/ShopifyPublishingManager.ts",
+      "type": "file",
+      "name": "ShopifyPublishingManager.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/ShopifyPublishingManager.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/orchestrators/managers/types.ts",
+      "type": "file",
+      "name": "types.ts",
+      "filePath": "/root/my-project/backend/orchestrators/managers/types.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/prompts/maintenancePrompt.txt",
+      "type": "file",
+      "name": "maintenancePrompt.txt",
+      "filePath": "/root/my-project/backend/prompts/maintenancePrompt.txt"
+    },
+    {
+      "id": "file:/root/my-project/backend/queues/definitions.ts",
+      "type": "file",
+      "name": "definitions.ts",
+      "filePath": "/root/my-project/backend/queues/definitions.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/repositories/articleRepo.ts",
+      "type": "file",
+      "name": "articleRepo.ts",
+      "filePath": "/root/my-project/backend/repositories/articleRepo.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/repositories/clientRepo.ts",
+      "type": "file",
+      "name": "clientRepo.ts",
+      "filePath": "/root/my-project/backend/repositories/clientRepo.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/repositories/keywordRepo.ts",
+      "type": "file",
+      "name": "keywordRepo.ts",
+      "filePath": "/root/my-project/backend/repositories/keywordRepo.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/repositories/logRepo.ts",
+      "type": "file",
+      "name": "logRepo.ts",
+      "filePath": "/root/my-project/backend/repositories/logRepo.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/admin.ts",
+      "type": "file",
+      "name": "admin.ts",
+      "filePath": "/root/my-project/backend/routes/admin.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/analytics.ts",
+      "type": "file",
+      "name": "analytics.ts",
+      "filePath": "/root/my-project/backend/routes/analytics.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/apiKeys.ts",
+      "type": "file",
+      "name": "apiKeys.ts",
+      "filePath": "/root/my-project/backend/routes/apiKeys.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/articles.ts",
+      "type": "file",
+      "name": "articles.ts",
+      "filePath": "/root/my-project/backend/routes/articles.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/auth.ts",
+      "type": "file",
+      "name": "auth.ts",
+      "filePath": "/root/my-project/backend/routes/auth.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/brandVoice.ts",
+      "type": "file",
+      "name": "brandVoice.ts",
+      "filePath": "/root/my-project/backend/routes/brandVoice.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/chat.ts",
+      "type": "file",
+      "name": "chat.ts",
+      "filePath": "/root/my-project/backend/routes/chat.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/clients.ts",
+      "type": "file",
+      "name": "clients.ts",
+      "filePath": "/root/my-project/backend/routes/clients.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/clientScraper.ts",
+      "type": "file",
+      "name": "clientScraper.ts",
+      "filePath": "/root/my-project/backend/routes/clientScraper.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/cms.ts",
+      "type": "file",
+      "name": "cms.ts",
+      "filePath": "/root/my-project/backend/routes/cms.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/contentIntelligence.ts",
+      "type": "file",
+      "name": "contentIntelligence.ts",
+      "filePath": "/root/my-project/backend/routes/contentIntelligence.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/cost.ts",
+      "type": "file",
+      "name": "cost.ts",
+      "filePath": "/root/my-project/backend/routes/cost.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/devices.ts",
+      "type": "file",
+      "name": "devices.ts",
+      "filePath": "/root/my-project/backend/routes/devices.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/editorial.ts",
+      "type": "file",
+      "name": "editorial.ts",
+      "filePath": "/root/my-project/backend/routes/editorial.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/enterprisePipeline.ts",
+      "type": "file",
+      "name": "enterprisePipeline.ts",
+      "filePath": "/root/my-project/backend/routes/enterprisePipeline.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/evaluation.ts",
+      "type": "file",
+      "name": "evaluation.ts",
+      "filePath": "/root/my-project/backend/routes/evaluation.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/factCheck.ts",
+      "type": "file",
+      "name": "factCheck.ts",
+      "filePath": "/root/my-project/backend/routes/factCheck.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/meta.ts",
+      "type": "file",
+      "name": "meta.ts",
+      "filePath": "/root/my-project/backend/routes/meta.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/observability.ts",
+      "type": "file",
+      "name": "observability.ts",
+      "filePath": "/root/my-project/backend/routes/observability.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/pexels.ts",
+      "type": "file",
+      "name": "pexels.ts",
+      "filePath": "/root/my-project/backend/routes/pexels.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/plugins.ts",
+      "type": "file",
+      "name": "plugins.ts",
+      "filePath": "/root/my-project/backend/routes/plugins.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/prompts.ts",
+      "type": "file",
+      "name": "prompts.ts",
+      "filePath": "/root/my-project/backend/routes/prompts.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/security.ts",
+      "type": "file",
+      "name": "security.ts",
+      "filePath": "/root/my-project/backend/routes/security.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/shopifyAuth.ts",
+      "type": "file",
+      "name": "shopifyAuth.ts",
+      "filePath": "/root/my-project/backend/routes/shopifyAuth.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/shopifyStore.ts",
+      "type": "file",
+      "name": "shopifyStore.ts",
+      "filePath": "/root/my-project/backend/routes/shopifyStore.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/systemConfig.ts",
+      "type": "file",
+      "name": "systemConfig.ts",
+      "filePath": "/root/my-project/backend/routes/systemConfig.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/webhooks.ts",
+      "type": "file",
+      "name": "webhooks.ts",
+      "filePath": "/root/my-project/backend/routes/webhooks.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/routes/workerScoring.ts",
+      "type": "file",
+      "name": "workerScoring.ts",
+      "filePath": "/root/my-project/backend/routes/workerScoring.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/aiEvaluation.ts",
+      "type": "file",
+      "name": "aiEvaluation.ts",
+      "filePath": "/root/my-project/backend/services/aiEvaluation.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/brandVoice.ts",
+      "type": "file",
+      "name": "brandVoice.ts",
+      "filePath": "/root/my-project/backend/services/brandVoice.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/chatEngine.ts",
+      "type": "file",
+      "name": "chatEngine.ts",
+      "filePath": "/root/my-project/backend/services/chatEngine.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/circuitBreaker.ts",
+      "type": "file",
+      "name": "circuitBreaker.ts",
+      "filePath": "/root/my-project/backend/services/circuitBreaker.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/clientScraper.ts",
+      "type": "file",
+      "name": "clientScraper.ts",
+      "filePath": "/root/my-project/backend/services/clientScraper.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/contentIntelligence.ts",
+      "type": "file",
+      "name": "contentIntelligence.ts",
+      "filePath": "/root/my-project/backend/services/contentIntelligence.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/contentSafety.ts",
+      "type": "file",
+      "name": "contentSafety.ts",
+      "filePath": "/root/my-project/backend/services/contentSafety.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/costOptimization.ts",
+      "type": "file",
+      "name": "costOptimization.ts",
+      "filePath": "/root/my-project/backend/services/costOptimization.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/costTracker.ts",
+      "type": "file",
+      "name": "costTracker.ts",
+      "filePath": "/root/my-project/backend/services/costTracker.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/deviceAuth.ts",
+      "type": "file",
+      "name": "deviceAuth.ts",
+      "filePath": "/root/my-project/backend/services/deviceAuth.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/editorialWorkflow.ts",
+      "type": "file",
+      "name": "editorialWorkflow.ts",
+      "filePath": "/root/my-project/backend/services/editorialWorkflow.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/enterpriseSecurity.ts",
+      "type": "file",
+      "name": "enterpriseSecurity.ts",
+      "filePath": "/root/my-project/backend/services/enterpriseSecurity.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/factCheckService.ts",
+      "type": "file",
+      "name": "factCheckService.ts",
+      "filePath": "/root/my-project/backend/services/factCheckService.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/internalLinks.ts",
+      "type": "file",
+      "name": "internalLinks.ts",
+      "filePath": "/root/my-project/backend/services/internalLinks.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/keywords.ts",
+      "type": "file",
+      "name": "keywords.ts",
+      "filePath": "/root/my-project/backend/services/keywords.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/multiCmsPublisher.ts",
+      "type": "file",
+      "name": "multiCmsPublisher.ts",
+      "filePath": "/root/my-project/backend/services/multiCmsPublisher.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/observability.ts",
+      "type": "file",
+      "name": "observability.ts",
+      "filePath": "/root/my-project/backend/services/observability.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/odooConnector.ts",
+      "type": "file",
+      "name": "odooConnector.ts",
+      "filePath": "/root/my-project/backend/services/odooConnector.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/openai.ts",
+      "type": "file",
+      "name": "openai.ts",
+      "filePath": "/root/my-project/backend/services/openai.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/pexelsService.ts",
+      "type": "file",
+      "name": "pexelsService.ts",
+      "filePath": "/root/my-project/backend/services/pexelsService.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/pluginService.ts",
+      "type": "file",
+      "name": "pluginService.ts",
+      "filePath": "/root/my-project/backend/services/pluginService.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/qualityScorer.ts",
+      "type": "file",
+      "name": "qualityScorer.ts",
+      "filePath": "/root/my-project/backend/services/qualityScorer.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/selfImprovementService.ts",
+      "type": "file",
+      "name": "selfImprovementService.ts",
+      "filePath": "/root/my-project/backend/services/selfImprovementService.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/seo.ts",
+      "type": "file",
+      "name": "seo.ts",
+      "filePath": "/root/my-project/backend/services/seo.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/seoIntelligence.ts",
+      "type": "file",
+      "name": "seoIntelligence.ts",
+      "filePath": "/root/my-project/backend/services/seoIntelligence.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/serpapi.ts",
+      "type": "file",
+      "name": "serpapi.ts",
+      "filePath": "/root/my-project/backend/services/serpapi.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/shopify.ts",
+      "type": "file",
+      "name": "shopify.ts",
+      "filePath": "/root/my-project/backend/services/shopify.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/shopifyOAuth.ts",
+      "type": "file",
+      "name": "shopifyOAuth.ts",
+      "filePath": "/root/my-project/backend/services/shopifyOAuth.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/vectorMemory.ts",
+      "type": "file",
+      "name": "vectorMemory.ts",
+      "filePath": "/root/my-project/backend/services/vectorMemory.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/webhooks.ts",
+      "type": "file",
+      "name": "webhooks.ts",
+      "filePath": "/root/my-project/backend/services/webhooks.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/services/workerScoringEngine.ts",
+      "type": "file",
+      "name": "workerScoringEngine.ts",
+      "filePath": "/root/my-project/backend/services/workerScoringEngine.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/integration/api-routes.test.ts",
+      "type": "file",
+      "name": "api-routes.test.ts",
+      "filePath": "/root/my-project/backend/tests/integration/api-routes.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/integration/pipeline-e2e.test.ts",
+      "type": "file",
+      "name": "pipeline-e2e.test.ts",
+      "filePath": "/root/my-project/backend/tests/integration/pipeline-e2e.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/integration/pipeline-routes.test.ts",
+      "type": "file",
+      "name": "pipeline-routes.test.ts",
+      "filePath": "/root/my-project/backend/tests/integration/pipeline-routes.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/mocks/mockServices.ts",
+      "type": "file",
+      "name": "mockServices.ts",
+      "filePath": "/root/my-project/backend/tests/mocks/mockServices.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/orchestrators/blogPipeline.test.ts",
+      "type": "file",
+      "name": "blogPipeline.test.ts",
+      "filePath": "/root/my-project/backend/tests/orchestrators/blogPipeline.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/pipeline-runner.sh",
+      "type": "file",
+      "name": "pipeline-runner.sh",
+      "filePath": "/root/my-project/backend/tests/pipeline-runner.sh"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/routes/health.test.ts",
+      "type": "file",
+      "name": "health.test.ts",
+      "filePath": "/root/my-project/backend/tests/routes/health.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/services/chatEngine.test.ts",
+      "type": "file",
+      "name": "chatEngine.test.ts",
+      "filePath": "/root/my-project/backend/tests/services/chatEngine.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/services/contentSafety.test.ts",
+      "type": "file",
+      "name": "contentSafety.test.ts",
+      "filePath": "/root/my-project/backend/tests/services/contentSafety.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/services/pluginService.test.ts",
+      "type": "file",
+      "name": "pluginService.test.ts",
+      "filePath": "/root/my-project/backend/tests/services/pluginService.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/services/qualityScorer.test.ts",
+      "type": "file",
+      "name": "qualityScorer.test.ts",
+      "filePath": "/root/my-project/backend/tests/services/qualityScorer.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/tests/services/seo.test.ts",
+      "type": "file",
+      "name": "seo.test.ts",
+      "filePath": "/root/my-project/backend/tests/services/seo.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/types/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/backend/types/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/utils/logger.ts",
+      "type": "file",
+      "name": "logger.ts",
+      "filePath": "/root/my-project/backend/utils/logger.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/utils/markdownToHtml.ts",
+      "type": "file",
+      "name": "markdownToHtml.ts",
+      "filePath": "/root/my-project/backend/utils/markdownToHtml.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/utils/queue.ts",
+      "type": "file",
+      "name": "queue.ts",
+      "filePath": "/root/my-project/backend/utils/queue.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/validators/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/backend/validators/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/backend/workers/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/backend/workers/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/CLAUDE.md",
+      "type": "file",
+      "name": "CLAUDE.md",
+      "filePath": "/root/my-project/CLAUDE.md"
+    },
+    {
+      "id": "file:/root/my-project/CONTRIBUTING.md",
+      "type": "file",
+      "name": "CONTRIBUTING.md",
+      "filePath": "/root/my-project/CONTRIBUTING.md"
+    },
+    {
+      "id": "file:/root/my-project/docker-compose.yml",
+      "type": "file",
+      "name": "docker-compose.yml",
+      "filePath": "/root/my-project/docker-compose.yml"
+    },
+    {
+      "id": "file:/root/my-project/docker/nginx.conf",
+      "type": "file",
+      "name": "nginx.conf",
+      "filePath": "/root/my-project/docker/nginx.conf"
+    },
+    {
+      "id": "file:/root/my-project/Dockerfile",
+      "type": "file",
+      "name": "Dockerfile",
+      "filePath": "/root/my-project/Dockerfile"
+    },
+    {
+      "id": "file:/root/my-project/ecosystem.config.cjs",
+      "type": "file",
+      "name": "ecosystem.config.cjs",
+      "filePath": "/root/my-project/ecosystem.config.cjs"
+    },
+    {
+      "id": "file:/root/my-project/frontend/index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "/root/my-project/frontend/index.html"
+    },
+    {
+      "id": "file:/root/my-project/frontend/package.json",
+      "type": "file",
+      "name": "package.json",
+      "filePath": "/root/my-project/frontend/package.json"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/App.tsx",
+      "type": "file",
+      "name": "App.tsx",
+      "filePath": "/root/my-project/frontend/src/App.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/components/Card.tsx",
+      "type": "file",
+      "name": "Card.tsx",
+      "filePath": "/root/my-project/frontend/src/components/Card.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/components/DataTable.tsx",
+      "type": "file",
+      "name": "DataTable.tsx",
+      "filePath": "/root/my-project/frontend/src/components/DataTable.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/components/FormField.tsx",
+      "type": "file",
+      "name": "FormField.tsx",
+      "filePath": "/root/my-project/frontend/src/components/FormField.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/components/Icon.tsx",
+      "type": "file",
+      "name": "Icon.tsx",
+      "filePath": "/root/my-project/frontend/src/components/Icon.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/components/Layout.tsx",
+      "type": "file",
+      "name": "Layout.tsx",
+      "filePath": "/root/my-project/frontend/src/components/Layout.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/components/Modal.tsx",
+      "type": "file",
+      "name": "Modal.tsx",
+      "filePath": "/root/my-project/frontend/src/components/Modal.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/components/ShopifyAppProvider.tsx",
+      "type": "file",
+      "name": "ShopifyAppProvider.tsx",
+      "filePath": "/root/my-project/frontend/src/components/ShopifyAppProvider.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/components/Toast.tsx",
+      "type": "file",
+      "name": "Toast.tsx",
+      "filePath": "/root/my-project/frontend/src/components/Toast.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/hooks/useAuth.tsx",
+      "type": "file",
+      "name": "useAuth.tsx",
+      "filePath": "/root/my-project/frontend/src/hooks/useAuth.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/hooks/useDeviceFingerprint.ts",
+      "type": "file",
+      "name": "useDeviceFingerprint.ts",
+      "filePath": "/root/my-project/frontend/src/hooks/useDeviceFingerprint.ts"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/main.tsx",
+      "type": "file",
+      "name": "main.tsx",
+      "filePath": "/root/my-project/frontend/src/main.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Admin.tsx",
+      "type": "file",
+      "name": "Admin.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Admin.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/AiEvaluation.tsx",
+      "type": "file",
+      "name": "AiEvaluation.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/AiEvaluation.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Analytics.tsx",
+      "type": "file",
+      "name": "Analytics.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Analytics.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/ApiKeys.tsx",
+      "type": "file",
+      "name": "ApiKeys.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/ApiKeys.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/ApiUsage.tsx",
+      "type": "file",
+      "name": "ApiUsage.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/ApiUsage.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/ArticleDetail.tsx",
+      "type": "file",
+      "name": "ArticleDetail.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/ArticleDetail.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Articles.tsx",
+      "type": "file",
+      "name": "Articles.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Articles.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/BrandVoice.tsx",
+      "type": "file",
+      "name": "BrandVoice.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/BrandVoice.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Chat.tsx",
+      "type": "file",
+      "name": "Chat.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Chat.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Clients.tsx",
+      "type": "file",
+      "name": "Clients.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Clients.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/CmsConnections.tsx",
+      "type": "file",
+      "name": "CmsConnections.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/CmsConnections.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Config.tsx",
+      "type": "file",
+      "name": "Config.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Config.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/ContentIntelligence.tsx",
+      "type": "file",
+      "name": "ContentIntelligence.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/ContentIntelligence.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/CopywriterDashboard.tsx",
+      "type": "file",
+      "name": "CopywriterDashboard.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/CopywriterDashboard.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/CostOptimization.tsx",
+      "type": "file",
+      "name": "CostOptimization.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/CostOptimization.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Dashboard.tsx",
+      "type": "file",
+      "name": "Dashboard.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Dashboard.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/EditorialWorkflow.tsx",
+      "type": "file",
+      "name": "EditorialWorkflow.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/EditorialWorkflow.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/FactChecking.tsx",
+      "type": "file",
+      "name": "FactChecking.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/FactChecking.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Improvements.tsx",
+      "type": "file",
+      "name": "Improvements.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Improvements.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Login.tsx",
+      "type": "file",
+      "name": "Login.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Login.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Observability.tsx",
+      "type": "file",
+      "name": "Observability.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Observability.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Pexels.tsx",
+      "type": "file",
+      "name": "Pexels.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Pexels.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/PipelineDashboard.tsx",
+      "type": "file",
+      "name": "PipelineDashboard.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/PipelineDashboard.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Plugins.tsx",
+      "type": "file",
+      "name": "Plugins.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Plugins.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Prompts.tsx",
+      "type": "file",
+      "name": "Prompts.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Prompts.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/QueueDashboard.tsx",
+      "type": "file",
+      "name": "QueueDashboard.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/QueueDashboard.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Security.tsx",
+      "type": "file",
+      "name": "Security.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Security.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Settings.tsx",
+      "type": "file",
+      "name": "Settings.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Settings.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/ShopifyWelcome.tsx",
+      "type": "file",
+      "name": "ShopifyWelcome.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/ShopifyWelcome.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/Webhooks.tsx",
+      "type": "file",
+      "name": "Webhooks.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/Webhooks.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/pages/WorkerPerformance.tsx",
+      "type": "file",
+      "name": "WorkerPerformance.tsx",
+      "filePath": "/root/my-project/frontend/src/pages/WorkerPerformance.tsx"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/services/api.ts",
+      "type": "file",
+      "name": "api.ts",
+      "filePath": "/root/my-project/frontend/src/services/api.ts"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/styles.css",
+      "type": "file",
+      "name": "styles.css",
+      "filePath": "/root/my-project/frontend/src/styles.css"
+    },
+    {
+      "id": "file:/root/my-project/frontend/src/types/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/frontend/src/types/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/frontend/tsconfig.json",
+      "type": "file",
+      "name": "tsconfig.json",
+      "filePath": "/root/my-project/frontend/tsconfig.json"
+    },
+    {
+      "id": "file:/root/my-project/frontend/tsconfig.node.json",
+      "type": "file",
+      "name": "tsconfig.node.json",
+      "filePath": "/root/my-project/frontend/tsconfig.node.json"
+    },
+    {
+      "id": "file:/root/my-project/frontend/vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "/root/my-project/frontend/vite.config.ts"
+    },
+    {
+      "id": "file:/root/my-project/n8n/workflows/seo-shopify-agent.json",
+      "type": "file",
+      "name": "seo-shopify-agent.json",
+      "filePath": "/root/my-project/n8n/workflows/seo-shopify-agent.json"
+    },
+    {
+      "id": "file:/root/my-project/package.json",
+      "type": "file",
+      "name": "package.json",
+      "filePath": "/root/my-project/package.json"
+    },
+    {
+      "id": "file:/root/my-project/PROJECT_MAP.md",
+      "type": "file",
+      "name": "PROJECT_MAP.md",
+      "filePath": "/root/my-project/PROJECT_MAP.md"
+    },
+    {
+      "id": "file:/root/my-project/project-blueprint.md",
+      "type": "file",
+      "name": "project-blueprint.md",
+      "filePath": "/root/my-project/project-blueprint.md"
+    },
+    {
+      "id": "file:/root/my-project/README.md",
+      "type": "file",
+      "name": "README.md",
+      "filePath": "/root/my-project/README.md"
+    },
+    {
+      "id": "file:/root/my-project/README.odt",
+      "type": "file",
+      "name": "README.odt",
+      "filePath": "/root/my-project/README.odt"
+    },
+    {
+      "id": "file:/root/my-project/SECURITY.md",
+      "type": "file",
+      "name": "SECURITY.md",
+      "filePath": "/root/my-project/SECURITY.md"
+    },
+    {
+      "id": "file:/root/my-project/tsconfig.json",
+      "type": "file",
+      "name": "tsconfig.json",
+      "filePath": "/root/my-project/tsconfig.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/.claude-plugin/plugin.json",
+      "type": "file",
+      "name": "plugin.json",
+      "filePath": "/root/my-project/understand-anything-plugin/.claude-plugin/plugin.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/architecture-analyzer.md",
+      "type": "file",
+      "name": "architecture-analyzer.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/architecture-analyzer.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/article-analyzer.md",
+      "type": "file",
+      "name": "article-analyzer.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/article-analyzer.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/assemble-reviewer.md",
+      "type": "file",
+      "name": "assemble-reviewer.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/assemble-reviewer.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/domain-analyzer.md",
+      "type": "file",
+      "name": "domain-analyzer.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/domain-analyzer.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/file-analyzer.md",
+      "type": "file",
+      "name": "file-analyzer.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/file-analyzer.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/graph-reviewer.md",
+      "type": "file",
+      "name": "graph-reviewer.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/graph-reviewer.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/knowledge-graph-guide.md",
+      "type": "file",
+      "name": "knowledge-graph-guide.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/knowledge-graph-guide.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/project-scanner.md",
+      "type": "file",
+      "name": "project-scanner.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/project-scanner.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/agents/tour-builder.md",
+      "type": "file",
+      "name": "tour-builder.md",
+      "filePath": "/root/my-project/understand-anything-plugin/agents/tour-builder.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/hooks/auto-update-prompt.md",
+      "type": "file",
+      "name": "auto-update-prompt.md",
+      "filePath": "/root/my-project/understand-anything-plugin/hooks/auto-update-prompt.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/hooks/hooks.json",
+      "type": "file",
+      "name": "hooks.json",
+      "filePath": "/root/my-project/understand-anything-plugin/hooks/hooks.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/package.json",
+      "type": "file",
+      "name": "package.json",
+      "filePath": "/root/my-project/understand-anything-plugin/package.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/package.json",
+      "type": "file",
+      "name": "package.json",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/package.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/change-classifier.test.ts",
+      "type": "file",
+      "name": "change-classifier.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/change-classifier.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/domain-normalize.test.ts",
+      "type": "file",
+      "name": "domain-normalize.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/domain-normalize.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/domain-persistence.test.ts",
+      "type": "file",
+      "name": "domain-persistence.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/domain-persistence.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/domain-types.test.ts",
+      "type": "file",
+      "name": "domain-types.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/domain-types.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/embedding-search.test.ts",
+      "type": "file",
+      "name": "embedding-search.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/embedding-search.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/fingerprint.test.ts",
+      "type": "file",
+      "name": "fingerprint.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/fingerprint.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/framework-registry.test.ts",
+      "type": "file",
+      "name": "framework-registry.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/framework-registry.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/ignore-filter.test.ts",
+      "type": "file",
+      "name": "ignore-filter.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/ignore-filter.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/ignore-generator.test.ts",
+      "type": "file",
+      "name": "ignore-generator.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/ignore-generator.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/language-lesson.test.ts",
+      "type": "file",
+      "name": "language-lesson.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/language-lesson.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/language-registry.test.ts",
+      "type": "file",
+      "name": "language-registry.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/language-registry.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/layer-detector.test.ts",
+      "type": "file",
+      "name": "layer-detector.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/layer-detector.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/normalize-graph.test.ts",
+      "type": "file",
+      "name": "normalize-graph.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/normalize-graph.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/parsers.test.ts",
+      "type": "file",
+      "name": "parsers.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/parsers.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/plugin-discovery.test.ts",
+      "type": "file",
+      "name": "plugin-discovery.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/plugin-discovery.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/plugin-registry.test.ts",
+      "type": "file",
+      "name": "plugin-registry.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/plugin-registry.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/schema.test.ts",
+      "type": "file",
+      "name": "schema.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/schema.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/search.test.ts",
+      "type": "file",
+      "name": "search.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/search.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/staleness.test.ts",
+      "type": "file",
+      "name": "staleness.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/staleness.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/__tests__/tour-generator.test.ts",
+      "type": "file",
+      "name": "tour-generator.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/__tests__/tour-generator.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/analyzer/graph-builder.test.ts",
+      "type": "file",
+      "name": "graph-builder.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/analyzer/graph-builder.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/analyzer/graph-builder.ts",
+      "type": "file",
+      "name": "graph-builder.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/analyzer/graph-builder.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/analyzer/language-lesson.ts",
+      "type": "file",
+      "name": "language-lesson.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/analyzer/language-lesson.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/analyzer/layer-detector.ts",
+      "type": "file",
+      "name": "layer-detector.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/analyzer/layer-detector.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/analyzer/llm-analyzer.test.ts",
+      "type": "file",
+      "name": "llm-analyzer.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/analyzer/llm-analyzer.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/analyzer/llm-analyzer.ts",
+      "type": "file",
+      "name": "llm-analyzer.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/analyzer/llm-analyzer.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/analyzer/normalize-graph.ts",
+      "type": "file",
+      "name": "normalize-graph.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/analyzer/normalize-graph.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/analyzer/tour-generator.ts",
+      "type": "file",
+      "name": "tour-generator.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/analyzer/tour-generator.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/change-classifier.ts",
+      "type": "file",
+      "name": "change-classifier.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/change-classifier.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/embedding-search.ts",
+      "type": "file",
+      "name": "embedding-search.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/embedding-search.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/fingerprint.ts",
+      "type": "file",
+      "name": "fingerprint.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/fingerprint.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/ignore-filter.ts",
+      "type": "file",
+      "name": "ignore-filter.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/ignore-filter.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/ignore-generator.ts",
+      "type": "file",
+      "name": "ignore-generator.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/ignore-generator.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/batch.ts",
+      "type": "file",
+      "name": "batch.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/batch.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/c.ts",
+      "type": "file",
+      "name": "c.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/c.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/cpp.ts",
+      "type": "file",
+      "name": "cpp.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/cpp.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/csharp.ts",
+      "type": "file",
+      "name": "csharp.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/csharp.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/css.ts",
+      "type": "file",
+      "name": "css.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/css.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/csv.ts",
+      "type": "file",
+      "name": "csv.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/csv.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/docker-compose.ts",
+      "type": "file",
+      "name": "docker-compose.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/docker-compose.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/dockerfile.ts",
+      "type": "file",
+      "name": "dockerfile.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/dockerfile.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/env.ts",
+      "type": "file",
+      "name": "env.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/env.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/github-actions.ts",
+      "type": "file",
+      "name": "github-actions.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/github-actions.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/go.ts",
+      "type": "file",
+      "name": "go.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/go.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/graphql.ts",
+      "type": "file",
+      "name": "graphql.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/graphql.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/html.ts",
+      "type": "file",
+      "name": "html.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/html.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/java.ts",
+      "type": "file",
+      "name": "java.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/java.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/javascript.ts",
+      "type": "file",
+      "name": "javascript.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/javascript.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/jenkinsfile.ts",
+      "type": "file",
+      "name": "jenkinsfile.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/jenkinsfile.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/json-config.ts",
+      "type": "file",
+      "name": "json-config.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/json-config.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/json-schema.ts",
+      "type": "file",
+      "name": "json-schema.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/json-schema.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/kotlin.ts",
+      "type": "file",
+      "name": "kotlin.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/kotlin.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/kubernetes.ts",
+      "type": "file",
+      "name": "kubernetes.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/kubernetes.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/lua.ts",
+      "type": "file",
+      "name": "lua.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/lua.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/makefile.ts",
+      "type": "file",
+      "name": "makefile.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/makefile.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/markdown.ts",
+      "type": "file",
+      "name": "markdown.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/markdown.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/openapi.ts",
+      "type": "file",
+      "name": "openapi.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/openapi.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/php.ts",
+      "type": "file",
+      "name": "php.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/php.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/plaintext.ts",
+      "type": "file",
+      "name": "plaintext.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/plaintext.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/powershell.ts",
+      "type": "file",
+      "name": "powershell.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/powershell.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/protobuf.ts",
+      "type": "file",
+      "name": "protobuf.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/protobuf.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/python.ts",
+      "type": "file",
+      "name": "python.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/python.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/restructuredtext.ts",
+      "type": "file",
+      "name": "restructuredtext.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/restructuredtext.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/ruby.ts",
+      "type": "file",
+      "name": "ruby.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/ruby.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/rust.ts",
+      "type": "file",
+      "name": "rust.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/rust.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/shell.ts",
+      "type": "file",
+      "name": "shell.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/shell.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/sql.ts",
+      "type": "file",
+      "name": "sql.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/sql.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/swift.ts",
+      "type": "file",
+      "name": "swift.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/swift.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/terraform.ts",
+      "type": "file",
+      "name": "terraform.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/terraform.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/toml.ts",
+      "type": "file",
+      "name": "toml.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/toml.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/typescript.ts",
+      "type": "file",
+      "name": "typescript.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/typescript.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/xml.ts",
+      "type": "file",
+      "name": "xml.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/xml.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/yaml.ts",
+      "type": "file",
+      "name": "yaml.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/configs/yaml.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/framework-registry.ts",
+      "type": "file",
+      "name": "framework-registry.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/framework-registry.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/django.ts",
+      "type": "file",
+      "name": "django.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/django.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/express.ts",
+      "type": "file",
+      "name": "express.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/express.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/fastapi.ts",
+      "type": "file",
+      "name": "fastapi.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/fastapi.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/flask.ts",
+      "type": "file",
+      "name": "flask.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/flask.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/gin.ts",
+      "type": "file",
+      "name": "gin.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/gin.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/nextjs.ts",
+      "type": "file",
+      "name": "nextjs.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/nextjs.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/rails.ts",
+      "type": "file",
+      "name": "rails.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/rails.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/react.ts",
+      "type": "file",
+      "name": "react.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/react.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/spring.ts",
+      "type": "file",
+      "name": "spring.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/spring.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/vue.ts",
+      "type": "file",
+      "name": "vue.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/frameworks/vue.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/language-registry.ts",
+      "type": "file",
+      "name": "language-registry.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/language-registry.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/languages/types.ts",
+      "type": "file",
+      "name": "types.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/languages/types.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/persistence/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/persistence/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/persistence/persistence.test.ts",
+      "type": "file",
+      "name": "persistence.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/persistence/persistence.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/discovery.ts",
+      "type": "file",
+      "name": "discovery.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/discovery.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/cpp-extractor.test.ts",
+      "type": "file",
+      "name": "cpp-extractor.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/cpp-extractor.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/csharp-extractor.test.ts",
+      "type": "file",
+      "name": "csharp-extractor.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/csharp-extractor.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/go-extractor.test.ts",
+      "type": "file",
+      "name": "go-extractor.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/go-extractor.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/java-extractor.test.ts",
+      "type": "file",
+      "name": "java-extractor.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/java-extractor.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/php-extractor.test.ts",
+      "type": "file",
+      "name": "php-extractor.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/php-extractor.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/python-extractor.test.ts",
+      "type": "file",
+      "name": "python-extractor.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/python-extractor.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/ruby-extractor.test.ts",
+      "type": "file",
+      "name": "ruby-extractor.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/ruby-extractor.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/rust-extractor.test.ts",
+      "type": "file",
+      "name": "rust-extractor.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/__tests__/rust-extractor.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/base-extractor.ts",
+      "type": "file",
+      "name": "base-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/base-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/cpp-extractor.ts",
+      "type": "file",
+      "name": "cpp-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/cpp-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/csharp-extractor.ts",
+      "type": "file",
+      "name": "csharp-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/csharp-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/go-extractor.ts",
+      "type": "file",
+      "name": "go-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/go-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/java-extractor.ts",
+      "type": "file",
+      "name": "java-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/java-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/php-extractor.ts",
+      "type": "file",
+      "name": "php-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/php-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/python-extractor.ts",
+      "type": "file",
+      "name": "python-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/python-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/ruby-extractor.ts",
+      "type": "file",
+      "name": "ruby-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/ruby-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/rust-extractor.ts",
+      "type": "file",
+      "name": "rust-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/rust-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/types.ts",
+      "type": "file",
+      "name": "types.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/types.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/typescript-extractor.ts",
+      "type": "file",
+      "name": "typescript-extractor.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/extractors/typescript-extractor.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/dockerfile-parser.ts",
+      "type": "file",
+      "name": "dockerfile-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/dockerfile-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/env-parser.ts",
+      "type": "file",
+      "name": "env-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/env-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/graphql-parser.ts",
+      "type": "file",
+      "name": "graphql-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/graphql-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/json-parser.ts",
+      "type": "file",
+      "name": "json-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/json-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/makefile-parser.ts",
+      "type": "file",
+      "name": "makefile-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/makefile-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/markdown-parser.ts",
+      "type": "file",
+      "name": "markdown-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/markdown-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/protobuf-parser.ts",
+      "type": "file",
+      "name": "protobuf-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/protobuf-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/shell-parser.ts",
+      "type": "file",
+      "name": "shell-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/shell-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/sql-parser.ts",
+      "type": "file",
+      "name": "sql-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/sql-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/terraform-parser.ts",
+      "type": "file",
+      "name": "terraform-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/terraform-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/toml-parser.ts",
+      "type": "file",
+      "name": "toml-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/toml-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/yaml-parser.ts",
+      "type": "file",
+      "name": "yaml-parser.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/parsers/yaml-parser.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/registry.ts",
+      "type": "file",
+      "name": "registry.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/registry.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/tree-sitter-plugin.test.ts",
+      "type": "file",
+      "name": "tree-sitter-plugin.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/tree-sitter-plugin.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/plugins/tree-sitter-plugin.ts",
+      "type": "file",
+      "name": "tree-sitter-plugin.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/plugins/tree-sitter-plugin.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/schema.ts",
+      "type": "file",
+      "name": "schema.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/schema.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/search.ts",
+      "type": "file",
+      "name": "search.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/search.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/staleness.ts",
+      "type": "file",
+      "name": "staleness.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/staleness.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/types.test.ts",
+      "type": "file",
+      "name": "types.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/types.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/src/types.ts",
+      "type": "file",
+      "name": "types.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/src/types.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/tsconfig.json",
+      "type": "file",
+      "name": "tsconfig.json",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/tsconfig.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/core/vitest.config.ts",
+      "type": "file",
+      "name": "vitest.config.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/core/vitest.config.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/index.html"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/package.json",
+      "type": "file",
+      "name": "package.json",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/package.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/public/knowledge-graph.json",
+      "type": "file",
+      "name": "knowledge-graph.json",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/public/knowledge-graph.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/App.tsx",
+      "type": "file",
+      "name": "App.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/App.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/Breadcrumb.tsx",
+      "type": "file",
+      "name": "Breadcrumb.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/Breadcrumb.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/CodeViewer.tsx",
+      "type": "file",
+      "name": "CodeViewer.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/CodeViewer.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/ContainerNode.tsx",
+      "type": "file",
+      "name": "ContainerNode.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/ContainerNode.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/CustomNode.tsx",
+      "type": "file",
+      "name": "CustomNode.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/CustomNode.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/DiffToggle.tsx",
+      "type": "file",
+      "name": "DiffToggle.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/DiffToggle.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/DomainClusterNode.tsx",
+      "type": "file",
+      "name": "DomainClusterNode.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/DomainClusterNode.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/DomainGraphView.tsx",
+      "type": "file",
+      "name": "DomainGraphView.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/DomainGraphView.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/ExportMenu.tsx",
+      "type": "file",
+      "name": "ExportMenu.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/ExportMenu.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/FileExplorer.tsx",
+      "type": "file",
+      "name": "FileExplorer.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/FileExplorer.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/FilterPanel.tsx",
+      "type": "file",
+      "name": "FilterPanel.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/FilterPanel.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/FlowNode.tsx",
+      "type": "file",
+      "name": "FlowNode.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/FlowNode.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/GraphView.tsx",
+      "type": "file",
+      "name": "GraphView.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/GraphView.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/KeyboardShortcutsHelp.tsx",
+      "type": "file",
+      "name": "KeyboardShortcutsHelp.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/KeyboardShortcutsHelp.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/KnowledgeGraphView.tsx",
+      "type": "file",
+      "name": "KnowledgeGraphView.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/KnowledgeGraphView.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/LayerClusterNode.tsx",
+      "type": "file",
+      "name": "LayerClusterNode.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/LayerClusterNode.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/LayerLegend.tsx",
+      "type": "file",
+      "name": "LayerLegend.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/LayerLegend.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/LearnPanel.tsx",
+      "type": "file",
+      "name": "LearnPanel.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/LearnPanel.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/MobileBottomNav.tsx",
+      "type": "file",
+      "name": "MobileBottomNav.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/MobileBottomNav.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/MobileDrawer.tsx",
+      "type": "file",
+      "name": "MobileDrawer.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/MobileDrawer.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/MobileLayout.tsx",
+      "type": "file",
+      "name": "MobileLayout.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/MobileLayout.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/NodeInfo.tsx",
+      "type": "file",
+      "name": "NodeInfo.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/NodeInfo.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/NodeTooltip.tsx",
+      "type": "file",
+      "name": "NodeTooltip.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/NodeTooltip.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/OnboardingOverlay.tsx",
+      "type": "file",
+      "name": "OnboardingOverlay.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/OnboardingOverlay.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/PathFinderModal.tsx",
+      "type": "file",
+      "name": "PathFinderModal.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/PathFinderModal.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/PersonaSelector.tsx",
+      "type": "file",
+      "name": "PersonaSelector.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/PersonaSelector.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/PortalNode.tsx",
+      "type": "file",
+      "name": "PortalNode.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/PortalNode.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/ProjectOverview.tsx",
+      "type": "file",
+      "name": "ProjectOverview.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/ProjectOverview.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/SearchBar.tsx",
+      "type": "file",
+      "name": "SearchBar.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/SearchBar.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/StepNode.tsx",
+      "type": "file",
+      "name": "StepNode.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/StepNode.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/ThemePicker.tsx",
+      "type": "file",
+      "name": "ThemePicker.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/ThemePicker.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/TokenGate.tsx",
+      "type": "file",
+      "name": "TokenGate.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/TokenGate.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/components/WarningBanner.tsx",
+      "type": "file",
+      "name": "WarningBanner.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/components/WarningBanner.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/contexts/I18nContext.tsx",
+      "type": "file",
+      "name": "I18nContext.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/contexts/I18nContext.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/hooks/useIsMobile.ts",
+      "type": "file",
+      "name": "useIsMobile.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/hooks/useIsMobile.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/hooks/useKeyboardShortcuts.ts",
+      "type": "file",
+      "name": "useKeyboardShortcuts.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/hooks/useKeyboardShortcuts.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/index.css",
+      "type": "file",
+      "name": "index.css",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/index.css"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/en.ts",
+      "type": "file",
+      "name": "en.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/en.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/ja.ts",
+      "type": "file",
+      "name": "ja.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/ja.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/ko.ts",
+      "type": "file",
+      "name": "ko.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/ko.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/ru.ts",
+      "type": "file",
+      "name": "ru.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/ru.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/zh-TW.ts",
+      "type": "file",
+      "name": "zh-TW.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/zh-TW.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/zh.ts",
+      "type": "file",
+      "name": "zh.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/locales/zh.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/main.tsx",
+      "type": "file",
+      "name": "main.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/main.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/store.ts",
+      "type": "file",
+      "name": "store.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/store.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/presets.ts",
+      "type": "file",
+      "name": "presets.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/presets.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/theme-engine.ts",
+      "type": "file",
+      "name": "theme-engine.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/theme-engine.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/ThemeContext.tsx",
+      "type": "file",
+      "name": "ThemeContext.tsx",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/ThemeContext.tsx"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/types.ts",
+      "type": "file",
+      "name": "types.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/themes/types.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/containers.test.ts",
+      "type": "file",
+      "name": "containers.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/containers.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/edgeAggregation.test.ts",
+      "type": "file",
+      "name": "edgeAggregation.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/edgeAggregation.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/elk-layout.test.ts",
+      "type": "file",
+      "name": "elk-layout.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/elk-layout.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/filters.test.ts",
+      "type": "file",
+      "name": "filters.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/filters.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/layerStats.test.ts",
+      "type": "file",
+      "name": "layerStats.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/layerStats.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/smoke.test.ts",
+      "type": "file",
+      "name": "smoke.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/__tests__/smoke.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/containers.ts",
+      "type": "file",
+      "name": "containers.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/containers.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/edgeAggregation.ts",
+      "type": "file",
+      "name": "edgeAggregation.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/edgeAggregation.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/elk-layout.ts",
+      "type": "file",
+      "name": "elk-layout.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/elk-layout.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/filters.ts",
+      "type": "file",
+      "name": "filters.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/filters.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/layerStats.ts",
+      "type": "file",
+      "name": "layerStats.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/layerStats.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/layout.ts",
+      "type": "file",
+      "name": "layout.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/layout.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/layout.worker.ts",
+      "type": "file",
+      "name": "layout.worker.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/layout.worker.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/louvain.ts",
+      "type": "file",
+      "name": "louvain.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/utils/louvain.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/src/vite-env.d.ts",
+      "type": "file",
+      "name": "vite-env.d.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/src/vite-env.d.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/tsconfig.app.json",
+      "type": "file",
+      "name": "tsconfig.app.json",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/tsconfig.app.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/tsconfig.json",
+      "type": "file",
+      "name": "tsconfig.json",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/tsconfig.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/vite.config.demo.ts",
+      "type": "file",
+      "name": "vite.config.demo.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/vite.config.demo.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/packages/dashboard/vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/packages/dashboard/vite.config.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/pnpm-workspace.yaml",
+      "type": "file",
+      "name": "pnpm-workspace.yaml",
+      "filePath": "/root/my-project/understand-anything-plugin/pnpm-workspace.yaml"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-chat/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-chat/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-dashboard/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-dashboard/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-diff/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-diff/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-domain/extract-domain-context.py",
+      "type": "file",
+      "name": "extract-domain-context.py",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-domain/extract-domain-context.py"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-domain/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-domain/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-explain/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-explain/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-knowledge/merge-knowledge-graph.py",
+      "type": "file",
+      "name": "merge-knowledge-graph.py",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-knowledge/merge-knowledge-graph.py"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-knowledge/parse-knowledge-base.py",
+      "type": "file",
+      "name": "parse-knowledge-base.py",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-knowledge/parse-knowledge-base.py"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-knowledge/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-knowledge/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand-onboard/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand-onboard/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/build-fingerprints.mjs",
+      "type": "file",
+      "name": "build-fingerprints.mjs",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/build-fingerprints.mjs"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/compute-batches.mjs",
+      "type": "file",
+      "name": "compute-batches.mjs",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/compute-batches.mjs"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/extract-import-map.mjs",
+      "type": "file",
+      "name": "extract-import-map.mjs",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/extract-import-map.mjs"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/extract-structure.mjs",
+      "type": "file",
+      "name": "extract-structure.mjs",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/extract-structure.mjs"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/django.md",
+      "type": "file",
+      "name": "django.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/django.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/express.md",
+      "type": "file",
+      "name": "express.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/express.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/fastapi.md",
+      "type": "file",
+      "name": "fastapi.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/fastapi.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/flask.md",
+      "type": "file",
+      "name": "flask.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/flask.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/gin.md",
+      "type": "file",
+      "name": "gin.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/gin.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/nextjs.md",
+      "type": "file",
+      "name": "nextjs.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/nextjs.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/rails.md",
+      "type": "file",
+      "name": "rails.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/rails.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/react.md",
+      "type": "file",
+      "name": "react.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/react.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/spring.md",
+      "type": "file",
+      "name": "spring.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/spring.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/frameworks/vue.md",
+      "type": "file",
+      "name": "vue.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/frameworks/vue.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/cpp.md",
+      "type": "file",
+      "name": "cpp.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/cpp.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/csharp.md",
+      "type": "file",
+      "name": "csharp.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/csharp.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/css.md",
+      "type": "file",
+      "name": "css.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/css.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/dockerfile.md",
+      "type": "file",
+      "name": "dockerfile.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/dockerfile.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/go.md",
+      "type": "file",
+      "name": "go.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/go.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/graphql.md",
+      "type": "file",
+      "name": "graphql.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/graphql.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/html.md",
+      "type": "file",
+      "name": "html.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/html.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/java.md",
+      "type": "file",
+      "name": "java.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/java.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/javascript.md",
+      "type": "file",
+      "name": "javascript.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/javascript.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/json.md",
+      "type": "file",
+      "name": "json.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/json.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/kotlin.md",
+      "type": "file",
+      "name": "kotlin.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/kotlin.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/markdown.md",
+      "type": "file",
+      "name": "markdown.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/markdown.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/php.md",
+      "type": "file",
+      "name": "php.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/php.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/protobuf.md",
+      "type": "file",
+      "name": "protobuf.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/protobuf.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/python.md",
+      "type": "file",
+      "name": "python.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/python.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/ruby.md",
+      "type": "file",
+      "name": "ruby.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/ruby.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/rust.md",
+      "type": "file",
+      "name": "rust.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/rust.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/shell.md",
+      "type": "file",
+      "name": "shell.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/shell.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/sql.md",
+      "type": "file",
+      "name": "sql.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/sql.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/swift.md",
+      "type": "file",
+      "name": "swift.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/swift.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/terraform.md",
+      "type": "file",
+      "name": "terraform.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/terraform.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/typescript.md",
+      "type": "file",
+      "name": "typescript.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/typescript.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/languages/yaml.md",
+      "type": "file",
+      "name": "yaml.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/languages/yaml.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/locales/en.md",
+      "type": "file",
+      "name": "en.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/locales/en.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/locales/ja.md",
+      "type": "file",
+      "name": "ja.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/locales/ja.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/locales/ko.md",
+      "type": "file",
+      "name": "ko.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/locales/ko.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/locales/ru.md",
+      "type": "file",
+      "name": "ru.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/locales/ru.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/locales/zh-TW.md",
+      "type": "file",
+      "name": "zh-TW.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/locales/zh-TW.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/locales/zh.md",
+      "type": "file",
+      "name": "zh.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/locales/zh.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/merge-batch-graphs.py",
+      "type": "file",
+      "name": "merge-batch-graphs.py",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/merge-batch-graphs.py"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/merge-subdomain-graphs.py",
+      "type": "file",
+      "name": "merge-subdomain-graphs.py",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/merge-subdomain-graphs.py"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/scan-project.mjs",
+      "type": "file",
+      "name": "scan-project.mjs",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/scan-project.mjs"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/skills/understand/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "/root/my-project/understand-anything-plugin/skills/understand/SKILL.md"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/__tests__/context-builder.test.ts",
+      "type": "file",
+      "name": "context-builder.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/__tests__/context-builder.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/__tests__/diff-analyzer.test.ts",
+      "type": "file",
+      "name": "diff-analyzer.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/__tests__/diff-analyzer.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/__tests__/explain-builder.test.ts",
+      "type": "file",
+      "name": "explain-builder.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/__tests__/explain-builder.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/__tests__/extract-structure.test.mjs",
+      "type": "file",
+      "name": "extract-structure.test.mjs",
+      "filePath": "/root/my-project/understand-anything-plugin/src/__tests__/extract-structure.test.mjs"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/__tests__/merge-recover-imports.test.mjs",
+      "type": "file",
+      "name": "merge-recover-imports.test.mjs",
+      "filePath": "/root/my-project/understand-anything-plugin/src/__tests__/merge-recover-imports.test.mjs"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/__tests__/onboard-builder.test.ts",
+      "type": "file",
+      "name": "onboard-builder.test.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/__tests__/onboard-builder.test.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/__tests__/worktree-redirect.test.mjs",
+      "type": "file",
+      "name": "worktree-redirect.test.mjs",
+      "filePath": "/root/my-project/understand-anything-plugin/src/__tests__/worktree-redirect.test.mjs"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/context-builder.ts",
+      "type": "file",
+      "name": "context-builder.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/context-builder.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/diff-analyzer.ts",
+      "type": "file",
+      "name": "diff-analyzer.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/diff-analyzer.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/explain-builder.ts",
+      "type": "file",
+      "name": "explain-builder.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/explain-builder.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/onboard-builder.ts",
+      "type": "file",
+      "name": "onboard-builder.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/onboard-builder.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/src/understand-chat.ts",
+      "type": "file",
+      "name": "understand-chat.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/src/understand-chat.ts"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/tsconfig.json",
+      "type": "file",
+      "name": "tsconfig.json",
+      "filePath": "/root/my-project/understand-anything-plugin/tsconfig.json"
+    },
+    {
+      "id": "file:/root/my-project/understand-anything-plugin/vitest.config.ts",
+      "type": "file",
+      "name": "vitest.config.ts",
+      "filePath": "/root/my-project/understand-anything-plugin/vitest.config.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/package.json",
+      "type": "file",
+      "name": "package.json",
+      "filePath": "/root/my-project/vireon-nextjs/package.json"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/README.md",
+      "type": "file",
+      "name": "README.md",
+      "filePath": "/root/my-project/vireon-nextjs/README.md"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/api/createPostHandler.ts",
+      "type": "file",
+      "name": "createPostHandler.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/api/createPostHandler.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/api/createPostsHandler.ts",
+      "type": "file",
+      "name": "createPostsHandler.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/api/createPostsHandler.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/api/createWebhookHandler.ts",
+      "type": "file",
+      "name": "createWebhookHandler.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/api/createWebhookHandler.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/components/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/components/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/components/VireonBlogList.tsx",
+      "type": "file",
+      "name": "VireonBlogList.tsx",
+      "filePath": "/root/my-project/vireon-nextjs/src/components/VireonBlogList.tsx"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/components/VireonBlogPost.tsx",
+      "type": "file",
+      "name": "VireonBlogPost.tsx",
+      "filePath": "/root/my-project/vireon-nextjs/src/components/VireonBlogPost.tsx"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/components/VireonContent.tsx",
+      "type": "file",
+      "name": "VireonContent.tsx",
+      "filePath": "/root/my-project/vireon-nextjs/src/components/VireonContent.tsx"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/lib/auth.ts",
+      "type": "file",
+      "name": "auth.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/lib/auth.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/lib/revalidation.ts",
+      "type": "file",
+      "name": "revalidation.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/lib/revalidation.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/lib/storage.ts",
+      "type": "file",
+      "name": "storage.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/lib/storage.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/lib/utils.ts",
+      "type": "file",
+      "name": "utils.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/lib/utils.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/server.ts",
+      "type": "file",
+      "name": "server.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/server.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/styles.css",
+      "type": "file",
+      "name": "styles.css",
+      "filePath": "/root/my-project/vireon-nextjs/src/styles.css"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/src/types/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "/root/my-project/vireon-nextjs/src/types/index.ts"
+    },
+    {
+      "id": "file:/root/my-project/vireon-nextjs/tsconfig.json",
+      "type": "file",
+      "name": "tsconfig.json",
+      "filePath": "/root/my-project/vireon-nextjs/tsconfig.json"
+    },
+    {
+      "id": "file:/root/my-project/vitest.config.ts",
+      "type": "file",
+      "name": "vitest.config.ts",
+      "filePath": "/root/my-project/vitest.config.ts"
+    },
+    {
+      "id": "file:/root/my-project/vitest.e2e.config.ts",
+      "type": "file",
+      "name": "vitest.e2e.config.ts",
+      "filePath": "/root/my-project/vitest.e2e.config.ts"
+    },
+    {
+      "id": "file:/root/my-project/wordpress-plugin/assets/admin.css",
+      "type": "file",
+      "name": "admin.css",
+      "filePath": "/root/my-project/wordpress-plugin/assets/admin.css"
+    },
+    {
+      "id": "file:/root/my-project/wordpress-plugin/includes/class-vireon-admin.php",
+      "type": "file",
+      "name": "class-vireon-admin.php",
+      "filePath": "/root/my-project/wordpress-plugin/includes/class-vireon-admin.php"
+    },
+    {
+      "id": "file:/root/my-project/wordpress-plugin/includes/class-vireon-api.php",
+      "type": "file",
+      "name": "class-vireon-api.php",
+      "filePath": "/root/my-project/wordpress-plugin/includes/class-vireon-api.php"
+    },
+    {
+      "id": "file:/root/my-project/wordpress-plugin/includes/class-vireon-auth.php",
+      "type": "file",
+      "name": "class-vireon-auth.php",
+      "filePath": "/root/my-project/wordpress-plugin/includes/class-vireon-auth.php"
+    },
+    {
+      "id": "file:/root/my-project/wordpress-plugin/includes/class-vireon-logger.php",
+      "type": "file",
+      "name": "class-vireon-logger.php",
+      "filePath": "/root/my-project/wordpress-plugin/includes/class-vireon-logger.php"
+    },
+    {
+      "id": "file:/root/my-project/wordpress-plugin/includes/class-vireon-sync.php",
+      "type": "file",
+      "name": "class-vireon-sync.php",
+      "filePath": "/root/my-project/wordpress-plugin/includes/class-vireon-sync.php"
+    },
+    {
+      "id": "file:/root/my-project/wordpress-plugin/readme.txt",
+      "type": "file",
+      "name": "readme.txt",
+      "filePath": "/root/my-project/wordpress-plugin/readme.txt"
+    },
+    {
+      "id": "file:/root/my-project/wordpress-plugin/vireon-integration.php",
+      "type": "file",
+      "name": "vireon-integration.php",
+      "filePath": "/root/my-project/wordpress-plugin/vireon-integration.php"
+    }
+  ],
+  "edges": [],
+  "layers": [],
+  "tour": []
+}

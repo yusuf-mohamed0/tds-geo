@@ -10,6 +10,10 @@ dist/
 .env.local
 .env.*.local
 
+# Understand Anything - generated knowledge graph artifacts
+.understand-anything/intermediate/
+.understand-anything/diff-overlay.json
+
 # Logs
 *.log
 logs/
