@@ -1,0 +1,342 @@
+{
+  "id": "aee35695-01d9-4a0f-ade5-6af800059cf3",
+  "name": "AI SEO Complete Pipeline",
+  "nodes": [
+    {
+      "id": "cron-trigger",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 400],
+      "parameters": {
+        "rule": {
+          "interval": [{}]
+        },
+        "scheduleType": "interval",
+        "scheduleInterval": {
+          "item": [{"name": "Days", "value": 1}]
+        }
+      }
+    },
+    {
+      "id": "health-check",
+      "name": "Health Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [200, 200],
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3000/health",
+        "authentication": "none",
+        "options": {
+          "timeout": 10000
+        }
+      }
+    },
+    {
+      "id": "check-health",
+      "name": "Is Backend Healthy?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [200, 400],
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true},
+          "conditions": [{
+            "id": "check-status",
+            "leftValue": "={{ $json.status }}",
+            "rightValue": "healthy",
+            "operator": {"type": "string", "operation": "equal"}
+          }]
+        }
+      }
+    },
+    {
+      "id": "fail-notify",
+      "name": "Backend Down Alert",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [400, 100],
+      "parameters": {}
+    },
+    {
+      "id": "set-client-id",
+      "name": "Set Client ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [400, 300],
+      "parameters": {
+        "values": {
+          "string": [{"name": "clientId", "value": "38e6e8da-b1c7-436c-809d-03bb46b42a1d"}]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "login",
+      "name": "Login to Vireon",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [600, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/login",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "email", "value": "admin@example.com"},
+            {"name": "password", "value": "admin123"}
+          ]
+        },
+        "options": {"timeout": 15000}
+      }
+    },
+    {
+      "id": "discover-keywords",
+      "name": "Discover Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [800, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/keywords/discover",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "industry", "value": "maintenance"},
+            {"name": "seedKeywords", "value": "[\"home maintenance\", \"property care\", \"preventative maintenance\", \"home repair tips\"]"},
+            {"name": "count", "value": 20}
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "headerParameters": {
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+          }
+        }
+      }
+    },
+    {
+      "id": "check-keywords",
+      "name": "Keywords Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [800, 500],
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true},
+          "conditions": [{
+            "id": "has-keywords",
+            "leftValue": "={{ $json.length }}",
+            "rightValue": 0,
+            "operator": {"type": "number", "operation": "larger"}
+          }]
+        }
+      }
+    },
+    {
+      "id": "no-keywords",
+      "name": "No Keywords Found",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, 600],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/n8n/log",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "event", "value": "pipeline_no_keywords"},
+            {"name": "message", "value": "No keywords discovered -- pipeline completed with no articles generated"},
+            {"name": "level", "value": "warn"}
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "headerParameters": {
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+          }
+        }
+      }
+    },
+    {
+      "id": "generate-article",
+      "name": "Generate Article",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/articles/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "clientId", "value": "{{ $('Set Client ID').item.json.clientId }}"},
+            {"name": "keyword", "value": "={{ $json[0].keyword }}"},
+            {"name": "publish", "value": true},
+            {"name": "tone", "value": "educational"}
+          ]
+        },
+        "options": {
+          "timeout": 180000,
+          "headerParameters": {
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+          }
+        }
+      }
+    },
+    {
+      "id": "wait-processing",
+      "name": "Wait 30s for Processing",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.2,
+      "position": [1200, 300],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 30,
+        "unit": "seconds",
+        "options": {}
+      }
+    },
+    {
+      "id": "fetch-articles",
+      "name": "Fetch Published Articles",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/articles?clientId={{ $('Set Client ID').item.json.clientId }}&status=published&limit=5",
+        "authentication": "none",
+        "options": {
+          "timeout": 15000,
+          "headerParameters": {
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+          }
+        }
+      }
+    },
+    {
+      "id": "check-publication",
+      "name": "Articles Published?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, 500],
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true},
+          "conditions": [{
+            "id": "has-articles",
+            "leftValue": "={{ Array.isArray($json.data) ? $json.data.length : 0 }}",
+            "rightValue": 0,
+            "operator": {"type": "number", "operation": "larger"}
+          }]
+        }
+      }
+    },
+    {
+      "id": "run-complete",
+      "name": "Pipeline Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1600, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/n8n/log",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "event", "value": "pipeline_success"},
+            {"name": "message", "value": "SEO pipeline completed successfully -- articles generated and published"},
+            {"name": "level", "value": "info"}
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "headerParameters": {
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+          }
+        }
+      }
+    },
+    {
+      "id": "no-publication",
+      "name": "No Articles Published",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1600, 600],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/n8n/log",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "event", "value": "pipeline_no_publication"},
+            {"name": "message", "value": "Pipeline completed but no articles were published"},
+            {"name": "level", "value": "warn"}
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "headerParameters": {
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule": {
+      "main": [[{"node": "Health Check", "type": "main", "index": 0}]]
+    },
+    "Health Check": {
+      "main": [[{"node": "Is Backend Healthy?", "type": "main", "index": 0}]]
+    },
+    "Is Backend Healthy?": {
+      "main": [
+        [{"node": "Set Client ID", "type": "main", "index": 0}],
+        [{"node": "Backend Down Alert", "type": "main", "index": 0}]
+      ]
+    },
+    "Set Client ID": {
+      "main": [[{"node": "Login to Vireon", "type": "main", "index": 0}]]
+    },
+    "Login to Vireon": {
+      "main": [[{"node": "Discover Keywords", "type": "main", "index": 0}]]
+    },
+    "Discover Keywords": {
+      "main": [[{"node": "Keywords Found?", "type": "main", "index": 0}]]
+    },
+    "Keywords Found?": {
+      "main": [
+        [{"node": "Generate Article", "type": "main", "index": 0}],
+        [{"node": "No Keywords Found", "type": "main", "index": 0}]
+      ]
+    },
+    "Generate Article": {
+      "main": [[{"node": "Wait 30s for Processing", "type": "main", "index": 0}]]
+    },
+    "Wait 30s for Processing": {
+      "main": [[{"node": "Fetch Published Articles", "type": "main", "index": 0}]]
+    },
+    "Fetch Published Articles": {
+      "main": [[{"node": "Articles Published?", "type": "main", "index": 0}]]
+    },
+    "Articles Published?": {
+      "main": [
+        [{"node": "Pipeline Success", "type": "main", "index": 0}],
+        [{"node": "No Articles Published", "type": "main", "index": 0}]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {"executionOrder": "v1"},
+  "tags": [],
+  "versionId": "1.0.0"
+}

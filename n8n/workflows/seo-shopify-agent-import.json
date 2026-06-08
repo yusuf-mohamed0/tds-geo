@@ -1,5 +1,11 @@
 {
+  "id": "fe6d6e24-8afa-4d72-a127-4aeec5a687bc",
   "name": "AI SEO Shopify Agent",
+  "active": false,
+  "createdAt": "2026-06-07T09:40:00.000Z",
+  "updatedAt": "2026-06-07T09:40:00.000Z",
+  "versionId": "fe6d6e24-8afa-4d72-a127-4aeec5a687bc",
+  "tags": [],
   "nodes": [
     {
       "id": "cron-trigger",
@@ -42,7 +48,7 @@
           "string": [
             {
               "name": "clientId",
-              "value": "YOUR_CLIENT_UUID_HERE"
+              "value": "cbe18ea6-f5b0-4520-afa5-45459e387a41"
             }
           ]
         },
@@ -50,14 +56,42 @@
       }
     },
     {
-      "id": "http-keywords",
-      "name": "Discover Keywords",
+      "id": "login",
+      "name": "Login to Vireon",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [450, 300],
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:3000/api/clients/{{ $json.clientId }}/keywords/discover",
+        "url": "http://localhost:3000/api/auth/login",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "admin@example.com"
+            },
+            {
+              "name": "password",
+              "value": "admin123"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      }
+    },
+    {
+      "id": "http-keywords",
+      "name": "Discover Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [550, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/keywords/discover",
         "authentication": "none",
         "sendBody": true,
         "bodyParameters": {
@@ -77,7 +111,15 @@
           ]
         },
         "options": {
-          "timeout": 30000
+          "timeout": 30000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+              }
+            ]
+          }
         }
       }
     },
@@ -89,7 +131,7 @@
       "position": [650, 300],
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:3000/api/clients/{{ $json.clientId }}/generate",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/generate",
         "authentication": "none",
         "sendBody": true,
         "bodyParameters": {
@@ -105,7 +147,15 @@
           ]
         },
         "options": {
-          "timeout": 120000
+          "timeout": 120000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+              }
+            ]
+          }
         }
       }
     },
@@ -117,7 +167,8 @@
       "position": [750, 400],
       "parameters": {
         "resume": "timeInterval",
-        "waitFor": 30,
+        "amount": 30,
+        "unit": "seconds",
         "options": {}
       }
     },
@@ -129,10 +180,18 @@
       "position": [850, 300],
       "parameters": {
         "method": "GET",
-        "url": "http://localhost:3000/api/clients/{{ $json.clientId }}/articles?status=published&limit=1",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/articles?status=published&limit=1",
         "authentication": "none",
         "options": {
-          "timeout": 15000
+          "timeout": 15000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+              }
+            ]
+          }
         }
       }
     }
@@ -142,6 +201,9 @@
       "main": [[{ "node": "Set Client ID", "type": "main", "index": 0 }]]
     },
     "Set Client ID": {
+      "main": [[{ "node": "Login to Vireon", "type": "main", "index": 0 }]]
+    },
+    "Login to Vireon": {
       "main": [[{ "node": "Discover Keywords", "type": "main", "index": 0 }]]
     },
     "Discover Keywords": {
@@ -152,15 +214,10 @@
     },
     "Wait 30s": {
       "main": [[{ "node": "Fetch Latest Articles", "type": "main", "index": 0 }]]
-    },
-    "Fetch Latest Articles": {
-      "main": [[]]
     }
   },
   "pinData": {},
   "settings": {
     "executionOrder": "v1"
-  },
-  "tags": ["seo", "shopify", "content-generation"],
-  "versionId": "1.0.0"
+  }
 }
