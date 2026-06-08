@@ -1,0 +1,10 @@
+# ──────────────────────────────────────────────
+# Test dependencies for Python microservices
+# ──────────────────────────────────────────────
+# Install with:
+#   pip install -r backend/services/requirements-test.txt
+# Or with system package protection bypass:
+#   pip install -r backend/services/requirements-test.txt --break-system-packages
+
+pytest>=8.0
+httpx>=0.27  # required by FastAPI TestClient for async test support
