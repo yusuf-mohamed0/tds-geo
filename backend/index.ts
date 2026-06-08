@@ -34,11 +34,14 @@ import { createSystemConfigRoutes } from './routes/systemConfig';
 // ─── Services ─────────────────────────────────
 import shopifyService from './services/shopify';
 import openaiService from './services/openai';
+import ollamaService from './services/ollama';
 import seoService from './services/seo';
 import keywordService from './services/keywords';
 import webhookService from './services/webhooks';
 import vectorMemoryService from './services/vectorMemory';
+import vectorStore from './services/vectorStoreClient';
 import internalLinksService from './services/internalLinks';
+import localLLMClient from './services/localLLMClient';
 
 // ═══ Platform Expansion Services ═════════════
 import pluginService from './services/pluginService';
@@ -240,7 +243,17 @@ app.get('/health', async (_req: Request, res: Response) => {
       }
     })();
 
-    const [stats, redisStatus] = await Promise.all([statsPromise, redisPromise]);
+    // Live pings to Python microservices (skip if not configured)
+    const turbovecPromise = process.env.TVEC_URL
+      ? vectorStore.healthCheck().then(ok => ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
+      : Promise.resolve('not_configured');
+    const airllmPromise = process.env.AIRLLM_URL
+      ? localLLMClient.healthCheck().then(s => s.healthy ? 'healthy' : 'unreachable').catch(() => 'unreachable')
+      : Promise.resolve('not_configured');
+
+    const [stats, redisStatus, turbovecStatus, airllmStatus] = await Promise.all([
+      statsPromise, redisPromise, turbovecPromise, airllmPromise
+    ]);
 
     res.json({
       status: 'healthy',
@@ -262,6 +275,22 @@ app.get('/health', async (_req: Request, res: Response) => {
           mode: openaiService.isMockMode ? 'mock' : 'live',
           model: openaiService.defaultModel,
           provider: openaiService.provider
+        },
+        ollama: {
+          status: ollamaService.isMockMode ? 'not_configured' : 'configured',
+          mode: ollamaService.isLocal ? 'local' : (ollamaService.isMockMode ? 'mock' : 'cloud'),
+          model: ollamaService.defaultModel,
+          provider: ollamaService.provider
+        },
+        turbovec: {
+          status: turbovecStatus,
+          mode: 'python_service',
+          url: process.env.TVEC_URL || 'http://127.0.0.1:8530'
+        },
+        airllm: {
+          status: airllmStatus,
+          mode: 'python_service',
+          url: process.env.AIRLLM_URL || 'http://127.0.0.1:8531'
         }
       },
       stats
@@ -359,6 +388,29 @@ app.use('/api/scraper', createClientScraperRoutes(pool));
 
 // ═══════ Worker Performance Scoring Routes ═══════
 app.use('/api/worker-scoring', createWorkerScoringRoutes(pool));
+
+// ─── n8n Pipeline Log Endpoint ────────────
+app.post('/api/n8n/log', authenticate, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { event, message, level = 'info', metadata } = req.body;
+    const user = (req as any).user;
+
+    if (!event || !message) {
+      res.status(400).json({ error: 'event and message are required' });
+      return;
+    }
+
+    await pool.query(
+      `INSERT INTO activity_logs (client_id, action, entity_type, level, message, metadata)
+       VALUES ($1, $2, 'pipeline', $3, $4, $5)`,
+      [user?.clientId || null, event, level, message, metadata ? JSON.stringify(metadata) : null]
+    );
+
+    res.json({ logged: true });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // ─── Self-Improvement Status ───────────────
 app.get('/api/improvements', authenticate, authorize('admin'), async (_req: Request, res: Response, next: NextFunction) => {
@@ -525,9 +577,29 @@ async function start(): Promise<void> {
       logger.warn(`OpenAI not configured: ${(e as Error).message}`);
     }
 
+    // Initialize Ollama (separate from OpenAI — can run alongside)
+    try {
+      ollamaService.initialize();
+    } catch (e) {
+      logger.warn(`Ollama not configured: ${(e as Error).message}`);
+    }
+
     keywordService.initialize(pool);
     internalLinksService.initialize(pool);
     vectorMemoryService.initialize(pool);
+
+    // Check connectivity to turbovec and AirLLM Python microservices
+    vectorStore.healthCheck().then(h => {
+      logger.info('turbovec vector store connectivity', { healthy: h });
+    }).catch(() => {});
+    localLLMClient.healthCheck().then(status => {
+      logger.info('AirLLM local inference connectivity', {
+        healthy: status.healthy,
+        modelLoaded: status.modelLoaded,
+        model: status.model,
+      });
+    }).catch(() => {});
+
     webhookService.initialize(pool);
     costTracker.initialize(pool);
 
