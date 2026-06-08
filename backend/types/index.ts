@@ -193,7 +193,7 @@ export interface CostEntry {
   id: string;
   client_id: string;
   article_id?: string;
-  provider: 'openai' | 'serpapi' | 'shopify' | 'other';
+  provider: 'openai' | 'ollama' | 'serpapi' | 'shopify' | 'other';
   model?: string;
   tokens_in?: number;
   tokens_out?: number;
@@ -976,6 +976,30 @@ export interface ModelRouterResult {
   estimatedCost: number;
   maxTokens: number;
   reason: string;
+}
+
+// ─── AI Service Interface ─────────────────────
+// Shared public interface for OpenAIService and OllamaService.
+// Enables the AI_PROVIDER router in openai.ts without losing type safety.
+
+export interface AIService {
+  initialize(): void;
+  isMockMode: boolean;
+  provider: string;
+  defaultModel: string;
+  maxTokens: number;
+  temperature: number;
+  generateBlogPost(params: GenerateBlogParams): Promise<GeneratedArticle>;
+  analyzeSEO(content: string, keyword: string): Promise<Record<string, unknown>>;
+  generateKeywordVariations(seedKeyword: string, count?: number): Promise<string[]>;
+  generateArticleImage(articleTitle: string, keyword: string, tone?: string): Promise<{ imageUrl: string; altText: string; prompt: string }>;
+  generateTitle(keyword: string, brandVoice?: string): Promise<string>;
+  generateOutline(keyword: string, title: string, blacklistKeywords?: string[]): Promise<string[]>;
+  enhanceSEO(content: string, keyword: string): Promise<string>;
+  generateFAQ(keyword: string, count?: number): Promise<string>;
+  generateMetadata(title: string, content: string, keyword: string): Promise<{ metaTitle: string; metaDescription: string }>;
+  moderateContent(content: string): Promise<{ safe: boolean; flags: Array<{ category: string; severity: string; text: string }>; summary: string }>;
+  chat(messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>, options?: { temperature?: number; maxTokens?: number }): Promise<string | null>;
 }
 
 // ─── 7. OBSERVABILITY + MONITORING ───

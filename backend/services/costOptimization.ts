@@ -34,12 +34,30 @@ class CostOptimizationService {
 
   // Model pricing (updated regularly)
   private readonly modelCatalog: ModelCapability[] = [
+    // ─── OpenAI ────────────────────────────────
     { model: 'gpt-4o', provider: 'openai', inputCostPer1K: 0.005, outputCostPer1K: 0.015, maxTokens: 16384, supportsReasoning: true, supportsImages: true, quality: 95, speedScore: 70 },
     { model: 'gpt-4o-mini', provider: 'openai', inputCostPer1K: 0.0015, outputCostPer1K: 0.006, maxTokens: 16384, supportsReasoning: true, supportsImages: true, quality: 85, speedScore: 85 },
     { model: 'gpt-4', provider: 'openai', inputCostPer1K: 0.03, outputCostPer1K: 0.06, maxTokens: 8192, supportsReasoning: true, supportsImages: false, quality: 90, speedScore: 50 },
     { model: 'gpt-3.5-turbo', provider: 'openai', inputCostPer1K: 0.001, outputCostPer1K: 0.002, maxTokens: 16384, supportsReasoning: false, supportsImages: false, quality: 70, speedScore: 95 },
+    { model: 'text-embedding-3-small', provider: 'openai', inputCostPer1K: 0.00002, outputCostPer1K: 0, maxTokens: 8191, supportsReasoning: false, supportsImages: false, quality: 85, speedScore: 100 },
 
-    { model: 'text-embedding-3-small', provider: 'openai', inputCostPer1K: 0.00002, outputCostPer1K: 0, maxTokens: 8191, supportsReasoning: false, supportsImages: false, quality: 85, speedScore: 100 }
+    // ─── Ollama Local (free — hardware cost only) ─
+    { model: 'llama3.1:8b', provider: 'ollama', inputCostPer1K: 0, outputCostPer1K: 0, maxTokens: 8192, supportsReasoning: true, supportsImages: false, quality: 78, speedScore: 85 },
+    { model: 'llama3.1:70b', provider: 'ollama', inputCostPer1K: 0, outputCostPer1K: 0, maxTokens: 8192, supportsReasoning: true, supportsImages: false, quality: 90, speedScore: 45 },
+    { model: 'mistral:7b', provider: 'ollama', inputCostPer1K: 0, outputCostPer1K: 0, maxTokens: 8192, supportsReasoning: true, supportsImages: false, quality: 75, speedScore: 88 },
+    { model: 'mixtral:8x7b', provider: 'ollama', inputCostPer1K: 0, outputCostPer1K: 0, maxTokens: 8192, supportsReasoning: true, supportsImages: false, quality: 85, speedScore: 55 },
+    { model: 'codellama:7b', provider: 'ollama', inputCostPer1K: 0, outputCostPer1K: 0, maxTokens: 8192, supportsReasoning: false, supportsImages: false, quality: 70, speedScore: 85 },
+    { model: 'llama3.2:3b', provider: 'ollama', inputCostPer1K: 0, outputCostPer1K: 0, maxTokens: 8192, supportsReasoning: false, supportsImages: false, quality: 65, speedScore: 95 },
+
+    // ─── Ollama Cloud (paid, API-key access) ──
+    // Actual model names from Ollama Cloud API (verified working models)
+    { model: 'ministral-3:14b', provider: 'ollama', inputCostPer1K: 0.0008, outputCostPer1K: 0.0025, maxTokens: 16384, supportsReasoning: true, supportsImages: false, quality: 85, speedScore: 80 },
+    { model: 'ministral-3:8b', provider: 'ollama', inputCostPer1K: 0.0005, outputCostPer1K: 0.0015, maxTokens: 16384, supportsReasoning: true, supportsImages: false, quality: 80, speedScore: 88 },
+    { model: 'ministral-3:3b', provider: 'ollama', inputCostPer1K: 0.0002, outputCostPer1K: 0.0008, maxTokens: 8192, supportsReasoning: false, supportsImages: false, quality: 70, speedScore: 95 },
+    { model: 'deepseek-v4-flash', provider: 'ollama', inputCostPer1K: 0.0003, outputCostPer1K: 0.001, maxTokens: 32768, supportsReasoning: true, supportsImages: false, quality: 88, speedScore: 92 },
+    { model: 'gemma3:12b', provider: 'ollama', inputCostPer1K: 0.0006, outputCostPer1K: 0.002, maxTokens: 8192, supportsReasoning: true, supportsImages: false, quality: 83, speedScore: 82 },
+    { model: 'gemma3:27b', provider: 'ollama', inputCostPer1K: 0.0012, outputCostPer1K: 0.004, maxTokens: 8192, supportsReasoning: true, supportsImages: false, quality: 90, speedScore: 60 },
+    { model: 'deepseek-v3.2', provider: 'ollama', inputCostPer1K: 0.0025, outputCostPer1K: 0.0075, maxTokens: 32768, supportsReasoning: true, supportsImages: false, quality: 95, speedScore: 55 },
   ];
 
   private static instance: CostOptimizationService;
@@ -93,6 +111,17 @@ class CostOptimizationService {
 
     if (candidates.length === 0) {
       candidates = [this.modelCatalog[0]]; // Fallback to GPT-4o
+    }
+
+    // Filter to active provider's models if AI_PROVIDER is set
+    const activeProvider = (process.env.AI_PROVIDER || '').toLowerCase();
+    if (activeProvider) {
+      candidates = candidates.filter(m => m.provider === activeProvider);
+    }
+
+    // Fallback: if filtering left nothing, keep all (allow optimizer to see full catalog)
+    if (candidates.length === 0) {
+      candidates = [...this.modelCatalog];
     }
 
     // Score and rank based on quality, speed, and cost
