@@ -40,7 +40,7 @@ NGROK_PID=$!
 echo "   Waiting for ngrok to be ready..."
 for i in $(seq 1 15); do
   if curl -s http://localhost:4040/api/tunnels > /dev/null 2>&1; then
-    NGROK_URL=$(curl -s http://localhost:4040/api/tunnels | python3 -c "import sys,json; print(json.load(sys.stdin)['tunnels'][0]['public_url'])" 2>/dev/null || echo "")
+    NGROK_URL=$(curl -s http://localhost:4040/api/tunnels | python -c "import sys,json; print(json.load(sys.stdin)['tunnels'][0]['public_url'])" 2>/dev/null || echo "")
     if [ -n "$NGROK_URL" ]; then
       echo "   ✅ Ngrok tunnel ready: $NGROK_URL"
       break

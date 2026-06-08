@@ -77,13 +77,13 @@ pkill -f "vectorStore.*server.py" 2>/dev/null || true
 sleep 1
 
 # Install dep if missing
-python3 -c "from turbovec import TurboQuantIndex; print('turbovec ready')" 2>/dev/null || {
+python -c "from turbovec import TurboQuantIndex; print('turbovec ready')" 2>/dev/null || {
   echo "   Installing turbovec..."
   pip3 install turbovec --quiet 2>&1 || pip3 install turbovec --quiet --break-system-packages 2>&1 | tail -1
 }
 
 mkdir -p "${TVEC_DATA_DIR:-/tmp/turbovec_indices}"
-nohup python3 "$PROJECT_DIR/backend/services/vectorStore/server.py" > "$TVEC_LOG" 2>&1 &
+nohup python "$PROJECT_DIR/backend/services/vectorStore/server.py" > "$TVEC_LOG" 2>&1 &
 TVEC_PID=$!
 ALL_PIDS+=("$TVEC_PID")
 echo "   🟢 turbovec started (PID: $TVEC_PID)"
@@ -100,12 +100,12 @@ echo "════════════════════════�
 pkill -f "localLLM.*server.py" 2>/dev/null || true
 sleep 1
 
-python3 -c "from airllm import AutoModel; print('airllm ready')" 2>/dev/null || {
+python -c "from airllm import AutoModel; print('airllm ready')" 2>/dev/null || {
   echo "   Installing airllm..."
   pip3 install airllm --quiet 2>&1 || pip3 install airllm --quiet --break-system-packages 2>&1 | tail -1
 }
 
-nohup python3 "$PROJECT_DIR/backend/services/localLLM/server.py" > "$AIRLLM_LOG" 2>&1 &
+nohup python "$PROJECT_DIR/backend/services/localLLM/server.py" > "$AIRLLM_LOG" 2>&1 &
 AIRLLM_PID=$!
 ALL_PIDS+=("$AIRLLM_PID")
 echo "   🟢 AirLLM started (PID: $AIRLLM_PID)"

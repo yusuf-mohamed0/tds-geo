@@ -48,7 +48,7 @@ class ClientScraperService {
    */
   get isAvailable(): boolean {
     try {
-      execSync('python3 -c "import scrapling" 2>/dev/null', { stdio: 'pipe' });
+      execSync('python -c "import scrapling" 2>/dev/null', { stdio: 'pipe' });
       return true;
     } catch {
       return false;
@@ -84,7 +84,7 @@ class ClientScraperService {
   private async scanWithScrapling(url: string, clientId?: string): Promise<WebsiteIntelligence> {
     return new Promise((resolve, reject) => {
       const startTime = Date.now();
-      const pythonProcess = spawn('python3', [
+      const pythonProcess = spawn('python', [
         this.scraperScriptPath,
         url,
       ], {

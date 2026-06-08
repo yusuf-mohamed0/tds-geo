@@ -10,7 +10,7 @@ CRED=$(curl -s -b /tmp/n8n-cookies.txt -X POST http://localhost:5678/rest/creden
   -H 'Content-Type: application/json' \
   -d '{"name":"OpenAI API","type":"openAiApi","data":{"apiKey":"'"$OPENAI_KEY"'"},"projectId":"raxMoWrfeOFUOzrL"}')
 echo "CRED: $CRED"
-CRED_ID=$(echo "$CRED" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+CRED_ID=$(echo "$CRED" | python -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
 echo "CRED_ID: $CRED_ID"
 
 # Get client ID from DB

@@ -22,14 +22,14 @@ echo -e "\n${CYAN}─── Step 1/8: Authentication ─────────
 TOKEN=$(curl -s -X POST "$BASE_URL/api/auth/login" \
   -H 'Content-Type: application/json' \
   -d '{"email":"admin@test.com","password":"admin123"}' | \
-  python3 -c "import sys,json; print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
+  python -c "import sys,json; print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
 [ -z "$TOKEN" ] && { echo -e "${RED}✗ Auth failed${NC}"; exit 1; }
 echo -e "${GREEN}✓ Authenticated as admin${NC}"
 
 # ─── Step 2: Verify Client & Keyword ─────────────────────
 echo -e "\n${CYAN}─── Step 2/8: Verify Client & Keyword ────────────────────${NC}"
 CLIENT_NAME=$(curl -s "$BASE_URL/api/clients" -H "Authorization: Bearer $TOKEN" | \
-  python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('clients',[{}])[0].get('name','unknown'))" 2>/dev/null)
+  python -c "import sys,json; d=json.load(sys.stdin); print(d.get('clients',[{}])[0].get('name','unknown'))" 2>/dev/null)
 echo -e "${GREEN}✓ Client: $CLIENT_NAME${NC}"
 
 KW_DATA=$(PGPASSWORD=postgres psql -h localhost -U postgres -d ai_seo_automation -t -A -c \
@@ -141,7 +141,7 @@ echo -e "\n${CYAN}─── Step 6/8: Store Article in Database ─────�
 
 ARTICLE_SLUG=$(echo "$ARTICLE_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
 
-python3 << PYEOF
+python << PYEOF
 import psycopg2
 import json
 from datetime import datetime, timedelta
@@ -228,7 +228,7 @@ cur.close()
 conn.close()
 PYEOF
 
-ARTICLE_ID=$(python3 -c "
+ARTICLE_ID=$(python -c "
 import psycopg2
 conn = psycopg2.connect('postgresql://postgres:postgres@localhost:5432/ai_seo_automation')
 cur = conn.cursor()
@@ -242,7 +242,7 @@ echo -e "${GREEN}✓ Article stored: ID=$ARTICLE_ID${NC}"
 # ─── Step 7: Queue Publishing ─────────────────────────────
 echo -e "\n${CYAN}─── Step 7/8: Queue Publishing Job ───────────────────────${NC}"
 
-python3 << PYEOF
+python << PYEOF
 import psycopg2, json
 conn = psycopg2.connect("postgresql://postgres:postgres@localhost:5432/ai_seo_automation")
 cur = conn.cursor()
@@ -288,7 +288,7 @@ echo ""
 echo -e "${YELLOW}📊 Database Records${NC}"
 
 # Show the actual DB records
-python3 << PYEOF
+python << PYEOF
 import psycopg2
 conn = psycopg2.connect("postgresql://postgres:postgres@localhost:5432/ai_seo_automation")
 cur = conn.cursor()

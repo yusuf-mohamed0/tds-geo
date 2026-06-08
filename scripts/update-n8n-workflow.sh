@@ -149,7 +149,7 @@ curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6
   "settings": {"executionOrder": "v1"},
   "tags": ["seo", "shopify", "content-generation"],
   "versionId": "da8694dc-150f-467f-a914-1d84f3cf4f72"
-}' 2>&1 | python3 -c "
+}' 2>&1 | python -c "
 import sys, json
 data = json.load(sys.stdin)
 print('Name:', data.get('name', 'FAILED'))

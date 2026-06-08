@@ -27,13 +27,13 @@ if pgrep -f "localLLM.*server.py" > /dev/null 2>&1; then
 fi
 
 # Make sure deps are installed
-python3 -c "from airllm import AutoModel; print('airllm ready')" 2>/dev/null || {
+python -c "from airllm import AutoModel; print('airllm ready')" 2>/dev/null || {
   echo "   Installing airllm..."
   pip3 install airllm --quiet 2>&1 || pip3 install airllm --quiet --break-system-packages 2>&1 | tail -2
 }
 
 # Start the Python server
-nohup python3 "$PROJECT_DIR/backend/services/localLLM/server.py" \
+nohup python "$PROJECT_DIR/backend/services/localLLM/server.py" \
   > "$AIRLLM_LOG" 2>&1 &
 
 LLM_PID=$!
