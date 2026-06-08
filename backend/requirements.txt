@@ -1,0 +1,33 @@
+# ════════════════════════════════════════════════════════════════
+# Python Dependencies — AI SEO Automation
+# ════════════════════════════════════════════════════════════════
+# Install all deps:
+#   pip install -r backend/requirements.txt
+# Install with system packages override:
+#   pip install -r backend/requirements.txt --break-system-packages
+#
+# For a minimal runtime install, split into separate requirement files
+# or use pip's --no-deps flag + manual install of only runtime packages
+# ════════════════════════════════════════════════════════════════
+
+# ─── Web Framework ────────────────────────────
+fastapi>=0.100.0          # API framework with Pydantic v2 support
+uvicorn>=0.23.0           # ASGI server for FastAPI
+
+# ─── Data & Computation ──────────────────────
+numpy>=1.24.0             # Numerical operations, vector arrays
+pydantic>=2.0.0           # Data validation (bundled with fastapi ≥0.100)
+
+# ─── Vector Store ─────────────────────────────
+turbovec>=0.7.0           # TurboQuant vector index (quantized ANN search)
+
+# ─── LLM Inference (optional — lazy imported) ──
+# airllm                   # AirLLM for on-device LLM inference (lazy import)
+# Uncomment the line above if you need model inference at runtime.
+
+# ════════════════════════════════════════════════════════════════
+# Dev / Test
+# ════════════════════════════════════════════════════════════════
+
+pytest>=8.0               # Test runner
+httpx>=0.27.0             # Required by FastAPI TestClient for async test support
