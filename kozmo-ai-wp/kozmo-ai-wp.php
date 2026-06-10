@@ -54,7 +54,14 @@ if (!function_exists('mb_strlen')) {
     }
 }
 if (!function_exists('mb_stripos')) {
-    function mb_stripos(string $haystack, string $needle, int $offset = 0, ?string $encoding = null): int|false {
+    /**
+     * @param string $haystack
+     * @param string $needle
+     * @param int    $offset
+     * @param string|null $encoding
+     * @return int|false
+     */
+    function mb_stripos(string $haystack, string $needle, int $offset = 0, ?string $encoding = null) {
         return stripos($haystack, $needle, $offset);
     }
 }
