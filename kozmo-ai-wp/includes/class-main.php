@@ -101,7 +101,7 @@ class Main {
         Logger::info('KOZMO AI WP Agent initialized', [
             'version'    => KOZMO_AI_WP_VERSION,
             'services'   => array_keys($this->services),
-            'agent_url'  => KOZMO_AI_AGENT_URL,
+            'agent_url'  => KOZMO_AI_WP_AGENT_URL,
         ]);
     }
 

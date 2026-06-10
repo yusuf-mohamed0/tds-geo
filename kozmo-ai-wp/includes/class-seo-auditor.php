@@ -54,15 +54,15 @@ class SeoAuditor {
         if ($has_h1) { $score -= 5; $warnings[] = 'Multiple H1 tags in content'; }
 
         // Meta
-        $meta_title = get_post_meta($post_id, '_vireon_meta_title', true);
-        $meta_desc = get_post_meta($post_id, '_vireon_meta_description', true);
+        $meta_title = get_post_meta($post_id, '_kozmo_ai_meta_title', true);
+        $meta_desc = get_post_meta($post_id, '_kozmo_ai_meta_description', true);
         if (empty($meta_title)) { $score -= 10; $issues[] = 'Missing meta title'; }
         else { $passes[] = 'Meta title set'; }
         if (empty($meta_desc)) { $score -= 10; $issues[] = 'Missing meta description'; }
         else { $passes[] = 'Meta description set'; }
 
         // Focus keyword in title
-        $focus = get_post_meta($post_id, '_vireon_focus_keyword', true);
+        $focus = get_post_meta($post_id, '_kozmo_ai_focus_keyword', true);
         if (!empty($focus)) {
             if (stripos($title, $focus) === false) { $score -= 5; $warnings[] = 'Focus keyword not in title'; }
             else { $passes[] = 'Focus keyword found in title'; }
@@ -86,7 +86,7 @@ class SeoAuditor {
         $passes[] = "Estimated reading time: {$reading_time} min";
 
         // Schema
-        $has_schema = get_post_meta($post_id, '_vireon_schema', true);
+        $has_schema = get_post_meta($post_id, '_kozmo_ai_schema', true);
         if (!empty($has_schema)) { $passes[] = 'Schema markup present'; }
 
         // Slug analysis

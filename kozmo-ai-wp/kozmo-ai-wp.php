@@ -43,7 +43,10 @@ spl_autoload_register(function ($class) {
     if (strncmp($prefix, $class, strlen($prefix)) !== 0) return;
 
     $relative = substr($class, strlen($prefix));
-    $file = $base_dir . 'class-' . strtolower(str_replace(['_', '\\'], ['-', '-'], $relative)) . '.php';
+    // Convert CamelCase to hyphen-case: RateLimiter → rate-limiter, KnowledgeBase → knowledge-base
+    $hyphenated = preg_replace('/([a-z0-9])([A-Z])/', '$1-$2', $relative);
+    $hyphenated = preg_replace('/([A-Z]+)([A-Z][a-z])/', '$1-$2', $hyphenated);
+    $file = $base_dir . 'class-' . strtolower(str_replace(['_', '\\'], ['-', '-'], $hyphenated)) . '.php';
 
     if (file_exists($file)) require $file;
 });

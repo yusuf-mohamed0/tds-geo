@@ -43,7 +43,7 @@ class ContentAnalyzer {
         $no_meta = $wpdb->get_results(
             "SELECT p.ID, p.post_title
              FROM {$wpdb->posts} p
-             LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_vireon_meta_title'
+             LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_kozmo_ai_meta_title'
              WHERE p.post_status = 'publish' AND p.post_type = 'post'
                AND pm.meta_id IS NULL
              LIMIT 20"

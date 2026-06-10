@@ -52,7 +52,7 @@ class Api {
         // Settings
         register_rest_route($ns, '/settings', [
             ['methods' => 'GET', 'callback' => [self::class, 'get_settings'], 'permission_callback' => [Auth::class, 'check_read_permission']],
-            ['methods' => 'PUT', 'callback' => [self::class, 'update_settings'], 'permission_callback' => '__return_true'],
+            ['methods' => 'PUT', 'callback' => [self::class, 'update_settings'], 'permission_callback' => [Auth::class, 'check_write_permission']],
         ]);
 
         // Scanner / knowledge base
