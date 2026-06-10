@@ -130,7 +130,7 @@ class Activator {
         $defaults = [
             'api_enabled'        => 'yes',
             'log_level'          => 'info',
-            'agent_url'          => KOZMO_AI_AGENT_URL,
+            'agent_url'          => KOZMO_AI_WP_AGENT_URL,
             'auto_discover'      => 'yes',
             'auto_publish'       => 'yes',
             'min_quality_score'  => 95,

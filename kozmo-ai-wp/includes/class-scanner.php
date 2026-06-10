@@ -343,7 +343,7 @@ class Scanner {
 
         if (empty($api_key)) return;
 
-        $agent_url = rtrim($settings['agent_url'] ?? KOZMO_AI_AGENT_URL, '/');
+        $agent_url = rtrim($settings['agent_url'] ?? KOZMO_AI_WP_AGENT_URL, '/');
         $response = wp_remote_post($agent_url . '/api/agent/webhook/sync', [
             'timeout' => 30,
             'headers' => [

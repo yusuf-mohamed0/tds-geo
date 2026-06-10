@@ -161,7 +161,7 @@ class Dashboard {
                 <table class="widefat striped" style="max-width:600px;">
                     <tr><td><?php esc_html_e('REST API Base', 'kozmo-ai-wp'); ?></td><td><code><?php echo esc_url(rest_url('kozmo-ai/v1/')); ?></code></td></tr>
                     <tr><td><?php esc_html_e('Webhook URL', 'kozmo-ai-wp'); ?></td><td><code><?php echo esc_url(rest_url('kozmo-ai/v1/webhook')); ?></code></td></tr>
-                    <tr><td><?php esc_html_e('Agent URL', 'kozmo-ai-wp'); ?></td><td><code><?php echo esc_html($settings['agent_url'] ?? KOZMO_AI_AGENT_URL); ?></code></td></tr>
+                    <tr><td><?php esc_html_e('Agent URL', 'kozmo-ai-wp'); ?></td><td><code><?php echo esc_html($settings['agent_url'] ?? KOZMO_AI_WP_AGENT_URL); ?></code></td></tr>
                     <tr><td><?php esc_html_e('Site URL', 'kozmo-ai-wp'); ?></td><td><code><?php echo esc_url(get_bloginfo('url')); ?></code></td></tr>
                     <tr><td><?php esc_html_e('API Enabled', 'kozmo-ai-wp'); ?></td><td><?php echo ($settings['api_enabled'] ?? 'yes') === 'yes' ? __('Yes', 'kozmo-ai-wp') : __('No', 'kozmo-ai-wp'); ?></td></tr>
                 </table>

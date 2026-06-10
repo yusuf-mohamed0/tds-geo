@@ -72,7 +72,7 @@ class Admin {
                 <div class="kozmo-card"><h2><?php esc_html_e('Connection', 'kozmo-ai-wp'); ?></h2>
                     <table class="form-table">
                         <tr><th><?php esc_html_e('Agent URL', 'kozmo-ai-wp'); ?></th>
-                            <td><input type="url" name="agent_url" value="<?php echo esc_attr($settings['agent_url'] ?? KOZMO_AI_AGENT_URL); ?>" class="regular-text" />
+                            <td><input type="url" name="agent_url" value="<?php echo esc_attr($settings['agent_url'] ?? KOZMO_AI_WP_AGENT_URL); ?>" class="regular-text" />
                                 <p class="description"><?php esc_html_e('URL of the KOZMO AI agent API.', 'kozmo-ai-wp'); ?></p></td></tr>
                         <tr><th><?php esc_html_e('API Enabled', 'kozmo-ai-wp'); ?></th>
                             <td><label><input type="checkbox" name="api_enabled" value="yes" <?php checked($settings['api_enabled'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Enable REST API', 'kozmo-ai-wp'); ?></label></td></tr>
@@ -119,7 +119,7 @@ class Admin {
         check_admin_referer('kozmo_ai_save_settings', 'kozmo_ai_nonce');
 
         $settings = [
-            'agent_url'         => esc_url_raw(wp_unslash($_POST['agent_url'] ?? KOZMO_AI_AGENT_URL)),
+            'agent_url'         => esc_url_raw(wp_unslash($_POST['agent_url'] ?? KOZMO_AI_WP_AGENT_URL)),
             'api_enabled'       => sanitize_text_field(wp_unslash($_POST['api_enabled'] ?? 'no')),
             'webhook_secret'    => sanitize_text_field(wp_unslash($_POST['webhook_secret'] ?? '')),
             'log_level'         => sanitize_text_field(wp_unslash($_POST['log_level'] ?? 'info')),
