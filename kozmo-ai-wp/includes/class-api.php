@@ -256,16 +256,56 @@ class Api {
     // ── Settings ──
     public static function get_settings(): \WP_REST_Response {
         $settings = get_option('kozmo_ai_wp_settings', []);
+        // Mask the encrypted API key — never expose it
+        if (!empty($settings['openai_api_key'])) {
+            $settings['openai_api_key'] = '********';
+        }
         return new \WP_REST_Response(['success' => true, 'data' => $settings], 200);
     }
 
     public static function update_settings(\WP_REST_Request $request): \WP_REST_Response {
         $body = $request->get_json_params();
         $settings = get_option('kozmo_ai_wp_settings', []);
-        foreach (['api_enabled', 'agent_url', 'auto_discover', 'auto_publish', 'min_quality_score', 'log_level', 'debug_mode'] as $key) {
+
+        // Handle OpenAI API key — encrypt it for storage
+        if (isset($body['openai_api_key'])) {
+            $raw_key = sanitize_text_field($body['openai_api_key']);
+            if (!empty($raw_key) && $raw_key !== '********') {
+                $key = defined('NONCE_KEY') ? NONCE_KEY : 'kozmo-ai-fallback';
+                $iv = openssl_random_pseudo_bytes(16);
+                $encrypted = openssl_encrypt($raw_key, 'aes-256-cbc', $key, 0, $iv);
+                if (false !== $encrypted) {
+                    $settings['openai_api_key'] = base64_encode($iv . $encrypted);
+                }
+            }
+        }
+
+        // General text/boolean settings
+        $text_fields = [
+            'api_enabled', 'agent_url', 'webhook_secret',
+            'auto_discover', 'auto_publish', 'auto_fix_errors', 'debug_mode',
+            'enable_auto_generation', 'generate_as_draft',
+            'log_level', 'openai_model', 'generation_frequency',
+        ];
+        foreach ($text_fields as $key) {
             if (isset($body[$key])) $settings[$key] = sanitize_text_field($body[$key]);
         }
+
+        // Numeric fields
+        if (isset($body['min_quality_score'])) $settings['min_quality_score'] = absint($body['min_quality_score']);
+        if (isset($body['max_articles_daily'])) $settings['max_articles_daily'] = absint($body['max_articles_daily']);
+
         update_option('kozmo_ai_wp_settings', $settings);
+
+        // Reschedule cron if generation frequency changed
+        if (isset($body['enable_auto_generation']) || isset($body['generation_frequency'])) {
+            if (($settings['enable_auto_generation'] ?? 'no') === 'yes') {
+                Scheduler::schedule_auto_generation($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily');
+            } else {
+                Scheduler::clear_auto_generation();
+            }
+        }
+
         return new \WP_REST_Response(['success' => true, 'message' => 'Settings updated.'], 200);
     }
 
