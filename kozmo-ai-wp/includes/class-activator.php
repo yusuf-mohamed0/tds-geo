@@ -12,13 +12,39 @@ defined('ABSPATH') || exit;
 class Activator {
 
     public static function activate(): void {
-        self::create_tables();
-        self::set_defaults();
-        self::schedule_crons();
-        self::trigger_initial_scan();
+        $errors = [];
+
+        try {
+            self::create_tables();
+        } catch (\Throwable $e) {
+            $errors[] = 'Table creation failed: ' . $e->getMessage();
+        }
+
+        try {
+            self::set_defaults();
+        } catch (\Throwable $e) {
+            $errors[] = 'Default setup failed: ' . $e->getMessage();
+        }
+
+        try {
+            self::schedule_crons();
+        } catch (\Throwable $e) {
+            $errors[] = 'Cron scheduling failed: ' . $e->getMessage();
+        }
+
+        try {
+            self::trigger_initial_scan();
+        } catch (\Throwable $e) {
+            $errors[] = 'Initial scan trigger failed: ' . $e->getMessage();
+        }
 
         update_option('kozmo_ai_wp_db_version', KOZMO_AI_WP_DB_VERSION);
         update_option('kozmo_ai_wp_activated_at', current_time('mysql'));
+
+        if (!empty($errors)) {
+            update_option('kozmo_ai_wp_activation_errors', $errors, false);
+            set_transient('kozmo_ai_wp_activation_notice', $errors, 30);
+        }
     }
 
     private static function create_tables(): void {
@@ -150,7 +176,7 @@ class Activator {
 
         // Auto-generate initial API key
         if (!get_option('kozmo_ai_wp_initial_key')) {
-            $api_key = 'kai_' . bin2hex(random_bytes(24));
+            $api_key = 'kai_' . bin2hex(kozmo_ai_wp_random_bytes(24));
             add_option('kozmo_ai_wp_initial_key', $api_key, '', 'no');
 
             global $wpdb;

@@ -109,7 +109,7 @@ class Main {
         add_action('init', [$this, 'on_wp_init']);
         add_action('wp', [$this, 'on_frontend']);
         add_action('rest_api_init', [$this, 'on_rest_init']);
-        add_filter('cron_schedules', [$this, 'add_cron_schedules']);
+        // Cron schedules are registered globally in kozmo-ai-wp.php (needed early for activation)
     }
 
     public function on_wp_init(): void {
@@ -124,33 +124,6 @@ class Main {
 
     public function on_rest_init(): void {
         // REST API already registered by Api::init()
-    }
-
-    /**
-     * Add custom cron schedules.
-     */
-    public function add_cron_schedules(array $schedules): array {
-        $schedules['kozmo_ai_every_minute'] = [
-            'interval' => 60,
-            'display'  => __('Every Minute', 'kozmo-ai-wp'),
-        ];
-        $schedules['kozmo_ai_every_5min'] = [
-            'interval' => 300,
-            'display'  => __('Every 5 Minutes', 'kozmo-ai-wp'),
-        ];
-        $schedules['kozmo_ai_every_15min'] = [
-            'interval' => 900,
-            'display'  => __('Every 15 Minutes', 'kozmo-ai-wp'),
-        ];
-        $schedules['kozmo_ai_hourly'] = [
-            'interval' => 3600,
-            'display'  => __('Hourly', 'kozmo-ai-wp'),
-        ];
-        $schedules['kozmo_ai_twice_daily'] = [
-            'interval' => 43200,
-            'display'  => __('Twice Daily', 'kozmo-ai-wp'),
-        ];
-        return $schedules;
     }
 
     /**
