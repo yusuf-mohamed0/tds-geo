@@ -423,56 +423,58 @@ class Vireon_Sync {
     private static function set_featured_image(int $post_id, string $image_url): void {
         require_once ABSPATH . 'wp-admin/includes/media.php';
         require_once ABSPATH . 'wp-admin/includes/file.php';
-        require_once ABSPATH . 'wp-admin/includes/image.php';    // Check if we already have this media imported
-    $attachment_id = attachment_url_to_postid($image_url);
-    if ($attachment_id) {
-      set_post_thumbnail($post_id, $attachment_id);
-      return;
-    }
+        require_once ABSPATH . 'wp-admin/includes/image.php';
 
-    // Download and sideload the image
-    $tmp = download_url($image_url);
-    if (is_wp_error($tmp)) {
-      Vireon_Logger::warning('Failed to download featured image', [
-        'post_id'     => $post_id,
-        'image_url'   => $image_url,
-        'error'       => $tmp->get_error_message(),
-      ]);
-      return;
-    }
+        // Check if we already have this media imported
+        $attachment_id = attachment_url_to_postid($image_url);
+        if ($attachment_id) {
+            set_post_thumbnail($post_id, $attachment_id);
+            return;
+        }
 
-    $file_array = [
-      'name'     => basename($image_url),
-      'tmp_name' => $tmp,
-    ];
+        // Download and sideload the image
+        $tmp = download_url($image_url);
+        if (is_wp_error($tmp)) {
+            Vireon_Logger::warning('Failed to download featured image', [
+                'post_id'   => $post_id,
+                'image_url' => $image_url,
+                'error'     => $tmp->get_error_message(),
+            ]);
+            return;
+        }
 
-    $attachment_id = media_handle_sideload($file_array, $post_id);
+        $file_array = [
+            'name'     => basename($image_url),
+            'tmp_name' => $tmp,
+        ];
 
-    if (is_wp_error($attachment_id)) {
-      Vireon_Logger::warning('Failed to sideload featured image', [
-        'post_id' => $post_id,
-        'error'   => $attachment_id->get_error_message(),
-      ]);
-      // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-      @unlink($tmp);
-      return;
-    }
+        $attachment_id = media_handle_sideload($file_array, $post_id);
 
-    set_post_thumbnail($post_id, $attachment_id);
+        if (is_wp_error($attachment_id)) {
+            Vireon_Logger::warning('Failed to sideload featured image', [
+                'post_id' => $post_id,
+                'error'   => $attachment_id->get_error_message(),
+            ]);
+            // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @unlink($tmp);
+            return;
+        }
 
-    // Set alt text from the post title (post already exists at this point)
-    $post_title = get_the_title($post_id);
-    if (!empty($post_title)) {
-      update_post_meta($attachment_id, '_wp_attachment_image_alt', sanitize_text_field($post_title));
-    }
+        set_post_thumbnail($post_id, $attachment_id);
 
-    // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-    @unlink($tmp);
+        // Set alt text from the post title
+        $post_title = get_the_title($post_id);
+        if (!empty($post_title)) {
+            update_post_meta($attachment_id, '_wp_attachment_image_alt', sanitize_text_field($post_title));
+        }
 
-    Vireon_Logger::info('Featured image set', [
-      'post_id'       => $post_id,
-      'attachment_id' => $attachment_id,
-    ]);
+        // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+        @unlink($tmp);
+
+        Vireon_Logger::info('Featured image set', [
+            'post_id'       => $post_id,
+            'attachment_id' => $attachment_id,
+        ]);
     }
 
     /**

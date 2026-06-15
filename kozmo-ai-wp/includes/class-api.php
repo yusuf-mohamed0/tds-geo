@@ -294,16 +294,18 @@ class Api {
                 break;
             case 'article.updated':
                 $post_id = $data['post_id'] ?? 0;
-                if (!$post_id && !empty($data['kozmo_ai_article_id'])) {
-                    $post = Sync::get_post_by_agent_id($data['kozmo_ai_article_id']);
+                $agent_id = $data['kozmo_ai_article_id'] ?? $data['agent_article_id'] ?? $data['vireon_article_id'] ?? '';
+                if (!$post_id && !empty($agent_id)) {
+                    $post = Sync::get_post_by_agent_id($agent_id);
                     $post_id = $post ? $post->ID : 0;
                 }
                 $result = $post_id ? Sync::update_post($post_id, $data) : Sync::create_post($data);
                 break;
             case 'article.deleted':
                 $post_id = $data['post_id'] ?? 0;
-                if (!$post_id && !empty($data['kozmo_ai_article_id'])) {
-                    $post = Sync::get_post_by_agent_id($data['kozmo_ai_article_id']);
+                $agent_id = $data['kozmo_ai_article_id'] ?? $data['agent_article_id'] ?? $data['vireon_article_id'] ?? '';
+                if (!$post_id && !empty($agent_id)) {
+                    $post = Sync::get_post_by_agent_id($agent_id);
                     $post_id = $post ? $post->ID : 0;
                 }
                 $result = $post_id ? Sync::delete_post($post_id, true) : ['success' => true, 'message' => 'No matching post.'];

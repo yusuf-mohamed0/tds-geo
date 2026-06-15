@@ -23,6 +23,63 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// ─── PHP version check ──────────────────────────────
+if (version_compare(PHP_VERSION, '7.4', '<')) {
+    add_action('admin_notices', function () {
+        echo '<div class="notice notice-error"><p><strong>Vireon:</strong> ' .
+             sprintf(
+                 esc_html__('Requires PHP 7.4 or later. Your server is running PHP %s.', 'vireon-integration'),
+                 PHP_VERSION
+             ) .
+             '</p></div>';
+    });
+    return; // Stop executing the plugin
+}
+
+// ─── PHP 8.0+ polyfills for PHP 7.4 compatibility ───
+if (!function_exists('str_starts_with')) {
+    function str_starts_with(string $haystack, string $needle): bool {
+        return 0 === strncmp($haystack, $needle, strlen($needle));
+    }
+}
+if (!function_exists('str_contains')) {
+    function str_contains(string $haystack, string $needle): bool {
+        return '' === $needle || false !== strpos($haystack, $needle);
+    }
+}
+if (!function_exists('str_ends_with')) {
+    function str_ends_with(string $haystack, string $needle): bool {
+        return '' === $needle || substr($haystack, -strlen($needle)) === $needle;
+    }
+}
+
+// ─── mbstring polyfills (for hosts without mbstring extension) ───
+if (!function_exists('mb_substr')) {
+    function mb_substr(string $str, int $start, ?int $length = null, string $encoding = 'UTF-8'): string {
+        return null === $length ? substr($str, $start) : substr($str, $start, $length);
+    }
+}
+if (!function_exists('mb_strlen')) {
+    function mb_strlen(string $str, string $encoding = 'UTF-8'): int {
+        return strlen($str);
+    }
+}
+if (!function_exists('mb_stripos')) {
+    function mb_stripos(string $haystack, string $needle, int $offset = 0, ?string $encoding = null) {
+        return stripos($haystack, $needle, $offset);
+    }
+}
+if (!function_exists('mb_strtolower')) {
+    function mb_strtolower(string $str, string $encoding = 'UTF-8'): string {
+        return strtolower($str);
+    }
+}
+if (!function_exists('mb_strtoupper')) {
+    function mb_strtoupper(string $str, string $encoding = 'UTF-8'): string {
+        return strtoupper($str);
+    }
+}
+
 // ──────────────────────────────────────────────
 // PLUGIN CONSTANTS
 // ──────────────────────────────────────────────

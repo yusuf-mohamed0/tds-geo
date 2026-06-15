@@ -32,14 +32,15 @@ class Sync {
         self::handle_featured_image($post_id, $article['featured_image_url'] ?? '');
         self::handle_meta($post_id, $article);
 
-        update_post_meta($post_id, '_kozmo_ai_article_id', $article['agent_article_id'] ?? '');
+        $agent_id = $article['agent_article_id'] ?? $article['vireon_article_id'] ?? $article['kozmo_ai_article_id'] ?? '';
+        update_post_meta($post_id, '_kozmo_ai_article_id', $agent_id);
         update_post_meta($post_id, '_kozmo_ai_imported_at', current_time('mysql'));
 
         // Track in articles table
         global $wpdb;
         $wpdb->replace($wpdb->prefix . 'kozmo_ai_articles', [
             'post_id'          => $post_id,
-            'agent_article_id' => $article['agent_article_id'] ?? '',
+            'agent_article_id' => $agent_id,
             'quality_score'    => $article['quality_score'] ?? 0,
         ], ['%d', '%s', '%f']);
 
