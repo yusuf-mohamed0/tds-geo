@@ -40,13 +40,13 @@
     "semantic_hash": "ae23ef4ce656ff3155f85ced602e1527"
   },
   "/root/my-project/backend/database/seed.sql": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779875480.2714727,
     "ast_hash": "ae03062af5ed1593b3522638f528682c",
     "semantic_hash": "ae03062af5ed1593b3522638f528682c"
   },
   "/root/my-project/backend/index.ts": {
-    "mtime": 1781520992.471728,
-    "ast_hash": "0c4ca6d607699c12c2142dea3f91af44",
+    "mtime": 1780824919.1794643,
+    "ast_hash": "559f582e1d1e4da3d3ace24758cade4b",
     "semantic_hash": ""
   },
   "/root/my-project/backend/middleware/auth.ts": {
@@ -350,9 +350,9 @@
     "semantic_hash": "09f9dea340a0fb4a5488ded219680221"
   },
   "/root/my-project/backend/services/vectorMemory.ts": {
-    "mtime": 1780916105.679835,
-    "ast_hash": "2e10a1553e7bf088dea9428b4c73fb37",
-    "semantic_hash": ""
+    "mtime": 1779919130.6767697,
+    "ast_hash": "9d3eb9b370d001195b16702f198fa6b1",
+    "semantic_hash": "9d3eb9b370d001195b16702f198fa6b1"
   },
   "/root/my-project/backend/services/webhooks.ts": {
     "mtime": 1779849219.8653321,
@@ -385,9 +385,9 @@
     "semantic_hash": "fdd91e022e015f466ebf832a6954c9d2"
   },
   "/root/my-project/backend/tests/pipeline-runner.sh": {
-    "mtime": 1781520992.471728,
-    "ast_hash": "a6a6fdd39f15920c68f6fe36ce62edd4",
-    "semantic_hash": ""
+    "mtime": 1779855770.2788053,
+    "ast_hash": "4c074449bb907d368e74edb60fd0a0c6",
+    "semantic_hash": "4c074449bb907d368e74edb60fd0a0c6"
   },
   "/root/my-project/backend/tests/routes/health.test.ts": {
     "mtime": 1780326034.9693422,
@@ -425,7 +425,7 @@
     "semantic_hash": ""
   },
   "/root/my-project/backend/utils/logger.ts": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779919070.4956343,
     "ast_hash": "ab82a67299b556d36222b0be6b4d32a6",
     "semantic_hash": "ab82a67299b556d36222b0be6b4d32a6"
   },
@@ -450,7 +450,7 @@
     "semantic_hash": ""
   },
   "/root/my-project/frontend/package.json": {
-    "mtime": 1781520992.471728,
+    "mtime": 1780393538.944994,
     "ast_hash": "d6e5ee0b41d25a5a4bf76a97bafc064d",
     "semantic_hash": ""
   },
@@ -680,13 +680,13 @@
     "semantic_hash": "75c8a18876a5c8826a34f53cb2db0c54"
   },
   "/root/my-project/n8n/workflows/seo-shopify-agent.json": {
-    "mtime": 1780928473.9703162,
-    "ast_hash": "17dc13de894c6be2e1d729b8fd422ac2",
-    "semantic_hash": ""
+    "mtime": 1779848258.791251,
+    "ast_hash": "5dcf130128e8b06ad778c250674c509f",
+    "semantic_hash": "5dcf130128e8b06ad778c250674c509f"
   },
   "/root/my-project/package.json": {
-    "mtime": 1781520992.471728,
-    "ast_hash": "dd29901ecf7fb120973a101ad803ed4e",
+    "mtime": 1780828209.2193925,
+    "ast_hash": "fb423ce6bb356fa40a45d4fa53c244cd",
     "semantic_hash": ""
   },
   "/root/my-project/scripts/browse-app.mjs": {
@@ -700,64 +700,64 @@
     "semantic_hash": "6e3d5e3a9d91b03286d1e7358d1534ae"
   },
   "/root/my-project/scripts/create-alamein-article-2.mjs": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779860060.7428098,
     "ast_hash": "c1d585e4382334561b888d8c5725b149",
     "semantic_hash": "c1d585e4382334561b888d8c5725b149"
   },
   "/root/my-project/scripts/create-batch-2.mjs": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779862140.3049612,
     "ast_hash": "78940a90ccb3fa748291f962433abafa",
     "semantic_hash": "78940a90ccb3fa748291f962433abafa"
   },
   "/root/my-project/scripts/create-pet-article.mjs": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779861753.9723094,
     "ast_hash": "ca228ac6921fd2ffcb6e8a940365916e",
     "semantic_hash": "ca228ac6921fd2ffcb6e8a940365916e"
   },
   "/root/my-project/scripts/fix-article-issues.mjs": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779860486.5802083,
     "ast_hash": "11ea01b083a7da6ce7f9079600d0aedb",
     "semantic_hash": "11ea01b083a7da6ce7f9079600d0aedb"
   },
   "/root/my-project/scripts/fix-batch-2.mjs": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779862287.603817,
     "ast_hash": "b3eafa378fdaabb068341825b8bdce13",
     "semantic_hash": "b3eafa378fdaabb068341825b8bdce13"
   },
   "/root/my-project/scripts/fix-final.mjs": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779862397.3693373,
     "ast_hash": "cd21aa00839a3d6f19a4b47659c91206",
     "semantic_hash": "cd21aa00839a3d6f19a4b47659c91206"
   },
   "/root/my-project/scripts/fix-h2s.mjs": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779862326.3252552,
     "ast_hash": "06a48ceeada52ecbda4048339bec2845",
     "semantic_hash": "06a48ceeada52ecbda4048339bec2845"
   },
   "/root/my-project/scripts/fix-title.mjs": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779860114.1194942,
     "ast_hash": "d6e8b3ba160431eb83e5d85afb87dcc0",
     "semantic_hash": "d6e8b3ba160431eb83e5d85afb87dcc0"
   },
   "/root/my-project/scripts/restructure-article.mjs": {
-    "mtime": 1781520992.4757307,
+    "mtime": 1779860419.5750577,
     "ast_hash": "81088580327c5ba27dc0a39041724438",
     "semantic_hash": "81088580327c5ba27dc0a39041724438"
   },
   "/root/my-project/scripts/rewrite-article.mjs": {
-    "mtime": 1781520992.4757307,
+    "mtime": 1779859885.2891479,
     "ast_hash": "2adf60f0c6cb23e480ec35731e132288",
     "semantic_hash": "2adf60f0c6cb23e480ec35731e132288"
   },
   "/root/my-project/scripts/run-alamein-pipeline.mjs": {
-    "mtime": 1781520992.4757307,
+    "mtime": 1779859372.3019025,
     "ast_hash": "82dcce49f2ebd6dee5c1ccd628db6e84",
     "semantic_hash": "82dcce49f2ebd6dee5c1ccd628db6e84"
   },
   "/root/my-project/scripts/start-dev.sh": {
-    "mtime": 1780922379.365857,
-    "ast_hash": "1f6b49ef687f757aff47ea97b9a97b9b",
-    "semantic_hash": ""
+    "mtime": 1780227980.4002624,
+    "ast_hash": "ec2203b7307b784552d8ac27cb07f696",
+    "semantic_hash": "ec2203b7307b784552d8ac27cb07f696"
   },
   "/root/my-project/tsconfig.json": {
     "mtime": 1779849030.8871152,
@@ -895,8 +895,8 @@
     "semantic_hash": ""
   },
   "/root/my-project/backend/services/clientScraper.ts": {
-    "mtime": 1780922405.679402,
-    "ast_hash": "1151a3c97055f32244341723efddfe55",
+    "mtime": 1780396045.2220383,
+    "ast_hash": "31c268ae26d259bed2a6d679dfc4c10a",
     "semantic_hash": ""
   },
   "/root/my-project/backend/services/odooConnector.ts": {
@@ -935,7 +935,7 @@
     "semantic_hash": ""
   },
   "/root/my-project/scripts/scraper/scrape_client.py": {
-    "mtime": 1781520992.4757307,
+    "mtime": 1780396031.684097,
     "ast_hash": "26c377efb87f5d44410076a8d5f24e8a",
     "semantic_hash": ""
   },
@@ -2145,112 +2145,112 @@
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/package.json": {
-    "mtime": 1781520992.4788334,
+    "mtime": 1780396954.7984004,
     "ast_hash": "18264eda2f6fc63bfce648b9a0223a6a",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/api/createPostHandler.ts": {
-    "mtime": 1781520992.478998,
+    "mtime": 1780396448.8010635,
     "ast_hash": "8a47c9fde7ae3b546bd63e8a6c87e79d",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/api/createPostsHandler.ts": {
-    "mtime": 1781520992.4790645,
+    "mtime": 1780396839.8922482,
     "ast_hash": "1649db781ac1b666a044aeb8251e86ad",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/api/createWebhookHandler.ts": {
-    "mtime": 1781520992.4790645,
+    "mtime": 1780396856.5158997,
     "ast_hash": "969b42b07eb28f880ac695ff554bb24d",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/components/VireonBlogList.tsx": {
-    "mtime": 1781520992.4790645,
+    "mtime": 1780396962.4258575,
     "ast_hash": "66f4f6acab57918c4b31a95e0581fe70",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/components/VireonBlogPost.tsx": {
-    "mtime": 1781520992.4792683,
+    "mtime": 1780396987.417509,
     "ast_hash": "8f502a98efd1832e9f9210887ed6e510",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/components/VireonContent.tsx": {
-    "mtime": 1781520992.4792683,
+    "mtime": 1780396523.710271,
     "ast_hash": "ce3287cd41073f763fa80b1ddea32ed8",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/components/index.ts": {
-    "mtime": 1781520992.4792683,
+    "mtime": 1780396531.2629461,
     "ast_hash": "51bb1024b216a42b9527277d08d5e3bb",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/index.ts": {
-    "mtime": 1781520992.4792683,
+    "mtime": 1780396541.6874726,
     "ast_hash": "9ad8fb22b7cd217ad2a035adcfd9ca15",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/lib/auth.ts": {
-    "mtime": 1781520992.4792683,
+    "mtime": 1780396887.8107731,
     "ast_hash": "e994e8ec507ffeab527cc74d1dd73f1e",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/lib/revalidation.ts": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780396422.0612204,
     "ast_hash": "eab65ac181901b04ec46338f38671b36",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/lib/storage.ts": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780396392.7892108,
     "ast_hash": "ea027d049b96b25cb9cdd5d10f618f7d",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/lib/utils.ts": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780396805.0002494,
     "ast_hash": "37a11a6f530e7c49a183bf8f543bcaf6",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/server.ts": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780396476.0490887,
     "ast_hash": "26ce6977052ac2707e55a83f08a328a2",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/src/types/index.ts": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780396366.638038,
     "ast_hash": "9bc2514430e7146e2732f766eaa39c74",
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/tsconfig.json": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780396346.4531553,
     "ast_hash": "c7ec0da01008d930826eeb4c18fe759a",
     "semantic_hash": ""
   },
   "/root/my-project/wordpress-plugin/includes/class-vireon-admin.php": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780395076.0443513,
     "ast_hash": "f4b80ed6d7839c4558c24e1b42446227",
     "semantic_hash": ""
   },
   "/root/my-project/wordpress-plugin/includes/class-vireon-api.php": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780394796.893054,
     "ast_hash": "8dd5710d7e134bfdcc53752bce8d9b90",
     "semantic_hash": ""
   },
   "/root/my-project/wordpress-plugin/includes/class-vireon-auth.php": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780395006.835227,
     "ast_hash": "7c76f8e9aae4433f6a250680b0a39f61",
     "semantic_hash": ""
   },
   "/root/my-project/wordpress-plugin/includes/class-vireon-logger.php": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780395063.3763516,
     "ast_hash": "30d243bcd908d04e8707358fe5bf9a8f",
     "semantic_hash": ""
   },
   "/root/my-project/wordpress-plugin/includes/class-vireon-sync.php": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780395113.848985,
     "ast_hash": "a779845b597472122de58616d35d139c",
     "semantic_hash": ""
   },
   "/root/my-project/wordpress-plugin/vireon-integration.php": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780395082.752351,
     "ast_hash": "fb3f81fe0657f8eddd2103f2d5017ff8",
     "semantic_hash": ""
   },
@@ -2285,12 +2285,12 @@
     "semantic_hash": ""
   },
   "/root/my-project/.github/workflows/ci.yml": {
-    "mtime": 1781520992.4477131,
-    "ast_hash": "c11df7192a16f2e1e8f9b4328e16afe7",
+    "mtime": 1779923150.2183995,
+    "ast_hash": "5634d2ae195ffacc486a1efdd8e6551e",
     "semantic_hash": ""
   },
   "/root/my-project/.github/workflows/docker-deploy.yml": {
-    "mtime": 1781520992.4477131,
+    "mtime": 1779872187.7143638,
     "ast_hash": "5b13040a036f24782759e94a7fb5a5ad",
     "semantic_hash": ""
   },
@@ -2300,7 +2300,7 @@
     "semantic_hash": ""
   },
   "/root/my-project/CONTRIBUTING.md": {
-    "mtime": 1781520992.4477131,
+    "mtime": 1780302756.6485968,
     "ast_hash": "9a666f2148220d005bc40b405ba71107",
     "semantic_hash": ""
   },
@@ -2310,7 +2310,7 @@
     "semantic_hash": ""
   },
   "/root/my-project/README.md": {
-    "mtime": 1781520992.4477131,
+    "mtime": 1780303719.1594315,
     "ast_hash": "fc6ae22777e27520f96fc3569fc7b849",
     "semantic_hash": ""
   },
@@ -2325,17 +2325,17 @@
     "semantic_hash": ""
   },
   "/root/my-project/docker-compose.yml": {
-    "mtime": 1781520992.471728,
+    "mtime": 1779922969.8732014,
     "ast_hash": "3ab6c6011cee157a667a9e04f19e363f",
     "semantic_hash": ""
   },
   "/root/my-project/frontend/index.html": {
-    "mtime": 1781520992.471728,
+    "mtime": 1780225582.7521088,
     "ast_hash": "4255e2d20d643ece3bf00f159398816a",
     "semantic_hash": ""
   },
   "/root/my-project/project-blueprint.md": {
-    "mtime": 1781520992.471728,
+    "mtime": 1780325693.4312873,
     "ast_hash": "0a423f8d84b90d453bc8e6d140d14b28",
     "semantic_hash": ""
   },
@@ -2635,12 +2635,12 @@
     "semantic_hash": ""
   },
   "/root/my-project/vireon-nextjs/README.md": {
-    "mtime": 1781520992.4757307,
+    "mtime": 1780396562.8033738,
     "ast_hash": "27832c2bcd86233a3171e85f7400defe",
     "semantic_hash": ""
   },
   "/root/my-project/wordpress-plugin/readme.txt": {
-    "mtime": 1781520992.479587,
+    "mtime": 1780394881.6035078,
     "ast_hash": "c05a3ab9c9ea101857b9709f7500c7f5",
     "semantic_hash": ""
   },
@@ -2652,361 +2652,6 @@
   "/root/my-project/understand-anything-plugin/packages/dashboard/public/favicon.svg": {
     "mtime": 1780820734.6174757,
     "ast_hash": "a3fd2b22265e848e9384dec1fe0af9d3",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/routes/browserUse.ts": {
-    "mtime": 1781521619.1620917,
-    "ast_hash": "995a76058e6c4a154eb3d773e9695d81",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/routes/crawl4ai.ts": {
-    "mtime": 1781521619.1620917,
-    "ast_hash": "ba0bf470cd58685e7c9cae2343095482",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/browserUseService.ts": {
-    "mtime": 1781521619.1620917,
-    "ast_hash": "ae89bf90760832d9e162676c32a616a4",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/crawl4aiService.ts": {
-    "mtime": 1781521619.1620917,
-    "ast_hash": "972413886ded45e7d55be218087d8b22",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/localLLM/__init__.py": {
-    "mtime": 1780920969.9022558,
-    "ast_hash": "6d8a9fb97c0c90e4d8cc91796f88a6cb",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/localLLM/server.py": {
-    "mtime": 1780916136.3218045,
-    "ast_hash": "b8ab5e3a762810571a2b76fa3e1acd1f",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/localLLM/test_airllm.py": {
-    "mtime": 1780918358.4023936,
-    "ast_hash": "8e329340c1d77feceeb92e4c68677f4d",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/localLLMClient.ts": {
-    "mtime": 1780916152.5938046,
-    "ast_hash": "25a1ac908c8c756504681e424499bc3b",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/vectorStore/__init__.py": {
-    "mtime": 1780918102.90401,
-    "ast_hash": "396686b31855e7ad6f2df3108d88b5cf",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/vectorStore/server.py": {
-    "mtime": 1780917906.3004987,
-    "ast_hash": "6b6d1a52dbe02dd19117ea5493110e10",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/vectorStore/test_server.py": {
-    "mtime": 1780918301.6145399,
-    "ast_hash": "f5c846635530a610e63ecae44441e8ca",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/vectorStoreClient.ts": {
-    "mtime": 1780916063.472392,
-    "ast_hash": "fd2d7c0ad7a86271d587ec8a545bc1df",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/package.json": {
-    "mtime": 1781521619.1620917,
-    "ast_hash": "44bd9dc0e0ed9b25ea5ca5af7f020b06",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/api/createPostHandler.ts": {
-    "mtime": 1781521619.163823,
-    "ast_hash": "c2d1c65ce1c96e142843cd7d8e9fbb05",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/api/createPostsHandler.ts": {
-    "mtime": 1781521619.1638987,
-    "ast_hash": "2dca43d380da10982a982aa4a428d326",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/api/createWebhookHandler.ts": {
-    "mtime": 1781521619.1638987,
-    "ast_hash": "02bc8452240e42b7efb228485554e8b4",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/components/KozmoAIBlogList.tsx": {
-    "mtime": 1781521619.1638987,
-    "ast_hash": "566ea66a0d64cc12e6ea78e1bc09e75b",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/components/KozmoAIBlogPost.tsx": {
-    "mtime": 1781521619.1640575,
-    "ast_hash": "f54871a095d46154049488fb6dfc67d8",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/components/KozmoAIContent.tsx": {
-    "mtime": 1781521619.1640575,
-    "ast_hash": "40a28fd11423a8d16237503aa2895745",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/components/index.ts": {
-    "mtime": 1781521619.1640575,
-    "ast_hash": "715b71a2194b8bd9a343f8b188f2046b",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/index.ts": {
-    "mtime": 1781521619.1640575,
-    "ast_hash": "37380051fcdcf106c290e36b2a964514",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/lib/auth.ts": {
-    "mtime": 1781521619.1640575,
-    "ast_hash": "3cf410a03aef8b691c9ea04773487171",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/lib/revalidation.ts": {
-    "mtime": 1781521619.1643293,
-    "ast_hash": "df21e233a278acc49535f724e515a24a",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/lib/storage.ts": {
-    "mtime": 1781521619.1643293,
-    "ast_hash": "50c8d9659e6678afa95b945d275e4c1b",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/lib/utils.ts": {
-    "mtime": 1781521619.1643293,
-    "ast_hash": "26528eb2a41ae0485b9c000f045da19a",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/server.ts": {
-    "mtime": 1781521619.1643293,
-    "ast_hash": "8972800ce85b461012f986e0fb9a2849",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/src/types/index.ts": {
-    "mtime": 1781521619.1643293,
-    "ast_hash": "847eb0f1b06f0b7c4541f6606b994767",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/tsconfig.json": {
-    "mtime": 1781521619.1643293,
-    "ast_hash": "c7ec0da01008d930826eeb4c18fe759a",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/assets/admin.js": {
-    "mtime": 1781521685.196646,
-    "ast_hash": "f6e8f130318144160fa471b1a122ee9c",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/assets/dashboard.js": {
-    "mtime": 1781521685.196646,
-    "ast_hash": "182e44183f626ff65b09b34043310aca",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/composer.json": {
-    "mtime": 1781521685.196646,
-    "ast_hash": "a3c50382654c81d2acb2fee9474c8212",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-activator.php": {
-    "mtime": 1781521685.196646,
-    "ast_hash": "c42e4330fe0636019fe9470e157d96c1",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-admin.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "01abc83af51bccd5a71ce6afb2478c88",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-api.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "797d0774fb3ff55180a9f86816aa0097",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-auth.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "c7fa1f304d7749069b8bfc7dccc66131",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-cache.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "7ae16384b5c467b26a8d271f41b5e322",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-content-analyzer.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "a7ae724961a6e0ed300b61b8601b826e",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-dashboard.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "8700ac980cf949b8c50ca7a0246d9518",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-database.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "c9d90a4571dd0385d77c789d60379762",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-deactivator.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "c42a6ef60b80f979850f295b59673b88",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-diagnostics.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "b196f67829ebb97028185a0f5866c412",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-heal-engine.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "34f2ef18878b387e3caba1de9f211b73",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-health.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "d959800a2ad31ad20ed2cdab73f87222",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-knowledge-base.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "cc9d941282bc7fbbc2b267339b03dcce",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-logger.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "d69b2cb5ab93bc07d9951513b169470e",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-main.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "04bb9d4f323365f9ebb6b1805dce07a2",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-quality-scorer.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "1dc2633d79f831f013c41146e193a41b",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-rate-limiter.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "b9b3edbf0e732bc0f84505455721030e",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-scanner.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "07c517cd7f603e7197e1a20e3d856e5d",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-scheduler.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "b770d484f1b745d9156a579ef3150292",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-security.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "289306bcd98cadc4e563f390fae440ab",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-seo-auditor.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "7d7ea676040bd90c6108bc4a670da55e",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-sync.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "cdb1652e0630d9cf1e6d00e8cd82dc67",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-uninstaller.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "fb5a0f434fa74f2e29b44698a988bf1f",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-update.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "17471a153d4ac759ac9199fd36138766",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/includes/class-worker.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "d19d28c7b90839443e229bbe63d4c8ba",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/kozmo-ai-wp.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "f85b585d7bcb2dc09b0de9056488a411",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/tests/wp-mocks.php": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "275bda93e262162b8baa15fe768457d6",
-    "semantic_hash": ""
-  },
-  "/root/my-project/n8n/workflows/seo-agent-complete.json": {
-    "mtime": 1781520992.471728,
-    "ast_hash": "56fb15e64d5b80da12f3e193cee76ba9",
-    "semantic_hash": ""
-  },
-  "/root/my-project/n8n/workflows/seo-shopify-agent-import.json": {
-    "mtime": 1781520992.471728,
-    "ast_hash": "5ffe30c1a5d4c60bc7d7fc154e34399e",
-    "semantic_hash": ""
-  },
-  "/root/my-project/scripts/browser-use-agent.py": {
-    "mtime": 1781521619.1643293,
-    "ast_hash": "c3f6af65f274707281b970c5560272c3",
-    "semantic_hash": ""
-  },
-  "/root/my-project/scripts/crawl4ai-scraper.py": {
-    "mtime": 1781521619.1643293,
-    "ast_hash": "2d185a60556f610d90e8e2ab496331fd",
-    "semantic_hash": ""
-  },
-  "/root/my-project/scripts/fix-n8n-workflow.sh": {
-    "mtime": 1781520992.471728,
-    "ast_hash": "cabb16d42a557f3ab018b0ad0a79920e",
-    "semantic_hash": ""
-  },
-  "/root/my-project/scripts/start-airllm.sh": {
-    "mtime": 1780922379.1623714,
-    "ast_hash": "7634ad4102ea06a542d58569e19f6ff8",
-    "semantic_hash": ""
-  },
-  "/root/my-project/scripts/start-all.sh": {
-    "mtime": 1780922379.4923482,
-    "ast_hash": "3a307cf40d0b09f5eb88e6a51eb4259b",
-    "semantic_hash": ""
-  },
-  "/root/my-project/scripts/start-vector-store.sh": {
-    "mtime": 1780922379.040475,
-    "ast_hash": "a35e87e0eefabbc457c6c2445e63d476",
-    "semantic_hash": ""
-  },
-  "/root/my-project/scripts/update-n8n-workflow.sh": {
-    "mtime": 1781520992.4757307,
-    "ast_hash": "3823d2391cbb3e79aeb13af7d3f36f4d",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/requirements.txt": {
-    "mtime": 1780921962.7311091,
-    "ast_hash": "3738bd60f0f73760987d464407a0997f",
-    "semantic_hash": ""
-  },
-  "/root/my-project/backend/services/requirements-test.txt": {
-    "mtime": 1780921866.5121405,
-    "ast_hash": "9d3fb0a3a7e615979698e35914267607",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-nextjs/README.md": {
-    "mtime": 1781521619.1620917,
-    "ast_hash": "27832c2bcd86233a3171e85f7400defe",
-    "semantic_hash": ""
-  },
-  "/root/my-project/kozmo-ai-wp/readme.txt": {
-    "mtime": 1781521685.196791,
-    "ast_hash": "014fd17b26e1197dfa354cb532ee8d62",
     "semantic_hash": ""
   }
 }

@@ -1,16 +1,16 @@
-# Graph Report - my-project  (2026-06-15)
+# Graph Report - my-project  (2026-06-07)
 
 ## Corpus Check
-- 588 files · ~472,036 words
+- 520 files · ~439,850 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4898 nodes · 9548 edges · 304 communities (243 shown, 61 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 497 edges (avg confidence: 0.8)
+- 4039 nodes · 7882 edges · 269 communities (212 shown, 57 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 53 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `24f6f7e0`
+- Built from commit: `5a395576`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -269,48 +269,18 @@
 - [[_COMMUNITY_Community 258|Community 258]]
 - [[_COMMUNITY_Community 259|Community 259]]
 - [[_COMMUNITY_Community 260|Community 260]]
-- [[_COMMUNITY_Community 269|Community 269]]
-- [[_COMMUNITY_Community 270|Community 270]]
-- [[_COMMUNITY_Community 271|Community 271]]
-- [[_COMMUNITY_Community 272|Community 272]]
-- [[_COMMUNITY_Community 273|Community 273]]
-- [[_COMMUNITY_Community 274|Community 274]]
-- [[_COMMUNITY_Community 275|Community 275]]
-- [[_COMMUNITY_Community 276|Community 276]]
-- [[_COMMUNITY_Community 277|Community 277]]
-- [[_COMMUNITY_Community 278|Community 278]]
-- [[_COMMUNITY_Community 279|Community 279]]
-- [[_COMMUNITY_Community 280|Community 280]]
-- [[_COMMUNITY_Community 281|Community 281]]
-- [[_COMMUNITY_Community 282|Community 282]]
-- [[_COMMUNITY_Community 283|Community 283]]
-- [[_COMMUNITY_Community 284|Community 284]]
-- [[_COMMUNITY_Community 285|Community 285]]
-- [[_COMMUNITY_Community 286|Community 286]]
-- [[_COMMUNITY_Community 287|Community 287]]
-- [[_COMMUNITY_Community 288|Community 288]]
-- [[_COMMUNITY_Community 289|Community 289]]
-- [[_COMMUNITY_Community 290|Community 290]]
-- [[_COMMUNITY_Community 292|Community 292]]
-- [[_COMMUNITY_Community 293|Community 293]]
-- [[_COMMUNITY_Community 295|Community 295]]
-- [[_COMMUNITY_Community 296|Community 296]]
-- [[_COMMUNITY_Community 297|Community 297]]
-- [[_COMMUNITY_Community 298|Community 298]]
-- [[_COMMUNITY_Community 299|Community 299]]
-- [[_COMMUNITY_Community 300|Community 300]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `__()` - 125 edges
-2. `StructuralAnalysis` - 112 edges
-3. `TreeSitterNode` - 98 edges
-4. `logger` - 72 edges
-5. `LanguageConfig` - 53 edges
-6. `useDashboardStore` - 53 edges
-7. `authorize()` - 52 edges
-8. `useToast()` - 51 edges
-9. `findChild()` - 46 edges
-10. `useI18n()` - 45 edges
+1. `StructuralAnalysis` - 112 edges
+2. `TreeSitterNode` - 98 edges
+3. `logger` - 66 edges
+4. `LanguageConfig` - 53 edges
+5. `useDashboardStore` - 53 edges
+6. `useToast()` - 51 edges
+7. `authorize()` - 48 edges
+8. `findChild()` - 46 edges
+9. `useI18n()` - 45 edges
+10. `DepartmentName` - 44 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `[TECH_STACK]` --semantically_similar_to--> `Tech Stack`  [INFERRED] [semantically similar]
@@ -319,19 +289,19 @@
   PROJECT_MAP.md → project-blueprint.md
 - `Frontend Architecture` --semantically_similar_to--> `Frontend Architecture`  [INFERRED] [semantically similar]
   PROJECT_MAP.md → project-blueprint.md
-- `vireon_init()` --calls--> `load_plugin_textdomain()`  [INFERRED]
-  wordpress-plugin/vireon-integration.php → kozmo-ai-wp/tests/wp-mocks.php
-- `vireon_activate()` --calls--> `get_option()`  [INFERRED]
-  wordpress-plugin/vireon-integration.php → kozmo-ai-wp/tests/wp-mocks.php
+- `Vireon — AI SEO Automation System` --references--> `[SYSTEM_FLOW]`  [EXTRACTED]
+  README.md → PROJECT_MAP.md
+- `Contributing to Vireon` --references--> `Vireon — AI SEO Automation System`  [EXTRACTED]
+  CONTRIBUTING.md → README.md
 
 ## Import Cycles
 - None detected.
 
-## Communities (304 total, 61 thin omitted)
+## Communities (269 total, 57 thin omitted)
 
 ### Community 0 - "Content and Editorial Data"
 Cohesion: 0.03
-Nodes (71): AbTest, Article, ArticleWithEditorial, AuditLogEntry, BenchmarkDataset, BrandVoiceProfile, Citation, Client (+63 more)
+Nodes (70): AbTest, Article, ArticleWithEditorial, AuditLogEntry, BenchmarkDataset, BrandVoiceProfile, Citation, Client (+62 more)
 
 ### Community 1 - "Content and Editorial Comments"
 Cohesion: 0.02
@@ -339,7 +309,7 @@ Nodes (82): AbTest, Article, ArticleWithEditorial, AuditLogEntry, BenchmarkDatas
 
 ### Community 2 - "Authentication and Authorization"
 Cohesion: 0.03
-Nodes (97): app, authLimiter, globalLimiter, pool, PORT, backend/middleware/auth.ts, backend/repositories/articleRepo.ts, backend/repositories/clientRepo.ts (+89 more)
+Nodes (106): app, authLimiter, globalLimiter, pool, PORT, backend/middleware/auth.ts, backend/repositories/articleRepo.ts, backend/repositories/clientRepo.ts (+98 more)
 
 ### Community 3 - "Backend Repositories and Middleware"
 Cohesion: 0.33
@@ -350,12 +320,12 @@ Cohesion: 0.07
 Nodes (4): OllamaService, OpenAIService, GenerateBlogParams, GeneratedArticle
 
 ### Community 5 - "Enterprise Security and Safety"
-Cohesion: 0.07
-Nodes (12): builtinLanguageConfigs, builtinFrameworkConfigs, FrameworkRegistry, FilePatternConfig, FilePatternConfigSchema, FrameworkConfig, FrameworkConfigSchema, LanguageConfig (+4 more)
+Cohesion: 0.06
+Nodes (13): builtinLanguageConfigs, builtinFrameworkConfigs, FrameworkRegistry, LanguageRegistry, FilePatternConfig, FilePatternConfigSchema, FrameworkConfig, FrameworkConfigSchema (+5 more)
 
 ### Community 6 - "UI Components and Analytics"
-Cohesion: 0.04
-Nodes (111): Card(), CardBody(), CardBodyProps, CardFooter(), CardFooterProps, CardHeader(), CardHeaderProps, CardProps (+103 more)
+Cohesion: 0.03
+Nodes (145): Card(), CardBody(), CardBodyProps, CardFooter(), CardFooterProps, CardHeader(), CardHeaderProps, CardProps (+137 more)
 
 ### Community 7 - "Content Intelligence and Knowledge Graph"
 Cohesion: 0.11
@@ -366,24 +336,24 @@ Cohesion: 0.11
 Nodes (16): createMockPool(), createMockRequest(), createMockResponse(), mockContentSafety, mockCostTracker, mockInternalLinks, mockKeywordService, mockOpenAI (+8 more)
 
 ### Community 9 - "UI Card Components"
-Cohesion: 0.06
-Nodes (33): FileAnalysisMeta, FileMeta, KIND_TO_NODE_TYPE, NonCodeFileAnalysisMeta, NonCodeFileMeta, DockerfileParser, EnvParser, GraphQLParser (+25 more)
+Cohesion: 0.07
+Nodes (23): EnvParser, JSONConfigParser, stripJsoncSyntax(), MakefileParser, MarkdownParser, ShellParser, SQLParser, TOMLParser (+15 more)
 
 ### Community 10 - "Background Workers and Handlers"
 Cohesion: 0.06
-Nodes (21): shutdown(), start(), CompetitiveAnalysis, EntityExtraction, SearchIntentClassification, SerpAnalysis, TopicalAuthorityScore, closeLogBuffer() (+13 more)
+Nodes (20): shutdown(), start(), CompetitiveAnalysis, EntityExtraction, SearchIntentClassification, SerpAnalysis, TopicalAuthorityScore, closeLogBuffer() (+12 more)
 
 ### Community 11 - "System Observability and Alerts"
-Cohesion: 0.14
-Nodes (7): SEVERITY_BADGE, STATUS_BADGE, Tab, ObservabilityService, SpanOptions, AiLatencyRecord, MetricsSnapshot
+Cohesion: 0.13
+Nodes (8): SEVERITY_BADGE, STATUS_BADGE, Tab, ObservabilityService, SpanOptions, AiLatencyRecord, DashboardMetrics, MetricsSnapshot
 
 ### Community 12 - "Pipeline Orchestration and Testing"
 Cohesion: 0.09
-Nodes (21): EnterprisePipelineOrchestrator, EnterprisePipelineResult, PipelineStageResult, createMockPool(), ArticleRecord, ArticleRepo, createArticleRepo(), ClientRecord (+13 more)
+Nodes (17): EnterprisePipelineOrchestrator, PipelineStageResult, createMockPool(), ArticleRecord, ArticleRepo, createArticleRepo(), ClientRecord, ClientRepo (+9 more)
 
 ### Community 13 - "UI Layout and Auth Context"
-Cohesion: 0.18
-Nodes (21): createPostHandler(), createPostsHandler(), createWebhookHandler(), AuthResult, constantTimeCompare(), hexToHmacSha256(), verifyRequest(), verifyWebhookSignature() (+13 more)
+Cohesion: 0.09
+Nodes (40): createPostHandler(), createPostsHandler(), createWebhookHandler(), VireonBlogCard(), VireonBlogList(), renderContent(), VireonBlogPost(), renderMarkdown() (+32 more)
 
 ### Community 15 - "TypeScript Configuration"
 Cohesion: 0.08
@@ -394,8 +364,8 @@ Cohesion: 0.07
 Nodes (26): dependencies, axios, @fortawesome/fontawesome-svg-core, @fortawesome/free-solid-svg-icons, @fortawesome/react-fontawesome, lucide-react, react, react-dom (+18 more)
 
 ### Community 17 - "Shopify Authentication and Store"
-Cohesion: 0.21
-Nodes (19): generateToken(), createShopifyAuthRoutes(), generateShopJwt(), createShopifyStoreRoutes(), buildInstallUrl(), buildOfflineInstallUrl(), deactivateSession(), ensureClientForShop() (+11 more)
+Cohesion: 0.24
+Nodes (18): generateToken(), createShopifyAuthRoutes(), generateShopJwt(), buildInstallUrl(), buildOfflineInstallUrl(), deactivateSession(), ensureClientForShop(), exchangeAccessToken() (+10 more)
 
 ### Community 18 - "TypeScript Compiler Settings"
 Cohesion: 0.09
@@ -422,12 +392,12 @@ Cohesion: 0.18
 Nodes (4): DeviceAuthService, DeviceFingerprint, DeviceRegistration, EmployeeSession
 
 ### Community 26 - "Form UI Components"
-Cohesion: 0.04
-Nodes (42): Scanner, self, __(), apply_filters(), count_users(), get_bloginfo(), get_categories(), get_locale() (+34 more)
+Cohesion: 0.14
+Nodes (16): CheckboxFieldProps, FormFieldBase, FormRowProps, InputFieldProps, SelectFieldProps, TextareaField(), TextareaFieldProps, ToggleField() (+8 more)
 
 ### Community 27 - "AI Chat Engine"
-Cohesion: 0.16
-Nodes (10): ChatEngine, COMMAND_PATTERNS, CommandResult, ParsedCommand, PermissionCheck, addJob(), createQueue(), getJobStatus() (+2 more)
+Cohesion: 0.14
+Nodes (13): ChatEngine, COMMAND_PATTERNS, CommandResult, ParsedCommand, PermissionCheck, addJob(), createQueue(), defaultJobOptions (+5 more)
 
 ### Community 28 - "Fact Checking Service"
 Cohesion: 0.25
@@ -438,8 +408,8 @@ Cohesion: 0.12
 Nodes (16): frontend/src/App.tsx, frontend/src/pages/Admin.tsx, frontend/src/pages/Analytics.tsx, frontend/src/pages/ApiKeys.tsx, frontend/src/pages/ApiUsage.tsx, frontend/src/pages/Articles.tsx, frontend/src/pages/Chat.tsx, frontend/src/pages/Clients.tsx (+8 more)
 
 ### Community 30 - "Build and Dev Scripts"
-Cohesion: 0.11
-Nodes (19): scripts, build, dev, dev:full, docker:build, docker:down, docker:up, lint (+11 more)
+Cohesion: 0.12
+Nodes (16): scripts, build, dev, dev:full, docker:build, docker:down, docker:up, lint (+8 more)
 
 ### Community 31 - "Image Search and Caching"
 Cohesion: 0.26
@@ -470,8 +440,8 @@ Cohesion: 0.08
 Nodes (37): DomainGraphViewInner(), EMPTY_TOPOLOGY, GraphViewInner(), LayerDetailTopology, NODE_TYPE_TO_CATEGORY, nodeTypes, SelectedNodeFitView(), TourFitView() (+29 more)
 
 ### Community 42 - "Authentication and Pipeline UI"
-Cohesion: 0.15
-Nodes (20): AIContentManager, ClientOperationsManager, CostOptimizationManager, DataAnalyticsManager, DepartmentManager, InfrastructureManager, OdooManager, QualityAssuranceManager (+12 more)
+Cohesion: 0.17
+Nodes (18): AIContentManager, ClientOperationsManager, CostOptimizationManager, DataAnalyticsManager, DepartmentManager, InfrastructureManager, OdooManager, QualityAssuranceManager (+10 more)
 
 ### Community 43 - "Job Queue Management"
 Cohesion: 0.09
@@ -510,16 +480,16 @@ Cohesion: 0.05
 Nodes (43): default, dependencies, fuse.js, ignore, tree-sitter-c-sharp, tree-sitter-cpp, tree-sitter-go, tree-sitter-java (+35 more)
 
 ### Community 56 - "Chat and Prompt Routes"
-Cohesion: 0.05
-Nodes (61): applyLLMLayers(), buildLayerDetectionPrompt(), detectLayers(), LAYER_PATTERNS, LLMLayerResponse, matchFileToLayer(), parseLayerDetectionResponse(), toLayerId() (+53 more)
+Cohesion: 0.11
+Nodes (33): buildFileAnalysisPrompt(), buildProjectSummaryPrompt(), extractJson(), LLMFileAnalysis, LLMProjectSummary, parseFileAnalysisResponse(), parseProjectSummaryResponse(), VALID_COMPLEXITIES (+25 more)
 
 ### Community 57 - "Shopify App Context"
-Cohesion: 0.08
-Nodes (24): ShopifyAppProvider(), ShopifyContext, ShopifyContextValue, useIsEmbedded(), useShop(), useShopify(), AuthContext, AuthContextType (+16 more)
+Cohesion: 0.31
+Nodes (6): ShopifyAppProvider(), ShopifyContext, ShopifyContextValue, useIsEmbedded(), useShop(), useShopify()
 
 ### Community 58 - "Device Fingerprinting"
-Cohesion: 0.05
-Nodes (35): DeviceFingerprint, fingerprintToHeaders(), getCachedFingerprint(), BrandVoice(), BriefForm, ColumnConfig, COLUMNS, ContentBrief (+27 more)
+Cohesion: 0.29
+Nodes (3): DeviceFingerprint, fingerprintToHeaders(), getCachedFingerprint()
 
 ### Community 60 - "Network Access Control"
 Cohesion: 0.05
@@ -570,8 +540,8 @@ Cohesion: 0.10
 Nodes (18): ExportMenu(), FilterPanel(), ALL_COMPLEXITIES, ALL_EDGE_CATEGORIES, ALL_NODE_TYPES, Complexity, DashboardStore, DEFAULT_FILTERS (+10 more)
 
 ### Community 101 - "Community 101"
-Cohesion: 0.08
-Nodes (23): CSharpExtractor, extractParams(), extractReturnType(), hasModifier(), lastComponent(), extractParams(), extractReturnType(), extractScopedIdentifierPath() (+15 more)
+Cohesion: 0.15
+Nodes (9): ATTR_METHODS, extractAttrProperties(), extractParams(), getStringContent(), IMPORT_METHODS, RubyExtractor, TreeSitterNode, CallGraphEntry (+1 more)
 
 ### Community 102 - "Community 102"
 Cohesion: 0.09
@@ -582,7 +552,7 @@ Cohesion: 0.18
 Nodes (22): ThemePicker(), DARK_ACCENT_SWATCHES, getAccent(), getPreset(), LIGHT_ACCENT_SWATCHES, PRESETS, applyTheme(), deriveFromAccent() (+14 more)
 
 ### Community 104 - "Community 104"
-Cohesion: 0.15
+Cohesion: 0.12
 Nodes (6): CeoAlert, CeoDirective, CeoHealthReport, IDepartmentManager, TaskResult, CeoOrchestrator
 
 ### Community 105 - "Community 105"
@@ -594,32 +564,32 @@ Cohesion: 0.13
 Nodes (27): Path, str, build_name_to_stem_map(), detect_format(), extract_code_blocks(), extract_first_paragraph(), extract_frontmatter(), extract_h1() (+19 more)
 
 ### Community 107 - "Community 107"
-Cohesion: 0.05
-Nodes (17): float, int, _clear_indices(), _random_vector(), _random_vectors(), Generate a random unit vector of given dimension., Clear the indices dict before each test., TestAddVectors (+9 more)
+Cohesion: 0.18
+Nodes (12): getStringValue(), hasChildOfType(), traverse(), builtinExtractors, LanguageExtractor, extractImportSpecifiers(), extractParams(), extractReturnType() (+4 more)
 
 ### Community 108 - "Community 108"
-Cohesion: 0.06
-Nodes (16): Admin, Diagnostics, Main, Scheduler, Update, self, self, self (+8 more)
+Cohesion: 0.13
+Nodes (22): registerAllParsers(), DEFAULT_CONFIG, ensureDir(), loadConfig(), loadDomainGraph(), loadFingerprints(), loadGraph(), loadMeta() (+14 more)
 
 ### Community 109 - "Community 109"
 Cohesion: 0.08
 Nodes (25): API Keys You'll Need, API Reference, Architecture, Authentication, CI/CD, Docker (Recommended for Production), Docker Setup (Alternative), Features (+17 more)
 
 ### Community 110 - "Community 110"
-Cohesion: 0.06
-Nodes (51): buildTourGenerationPrompt(), generateHeuristicTour(), parseTourGenerationResponse(), DEFAULT_CONFIG, ensureDir(), loadConfig(), loadDomainGraph(), loadFingerprints() (+43 more)
+Cohesion: 0.11
+Nodes (23): autoFixGraph(), buildErrors(), buildInvalidCollectionIssue(), COMPLEXITY_ALIASES, DIRECTION_ALIASES, DomainMetaSchema, EDGE_TYPE_ALIASES, EdgeTypeSchema (+15 more)
 
 ### Community 111 - "Community 111"
 Cohesion: 0.08
 Nodes (24): 1. Set your API key, 2. Create API route files, 3. Build your blog pages, Advanced Usage, API Reference, Architecture, Debug logging, `DELETE /api/vireon/posts/[id]` (+16 more)
 
 ### Community 112 - "Community 112"
-Cohesion: 0.06
-Nodes (28): GraphBuilder, BASE_CONCEPT_PATTERNS, buildConceptPatterns(), buildLanguageLessonPrompt(), detectLanguageConcepts(), extractJson(), getLanguageDisplayName(), LanguageLessonResult (+20 more)
+Cohesion: 0.14
+Nodes (11): cosineSimilarity(), SemanticSearchEngine, SemanticSearchOptions, FUSE_OPTIONS, SearchEngine, SearchOptions, SearchResult, GraphNode (+3 more)
 
 ### Community 113 - "Community 113"
-Cohesion: 0.11
-Nodes (29): str, str, BaseModel, generate(), GenerateRequest, GenerateResponse, _load_model(), LoadModelRequest (+21 more)
+Cohesion: 0.23
+Nodes (8): CSharpExtractor, extractParams(), extractReturnType(), extractUsingSource(), hasModifier(), lastComponent(), StructuralAnalysis, require
 
 ### Community 114 - "Community 114"
 Cohesion: 0.09
@@ -630,8 +600,8 @@ Cohesion: 0.09
 Nodes (22): compilerOptions, baseUrl, declaration, declarationMap, esModuleInterop, forceConsistentCasingInFileNames, isolatedModules, jsx (+14 more)
 
 ### Community 116 - "Community 116"
-Cohesion: 0.26
-Nodes (6): Vireon_API, self, WP_REST_Request, WP_REST_Response, WP_REST_Request, WP_REST_Response
+Cohesion: 0.21
+Nodes (4): Vireon_API, self, WP_REST_Request, WP_REST_Response
 
 ### Community 117 - "Community 117"
 Cohesion: 0.19
@@ -658,12 +628,12 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleDetection, moduleResolution (+11 more)
 
 ### Community 123 - "Community 123"
-Cohesion: 0.06
-Nodes (35): findChild(), findChildren(), getStringValue(), hasChildOfType(), traverse(), CppExtractor, extractFuncDeclName(), extractParams() (+27 more)
+Cohesion: 0.25
+Nodes (7): findChild(), extractParams(), extractReturnType(), extractUseName(), lastSegment(), PhpExtractor, require
 
 ### Community 124 - "Community 124"
-Cohesion: 0.11
-Nodes (12): Api, Sync, self, WP_REST_Request, WP_REST_Response, self, esc_url_raw(), get_terms() (+4 more)
+Cohesion: 0.16
+Nodes (11): buildTourGenerationPrompt(), generateHeuristicTour(), parseTourGenerationResponse(), getChangedFiles(), isStale(), mergeGraphUpdate(), StalenessResult, KnowledgeGraph (+3 more)
 
 ### Community 125 - "Community 125"
 Cohesion: 0.13
@@ -674,24 +644,24 @@ Cohesion: 0.12
 Nodes (11): DomainClusterData, DomainClusterFlowNode, DomainClusterNode(), BuiltGraph, nodeTypes, FlowFlowNode, FlowNode(), FlowNodeData (+3 more)
 
 ### Community 127 - "Community 127"
-Cohesion: 0.06
-Nodes (31): main, connections, Articles Published?, Daily Schedule, Discover Keywords, Fetch Published Articles, Generate Article, Health Check (+23 more)
+Cohesion: 0.21
+Nodes (7): extractParams(), extractReturnType(), extractScopedIdentifierPath(), hasModifier(), JavaExtractor, lastComponent(), require
 
 ### Community 128 - "Community 128"
-Cohesion: 0.07
-Nodes (16): Without AIRLLM_MODEL or a loaded model, generate should 400., With AIRLLM_MODEL set to a fake model, generate will try to         auto-load an, Pydantic should reject missing prompt., Temperature must be a float., max_new_tokens must be an integer., model_name is required for /model/load., Reset model state and env before each test., Without AIRLLM_MODEL set, health should report no_model_loaded. (+8 more)
+Cohesion: 0.18
+Nodes (10): FileAnalysisMeta, FileMeta, KIND_TO_NODE_TYPE, NonCodeFileAnalysisMeta, NonCodeFileMeta, DockerfileParser, GraphQLParser, EndpointInfo (+2 more)
 
 ### Community 129 - "Community 129"
-Cohesion: 0.12
-Nodes (19): KozmoAIBlogList(), KozmoAIContent(), renderMarkdown(), CreatePostPayload, StorageProvider, UpdatePostPayload, getKozmoAIFetchTags(), getKozmoAITags() (+11 more)
+Cohesion: 0.25
+Nodes (7): findChildren(), extractParams(), extractReturnType(), extractScopedPath(), isPublic(), RustExtractor, require
 
 ### Community 130 - "Community 130"
-Cohesion: 0.21
+Cohesion: 0.22
 Nodes (6): extractParams(), extractReceiverType(), extractResultType(), GoExtractor, isExported(), require
 
 ### Community 131 - "Community 131"
-Cohesion: 0.07
-Nodes (15): Vireon_Logger, Vireon_Sync, WP_Post, get_permalink(), get_posts(), load_plugin_textdomain(), plugin_basename(), set_post_thumbnail() (+7 more)
+Cohesion: 0.14
+Nodes (3): Vireon_Sync, self, WP_Post
 
 ### Community 132 - "Community 132"
 Cohesion: 0.20
@@ -710,8 +680,8 @@ Cohesion: 0.12
 Nodes (16): compilerOptions, declaration, declarationMap, esModuleInterop, forceConsistentCasingInFileNames, lib, module, moduleResolution (+8 more)
 
 ### Community 136 - "Community 136"
-Cohesion: 0.08
-Nodes (24): 1. Set your API key, 2. Create API route files, 3. Build your blog pages, Advanced Usage, API Reference, Architecture, Debug logging, `DELETE /api/vireon/posts/[id]` (+16 more)
+Cohesion: 0.23
+Nodes (7): CppExtractor, extractFuncDeclName(), extractParams(), extractReturnType(), isStatic(), unwrapDeclaratorName(), require
 
 ### Community 137 - "Community 137"
 Cohesion: 0.12
@@ -722,12 +692,8 @@ Cohesion: 0.12
 Nodes (16): compilerOptions, declaration, declarationMap, esModuleInterop, forceConsistentCasingInFileNames, lib, module, moduleResolution (+8 more)
 
 ### Community 139 - "Community 139"
-Cohesion: 0.08
-Nodes (24): active, connections, Discover Keywords, Generate Article, Login to Vireon, Schedule Trigger, Set Client ID, Wait 30s (+16 more)
-
-### Community 140 - "Community 140"
-Cohesion: 0.11
-Nodes (22): Auth, Vireon_Admin, self, absint(), add_query_arg(), admin_url(), check_admin_referer(), current_user_can() (+14 more)
+Cohesion: 0.18
+Nodes (13): COMPLEXITY_STRING_MAP, DroppedEdge, inferTypeFromId(), NormalizationStats, normalizeBatchOutput(), NormalizeBatchResult, normalizeComplexity(), normalizeNodeId() (+5 more)
 
 ### Community 141 - "Community 141"
 Cohesion: 0.12
@@ -737,29 +703,21 @@ Nodes (15): author, description, engines, node, files, homepage, keywords, licen
 Cohesion: 0.18
 Nodes (15): main, connections, Check if Published, Discover Keywords, Fetch Latest Articles, Generate Article, Schedule Trigger, Set Client ID (+7 more)
 
-### Community 143 - "Community 143"
-Cohesion: 0.08
-Nodes (9): HealEngine, Logger, Worker, self, self, self, mb_substr(), current_time() (+1 more)
-
 ### Community 144 - "Community 144"
 Cohesion: 0.14
 Nodes (13): 10.1 JWT Authentication, 10.2 Role-Based Access Control, 10.3 Shopify OAuth, 10. Authentication & Authorization, 1. Project Overview, 2. Tech Stack, 3. Project Structure, 9.1 Route Inventory (+5 more)
 
 ### Community 145 - "Community 145"
-Cohesion: 0.13
-Nodes (4): LanguageRegistry, PluginRegistry, ImportResolution, emptyAnalysis
+Cohesion: 0.26
+Nodes (11): BASE_CONCEPT_PATTERNS, buildConceptPatterns(), buildLanguageLessonPrompt(), detectLanguageConcepts(), extractJson(), getLanguageDisplayName(), LanguageLessonResult, parseLanguageLessonResponse() (+3 more)
 
 ### Community 146 - "Community 146"
-Cohesion: 0.09
-Nodes (22): compilerOptions, baseUrl, declaration, declarationMap, esModuleInterop, forceConsistentCasingInFileNames, isolatedModules, jsx (+14 more)
+Cohesion: 0.24
+Nodes (9): applyLLMLayers(), buildLayerDetectionPrompt(), detectLayers(), LAYER_PATTERNS, LLMLayerResponse, matchFileToLayer(), parseLayerDetectionResponse(), toLayerId() (+1 more)
 
 ### Community 147 - "Community 147"
-Cohesion: 0.21
-Nodes (13): KozmoAIBlogPost(), renderContent(), VireonBlogCard(), VireonBlogList(), renderContent(), VireonBlogPost(), renderMarkdown(), VireonContent() (+5 more)
-
-### Community 148 - "Community 148"
-Cohesion: 0.10
-Nodes (8): QualityScorer, Vireon_Auth, self, mb_stripos(), mb_strlen(), mb_strtolower(), str_starts_with(), self
+Cohesion: 0.23
+Nodes (5): extractParams(), extractReturnType(), PythonExtractor, unwrapDecorated(), require
 
 ### Community 149 - "Community 149"
 Cohesion: 0.15
@@ -773,10 +731,6 @@ Nodes (12): edges, layers, nodes, project, analyzedAt, description, frameworks, 
 Cohesion: 0.17
 Nodes (11): Critical Constraints, Executing the Script, Graph Reviewer, Phase 1 — Validation Script, Phase 2 -- Review and Decision, Script Output Format, Script Requirements, Severity Classification (for the script to apply) (+3 more)
 
-### Community 152 - "Community 152"
-Cohesion: 0.15
-Nodes (4): Cache, RateLimiter, self, self
-
 ### Community 153 - "Community 153"
 Cohesion: 0.27
 Nodes (8): detectLanguage(), findGraphFile(), graphFileCandidates(), graphFilePathSet(), normalizeGraphPath(), projectRootFromGraphFile(), readSourceFile(), rejectFileRequest()
@@ -786,8 +740,8 @@ Cohesion: 0.17
 Nodes (11): 3a. Architecture update (only if `rerunArchitecture === true`), 3b. Lite layer update (if `rerunArchitecture === false`), 3c. Lite validation, 3d. Save, Auto-Update Knowledge Graph (Internal — Hook-Triggered), Error Handling, Notes, Phase 0 — Pre-flight (Zero Token Cost) (+3 more)
 
 ### Community 155 - "Community 155"
-Cohesion: 0.11
-Nodes (6): Dashboard, Security, self, self, check_ajax_referer(), wp_verify_nonce()
+Cohesion: 0.24
+Nodes (7): createIgnoreFilter(), DEFAULT_IGNORE_PATTERNS, IgnoreFilter, DETECTABLE_DIRS, generateStarterIgnoreFile(), GENERIC_SUGGESTIONS, parseGitignorePatterns()
 
 ### Community 156 - "Community 156"
 Cohesion: 0.27
@@ -824,10 +778,6 @@ Nodes (9): Critical Constraints, Phase 1 -- Discovery (bundled scan + LLM narrat
 ### Community 165 - "Community 165"
 Cohesion: 0.20
 Nodes (9): author, name, description, homepage, keywords, license, name, repository (+1 more)
-
-### Community 166 - "Community 166"
-Cohesion: 0.21
-Nodes (5): builtinExtractors, require, TreeSitterLanguage, TreeSitterParser, TreeSitterPlugin
 
 ### Community 167 - "Community 167"
 Cohesion: 0.24
@@ -969,10 +919,6 @@ Nodes (6): Common Frameworks, Example Language Notes, File Patterns, Import Patt
 Cohesion: 0.29
 Nodes (6): Common Frameworks, Example Language Notes, File Patterns, Import Patterns, Key Concepts, TypeScript Language Prompt Snippet
 
-### Community 202 - "Community 202"
-Cohesion: 0.25
-Nodes (4): FileStorage, KozmoAIArticle, KozmoAIPost, KozmoAIPostList
-
 ### Community 203 - "Community 203"
 Cohesion: 0.29
 Nodes (7): 5.1 Entry Point (`backend/index.ts`), 5.2 Config Loading, 5.3 Middleware Stack, 5.4 Database Connection, 5.5 Queue System (`backend/utils/queue.ts`), 5.6 Logger (`backend/utils/logger.ts`), 5. Backend Architecture
@@ -1077,10 +1023,6 @@ Nodes (6): scripts, build, clean, dev, prepublishOnly, typecheck
 Cohesion: 0.40
 Nodes (4): Checklist, Description, How Has This Been Tested?, Type of Change
 
-### Community 230 - "Community 230"
-Cohesion: 0.27
-Nodes (3): VireonArticle, VireonPost, FileStorage
-
 ### Community 231 - "Community 231"
 Cohesion: 0.40
 Nodes (5): 11.1 Test Infrastructure, 11.2 Test Files, 11.3 Testing Patterns, 11.4 Running Tests, 11. Testing Strategy
@@ -1141,105 +1083,29 @@ Nodes (4): ./types, default, import, types
 Cohesion: 0.50
 Nodes (4): peerDependencies, next, react, react-dom
 
-### Community 246 - "Community 246"
-Cohesion: 0.12
-Nodes (8): Activator, Deactivator, Uninstaller, add_option(), delete_option(), flush_rewrite_rules(), vireon_activate(), vireon_deactivate()
-
 ### Community 250 - "Community 250"
 Cohesion: 0.67
 Nodes (3): repository, type, url
 
-### Community 253 - "Community 253"
-Cohesion: 0.08
-Nodes (14): ContentAnalyzer, Database, SeoAuditor, WP_Post, self, self, self, get_post_meta() (+6 more)
-
-### Community 269 - "Community 269"
-Cohesion: 0.15
-Nodes (4): Health, KnowledgeBase, self, self
-
-### Community 270 - "Community 270"
-Cohesion: 0.12
-Nodes (15): author, description, engines, node, files, homepage, keywords, license (+7 more)
-
-### Community 272 - "Community 272"
-Cohesion: 0.15
-Nodes (12): createScheduleSchema, createWebhookSchema, discoverKeywordsSchema, generateArticleSchema, generateImageSchema, loginSchema, paginationSchema, publishArticleSchema (+4 more)
-
-### Community 273 - "Community 273"
-Cohesion: 0.17
-Nodes (11): authors, autoload, classmap, config, optimize-autoloader, description, license, name (+3 more)
-
-### Community 275 - "Community 275"
-Cohesion: 0.18
-Nodes (11): default, import, types, default, exports, ./components, ./styles.css, import (+3 more)
-
-### Community 276 - "Community 276"
-Cohesion: 0.27
-Nodes (9): CreatePostPayload, UpdatePostPayload, VireonArticleStatus, VireonAuthor, VireonPostList, VireonWebhookPayload, CreatePostPayload, StorageProvider (+1 more)
-
-### Community 277 - "Community 277"
-Cohesion: 0.29
-Nodes (7): devDependencies, next, react, react-dom, @types/node, @types/react, typescript
-
-### Community 278 - "Community 278"
-Cohesion: 0.48
-Nodes (6): AuthResult, constantTimeCompare(), hexToHmacSha256(), verifyRequest(), verifyWebhookSignature(), verifyWebhookSignatureAsync()
-
-### Community 279 - "Community 279"
-Cohesion: 0.33
-Nodes (6): main(), bool, int, str, Run a browser-use agent and return the result as a dict., run_agent()
-
-### Community 280 - "Community 280"
-Cohesion: 0.33
-Nodes (6): main(), bool, int, str, Scrape a URL using crawl4ai and return the result as a dict., scrape_url()
-
-### Community 281 - "Community 281"
-Cohesion: 0.48
-Nodes (6): AuthResult, constantTimeCompare(), hexToHmacSha256(), verifyRequest(), verifyWebhookSignature(), verifyWebhookSignatureAsync()
-
-### Community 282 - "Community 282"
-Cohesion: 0.33
-Nodes (6): scripts, build, clean, dev, prepublishOnly, typecheck
-
-### Community 287 - "Community 287"
-Cohesion: 0.50
-Nodes (4): ./lib/*, default, import, types
-
-### Community 288 - "Community 288"
-Cohesion: 0.50
-Nodes (4): ./server, default, import, types
-
-### Community 289 - "Community 289"
-Cohesion: 0.50
-Nodes (4): ./types, default, import, types
-
-### Community 290 - "Community 290"
-Cohesion: 0.50
-Nodes (4): peerDependencies, next, react, react-dom
-
-### Community 296 - "Community 296"
-Cohesion: 0.67
-Nodes (3): repository, type, url
-
 ## Knowledge Gaps
-- **1594 isolated node(s):** `PreToolUse`, `version`, `languages`, `frameworks`, `description` (+1589 more)
+- **1436 isolated node(s):** `PreToolUse`, `version`, `languages`, `frameworks`, `description` (+1431 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **61 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **57 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `logger` connect `Authentication and Authorization` to `AI Content Generation Services`, `UI Components and Analytics`, `Mock Testing Utilities`, `Background Workers and Handlers`, `System Observability and Alerts`, `Pipeline Orchestration and Testing`, `Shopify Authentication and Store`, `Resilience and Circuit Breaker`, `AI Chat Engine`, `Fact Checking Service`, `Image Search and Caching`, `Content Quality Improvement`, `Authentication and Pipeline UI`, `Plugin System and Hooks`, `Content Quality Scoring`, `Cost Tracking Service`, `Device Fingerprinting`, `Brand Voice UI`, `Community 99`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **Why does `KeywordService` connect `Keyword Research and SEO Analytics` to `Authentication and Authorization`?**
+- **Why does `logger` connect `Authentication and Authorization` to `Content Quality Improvement`, `Community 99`, `UI Components and Analytics`, `Mock Testing Utilities`, `Authentication and Pipeline UI`, `System Observability and Alerts`, `Pipeline Orchestration and Testing`, `Plugin System and Hooks`, `Content Quality Scoring`, `Background Workers and Handlers`, `Shopify Authentication and Store`, `Resilience and Circuit Breaker`, `Cost Tracking Service`, `Form UI Components`, `AI Chat Engine`, `Fact Checking Service`, `Brand Voice UI`, `Image Search and Caching`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `QueueNames` connect `Authentication and Pipeline UI` to `Authentication and Authorization`, `Payload and Job Types`, `Community 104`, `Background Workers and Handlers`, `API Response Models`, `AI Chat Engine`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Why does `registerAllParsers()` connect `Community 108` to `Chat and Prompt Routes`, `UI Card Components`, `API Schema Definitions`, `Community 167`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
-- **Why does `connections` connect `Community 142` to `Community 179`, `Keyword Research and SEO Analytics`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Are the 17 inferred relationships involving `__()` (e.g. with `.action_links()` and `.add_menu()`) actually correct?**
-  _`__()` has 17 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `PreToolUse`, `version`, `languages` to the rest of the system?**
-  _1681 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1505 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Content and Editorial Data` be split into smaller, more focused modules?**
-  _Cohesion score 0.027777777777777776 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.028169014084507043 - nodes in this community are weakly interconnected._
 - **Should `Content and Editorial Comments` be split into smaller, more focused modules?**
   _Cohesion score 0.024684102262709375 - nodes in this community are weakly interconnected._
+- **Should `Authentication and Authorization` be split into smaller, more focused modules?**
+  _Cohesion score 0.03450242372398061 - nodes in this community are weakly interconnected._
