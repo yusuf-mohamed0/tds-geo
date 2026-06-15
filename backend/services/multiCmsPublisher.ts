@@ -9,8 +9,9 @@ import { logger } from '../utils/logger';
 import { Article, PublishResult, CmsProvider, CmsConnection, PublisherAdapter } from '../types';
 import shopifyService from './shopify';
 
-// Vireon WP Plugin REST API namespace
+// WordPress plugin REST API namespaces
 const VIREON_API_NAMESPACE = 'vireon/v1';
+const KOZMO_AI_API_NAMESPACE = 'kozmo-ai/v1';
 
 interface PublisherCapabilities {
   supportsMedia: boolean;
@@ -325,33 +326,47 @@ class MultiCmsPublisherService {
 
   /**
    * Build headers and base URL for WordPress requests.
-   * Supports two modes:
-   *   1. Vireon WP Plugin: X-Vireon-Key header + /vireon/v1/ endpoints
-   *   2. Native WP REST API: Basic Auth (App Passwords) + /wp/v2/ endpoints
+   * Supports three modes:
+   *   1. KOZMO AI WP Plugin: X-KOZMO-AI-Key header + /kozmo-ai/v1/ endpoints
+   *   2. Vireon WP Plugin: X-Vireon-Key header + /vireon/v1/ endpoints
+   *   3. Native WP REST API: Basic Auth (App Passwords) + /wp/v2/ endpoints
    */
   private buildWordPressRequest(
     config: Record<string, unknown>
-  ): { baseUrl: string; headers: Record<string, string>; mode: 'vireon' | 'native' } {
+  ): { baseUrl: string; headers: Record<string, string>; mode: 'kozmo_ai' | 'vireon' | 'native' } {
     const wpUrl = (config.wpUrl as string) || (config.endpoint_url as string) || process.env.WORDPRESS_API_URL || '';
-    const apiKey = (config.apiKey as string) || (config.vireon_api_key as string) || '';
+    const kozmoAiKey = (config.kozmoAiKey as string) || (config.kozmo_ai_api_key as string) || process.env.KOZMO_AI_WORDPRESS_API_KEY || '';
+    const vireonKey = (config.apiKey as string) || (config.vireon_api_key as string) || '';
     const wpToken = (config.wpToken as string) || (config.wpAppPassword as string) || process.env.WORDPRESS_APP_PASSWORD || '';
 
     // Strip trailing slash and any path segment to get base site URL
     const baseSiteUrl = wpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
 
-    if (apiKey) {
-      // Mode 1: Vireon WP Plugin API
+    if (kozmoAiKey) {
+      // Mode 1: KOZMO AI WP Plugin API
+      return {
+        baseUrl: `${baseSiteUrl}/wp-json/${KOZMO_AI_API_NAMESPACE}`,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-KOZMO-AI-Key': kozmoAiKey,
+        },
+        mode: 'kozmo_ai',
+      };
+    }
+
+    if (vireonKey) {
+      // Mode 2: Vireon WP Plugin API
       return {
         baseUrl: `${baseSiteUrl}/wp-json/${VIREON_API_NAMESPACE}`,
         headers: {
           'Content-Type': 'application/json',
-          'X-Vireon-Key': apiKey,
+          'X-Vireon-Key': vireonKey,
         },
         mode: 'vireon',
       };
     }
 
-    // Mode 2: Native WP REST API with Basic Auth (App Passwords)
+    // Mode 3: Native WP REST API with Basic Auth (App Passwords)
     return {
       baseUrl: `${baseSiteUrl}/wp-json/wp/v2`,
       headers: {
@@ -363,13 +378,14 @@ class MultiCmsPublisherService {
   }
 
   private async testWordPressConnection(): Promise<boolean> {
-    // First try the env-var-based approach (legacy)
-    const wpUrl = process.env.WORDPRESS_API_URL;
-    const wpToken = process.env.WORDPRESS_APP_PASSWORD;
-    if (wpUrl && wpToken) {
+    // Try KOZMO AI API env vars
+    const kozmoAiWpUrl = process.env.KOZMO_AI_WORDPRESS_URL;
+    const kozmoAiKey = process.env.KOZMO_AI_WORDPRESS_API_KEY;
+    if (kozmoAiWpUrl && kozmoAiKey) {
       try {
-        const response = await fetch(`${wpUrl}/wp-json/wp/v2/`, {
-          headers: { Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}` },
+        const baseSiteUrl = kozmoAiWpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
+        const response = await fetch(`${baseSiteUrl}/wp-json/${KOZMO_AI_API_NAMESPACE}/status`, {
+          headers: { 'X-KOZMO-AI-Key': kozmoAiKey },
           signal: AbortSignal.timeout(5000)
         });
         if (response.ok) return true;
@@ -388,24 +404,58 @@ class MultiCmsPublisherService {
           headers: { 'X-Vireon-Key': vireonApiKey },
           signal: AbortSignal.timeout(5000)
         });
-        return response.ok;
+        if (response.ok) return true;
       } catch {
-        return false;
+        // Fall through
       }
     }
 
-    logger.warn('WordPress credentials not configured (set WORDPRESS_API_URL + WORDPRESS_APP_PASSWORD, or VIREON_WORDPRESS_URL + VIREON_WORDPRESS_API_KEY)');
+    // Try native WP REST API (legacy)
+    const wpUrl = process.env.WORDPRESS_API_URL;
+    const wpToken = process.env.WORDPRESS_APP_PASSWORD;
+    if (wpUrl && wpToken) {
+      try {
+        const response = await fetch(`${wpUrl}/wp-json/wp/v2/`, {
+          headers: { Authorization: `Basic ${Buffer.from(wpToken).toString('base64')}` },
+          signal: AbortSignal.timeout(5000)
+        });
+        if (response.ok) return true;
+      } catch {
+        // Fall through
+      }
+    }
+
+    logger.warn('WordPress credentials not configured (set KOZMO_AI_WORDPRESS_URL + KOZMO_AI_WORDPRESS_API_KEY, VIREON_WORDPRESS_URL + VIREON_WORDPRESS_API_KEY, or WORDPRESS_API_URL + WORDPRESS_APP_PASSWORD)');
     return false;
   }
 
   private async publishToWordPress(article: Article, config: Record<string, unknown>): Promise<PublishResult> {
     const req = this.buildWordPressRequest(config);
 
-    // Build the payload — different format for Vireon API vs native WP
+    // Build the payload — different format per API mode
     let endpoint: string;
     let body: Record<string, unknown>;
 
-    if (req.mode === 'vireon') {
+    if (req.mode === 'kozmo_ai') {
+      // KOZMO AI WP Plugin: uses kozmo-ai/v1/posts endpoint
+      endpoint = `${req.baseUrl}/posts`;
+      body = {
+        title: article.title,
+        content_html: article.content_html || article.content_md || '',
+        slug: article.slug || article.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || '',
+        status: (config.status as string) || 'draft',
+        tags: article.tags || [],
+        categories: (config.categories as string[]) || [],
+        meta_title: article.meta_title || '',
+        meta_description: article.meta_description || '',
+        focus_keyword: (config.focus_keyword as string) || '',
+        featured_image_url: (config.featured_image_url as string) || '',
+        publish_date: (config.publish_date as string) || '',
+        author_id: (config.author_id as number) || 0,
+        agent_article_id: article.id,
+        auto_publish: config.auto_publish ?? true,
+      };
+    } else if (req.mode === 'vireon') {
       // Vireon WP Plugin: uses vireon/v1/posts endpoint
       endpoint = `${req.baseUrl}/posts`;
       body = {
@@ -461,8 +511,17 @@ class MultiCmsPublisherService {
 
     const data: any = await response.json();
 
+    // KOZMO AI API returns { success, data: { post_id, post_url }, quality }
+    if (req.mode === 'kozmo_ai' && data.data) {
+      return {
+        id: data.data.post_id,
+        blogId: 1,
+        url: data.data.post_url || '',
+        handle: data.data.post_id?.toString() || '',
+      };
+    }
+
     // Vireon API returns { success, data: { post_id, post_url } }
-    // Native WP API returns { id, link, slug }
     if (req.mode === 'vireon' && data.data) {
       return {
         id: data.data.post_id,
@@ -472,6 +531,7 @@ class MultiCmsPublisherService {
       };
     }
 
+    // Native WP API returns { id, link, slug }
     return { id: data.id, blogId: 1, url: data.link || '', handle: data.slug || '' };
   }
 
@@ -483,7 +543,18 @@ class MultiCmsPublisherService {
     let endpoint: string;
     let body: Record<string, unknown>;
 
-    if (req.mode === 'vireon') {
+    if (req.mode === 'kozmo_ai') {
+      endpoint = `${req.baseUrl}/posts/${articleId}`;
+      body = {
+        title: article.title,
+        content_html: article.content_html || article.content_md,
+        slug: article.slug,
+        status: (config.status as string) || undefined,
+        tags: article.tags,
+        meta_title: article.meta_title,
+        meta_description: article.meta_description,
+      };
+    } else if (req.mode === 'vireon') {
       endpoint = `${req.baseUrl}/posts/${articleId}`;
       body = {
         title: article.title,
@@ -494,10 +565,6 @@ class MultiCmsPublisherService {
         meta_title: article.meta_title,
         meta_description: article.meta_description,
       };
-      // Remove undefined values
-      Object.keys(body).forEach(key => {
-        if (body[key] === undefined) delete body[key];
-      });
     } else {
       endpoint = `${req.baseUrl}/posts/${articleId}`;
       body = {
@@ -506,13 +573,16 @@ class MultiCmsPublisherService {
         slug: article.slug,
         tags: article.tags,
       };
-      Object.keys(body).forEach(key => {
-        if (body[key] === undefined) delete body[key];
-      });
     }
 
+    // Remove undefined values so we don't overwrite with empty
+    Object.keys(body).forEach(key => {
+      if (body[key] === undefined) delete body[key];
+    });
+
+    const method = req.mode === 'kozmo_ai' ? 'PUT' : 'POST';
     const response = await fetch(endpoint, {
-      method: 'POST',
+      method,
       headers: req.headers,
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(30000),
@@ -528,7 +598,7 @@ class MultiCmsPublisherService {
 
     const data: any = await response.json();
 
-    if (req.mode === 'vireon' && data.data) {
+    if ((req.mode === 'kozmo_ai' || req.mode === 'vireon') && data.data) {
       return { id: data.data.post_id, blogId: 1, url: '', handle: '' };
     }
 
