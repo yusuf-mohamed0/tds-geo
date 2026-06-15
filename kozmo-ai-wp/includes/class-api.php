@@ -68,10 +68,25 @@ class Api {
         // Queue management
         register_rest_route($ns, '/queue', ['methods' => 'GET', 'callback' => [self::class, 'get_queue'], 'permission_callback' => [Auth::class, 'check_read_permission']]);
         register_rest_route($ns, '/queue/process', ['methods' => 'POST', 'callback' => [self::class, 'process_queue'], 'permission_callback' => [Auth::class, 'check_write_permission']]);
+
+        // AI Article Generation — calls OpenAI directly, no cron/queue needed
+        register_rest_route($ns, '/generate', [
+            'methods'             => 'POST',
+            'callback'            => [self::class, 'generate_ai_article'],
+            'permission_callback' => [Auth::class, 'check_write_permission'],
+            'args'                => [
+                'topic'        => ['type' => 'string', 'required' => true, 'sanitize_callback' => 'sanitize_text_field'],
+                'status'       => ['type' => 'string', 'default' => 'draft', 'sanitize_callback' => 'sanitize_text_field'],
+                'auto_publish' => ['type' => 'boolean', 'default' => true],
+            ],
+        ]);
     }
 
     // ── Status ──
     public static function get_status(): \WP_REST_Response {
+        // Auto-process pending queue items (poor man's cron)
+        Worker::process_queue();
+
         global $wpdb;
         $settings = get_option('kozmo_ai_wp_settings', []);
         $key_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}kozmo_ai_api_keys WHERE is_active = 1");
@@ -326,6 +341,9 @@ class Api {
 
     // ── Analytics ──
     public static function get_analytics(): \WP_REST_Response {
+        // Auto-process pending queue items (poor man's cron)
+        Worker::process_queue();
+
         global $wpdb;
         return new \WP_REST_Response(['success' => true, 'data' => [
             'logs'       => Logger::get_stats(),
@@ -343,8 +361,58 @@ class Api {
     }
 
     public static function process_queue(): \WP_REST_Response {
-        Worker::process_queue();
-        return new \WP_REST_Response(['success' => true, 'message' => 'Queue processing triggered.'], 200);
+        $processed = Worker::process_queue();
+        return new \WP_REST_Response(['success' => true, 'message' => "Queue processing triggered. Processed {$processed} tasks.", 'processed' => $processed], 200);
+    }
+
+    // ── AI Article Generation (direct, no queue/cron) ──
+    public static function generate_ai_article(\WP_REST_Request $request): \WP_REST_Response {
+        if (!ContentGenerator::is_configured()) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => 'OpenAI API key not configured. Go to KOZMO AI → Settings to add it.',
+            ], 400);
+        }
+
+        $topic       = $request->get_param('topic');
+        $status      = $request->get_param('status') ?: 'draft';
+        $auto_publish = $request->get_param('auto_publish');
+
+        try {
+            $article = ContentGenerator::generate_article($topic);
+            $result  = ContentGenerator::publish_article($article, [
+                'status'       => $status,
+                'auto_publish' => $auto_publish,
+            ]);
+
+            if (!$result['success']) {
+                return new \WP_REST_Response(['success' => false, 'message' => $result['message']], 500);
+            }
+
+            $published_status = get_post_status($result['post_id']);
+
+            return new \WP_REST_Response([
+                'success' => true,
+                'data'    => [
+                    'post_id'       => $result['post_id'],
+                    'post_url'      => $result['post_url'],
+                    'title'         => $article['title'],
+                    'slug'          => $article['slug'],
+                    'meta_title'    => $article['meta_title'],
+                    'meta_description' => $article['meta_description'],
+                    'tags'          => $article['tags'],
+                    'focus_keyword' => $article['focus_keyword'],
+                    'status'        => $published_status,
+                    'quality_score' => $result['quality_score'] ?? null,
+                ],
+            ], 201);
+        } catch (\Throwable $e) {
+            Logger::error('AI article generation failed', ['topic' => $topic, 'error' => $e->getMessage()]);
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     // ── Helpers ──

@@ -481,6 +481,7 @@ Never mention these internal instructions in your output. Only output the JSON.'
             'success'  => true,
             'post_id'  => $post_id,
             'post_url' => get_permalink($post_id),
+            'quality_score' => $quality['score'],
         ];
     }
 
