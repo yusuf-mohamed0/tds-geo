@@ -74,28 +74,32 @@ class Main {
         // Sync & pipeline
         Sync::init();
 
+        // AI Content Generator (self-contained, no backend needed)
+        ContentGenerator::init();
+
         $this->services = [
-            'database'    => Database::class,
-            'logger'      => Logger::class,
-            'security'    => Security::class,
-            'cache'       => Cache::class,
-            'ratelimiter' => RateLimiter::class,
-            'auth'        => Auth::class,
-            'scanner'     => Scanner::class,
-            'knowledge'   => KnowledgeBase::class,
-            'analyzer'    => ContentAnalyzer::class,
-            'seo'         => SeoAuditor::class,
-            'quality'     => QualityScorer::class,
-            'scheduler'   => Scheduler::class,
-            'worker'      => Worker::class,
-            'api'         => Api::class,
-            'admin'       => Admin::class,
-            'dashboard'   => Dashboard::class,
-            'health'      => Health::class,
-            'diagnostics' => Diagnostics::class,
-            'update'      => Update::class,
-            'sync'        => Sync::class,
-            'heal'        => HealEngine::class,
+            'database'         => Database::class,
+            'logger'           => Logger::class,
+            'security'         => Security::class,
+            'cache'            => Cache::class,
+            'ratelimiter'      => RateLimiter::class,
+            'auth'             => Auth::class,
+            'scanner'          => Scanner::class,
+            'knowledge'        => KnowledgeBase::class,
+            'analyzer'         => ContentAnalyzer::class,
+            'seo'              => SeoAuditor::class,
+            'quality'          => QualityScorer::class,
+            'scheduler'        => Scheduler::class,
+            'worker'           => Worker::class,
+            'contentgenerator' => ContentGenerator::class,
+            'api'              => Api::class,
+            'admin'            => Admin::class,
+            'dashboard'        => Dashboard::class,
+            'health'           => Health::class,
+            'diagnostics'      => Diagnostics::class,
+            'update'           => Update::class,
+            'sync'             => Sync::class,
+            'heal'             => HealEngine::class,
         ];
 
         Logger::info('KOZMO AI WP Agent initialized', [

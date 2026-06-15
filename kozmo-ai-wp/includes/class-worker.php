@@ -159,6 +159,32 @@ class Worker {
                 // Scan posts for broken links
                 return ['success' => true];
 
+            case 'generate_article':
+                $topic = $data['topic'] ?? '';
+                if (empty($topic)) {
+                    return ['success' => false, 'message' => 'Topic required for article generation'];
+                }
+                try {
+                    $article = ContentGenerator::generate_article($topic);
+                    $settings = get_option('kozmo_ai_wp_settings', []);
+                    $status = ($settings['generate_as_draft'] ?? 'yes') === 'yes' ? 'draft' : 'publish';
+                    $result  = ContentGenerator::publish_article($article, ['status' => $status]);
+                    return $result;
+                } catch (\Throwable $e) {
+                    return ['success' => false, 'message' => $e->getMessage()];
+                }
+
+            case 'discover_topics':
+                try {
+                    $topics = ContentGenerator::discover_topics();
+                    foreach ($topics as $topic) {
+                        self::enqueue('generate_article', ['topic' => $topic], 10);
+                    }
+                    return ['success' => true, 'message' => 'Discovered ' . count($topics) . ' topics'];
+                } catch (\Throwable $e) {
+                    return ['success' => false, 'message' => $e->getMessage()];
+                }
+
             case 'cleanup':
                 Database::run_cleanup();
                 return ['success' => true];

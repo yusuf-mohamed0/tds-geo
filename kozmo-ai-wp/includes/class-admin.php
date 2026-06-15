@@ -81,18 +81,44 @@ class Admin {
                                 <p class="description"><?php esc_html_e('Secret for webhook signature verification (min 16 chars).', 'kozmo-ai-wp'); ?></p></td></tr>
                     </table></div>
 
+                <div class="kozmo-card"><h2><?php esc_html_e('AI Content Generation', 'kozmo-ai-wp'); ?></h2>
+                    <p class="description" style="margin-bottom:15px;"><?php esc_html_e('Connect OpenAI to automatically generate and publish SEO-optimized articles. No external backend needed.', 'kozmo-ai-wp'); ?></p>
+                    <table class="form-table">
+                        <tr><th><?php esc_html_e('OpenAI API Key', 'kozmo-ai-wp'); ?></th>
+                            <td><input type="password" name="openai_api_key" value="<?php echo !empty($settings['openai_api_key']) ? '********' : ''; ?>" class="regular-text" placeholder="sk-..." />
+                                <p class="description"><?php esc_html_e('Your OpenAI API key. Stored encrypted. Required for auto-generation.', 'kozmo-ai-wp'); ?></p></td></tr>
+                        <tr><th><?php esc_html_e('OpenAI Model', 'kozmo-ai-wp'); ?></th>
+                            <td><select name="openai_model">
+                                <option value="gpt-4o" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o'); ?>>GPT-4o (recommended)</option>
+                                <option value="gpt-4o-mini" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o-mini'); ?>>GPT-4o Mini (faster, cheaper)</option>
+                                <option value="gpt-4-turbo" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4-turbo'); ?>>GPT-4 Turbo</option>
+                            </select></td></tr>
+                        <tr><th><?php esc_html_e('Enable Auto-Generation', 'kozmo-ai-wp'); ?></th>
+                            <td><label><input type="checkbox" name="enable_auto_generation" value="yes" <?php checked($settings['enable_auto_generation'] ?? 'no', 'yes'); ?> /> <?php esc_html_e('Automatically discover topics and generate articles on a schedule', 'kozmo-ai-wp'); ?></label></td></tr>
+                        <tr><th><?php esc_html_e('Generation Frequency', 'kozmo-ai-wp'); ?></th>
+                            <td><select name="generation_frequency">
+                                <option value="kozmo_ai_every_15min" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily', 'kozmo_ai_every_15min'); ?>><?php esc_html_e('Every 15 minutes', 'kozmo-ai-wp'); ?></option>
+                                <option value="kozmo_ai_hourly" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily', 'kozmo_ai_hourly'); ?>><?php esc_html_e('Every hour', 'kozmo-ai-wp'); ?></option>
+                                <option value="kozmo_ai_twice_daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily', 'kozmo_ai_twice_daily'); ?>><?php esc_html_e('Twice daily', 'kozmo-ai-wp'); ?></option>
+                                <option value="daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily', 'daily'); ?>><?php esc_html_e('Once daily', 'kozmo-ai-wp'); ?></option>
+                            </select></td></tr>
+                        <tr><th><?php esc_html_e('Save as Draft', 'kozmo-ai-wp'); ?></th>
+                            <td><label><input type="checkbox" name="generate_as_draft" value="yes" <?php checked($settings['generate_as_draft'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Save generated articles as drafts (uncheck to publish immediately)', 'kozmo-ai-wp'); ?></label></td></tr>
+                        <tr><th><?php esc_html_e('Max Articles/Day', 'kozmo-ai-wp'); ?></th>
+                            <td><input type="number" name="max_articles_daily" value="<?php echo esc_attr($settings['max_articles_daily'] ?? 5); ?>" min="1" max="50" />
+                                <p class="description"><?php esc_html_e('Maximum articles to generate per day.', 'kozmo-ai-wp'); ?></p></td></tr>
+                        <tr><th><?php esc_html_e('Publish On Quality >=', 'kozmo-ai-wp'); ?></th>
+                            <td><input type="number" name="min_quality_score" value="<?php echo esc_attr($settings['min_quality_score'] ?? 95); ?>" min="1" max="100" /> / 100</td></tr>
+                        <tr><th><?php esc_html_e('Auto Publish', 'kozmo-ai-wp'); ?></th>
+                            <td><label><input type="checkbox" name="auto_publish" value="yes" <?php checked($settings['auto_publish'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Auto-publish drafts when quality score >= minimum threshold', 'kozmo-ai-wp'); ?></label></td></tr>
+                    </table></div>
+
                 <div class="kozmo-card"><h2><?php esc_html_e('Automation', 'kozmo-ai-wp'); ?></h2>
                     <table class="form-table">
-                        <tr><th><?php esc_html_e('Auto Publish', 'kozmo-ai-wp'); ?></th>
-                            <td><label><input type="checkbox" name="auto_publish" value="yes" <?php checked($settings['auto_publish'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Publish articles when quality score >= threshold', 'kozmo-ai-wp'); ?></label></td></tr>
-                        <tr><th><?php esc_html_e('Min Quality Score', 'kozmo-ai-wp'); ?></th>
-                            <td><input type="number" name="min_quality_score" value="<?php echo esc_attr($settings['min_quality_score'] ?? 95); ?>" min="0" max="100" /> / 100</td></tr>
                         <tr><th><?php esc_html_e('Auto Fix Errors', 'kozmo-ai-wp'); ?></th>
                             <td><label><input type="checkbox" name="auto_fix_errors" value="yes" <?php checked($settings['auto_fix_errors'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Automatically attempt to repair errors', 'kozmo-ai-wp'); ?></label></td></tr>
                         <tr><th><?php esc_html_e('Auto Scan', 'kozmo-ai-wp'); ?></th>
                             <td><label><input type="checkbox" name="auto_discover" value="yes" <?php checked($settings['auto_discover'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Auto-discover site changes', 'kozmo-ai-wp'); ?></label></td></tr>
-                        <tr><th><?php esc_html_e('Max Articles/Day', 'kozmo-ai-wp'); ?></th>
-                            <td><input type="number" name="max_articles_daily" value="<?php echo esc_attr($settings['max_articles_daily'] ?? 10); ?>" min="1" max="100" /></td></tr>
                     </table></div>
 
                 <div class="kozmo-card"><h2><?php esc_html_e('Logging', 'kozmo-ai-wp'); ?></h2>
@@ -118,22 +144,46 @@ class Admin {
         if (!current_user_can('manage_options')) wp_die('Unauthorized');
         check_admin_referer('kozmo_ai_save_settings', 'kozmo_ai_nonce');
 
+        $old_settings = get_option('kozmo_ai_wp_settings', []);
+
+        // Handle OpenAI API key — encrypt inline to avoid double-save bug
+        $openai_key_raw = sanitize_text_field(wp_unslash($_POST['openai_api_key'] ?? ''));
+        $encrypted_openai_key = $old_settings['openai_api_key'] ?? '';
+        if (!empty($openai_key_raw) && $openai_key_raw !== '********') {
+            $key = defined('NONCE_KEY') ? NONCE_KEY : 'kozmo-ai-fallback';
+            $iv = openssl_random_pseudo_bytes(16);
+            $encrypted = openssl_encrypt($openai_key_raw, 'aes-256-cbc', $key, 0, $iv);
+            if (false !== $encrypted) {
+                $encrypted_openai_key = base64_encode($iv . $encrypted);
+            }
+        }
+
         $settings = [
-            'agent_url'         => esc_url_raw(wp_unslash($_POST['agent_url'] ?? KOZMO_AI_WP_AGENT_URL)),
-            'api_enabled'       => sanitize_text_field(wp_unslash($_POST['api_enabled'] ?? 'no')),
-            'webhook_secret'    => sanitize_text_field(wp_unslash($_POST['webhook_secret'] ?? '')),
-            'log_level'         => sanitize_text_field(wp_unslash($_POST['log_level'] ?? 'info')),
-            'auto_publish'      => sanitize_text_field(wp_unslash($_POST['auto_publish'] ?? 'no')),
-            'auto_discover'     => sanitize_text_field(wp_unslash($_POST['auto_discover'] ?? 'no')),
-            'auto_fix_errors'   => sanitize_text_field(wp_unslash($_POST['auto_fix_errors'] ?? 'no')),
-            'min_quality_score' => absint(wp_unslash($_POST['min_quality_score'] ?? 95)),
-            'max_articles_daily' => absint(wp_unslash($_POST['max_articles_daily'] ?? 10)),
-            'debug_mode'        => sanitize_text_field(wp_unslash($_POST['debug_mode'] ?? 'no')),
-            'enable_webhooks'   => 'yes',
-            'cron_interval'     => get_option('kozmo_ai_wp_settings')['cron_interval'] ?? 'kozmo_ai_every_15min',
-            'last_scan_at'      => get_option('kozmo_ai_wp_settings')['last_scan_at'] ?? '',
-            'last_sync_at'      => current_time('mysql'),
+            'agent_url'              => esc_url_raw(wp_unslash($_POST['agent_url'] ?? KOZMO_AI_WP_AGENT_URL)),
+            'api_enabled'            => sanitize_text_field(wp_unslash($_POST['api_enabled'] ?? 'no')),
+            'webhook_secret'         => sanitize_text_field(wp_unslash($_POST['webhook_secret'] ?? '')),
+            'log_level'              => sanitize_text_field(wp_unslash($_POST['log_level'] ?? 'info')),
+            'auto_publish'           => sanitize_text_field(wp_unslash($_POST['auto_publish'] ?? 'no')),
+            'auto_discover'          => sanitize_text_field(wp_unslash($_POST['auto_discover'] ?? 'no')),
+            'auto_fix_errors'        => sanitize_text_field(wp_unslash($_POST['auto_fix_errors'] ?? 'no')),
+            'min_quality_score'      => absint(wp_unslash($_POST['min_quality_score'] ?? 95)),
+            'max_articles_daily'     => absint(wp_unslash($_POST['max_articles_daily'] ?? 5)),
+            'debug_mode'             => sanitize_text_field(wp_unslash($_POST['debug_mode'] ?? 'no')),
+            'enable_webhooks'        => 'yes',
+            'enable_auto_generation' => sanitize_text_field(wp_unslash($_POST['enable_auto_generation'] ?? 'no')),
+            'generation_frequency'   => sanitize_text_field(wp_unslash($_POST['generation_frequency'] ?? 'kozmo_ai_twice_daily')),
+            'openai_model'           => sanitize_text_field(wp_unslash($_POST['openai_model'] ?? 'gpt-4o')),
+            'generate_as_draft'      => sanitize_text_field(wp_unslash($_POST['generate_as_draft'] ?? 'yes')),
+            'openai_api_key'         => $encrypted_openai_key,
+            'cron_interval'          => $old_settings['cron_interval'] ?? 'kozmo_ai_every_15min',
+            'last_scan_at'           => $old_settings['last_scan_at'] ?? '',
+            'last_sync_at'           => current_time('mysql'),
         ];
+
+        // Clear stale cron if auto-generation is disabled
+        if (($settings['enable_auto_generation'] ?? 'no') !== 'yes') {
+            Scheduler::clear_auto_generation();
+        }
 
         if (!empty($settings['webhook_secret']) && strlen($settings['webhook_secret']) < 16) {
             $existing = get_option('kozmo_ai_wp_settings', []);

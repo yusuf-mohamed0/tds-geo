@@ -155,6 +155,32 @@ class Dashboard {
                 <?php endif; ?>
             </div>
 
+            <!-- Auto-Generation Status -->
+            <?php if (ContentGenerator::is_configured()): ?>
+            <div class="kozmo-card">
+                <h2><?php esc_html_e('AI Auto-Generation', 'kozmo-ai-wp'); ?></h2>
+                <?php
+                $gen_enabled = ($settings['enable_auto_generation'] ?? 'no') === 'yes';
+                $today_count = ContentGenerator::get_today_generation_count();
+                $next_run = wp_next_scheduled('kozmo_ai_generate_articles');
+                $model = $settings['openai_model'] ?? 'gpt-4o';
+                $daily_max = (int) ($settings['max_articles_daily'] ?? 5);
+                ?>
+                <table class="widefat striped" style="max-width:600px;">
+                    <tr><td><?php esc_html_e('Status', 'kozmo-ai-wp'); ?></td>
+                        <td><?php if ($gen_enabled): ?><span class="kozmo-badge badge-active"><?php esc_html_e('Active', 'kozmo-ai-wp'); ?></span><?php else: ?><span class="kozmo-badge badge-inactive"><?php esc_html_e('Disabled', 'kozmo-ai-wp'); ?></span><?php endif; ?>
+                        <?php if (!$gen_enabled): ?><a href="<?php echo esc_url(admin_url('admin.php?page=kozmo-ai-wp-settings')); ?>" class="button button-small"><?php esc_html_e('Enable', 'kozmo-ai-wp'); ?></a><?php endif; ?></td></tr>
+                    <tr><td><?php esc_html_e('AI Model', 'kozmo-ai-wp'); ?></td><td><code><?php echo esc_html($model); ?></code></td></tr>
+                    <tr><td><?php esc_html_e('Articles Today', 'kozmo-ai-wp'); ?></td><td><?php echo (int) $today_count; ?> / <?php echo (int) $daily_max; ?></td></tr>
+                    <tr><td><?php esc_html_e('Generated As', 'kozmo-ai-wp'); ?></td><td><?php echo ($settings['generate_as_draft'] ?? 'yes') === 'yes' ? esc_html__('Draft', 'kozmo-ai-wp') : esc_html__('Published', 'kozmo-ai-wp'); ?></td></tr>
+                    <?php if ($next_run): ?>
+                    <tr><td><?php esc_html_e('Next Generation', 'kozmo-ai-wp'); ?></td><td><?php echo esc_html(wp_date(get_option('date_format') . ' ' . get_option('time_format'), $next_run)); ?></td></tr>
+                    <?php endif; ?>
+                    <tr><td><?php esc_html_e('Auto-Publish', 'kozmo-ai-wp'); ?></td><td><?php echo ($settings['auto_publish'] ?? 'yes') === 'yes' ? sprintf(esc_html__('Yes (quality >= %d)', 'kozmo-ai-wp'), (int) ($settings['min_quality_score'] ?? 95)) : esc_html__('No', 'kozmo-ai-wp'); ?></td></tr>
+                </table>
+            </div>
+            <?php endif; ?>
+
             <!-- Connection Info -->
             <div class="kozmo-card">
                 <h2><?php esc_html_e('Connection Info', 'kozmo-ai-wp'); ?></h2>

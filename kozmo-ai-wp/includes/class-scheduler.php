@@ -10,5 +10,38 @@ class Scheduler {
 
     public static function init(): void {
         if (null === self::$instance) self::$instance = new self();
+
+        // Register cron hooks for auto-generation (admin only to avoid wasted DB queries)
+        if (is_admin()) {
+            add_action('init', [self::class, 'schedule_auto_generation']);
+        }
+    }
+
+    /**
+     * Schedule the auto-generation cron job if it's not already scheduled.
+     */
+    public static function schedule_auto_generation(): void {
+        if (!wp_next_scheduled('kozmo_ai_generate_articles')) {
+            $settings = get_option('kozmo_ai_wp_settings', []);
+            // Check if auto-generation is enabled and OpenAI key is configured
+            if (ContentGenerator::is_configured()) {
+                $frequency = $settings['generation_frequency'] ?? 'kozmo_ai_twice_daily';
+                wp_schedule_event(time() + 600, $frequency, 'kozmo_ai_generate_articles');
+            }
+        }
+    }
+
+    /**
+     * Remove all scheduled auto-generation events.
+     */
+    public static function clear_auto_generation(): void {
+        $timestamp = wp_next_scheduled('kozmo_ai_generate_articles');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'kozmo_ai_generate_articles');
+        }
+        $timestamp = wp_next_scheduled('kozmo_ai_discover_topics');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'kozmo_ai_discover_topics');
+        }
     }
 }
