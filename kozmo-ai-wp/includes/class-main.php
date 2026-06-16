@@ -86,6 +86,9 @@ class Main {
         // AI Content Generator (self-contained, no backend needed)
         ContentGenerator::init();
 
+        // Content research & SEO report
+        ContentResearch::init();
+
         $this->services = [
             'database'         => Database::class,
             'logger'           => Logger::class,
@@ -112,6 +115,7 @@ class Main {
             'telemetry'        => Telemetry::class,
             'backend'          => BackendClient::class,
             'graphify'         => GraphifyClient::class,
+            'research'         => ContentResearch::class,
         ];
 
         Logger::info('KOZMO AI WP Agent initialized', [

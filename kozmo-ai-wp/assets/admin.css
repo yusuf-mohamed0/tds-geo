@@ -178,6 +178,32 @@ details.k-details .k-details-body { padding: 20px; }
 .k-notice-success { background: var(--k-green-dim); color: var(--k-green); }
 .k-notice-info { background: var(--k-blue-dim); color: var(--k-blue); }
 
+/* ─── Toast Notification ─── */
+.k-toast { position: fixed; bottom: 24px; right: 24px; z-index: 99999; padding: 12px 20px; border-radius: var(--k-radius-lg); font-size: 13px; font-weight: 500; line-height: 1.4; max-width: 360px; transform: translateY(16px); opacity: 0; transition: all .3s ease; pointer-events: none; }
+.k-toast-visible { transform: translateY(0); opacity: 1; }
+.k-toast-success { background: var(--k-green-dim); color: var(--k-green); border: 1px solid var(--k-green); }
+.k-toast-error { background: var(--k-red-dim); color: var(--k-red); border: 1px solid var(--k-red); }
+
+/* ─── Loading State ─── */
+.k-loading { position: relative; pointer-events: none; opacity: .7; }
+.k-loading:after { content: ''; display: inline-block; width: 12px; height: 12px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: kSpin .6s linear infinite; margin-left: 6px; vertical-align: middle; }
+@keyframes kSpin { to { transform: rotate(360deg); } }
+
+/* ─── Action Buttons ─── */
+.k-action-group { display: flex; gap: 4px; justify-content: flex-end; }
+.k-action-group .k-btn { font-size: 11px; padding: 3px 8px; }
+.k-action-group .k-btn:disabled { opacity: .4; cursor: default; }
+
+/* ─── Research Panel ─── */
+.k-research-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+@media (max-width: 900px) { .k-research-grid { grid-template-columns: 1fr; } }
+.k-research-card { background: var(--k-surface); border: 1px solid var(--k-border); border-radius: var(--k-radius-xl); padding: 20px; }
+.k-research-card h3 { font-size: 13px; font-weight: 600; color: var(--k-text); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px; }
+.k-research-card .k-tag { margin: 3px; cursor: default; }
+.k-research-card .k-tag:hover { filter: brightness(1.2); }
+.k-research-stat { font-size: 22px; font-weight: 700; color: var(--k-accent); }
+.k-research-label { font-size: 11px; color: var(--k-text-tertiary); text-transform: uppercase; letter-spacing: .03em; }
+
 /* ─── Override WordPress Admin Noise ─── */
 body.kozmo-dark { background: var(--k-bg) !important; }
 body.kozmo-dark #wpcontent { background: var(--k-bg); }

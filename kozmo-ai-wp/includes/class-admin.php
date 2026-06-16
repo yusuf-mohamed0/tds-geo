@@ -12,7 +12,10 @@ class Admin {
         add_action('admin_enqueue_scripts', [self::class, 'enqueue_assets']);
         add_action('admin_post_kozmo_ai_save_settings', [self::class, 'handle_save_settings']);
         add_action('admin_post_kozmo_ai_clear_logs', [self::class, 'handle_clear_logs']);
+        add_action('admin_post_kozmo_ai_download_seo_report', [SeoReport::class, 'download']);
         add_action('wp_ajax_kozmo_ai_dashboard_data', [Dashboard::class, 'ajax_data']);
+        add_action('wp_ajax_kozmo_ai_article_action', [self::class, 'handle_article_action']);
+        add_action('wp_ajax_kozmo_ai_research_data', [self::class, 'handle_research_data']);
         add_filter('plugin_action_links_' . KOZMO_AI_WP_BASENAME, [self::class, 'action_links']);
         add_filter('admin_body_class', [self::class, 'body_class']);
     }
@@ -33,6 +36,8 @@ class Admin {
         );
         add_submenu_page('kozmo-ai-wp', 'Dashboard', 'Dashboard', 'manage_options', 'kozmo-ai-wp', [Dashboard::class, 'render']);
         add_submenu_page('kozmo-ai-wp', 'Content', 'Content', 'manage_options', 'kozmo-ai-wp-content', [self::class, 'render_content']);
+        add_submenu_page('kozmo-ai-wp', 'Research', 'Research', 'manage_options', 'kozmo-ai-wp-research', [self::class, 'render_research']);
+        add_submenu_page('kozmo-ai-wp', 'SEO Report', 'SEO Report', 'manage_options', 'kozmo-ai-wp-seo', [self::class, 'render_seo_report']);
         add_submenu_page('kozmo-ai-wp', 'Settings', 'Settings', 'manage_options', 'kozmo-ai-wp-settings', [self::class, 'render_settings']);
     }
 
@@ -110,8 +115,16 @@ class Admin {
                         <td><span class="k-tag <?php echo $a['pipeline_status'] === 'completed' ? 'k-tag-green' : 'k-tag-blue'; ?>"><?php echo esc_html($a['pipeline_status'] ?? 'pending'); ?></span></td>
                         <td class="k-text-mono"><?php echo esc_html(wp_date('M j, Y', strtotime($a['post_date']))); ?></td>
                         <td style="text-align:right;white-space:nowrap;">
+                            <div class="k-action-group">
+                            <?php if ($a['post_status'] !== 'publish'): ?>
+                            <button class="k-btn k-btn-sm k-tag-green" onclick="articleAction(<?php echo (int) $a['ID']; ?>, 'publish')" data-k-action="<?php echo (int) $a['ID']; ?>" data-k-act="publish">Publish</button>
+                            <?php endif; ?>
+                            <?php if ($a['post_status'] !== 'draft'): ?>
+                            <button class="k-btn k-btn-sm k-btn-secondary" onclick="articleAction(<?php echo (int) $a['ID']; ?>, 'draft')" data-k-action="<?php echo (int) $a['ID']; ?>" data-k-act="draft">Draft</button>
+                            <?php endif; ?>
                             <a href="<?php echo esc_url(get_edit_post_link($a['ID'])); ?>" class="k-btn k-btn-secondary k-btn-sm">Edit</a>
-                            <a href="<?php echo esc_url(get_permalink($a['ID'])); ?>" class="k-btn k-btn-secondary k-btn-sm" target="_blank">View</a>
+                            <button class="k-btn k-btn-sm k-btn-danger" onclick="articleAction(<?php echo (int) $a['ID']; ?>, 'delete')" data-k-action="<?php echo (int) $a['ID']; ?>" data-k-act="delete">×</button>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?></tbody></table>
@@ -337,5 +350,201 @@ class Admin {
         Logger::clear();
         wp_safe_redirect(admin_url('admin.php?page=kozmo-ai-wp-settings&updated=1'));
         exit;
+    }
+
+    // ── Article AJAX Actions ──
+    public static function handle_article_action(): void {
+        check_ajax_referer('kozmo_ai_wp_ajax', 'nonce');
+        if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized']);
+
+        $post_id = (int) ($_POST['post_id'] ?? 0);
+        $action = sanitize_text_field(wp_unslash($_POST['act'] ?? ''));
+
+        if (!$post_id || !in_array($action, ['publish', 'draft', 'delete'], true)) {
+            wp_send_json_error(['message' => 'Invalid parameters']);
+        }
+
+        if ($action === 'delete') {
+            wp_delete_post($post_id, true);
+            Logger::info('Article deleted via dashboard', ['post_id' => $post_id]);
+            wp_send_json_success(['message' => 'Article permanently deleted']);
+        }
+
+        if ($action === 'publish') {
+            wp_publish_post($post_id);
+            update_post_meta($post_id, '_kozmo_ai_pipeline_stage', 'completed');
+            delete_post_meta($post_id, '_kozmo_ai_pipeline_error');
+            Logger::info('Article published via dashboard', ['post_id' => $post_id]);
+            wp_send_json_success(['message' => 'Article published']);
+        }
+
+        if ($action === 'draft') {
+            wp_update_post(['ID' => $post_id, 'post_status' => 'draft']);
+            Logger::info('Article moved to draft via dashboard', ['post_id' => $post_id]);
+            wp_send_json_success(['message' => 'Article moved to draft']);
+        }
+    }
+
+    // ── Research Data AJAX ──
+    public static function handle_research_data(): void {
+        check_ajax_referer('kozmo_ai_wp_ajax', 'nonce');
+        if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized']);
+
+        try {
+            ContentResearch::auto_research();
+            $keywords = get_option('kozmo_ai_cached_keywords', []);
+            $gaps = get_option('kozmo_ai_cached_gaps', []);
+            wp_send_json_success([
+                'keywords' => $keywords,
+                'gaps'     => $gaps,
+            ]);
+        } catch (\Throwable $e) {
+            wp_send_json_error(['message' => $e->getMessage()]);
+        }
+    }
+
+    // ── Research Page ──
+    public static function render_research(): void {
+        $keywords = get_option('kozmo_ai_cached_keywords', []);
+        $gaps = get_option('kozmo_ai_cached_gaps', []);
+        ?>
+        <div class="wrap k-shell">
+            <?php Dashboard::render_nav('research'); ?>
+            <div class="k-gen k-fade">
+                <div class="k-gen-info">
+                    <div class="k-gen-item"><span class="k-gen-label">Keyword Clusters</span><span class="k-gen-value"><?php echo count($keywords); ?></span></div>
+                    <div class="k-gen-item"><span class="k-gen-label">Content Gaps</span><span class="k-gen-value"><?php echo count($gaps); ?></span></div>
+                    <span class="k-tag k-tag-blue">Auto-researched via OpenAI</span>
+                </div>
+                <div class="k-gen-actions">
+                    <button id="k-research" class="k-btn k-btn-primary k-btn-sm">⟳ Research Now</button>
+                </div>
+            </div>
+
+            <div class="k-research-grid">
+                <div class="k-research-card">
+                    <h3>🔍 Keyword Clusters</h3>
+                    <?php if (empty($keywords)): ?>
+                    <div class="k-empty" style="padding:24px;"><div class="k-empty-icon">🔑</div>No keywords yet. Click "Research Now" to fetch.</div>
+                    <?php else: foreach ($keywords as $k): ?>
+                    <div style="margin-bottom:14px;padding:10px 12px;background:var(--k-bg-elevated);border-radius:var(--k-radius);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <strong style="font-size:13px;"><?php echo esc_html($k['cluster_name'] ?? ''); ?></strong>
+                            <span class="k-tag <?php echo ($k['trend'] ?? 'stable') === 'up' ? 'k-tag-green' : (($k['trend'] ?? 'stable') === 'down' ? 'k-tag-red' : 'k-tag-yellow'); ?>"><?php echo esc_html($k['trend'] ?? 'stable'); ?></span>
+                        </div>
+                        <div style="font-size:11px;color:var(--k-text-tertiary);margin-bottom:4px;">
+                            Intent: <?php echo esc_html($k['search_intent'] ?? '—'); ?> · Volume: <?php echo (int) ($k['avg_monthly'] ?? 0); ?>
+                        </div>
+                        <div><?php foreach ((array) ($k['keywords'] ?? []) as $kw): ?>
+                            <span class="k-tag k-tag-blue"><?php echo esc_html($kw); ?></span>
+                        <?php endforeach; ?></div>
+                    </div>
+                    <?php endforeach; endif; ?>
+                </div>
+
+                <div class="k-research-card">
+                    <h3>📊 Content Gaps</h3>
+                    <?php if (empty($gaps)): ?>
+                    <div class="k-empty" style="padding:24px;"><div class="k-empty-icon">📊</div>No gaps yet. Click "Research Now" to fetch.</div>
+                    <?php else: foreach ($gaps as $g): ?>
+                    <div style="margin-bottom:14px;padding:10px 12px;background:var(--k-bg-elevated);border-radius:var(--k-radius);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <strong style="font-size:13px;"><?php echo esc_html($g['gap'] ?? ''); ?></strong>
+                            <span class="k-tag <?php echo ($g['urgency'] ?? 'medium') === 'high' ? 'k-tag-red' : (($g['urgency'] ?? 'medium') === 'low' ? 'k-tag-yellow' : 'k-tag-blue'); ?>"><?php echo esc_html($g['urgency'] ?? 'medium'); ?></span>
+                        </div>
+                        <div style="display:flex;gap:8px;font-size:11px;color:var(--k-text-tertiary);margin-bottom:4px;">
+                            <span>Opportunity: <?php echo (int) ($g['opportunity_score'] ?? 0); ?>/10</span>
+                        </div>
+                        <div style="font-size:12px;color:var(--k-text-secondary);"><?php echo esc_html($g['why_it_matters'] ?? ''); ?></div>
+                    </div>
+                    <?php endforeach; endif; ?>
+                </div>
+            </div>
+        </div>
+        <script>
+        (function($) {
+            $('#k-research').on('click', function() {
+                var $btn = $(this).prop('disabled', true).text('⟳ Researching...');
+                $.post(ajaxurl, { action: 'kozmo_ai_research_data', nonce: kozmoAI?.nonce }, function(r) {
+                    if (r.success) location.reload();
+                    else alert(r.data?.message || 'Research failed');
+                }).always(function() { $btn.prop('disabled', false).text('⟳ Research Now'); });
+            });
+        })(jQuery);
+        </script>
+        <?php
+    }
+
+    // ── SEO Report Page ──
+    public static function render_seo_report(): void {
+        $report = SeoReport::generate();
+        $grade = $report['health_score'] >= 90 ? 'A' : ($report['health_score'] >= 75 ? 'B' : ($report['health_score'] >= 60 ? 'C' : 'D'));
+        $color = $report['health_score'] >= 90 ? 'var(--k-green)' : ($report['health_score'] >= 75 ? 'var(--k-yellow)' : 'var(--k-red)');
+        ?>
+        <div class="wrap k-shell">
+            <?php Dashboard::render_nav('seo'); ?>
+            <div class="k-gen k-fade">
+                <div class="k-gen-info">
+                    <div class="k-gen-item"><span class="k-gen-label">Grade</span><span class="k-gen-value" style="color:<?php echo $color; ?>"><?php echo $grade; ?></span></div>
+                    <div class="k-gen-item"><span class="k-gen-label">Health Score</span><span class="k-gen-value"><?php echo (int) $report['health_score']; ?>/100</span></div>
+                    <div class="k-gen-item"><span class="k-gen-label">AI Articles</span><span class="k-gen-value"><?php echo (int) $report['article_stats']['ai_generated']; ?></span></div>
+                    <div class="k-gen-item"><span class="k-gen-label">Avg Quality</span><span class="k-gen-value"><?php echo (float) $report['article_stats']['avg_quality']; ?>/100</span></div>
+                </div>
+                <div class="k-gen-actions">
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <?php wp_nonce_field('kozmo_ai_download_seo_report', 'kozmo_ai_seo_nonce'); ?>
+                        <input type="hidden" name="action" value="kozmo_ai_download_seo_report">
+                        <button type="submit" class="k-btn k-btn-primary k-btn-sm">⬇ Download Full Report</button>
+                        <button id="k-seo-refresh" class="k-btn k-btn-secondary k-btn-sm">Refresh</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="k-grid">
+                <div class="k-stat"><div class="k-stat-label">Health Score</div><div class="k-stat-value" style="color:<?php echo $color; ?>"><?php echo (int) $report['health_score']; ?></div><div class="k-stat-sub"><?php echo esc_html(ucfirst($report['health_status'])); ?></div></div>
+                <div class="k-stat"><div class="k-stat-label">Total Articles</div><div class="k-stat-value"><?php echo (int) $report['article_stats']['total_published']; ?></div><div class="k-stat-sub"><?php echo (int) $report['article_stats']['ai_generated']; ?> AI-generated</div></div>
+                <div class="k-stat"><div class="k-stat-label">Avg Quality</div><div class="k-stat-value"><?php echo (float) $report['article_stats']['avg_quality']; ?></div><div class="k-stat-sub">out of 100</div></div>
+                <div class="k-stat"><div class="k-stat-label">Content Issues</div><div class="k-stat-value"><?php echo (int) ($report['content_health']['thin_content'] ?? 0); ?></div><div class="k-stat-sub"><?php echo (int) ($report['content_health']['no_featured_images'] ?? 0); ?> no images</div></div>
+                <div class="k-stat"><div class="k-stat-label">Duplicate Titles</div><div class="k-stat-value"><?php echo (int) ($report['content_health']['duplicate_titles'] ?? 0); ?></div><div class="k-stat-sub">groups of duplicates</div></div>
+                <div class="k-stat"><div class="k-stat-label">Outdated Content</div><div class="k-stat-value"><?php echo (int) ($report['content_health']['old_posts'] ?? 0); ?></div><div class="k-stat-sub">not updated in 6+ months</div></div>
+            </div>
+
+            <div class="k-panel">
+                <div class="k-card">
+                    <div class="k-card-header"><h2>Health Checks</h2></div>
+                    <div class="k-health"><?php foreach ($report['health_checks'] as $name => $check): ?>
+                        <div class="k-health-item"><span class="k-dot" style="background:<?php echo $check['status'] === 'healthy' ? 'var(--k-green)' : ($check['status'] === 'degraded' ? 'var(--k-yellow)' : 'var(--k-red)'); ?>"></span><?php echo esc_html(ucfirst($name)); ?> — <?php echo esc_html($check['status']); ?></div>
+                    <?php endforeach; ?></div>
+                </div>
+                <div class="k-card">
+                    <div class="k-card-header"><h2>Settings</h2></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;">
+                        <div><span style="color:var(--k-text-tertiary);">Model:</span> <?php echo esc_html($report['settings']['model']); ?></div>
+                        <div><span style="color:var(--k-text-tertiary);">Frequency:</span> <?php echo esc_html($report['settings']['frequency']); ?></div>
+                        <div><span style="color:var(--k-text-tertiary);">Daily Max:</span> <?php echo (int) $report['settings']['daily_max']; ?></div>
+                        <div><span style="color:var(--k-text-tertiary);">Mode:</span> <?php echo $report['settings']['draft_mode'] ? 'Draft' : 'Published'; ?></div>
+                        <div><span style="color:var(--k-text-tertiary);">PHP:</span> <?php echo esc_html($report['php_version']); ?></div>
+                        <div><span style="color:var(--k-text-tertiary);">WP:</span> <?php echo esc_html($report['wp_version']); ?></div>
+                        <div><span style="color:var(--k-text-tertiary);">Speed:</span> <?php echo esc_html($report['pagespeed_estimate']); ?></div>
+                        <div><span style="color:var(--k-text-tertiary);">Pending Tasks:</span> <?php echo (int) ($report['queue_stats']['pending'] ?? 0); ?></div>
+                    </div>
+                </div>
+            </div>
+
+            <?php if (!empty($report['recommendations'])): ?>
+            <div class="k-card k-fade">
+                <div class="k-card-header"><h2>Recommendations</h2></div>
+                <?php foreach ($report['recommendations'] as $rec): ?>
+                <div style="padding:10px 14px;margin-bottom:8px;background:var(--k-accent-dim);border:1px solid var(--k-accent);border-radius:var(--k-radius);font-size:13px;color:var(--k-accent);"><?php echo esc_html($rec); ?></div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <script>
+        (function($) {
+            $('#k-seo-refresh').on('click', function() { location.reload(); });
+        })(jQuery);
+        </script>
+        <?php
     }
 }

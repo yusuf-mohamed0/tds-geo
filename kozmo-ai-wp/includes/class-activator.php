@@ -260,6 +260,10 @@ class Activator {
         }
 
         Telemetry::schedule();
+
+        if (!wp_next_scheduled('kozmo_ai_research_keywords')) {
+            wp_schedule_event(time() + 7200, 'kozmo_ai_daily', 'kozmo_ai_research_keywords');
+        }
     }
 
     private static function trigger_initial_scan(): void {
@@ -290,6 +294,7 @@ class Activator {
             'kozmo_ai_cleanup',
             'kozmo_ai_generate_articles',
             'kozmo_ai_discover_topics',
+            'kozmo_ai_research_keywords',
         ];
         foreach ($hooks as $hook) {
             $timestamp = wp_next_scheduled($hook);

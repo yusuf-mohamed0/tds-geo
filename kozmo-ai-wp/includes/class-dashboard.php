@@ -55,6 +55,7 @@ class Dashboard {
                 </div>
                 <div class="k-gen-actions">
                     <button id="k-refresh" class="k-btn k-btn-secondary k-btn-sm">Refresh</button>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=kozmo-ai-wp-seo')); ?>" class="k-btn k-btn-secondary k-btn-sm">SEO Report</a>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=kozmo-ai-wp-settings')); ?>" class="k-btn k-btn-primary k-btn-sm">Settings</a>
                 </div>
             </div>
@@ -79,7 +80,7 @@ class Dashboard {
                     <div class="k-empty"><div class="k-empty-icon">📝</div>No AI-generated articles yet</div>
                     <?php else: ?>
                     <div class="k-table-wrap">
-                    <table class="k-table k-articles"><thead><tr><th>Title</th><th>Status</th><th>Quality</th><th>Pipeline</th><th>Date</th></tr></thead>
+                    <table class="k-table k-articles"><thead><tr><th>Title</th><th>Status</th><th>Quality</th><th>Pipeline</th><th>Date</th><th style="text-align:right;">Actions</th></tr></thead>
                         <tbody><?php foreach ($articles as $a):
                             $stage = $a['pipeline_stage'] ?? 'pending';
                             $error = $a['pipeline_error'] ?? '';
@@ -94,7 +95,15 @@ class Dashboard {
                                     <span class="k-pipeline-label"><?php echo $error ? 'Failed' : esc_html($stage); ?></span>
                                 </div>
                             </td>
-                            <td class="k-text-mono"><?php echo esc_html(wp_date('M j, Y', strtotime($a['post_date']))); ?></td></tr>
+                            <td class="k-text-mono"><?php echo esc_html(wp_date('M j, Y', strtotime($a['post_date']))); ?></td>
+                            <td style="text-align:right;white-space:nowrap;">
+                                <div class="k-action-group">
+                                <?php if ($a['post_status'] !== 'publish'): ?>
+                                <button class="k-btn k-btn-sm k-tag-green" onclick="articleAction(<?php echo (int) $a['ID']; ?>, 'publish')" data-k-action="<?php echo (int) $a['ID']; ?>" data-k-act="publish">Pub</button>
+                                <?php endif; ?>
+                                <button class="k-btn k-btn-sm k-btn-danger" onclick="articleAction(<?php echo (int) $a['ID']; ?>, 'delete')" data-k-action="<?php echo (int) $a['ID']; ?>" data-k-act="delete">×</button>
+                                </div>
+                            </td></tr>
                         <?php endforeach; ?></tbody>
                     </table>
                     </div><?php endif; ?>
@@ -219,6 +228,8 @@ class Dashboard {
         $pages = [
             'dashboard' => ['Dashboard', admin_url('admin.php?page=kozmo-ai-wp')],
             'content'   => ['Content',   admin_url('admin.php?page=kozmo-ai-wp-content')],
+            'research'  => ['Research',  admin_url('admin.php?page=kozmo-ai-wp-research')],
+            'seo'       => ['SEO Report', admin_url('admin.php?page=kozmo-ai-wp-seo')],
             'settings'  => ['Settings',  admin_url('admin.php?page=kozmo-ai-wp-settings')],
         ];
         $health = Health::run_checks();
