@@ -188,10 +188,11 @@ class Admin {
                             <table class="k-key-table"><thead><tr><th>Label</th><th>Key</th><th>Permissions</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
                                 <tbody><?php foreach ($keys as $key): ?>
                                 <tr><td><?php echo esc_html($key['label'] ?: '—'); ?></td>
-                                    <td class="k-masked"><?php echo esc_html($key['masked_key'] ?? '••••••••'); ?></td>
+                                    <td class="k-masked" data-key-id="<?php echo (int) $key['id']; ?>"><?php echo esc_html($key['masked_key'] ?? '••••••••'); ?></td>
                                     <td><?php echo esc_html($key['permissions']); ?></td>
                                     <td><span class="k-tag <?php echo $key['is_active'] ? 'k-tag-active' : 'k-tag-red'; ?>"><?php echo $key['is_active'] ? 'Active' : 'Revoked'; ?></span></td>
-                                    <td style="text-align:right;"><?php if ($key['is_active']): ?>
+                                    <td style="text-align:right;white-space:nowrap;"><?php if ($key['is_active']): ?>
+                                        <button type="button" class="k-btn k-btn-secondary k-btn-sm" onclick="revealApiKey(<?php echo (int) $key['id']; ?>)">Show</button>
                                         <?php wp_nonce_field('kozmo_ai_revoke_key', 'kozmo_ai_revoke_' . $key['id']); ?>
                                         <button type="submit" name="revoke_key" value="<?php echo esc_attr($key['id']); ?>" class="k-btn k-btn-danger k-btn-sm" onclick="return confirm('Revoke this key?');">Revoke</button>
                                     <?php endif; ?></td>

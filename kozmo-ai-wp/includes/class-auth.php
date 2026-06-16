@@ -11,6 +11,7 @@ class Auth {
         self::ensure_schema();
         add_action('admin_post_kozmo_ai_generate_key', [self::class, 'handle_generate_key']);
         add_action('admin_post_kozmo_ai_revoke_key', [self::class, 'handle_revoke_key']);
+        add_action('wp_ajax_kozmo_ai_reveal_key', [self::class, 'handle_reveal_key']);
     }
 
     private static function ensure_schema(): void {
@@ -21,6 +22,27 @@ class Auth {
         if (!$has_hash) {
             $wpdb->query("ALTER TABLE {$table} ADD COLUMN api_key_hash VARCHAR(255) DEFAULT NULL AFTER api_key");
         }
+        $has_enc = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM {$table} LIKE %s", 'api_key_encrypted'));
+        if (!$has_enc) {
+            $wpdb->query("ALTER TABLE {$table} ADD COLUMN api_key_encrypted TEXT DEFAULT NULL AFTER api_key_hash");
+        }
+    }
+
+    private static function encrypt_key(string $plaintext): string {
+        $key = defined('NONCE_KEY') ? NONCE_KEY : 'kozmo-ai-fallback';
+        $iv = openssl_random_pseudo_bytes(16);
+        $encrypted = openssl_encrypt($plaintext, 'aes-256-cbc', $key, 0, $iv);
+        return base64_encode($iv . $encrypted);
+    }
+
+    private static function decrypt_key(string $encoded): ?string {
+        $key = defined('NONCE_KEY') ? NONCE_KEY : 'kozmo-ai-fallback';
+        $data = base64_decode($encoded, true);
+        if (false === $data || strlen($data) < 17) return null;
+        $iv = substr($data, 0, 16);
+        $encrypted = substr($data, 16);
+        $decrypted = openssl_decrypt($encrypted, 'aes-256-cbc', $key, 0, $iv);
+        return false !== $decrypted ? $decrypted : null;
     }
 
     private static function hash_api_key(string $api_key): string {
@@ -55,15 +77,16 @@ class Auth {
         $inserted = $wpdb->insert(
             $wpdb->prefix . 'kozmo_ai_api_keys',
             [
-                'api_key'     => null,
-                'api_key_hash'=> self::hash_api_key($api_key),
-                'label'       => sanitize_text_field($label),
-                'permissions' => sanitize_text_field($permissions),
-                'is_active'   => 1,
-                'expires_at'  => $expires_at,
-                'created_by'  => $created_by ?: get_current_user_id(),
+                'api_key'          => null,
+                'api_key_hash'     => self::hash_api_key($api_key),
+                'api_key_encrypted'=> self::encrypt_key($api_key),
+                'label'            => sanitize_text_field($label),
+                'permissions'      => sanitize_text_field($permissions),
+                'is_active'        => 1,
+                'expires_at'       => $expires_at,
+                'created_by'       => $created_by ?: get_current_user_id(),
             ],
-            ['%s', '%s', '%s', '%s', '%d', '%s', '%d']
+            ['%s', '%s', '%s', '%s', '%s', '%d', '%s', '%d']
         );
 
         if (!$inserted) return ['success' => false, 'message' => __('Failed to generate API key.', 'kozmo-ai-wp')];
@@ -143,6 +166,42 @@ class Auth {
         }
 
         return $keys;
+    }
+
+    public static function reveal_key(int $key_id): ?string {
+        global $wpdb;
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT api_key, api_key_encrypted FROM {$wpdb->prefix}kozmo_ai_api_keys WHERE id = %d",
+            $key_id
+        ), ARRAY_A);
+        if (!$row) return null;
+        if (!empty($row['api_key_encrypted'])) {
+            return self::decrypt_key($row['api_key_encrypted']);
+        }
+        if (!empty($row['api_key'])) {
+            return $row['api_key'];
+        }
+        return null;
+    }
+
+    public static function handle_reveal_key(): void {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized.']);
+        }
+        $key_id = absint($_POST['key_id'] ?? 0);
+        $password = wp_unslash($_POST['password'] ?? '');
+        if (!$key_id || !$password) {
+            wp_send_json_error(['message' => 'Missing key ID or password.']);
+        }
+        $user = wp_get_current_user();
+        if (!wp_check_password($password, $user->user_pass, $user->ID)) {
+            wp_send_json_error(['message' => 'Invalid password.']);
+        }
+        $revealed = self::reveal_key($key_id);
+        if (null === $revealed) {
+            wp_send_json_error(['message' => 'Cannot reveal this key (only hash stored). Generate a new one.']);
+        }
+        wp_send_json_success(['api_key' => $revealed]);
     }
 
     public static function revoke_key_by_id(int $key_id): bool {

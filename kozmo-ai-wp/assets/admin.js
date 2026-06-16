@@ -163,4 +163,25 @@
       scheduleRefresh();
     }
   });
+
+  // ─── Reveal API key with admin password ───
+  window.revealApiKey = function(keyId) {
+    var password = prompt('Enter your admin password to reveal this API key:');
+    if (!password) return;
+    $.post(ajaxurl, {
+      action: 'kozmo_ai_reveal_key',
+      key_id: keyId,
+      password: password
+    }, function(r) {
+      if (r.success && r.data && r.data.api_key) {
+        var $td = $('[data-key-id="' + keyId + '"]');
+        $td.html('<code style="font-size:11px;word-break:break-all;">' + $('<span>').text(r.data.api_key).html() + '</code>');
+        setTimeout(function() {
+          $td.html(r.data.api_key.substring(0, 16) + '...');
+        }, 15000);
+      } else {
+        alert(r.data && r.data.message ? r.data.message : 'Failed to reveal key.');
+      }
+    });
+  };
 })(jQuery);
