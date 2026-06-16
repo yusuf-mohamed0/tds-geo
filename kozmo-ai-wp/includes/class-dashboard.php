@@ -28,6 +28,12 @@ class Dashboard {
         $recent = Logger::get_logs(5);
         $articles = self::recent_articles(5);
         $overall = $health['overall'] ?? 'healthy';
+
+        // Pre-compute integration statuses (wrapped for safety)
+        $backend_available = false;
+        $graphify_available = false;
+        try { $backend_available = BackendClient::is_available(); } catch (\Throwable $e) {}
+        try { $graphify_available = GraphifyClient::is_available(); } catch (\Throwable $e) {}
         ?>
         <div class="wrap k-shell k-dashboard">
             <?php self::render_nav('dashboard'); ?>
@@ -51,6 +57,12 @@ class Dashboard {
                     <div class="k-gen-item"><span class="k-gen-label">Mode</span><span class="k-gen-value"><?php echo esc_html($publish_mode); ?></span></div>
                     <div class="k-gen-item"><span class="k-gen-label">Next Run</span><span class="k-gen-value" data-k-next><?php echo $next_run ? esc_html(wp_date(get_option('date_format') . ' ' . get_option('time_format'), $next_run)) : 'Awaiting schedule'; ?></span></div>
                     <span class="k-tag k-gen-badge <?php echo $gen_enabled ? 'k-tag-active' : 'k-tag-yellow'; ?>"><?php echo $gen_enabled ? 'Active' : 'Paused'; ?></span>
+                    <?php if ($backend_available): ?>
+                    <span class="k-tag k-tag-green">Backend</span>
+                    <?php endif; ?>
+                    <?php if ($graphify_available): ?>
+                    <span class="k-tag k-tag-violet">Graph</span>
+                    <?php endif; ?>
                 </div>
                 <div class="k-gen-actions">
                     <button id="k-refresh" class="k-btn k-btn-secondary k-btn-sm">Refresh</button>
@@ -124,6 +136,7 @@ class Dashboard {
         check_ajax_referer('kozmo_ai_wp_ajax', 'nonce');
         if (!current_user_can('manage_options')) wp_send_json_error('Unauthorized');
 
+        $settings = get_option('kozmo_ai_wp_settings', []);
         wp_send_json_success([
             'health'  => Health::run_checks(),
             'queue'   => Worker::get_queue_stats(),
@@ -133,12 +146,34 @@ class Dashboard {
             'content' => ContentAnalyzer::analyze_content_health(),
             'keywords' => ContentAnalyzer::keyword_coverage(),
             'next_run' => wp_next_scheduled('kozmo_ai_generate_articles'),
-            'generation_enabled' => (get_option('kozmo_ai_wp_settings', [])['enable_auto_generation'] ?? 'yes') === 'yes',
-            'last_scan' => get_option('kozmo_ai_wp_settings', [])['last_scan_at'] ?? '',
+            'generation_enabled' => ($settings['enable_auto_generation'] ?? 'yes') === 'yes',
+            'last_scan' => $settings['last_scan_at'] ?? '',
             'today_articles' => ContentGenerator::get_today_generation_count(),
             'recent_logs' => Logger::get_logs(5),
             'recent_articles' => self::recent_articles(5),
+            'backend_connected'  => self::safe_bool('BackendClient::is_configured'),
+            'backend_available'  => self::safe_bool('BackendClient::is_available'),
+            'graphify_available' => self::safe_bool('GraphifyClient::is_available'),
         ]);
+    }
+
+    /**
+     * Safely call a static bool method — returns false on any error.
+     */
+    private static function safe_bool(string $callable): bool {
+        try {
+            if (0 === strncmp($callable, 'BackendClient::', 15)) {
+                $method = substr($callable, 15);
+                return BackendClient::$method();
+            }
+            if (0 === strncmp($callable, 'GraphifyClient::', 16)) {
+                $method = substr($callable, 16);
+                return GraphifyClient::$method();
+            }
+        } catch (\Throwable $e) {
+            Logger::debug('safe_bool caught error', ['callable' => $callable, 'error' => $e->getMessage()]);
+        }
+        return false;
     }
 
     public static function render_nav(string $active): void {

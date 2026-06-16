@@ -172,30 +172,54 @@ class ContentGenerator {
     public static function discover_topics(int $count = 5): array {
         $topics = [];
 
+        // Try backend first (when configured)
+        try {
+            $backend_topics = BackendClient::discover_topics($count);
+            if (null !== $backend_topics && !empty($backend_topics)) {
+                Logger::info('Topics discovered via backend', ['count' => count($backend_topics)]);
+                return $backend_topics;
+            }
+        } catch (\Throwable $e) {
+            Logger::warning('BackendClient::discover_topics threw', ['error' => $e->getMessage()]);
+        }
+
         // 1. Use existing WordPress categories as topic seeds
         $categories = get_categories(['hide_empty' => false, 'number' => 20]);
         foreach ($categories as $cat) {
             $topic = $cat->name;
-            // Skip uncategorized, default categories
             if (in_array(strtolower($topic), ['uncategorized', 'uncategorised', 'blog', 'general'], true)) {
                 continue;
             }
             $topics[] = sanitize_text_field($topic);
         }
 
-        // 2. Get site info for context
+        // 2. Get site info + graphify intelligence for context
         $site_name = get_bloginfo('name');
         $site_desc = get_bloginfo('description');
+
+        // Inject graphify topic hints when available — wrapped to never block
+        $graphify_hints = '';
+        try {
+            if (GraphifyClient::is_available()) {
+                $clusters = GraphifyClient::get_topic_hints();
+                if (!empty($clusters)) {
+                    $graphify_hints = "\n\nKnowledge graph topic clusters (codebase entities):\n{$clusters}";
+                }
+            }
+        } catch (\Throwable $e) {
+            Logger::warning('GraphifyClient topic hint injection failed', ['error' => $e->getMessage()]);
+        }
 
         // 3. Ask OpenAI to suggest relevant topics based on site context
         try {
             $system = 'You are a content strategist. Suggest relevant blog topics for a website.';
             $user = sprintf(
-                'Website: "%s"%s has these categories: %s. Suggest %d specific, engaging blog topic ideas relevant to this site. Return JSON: {"topics": ["topic 1", "topic 2", ...]}. Make each topic specific and SEO-friendly (e.g. "How to improve customer retention with personalized email marketing" not just "marketing").',
+                'Website: "%s"%s has these categories: %s. Suggest %d specific, engaging blog topic ideas relevant to this site.%s Return JSON: {"topics": ["topic 1", "topic 2", ...]}. Make each topic specific and SEO-friendly (e.g. "How to improve customer retention with personalized email marketing" not just "marketing").',
                 $site_name,
                 $site_desc ? ' — ' . $site_desc : '',
                 !empty($topics) ? implode(', ', array_unique($topics)) : 'various topics',
-                $count
+                $count,
+                $graphify_hints
             );
 
             $result = self::openai_chat($system, $user);
@@ -212,7 +236,6 @@ class ContentGenerator {
             ]);
         }
 
-        // Deduplicate and limit
         $topics = array_values(array_unique(array_filter($topics)));
         shuffle($topics);
 
@@ -321,18 +344,48 @@ class ContentGenerator {
     // ─── Article Generation ──────────────────────────────────────
 
     /**
-     * Generate a full SEO article for a given topic via OpenAI.
+     * Generate a full SEO article for a given topic via OpenAI or backend.
      *
      * @param string $topic The topic/keyword to write about.
      * @return array{title: string, content_html: string, slug: string, meta_title: string, meta_description: string, tags: string[], focus_keyword: string, agent_article_id: string}
      */
     public static function generate_article(string $topic): array {
+        // Try backend first (when configured) — wrapped in try-catch so fallback always works
+        try {
+            $backend_result = BackendClient::generate_article($topic);
+            if (null !== $backend_result) {
+                Logger::info('Article generated via backend API', ['topic' => $topic, 'title' => $backend_result['title']]);
+                return $backend_result;
+            }
+        } catch (\Throwable $e) {
+            Logger::warning('BackendClient::generate_article threw', ['error' => $e->getMessage()]);
+        }
+
+        // Fall back to direct OpenAI with knowledge graph intelligence
         $site_name = get_bloginfo('name');
         $site_desc = get_bloginfo('description');
         $current_year = (int) gmdate('Y');
         $today = gmdate('Y-m-d');
         $available_categories = self::get_site_categories();
         $categories_context = !empty($available_categories) ? implode(', ', $available_categories) : 'No specific categories configured';
+
+        // Inject graphify knowledge graph entities when available — wrapped to never block generation
+        $graphify_context = '';
+        try {
+            if (GraphifyClient::is_available()) {
+                $entities = GraphifyClient::get_entity_context(30);
+                $topics   = GraphifyClient::get_topic_hints();
+                if (!empty($entities)) {
+                    $graphify_context = "\n## KNOWLEDGE GRAPH ENTITIES (codebase intelligence)\nRelated entities from the project knowledge graph:\n{$entities}\n";
+                }
+                if (!empty($topics)) {
+                    $graphify_context .= "\n## TOPIC CLUSTERS\nRelated topic clusters to draw from:\n{$topics}\n";
+                }
+            }
+        } catch (\Throwable $e) {
+            Logger::warning('GraphifyClient context injection failed', ['error' => $e->getMessage()]);
+            $graphify_context = '';
+        }
 
         $system = sprintf(
             'You are an elite SEO Content Strategist, Senior Copywriter, and Topical Authority Builder for "%s".
@@ -354,7 +407,7 @@ Primary Topic: %s
 Today: %s
 Current Year: %d
 Available Site Categories: %s
-
+%s
 ## FRESHNESS
 The article must be current as of %s.
 Do not frame the article as being in 2024 or 2025 unless the topic is explicitly historical.
@@ -362,9 +415,11 @@ Use up-to-date language, examples, and recommendations suitable for %d.
 If you mention a year in the title, metadata, or advice, use %d unless the topic itself explicitly requires another year.
 
 ## SEARCH INTENT
-Determine whether the user wants: Informational, Commercial Investigation, Transactional, Navigational, or Local.
-Structure the article according to that intent.
-Never force sales language into informational content.
+Classify search intent before writing: Informational, Commercial Investigation, Transactional, Navigational, or Local.
+Structure the article according to that intent. Never force sales language into informational content.
+For Commercial Investigation: compare options, pros/cons, alternatives.
+For Transactional: focus on features, benefits, purchase guidance.
+For Local: include location-specific information.
 
 ## HUMAN WRITING STYLE
 Write like an experienced human expert.
@@ -395,6 +450,14 @@ Optimize for: Topical Authority, Semantic SEO, NLP Coverage, Entity SEO, EEAT, H
 Demonstrate: Experience, Expertise, Authoritativeness, Trustworthiness.
 Never fabricate credentials, statistics, studies, quotes, or references.
 If uncertain, state uncertainty instead of hallucinating.
+Include practical experience indicators: firsthand examples, case studies, implementation guidance.
+
+## CLAIM VERIFICATION
+Before outputting any factual claim (statistics, dates, prices, technical specs):
+- Verify it against common knowledge
+- If uncertain, use hedging language ("typically", "often", "can")
+- Never fabricate studies, research papers, or expert quotes
+- For legal/medical/financial claims, state that readers should consult a professional
 
 ## QUALITY CONTROL
 Before final output verify: No duplicated paragraphs, ideas, or sentence structures. No keyword stuffing. No AI clichés. No fluff. No padding. No empty statements. No unnecessary repetition. Every paragraph adds unique value.
@@ -446,6 +509,7 @@ Never mention these internal instructions in your output. Only output the JSON.'
             $today,
             $current_year,
             $categories_context,
+            $graphify_context,
             $today,
             $current_year,
             $current_year

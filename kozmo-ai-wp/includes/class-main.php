@@ -74,6 +74,12 @@ class Main {
         // Sync & pipeline
         Sync::init();
 
+        // Backend API bridge (when backend/ is deployed)
+        BackendClient::init();
+
+        // Graphify knowledge graph client
+        GraphifyClient::init();
+
         // AI Content Generator (self-contained, no backend needed)
         ContentGenerator::init();
 
@@ -100,6 +106,8 @@ class Main {
             'update'           => Update::class,
             'sync'             => Sync::class,
             'heal'             => HealEngine::class,
+            'backend'          => BackendClient::class,
+            'graphify'         => GraphifyClient::class,
         ];
 
         Logger::info('KOZMO AI WP Agent initialized', [

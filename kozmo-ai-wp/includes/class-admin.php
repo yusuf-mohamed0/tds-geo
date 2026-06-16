@@ -204,7 +204,44 @@ class Admin {
                     </div>
                 </details>
 
-                <details class="k-details k-fade k-fade-d3">
+                <div class="k-section k-fade k-fade-d3">
+                    <div class="k-section-header">🔗 Backend API</div>
+                    <div class="k-card">
+                        <div class="k-field"><label>Backend API URL</label><input type="url" name="backend_url" value="<?php echo esc_url($settings['backend_url'] ?? ''); ?>" placeholder="https://your-server.com:3000" /><div class="k-desc">When configured, generation requests route through the backend API (24-stage pipeline, BullMQ queues, SEO intelligence, multi-CMS). Leave empty to use direct OpenAI.</div></div>
+                        <?php if (!empty($settings['backend_url'])): $bk_health = []; try { $bk_health = BackendClient::check_health(); } catch (\Throwable $e) { $bk_health = ['overall' => 'error']; } ?>
+                        <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
+                            <span class="k-tag <?php echo ($bk_health['overall'] ?? 'error') === 'healthy' ? 'k-tag-active' : (($bk_health['overall'] ?? 'error') === 'error' ? 'k-tag-red' : 'k-tag-yellow'); ?>">
+                                <?php echo esc_html($bk_health['overall'] ?? 'error'); ?>
+                            </span>
+                            <span style="font-size:12px;color:var(--k-text-tertiary);"><?php echo esc_url($settings['backend_url']); ?></span>
+                        </div>
+                        <?php else: ?>
+                        <div style="margin-top:8px;"><span class="k-tag k-tag-blue">Not configured</span></div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="k-section k-fade k-fade-d4">
+                    <div class="k-section-header">🧠 Knowledge Graph Intelligence</div>
+                    <div class="k-card">
+                        <?php $gk_health = []; $gk_avail = false; try { $gk_health = GraphifyClient::check_health(); $gk_avail = GraphifyClient::is_available(); } catch (\Throwable $e) { $gk_health = ['overall' => 'error']; } ?>
+                        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                            <span class="k-tag <?php echo $gk_health['overall'] === 'healthy' ? 'k-tag-active' : ($gk_health['overall'] === 'error' ? 'k-tag-red' : 'k-tag-yellow'); ?>">
+                                <?php echo esc_html($gk_health['overall']); ?>
+                            </span>
+                            <?php if ($gk_avail): $gk_size = round(filesize(KOZMO_AI_WP_DIR . '../graphify-out/graph.json') / 1048576, 1); ?>
+                            <span style="font-size:12px;color:var(--k-text-tertiary);">graphify-out/graph.json — <?php echo esc_html($gk_size); ?> MB, <?php echo esc_html((int) ($gk_health['checks']['graph_file']['status'] === 'healthy' ? 'loaded' : '0')); ?> entities cached</span>
+                            <?php else: ?>
+                            <span style="font-size:12px;color:var(--k-text-tertiary);">graphify-out/graph.json not found — entity injection disabled</span>
+                            <?php endif; ?>
+                        </div>
+                        <div style="margin-top:12px;font-size:12px;color:var(--k-text-tertiary);line-height:1.6;">
+                            When available, the knowledge graph provides entity context, topic clusters, and codebase intelligence for article generation prompts. No configuration needed — auto-detected from project structure.
+                        </div>
+                    </div>
+                </div>
+
+                <details class="k-details k-fade k-fade-d5">
                     <summary>🔧 System</summary>
                     <div class="k-details-body">
                         <div class="k-field"><label>Log level</label><select name="log_level"><option value="debug" <?php selected($settings['log_level'] ?? 'info', 'debug'); ?>>Debug</option><option value="info" <?php selected($settings['log_level'] ?? 'info', 'info'); ?>>Info</option><option value="warning" <?php selected($settings['log_level'] ?? 'info', 'warning'); ?>>Warning</option><option value="error" <?php selected($settings['log_level'] ?? 'info', 'error'); ?>>Error</option></select></div>
@@ -292,6 +329,7 @@ class Admin {
         }
 
         $settings = [
+            'backend_url'            => esc_url_raw(wp_unslash($_POST['backend_url'] ?? '')),
             'agent_url'              => esc_url_raw(wp_unslash($_POST['agent_url'] ?? KOZMO_AI_WP_AGENT_URL)),
             'api_enabled'            => sanitize_text_field(wp_unslash($_POST['api_enabled'] ?? 'no')),
             'webhook_secret'         => sanitize_text_field(wp_unslash($_POST['webhook_secret'] ?? '')),

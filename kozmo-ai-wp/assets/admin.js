@@ -51,6 +51,19 @@
     }
   }
 
+  // ─── Update integration badges ───
+  function setIntegrationBadges(backendAvail, graphifyAvail) {
+    var $gen = $('.k-genz, .k-gen');
+    // Remove existing integration badges
+    $gen.find('.k-integration-badge').remove();
+    if (backendAvail) {
+      $gen.find('.k-gen-info').append('<span class="k-tag k-tag-green k-integration-badge">Backend</span>');
+    }
+    if (graphifyAvail) {
+      $gen.find('.k-gen-info').append('<span class="k-tag k-tag-violet k-integration-badge">Graph</span>');
+    }
+  }
+
   // ─── Load dashboard data ───
   function loadDashboard() {
     if (!k.ajaxUrl) return;
@@ -66,6 +79,7 @@
 
       setState(health.overall || 'healthy');
       setGenState(d.generation_enabled);
+      setIntegrationBadges(d.backend_available, d.graphify_available);
 
       setStat('health', health.score || 100, health.overall);
       setStat('queue', queue.pending || 0, (queue.failed || 0) + ' failed');

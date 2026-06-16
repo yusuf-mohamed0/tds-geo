@@ -45,6 +45,27 @@ class Health {
         $last_scan = $settings['last_scan_at'] ?? '';
         $checks['last_scan'] = ['status' => !empty($last_scan) ? 'healthy' : 'pending', 'timestamp' => $last_scan];
 
+        // Backend API connectivity
+        try {
+            $backend = BackendClient::check_health();
+            $checks['backend'] = [
+                'status'  => $backend['overall'] === 'healthy' ? 'healthy' : ($backend['overall'] === 'error' ? 'error' : 'disabled'),
+                'url'     => $settings['backend_url'] ?? '',
+            ];
+        } catch (\Throwable $e) {
+            $checks['backend'] = ['status' => 'error'];
+        }
+
+        // Graphify knowledge graph
+        try {
+            $graphify = GraphifyClient::check_health();
+            $checks['graphify'] = [
+                'status' => $graphify['overall'] === 'healthy' ? 'healthy' : ($graphify['overall'] === 'error' ? 'error' : 'disabled'),
+            ];
+        } catch (\Throwable $e) {
+            $checks['graphify'] = ['status' => 'error'];
+        }
+
         // Overall
         $unhealthy = count(array_filter($checks, fn($c) => $c['status'] === 'error'));
         $degraded = count(array_filter($checks, fn($c) => $c['status'] === 'degraded'));
