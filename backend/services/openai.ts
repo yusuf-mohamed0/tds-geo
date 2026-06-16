@@ -7,6 +7,7 @@ import { logger } from '../utils/logger';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || '';
 
 class OpenAIService {
   private openaiClient: OpenAI | null = null;
@@ -29,7 +30,10 @@ class OpenAIService {
       return;
     }
 
-    this.openaiClient = new OpenAI({ apiKey: OPENAI_API_KEY });
+    this.openaiClient = new OpenAI({
+      apiKey: OPENAI_API_KEY,
+      ...(OPENAI_BASE_URL ? { baseURL: OPENAI_BASE_URL } : {}),
+    });
     logger.info('OpenAI client initialized', { model: this.defaultModel });
   }
 

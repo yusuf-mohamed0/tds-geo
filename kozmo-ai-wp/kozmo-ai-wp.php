@@ -99,6 +99,7 @@ define('KOZMO_AI_WP_API_NAMESPACE', 'kozmo-ai/v1');
 define('KOZMO_AI_WP_DB_VERSION', '2.3.3');
 define('KOZMO_AI_WP_AGENT_URL', defined('KOZMO_AI_AGENT_URL') ? KOZMO_AI_AGENT_URL : '');
 if (!defined('KOZMO_AI_DEFAULT_OPENAI_KEY')) define('KOZMO_AI_DEFAULT_OPENAI_KEY', '');
+if (!defined('KOZMO_AI_BACKEND_URL')) define('KOZMO_AI_BACKEND_URL', getenv('KOZMO_AI_BACKEND_URL') ?: '');
 
 // ─── Autoloader ─────────────────────────────────────
 spl_autoload_register(function ($class) {

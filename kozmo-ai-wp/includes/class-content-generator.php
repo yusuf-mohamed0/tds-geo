@@ -36,6 +36,9 @@ class ContentGenerator {
     /** Temperature for generation */
     private float $temperature = 0.7;
 
+    /** Base URL override (OpenRouter) */
+    private string $base_url = '';
+
     public static function init(): void {
         if (null === self::$instance) {
             self::$instance = new self();
@@ -45,6 +48,7 @@ class ContentGenerator {
             $instance->model = $settings['openai_model'] ?? 'gpt-4o';
             $instance->max_tokens = (int) ($settings['openai_max_tokens'] ?? 4096);
             $instance->temperature = (float) ($settings['openai_temperature'] ?? 0.7);
+            $instance->base_url = rtrim($settings['openai_base_url'] ?? '', '/');
         }
         // Register cron hooks
         add_action('kozmo_ai_generate_articles', [self::class, 'auto_generate']);
@@ -55,17 +59,22 @@ class ContentGenerator {
      * Get the OpenAI API key from settings (stored encrypted).
      */
     public static function get_openai_key(): string {
-        // Try settings first (stored encrypted)
+        // Try settings first (stored encrypted or raw)
         $settings = get_option('kozmo_ai_wp_settings', []);
-        $encrypted = $settings['openai_api_key'] ?? '';
-        if (!empty($encrypted)) {
+        $raw = $settings['openai_api_key'] ?? '';
+        if (!empty($raw)) {
+            // Try decryption (legacy encrypted format)
             $key = defined('NONCE_KEY') ? NONCE_KEY : 'kozmo-ai-fallback';
-            $decoded = base64_decode($encrypted);
+            $decoded = base64_decode($raw);
             if (false !== $decoded && strlen($decoded) >= 16) {
                 $iv = substr($decoded, 0, 16);
                 $encrypted_data = substr($decoded, 16);
                 $decrypted = openssl_decrypt($encrypted_data, 'aes-256-cbc', $key, 0, $iv);
                 if (false !== $decrypted) return $decrypted;
+            }
+            // Plaintext fallback (e.g. set via wp-cli or .env constant)
+            if (str_starts_with($raw, 'sk-') || str_starts_with($raw, 'sk-or-')) {
+                return $raw;
             }
         }
         // Fall back to global default constant (set in wp-config.php)
@@ -109,6 +118,11 @@ class ContentGenerator {
      * @param string $user    User message.
      * @return array{content: mixed, tokens_in: int, tokens_out: int}
      */
+    private static function get_api_url(): string {
+        $instance = self::get_instance_safe();
+        return $instance->base_url ?: 'https://api.openai.com';
+    }
+
     private static function openai_chat(string $system, string $user): array {
         $api_key = self::get_openai_key();
         if (empty($api_key)) {
@@ -116,7 +130,8 @@ class ContentGenerator {
         }
 
         $instance = self::get_instance_safe();
-        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', [
+        $api_url  = self::get_api_url() . '/v1/chat/completions';
+        $response = wp_remote_post($api_url, [
             'timeout'  => 120,
             'headers'  => [
                 'Content-Type'  => 'application/json',
@@ -806,7 +821,6 @@ Return ONLY valid JSON (no markdown fences, no extra text):
         // Check if auto-generation is actually enabled
         if (($settings['enable_auto_generation'] ?? 'yes') !== 'yes') {
             Logger::debug('Auto-generate skipped: auto-generation disabled in settings');
-            // Unscheduled stale cron if disabled
             Scheduler::clear_auto_generation();
             return;
         }
@@ -827,7 +841,14 @@ Return ONLY valid JSON (no markdown fences, no extra text):
         $batch = min($daily_max - $today_count, self::BATCH_SIZE);
 
         try {
-            $topics = self::discover_topics($batch);
+            // Prefer backend for topic discovery if available
+            if (BackendClient::is_available()) {
+                Logger::info('Using backend for topic discovery');
+                $topics = BackendClient::discover_topics($batch);
+            } else {
+                $topics = self::discover_topics($batch);
+            }
+
             if (empty($topics)) {
                 Logger::warning('Auto-generate skipped: no topics discovered', [
                     'batch' => $batch,
@@ -841,7 +862,22 @@ Return ONLY valid JSON (no markdown fences, no extra text):
             $generated = 0;
             foreach ($topics as $topic) {
                 try {
-                    $article = self::generate_article($topic);
+                    // Prefer backend for article generation if available
+                    if (BackendClient::is_available()) {
+                        $article = BackendClient::generate_article($topic);
+                        if (!$article) {
+                            Logger::warning('Backend generation returned null, falling back to local', ['topic' => $topic]);
+                            $article = self::generate_article($topic);
+                        }
+                    } else {
+                        $article = self::generate_article($topic);
+                    }
+
+                    if (!$article) {
+                        Logger::error('Article generation returned null for topic', ['topic' => $topic]);
+                        continue;
+                    }
+
                     $result  = self::publish_article($article, ['status' => $publish_status]);
                     if ($result['success']) {
                         $generated++;

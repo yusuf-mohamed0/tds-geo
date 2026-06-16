@@ -170,6 +170,7 @@ class Admin {
                     <div class="k-card">
                         <div class="k-field"><label>API Key</label><input type="password" name="openai_api_key" value="<?php echo !empty($settings['openai_api_key']) ? '********' : ''; ?>" placeholder="sk-..." /><div class="k-desc">The only required field. Everything else auto-configures.</div><button id="k-test-api" class="k-btn k-btn-secondary k-btn-sm" style="margin-top:8px;">Test Connection</button></div>
                         <div class="k-field"><label>Model</label><select name="openai_model"><option value="gpt-4o" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o'); ?>>GPT-4o (recommended)</option><option value="gpt-4o-mini" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o-mini'); ?>>GPT-4o Mini (cheaper)</option><option value="gpt-4-turbo" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4-turbo'); ?>>GPT-4 Turbo</option></select></div>
+                        <div class="k-field"><label>API Base URL <span class="k-desc">(optional — OpenRouter)</span></label><input type="url" name="openai_base_url" value="<?php echo esc_attr($settings['openai_base_url'] ?? ''); ?>" placeholder="https://openrouter.ai/api/v1" /></div>
                     </div>
                 </div>
 
@@ -216,6 +217,17 @@ class Admin {
                                     <?php endif; ?></td>
                                 </tr><?php endforeach; ?></tbody>
                             </table>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="k-section-header">Backend Server</div>
+                        <div class="k-card">
+                            <div class="k-field"><label>Backend URL</label><input type="url" name="backend_url" value="<?php echo esc_attr($settings['backend_url'] ?? ''); ?>" placeholder="http://localhost:3000" />
+                            <div class="k-desc">Your local AI server. When set, the plugin delegates AI work to this server.</div></div>
+                            <?php if (!empty($settings['backend_url'])): $be = \KozmoAI_WP\BackendClient::check_health(); ?>
+                            <div class="k-health" style="margin-top:8px;">
+                                <div class="k-health-item"><span class="k-dot" style="background:<?php echo $be['overall'] === 'healthy' ? 'var(--k-green)' : 'var(--k-red)'; ?>"></span>Backend — <?php echo esc_html($be['overall']); ?></div>
+                            </div>
                             <?php endif; ?>
                         </div>
 
@@ -307,8 +319,11 @@ class Admin {
             }
         }
 
+        $default_backend = defined('KOZMO_AI_BACKEND_URL') ? KOZMO_AI_BACKEND_URL : '';
+
         $settings = [
             'agent_url'              => esc_url_raw(wp_unslash($_POST['agent_url'] ?? KOZMO_AI_WP_AGENT_URL)),
+            'backend_url'            => esc_url_raw(wp_unslash($_POST['backend_url'] ?? $default_backend)),
             'api_enabled'            => sanitize_text_field(wp_unslash($_POST['api_enabled'] ?? 'yes')),
             'webhook_secret'         => sanitize_text_field(wp_unslash($_POST['webhook_secret'] ?? '')),
             'log_level'              => sanitize_text_field(wp_unslash($_POST['log_level'] ?? 'info')),
@@ -316,6 +331,7 @@ class Admin {
             'enable_auto_generation' => sanitize_text_field(wp_unslash($_POST['enable_auto_generation'] ?? 'yes')),
             'generation_frequency'   => sanitize_text_field(wp_unslash($_POST['generation_frequency'] ?? 'kozmo_ai_every_15min')),
             'openai_model'           => sanitize_text_field(wp_unslash($_POST['openai_model'] ?? 'gpt-4o')),
+            'openai_base_url'        => esc_url_raw(wp_unslash($_POST['openai_base_url'] ?? '')),
             'generate_as_draft'      => sanitize_text_field(wp_unslash($_POST['generate_as_draft'] ?? 'no')),
             'auto_publish'           => sanitize_text_field(wp_unslash($_POST['auto_publish'] ?? 'no')),
             'min_quality_score'      => absint(wp_unslash($_POST['min_quality_score'] ?? 95)),
@@ -564,7 +580,10 @@ class Admin {
                 wp_send_json_error(['message' => 'No API key configured. Add one in Settings.']);
                 return;
             }
-            $response = wp_remote_get('https://api.openai.com/v1/models', [
+            $settings = get_option('kozmo_ai_wp_settings', []);
+            $base_url = rtrim($settings['openai_base_url'] ?? '', '/') ?: 'https://api.openai.com';
+            $model_url = $base_url . '/v1/models';
+            $response = wp_remote_get($model_url, [
                 'timeout' => 15,
                 'headers' => ['Authorization' => 'Bearer ' . $api_key],
             ]);
@@ -575,14 +594,15 @@ class Admin {
             $status = wp_remote_retrieve_response_code($response);
             if ($status === 200) {
                 $body = json_decode(wp_remote_retrieve_body($response), true);
-                $model = $body['data'][0]['id'] ?? 'Connected';
-                $settings = get_option('kozmo_ai_wp_settings', []);
                 $configured = $settings['openai_model'] ?? 'gpt-4o';
-                wp_send_json_success(['model' => "Key works! Connected as '{$configured}'"]);
+                $is_openrouter = str_contains($base_url, 'openrouter');
+                $label = $is_openrouter ? "OpenRouter connected! Using '{$configured}'" : "Key works! Connected as '{$configured}'";
+                wp_send_json_success(['model' => $label]);
             } elseif ($status === 401) {
                 wp_send_json_error(['message' => 'Invalid API key. Check your key in Settings.']);
             } else {
-                wp_send_json_error(['message' => "HTTP {$status} — unexpected response from OpenAI"]);
+                $provider = str_contains($base_url, 'openrouter') ? 'OpenRouter' : 'OpenAI';
+                wp_send_json_error(['message' => "HTTP {$status} — unexpected response from {$provider}"]);
             }
         } catch (\Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);

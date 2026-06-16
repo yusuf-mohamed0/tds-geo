@@ -118,8 +118,10 @@ Return JSON: {"gaps": [{"gap": "...", "opportunity_score": 8, "urgency": "high|m
 
         $settings = get_option('kozmo_ai_wp_settings', []);
         $model = $settings['openai_model'] ?? 'gpt-4o';
+        $base_url = rtrim($settings['openai_base_url'] ?? '', '/') ?: 'https://api.openai.com';
+        $api_url = $base_url . '/v1/chat/completions';
 
-        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', [
+        $response = wp_remote_post($api_url, [
             'timeout'  => 60,
             'headers'  => [
                 'Content-Type'  => 'application/json',
