@@ -29,11 +29,6 @@ class Dashboard {
         $articles = self::recent_articles(5);
         $overall = $health['overall'] ?? 'healthy';
 
-        // Pre-compute integration statuses (wrapped for safety)
-        $backend_available = false;
-        $graphify_available = false;
-        try { $backend_available = BackendClient::is_available(); } catch (\Throwable $e) {}
-        try { $graphify_available = GraphifyClient::is_available(); } catch (\Throwable $e) {}
         ?>
         <div class="wrap k-shell k-dashboard">
             <?php self::render_nav('dashboard'); ?>
@@ -57,12 +52,6 @@ class Dashboard {
                     <div class="k-gen-item"><span class="k-gen-label">Mode</span><span class="k-gen-value"><?php echo esc_html($publish_mode); ?></span></div>
                     <div class="k-gen-item"><span class="k-gen-label">Next Run</span><span class="k-gen-value" data-k-next><?php echo $next_run ? esc_html(wp_date(get_option('date_format') . ' ' . get_option('time_format'), $next_run)) : 'Awaiting schedule'; ?></span></div>
                     <span class="k-tag k-gen-badge <?php echo $gen_enabled ? 'k-tag-active' : 'k-tag-yellow'; ?>"><?php echo $gen_enabled ? 'Active' : 'Paused'; ?></span>
-                    <?php if ($backend_available): ?>
-                    <span class="k-tag k-tag-green">Backend</span>
-                    <?php endif; ?>
-                    <?php if ($graphify_available): ?>
-                    <span class="k-tag k-tag-violet">Graph</span>
-                    <?php endif; ?>
                 </div>
                 <div class="k-gen-actions">
                     <button id="k-refresh" class="k-btn k-btn-secondary k-btn-sm">Refresh</button>
@@ -77,6 +66,8 @@ class Dashboard {
                 <div class="k-stat"><div class="k-stat-label">Knowledge Items</div><div class="k-stat-value" data-k-stat="knowledge"><?php echo (int) ($kb['total'] ?? 0); ?></div><div class="k-stat-sub" data-k-sub="knowledge"><?php echo (int) ($kb['unsynced'] ?? 0); ?> unsynced</div></div>
                 <div class="k-stat"><div class="k-stat-label">Thin Content</div><div class="k-stat-value" data-k-stat="content"><?php echo (int) ($content_health['thin_content'] ?? 0); ?></div><div class="k-stat-sub" data-k-sub="content"><?php echo (int) ($content_health['no_featured_images'] ?? 0); ?> no images</div></div>
                 <div class="k-stat"><div class="k-stat-label">Taxonomy Coverage</div><div class="k-stat-value" data-k-stat="taxonomy"><?php echo (int) ($keyword_coverage['total_cats'] ?? 0); ?></div><div class="k-stat-sub" data-k-sub="taxonomy"><?php echo (int) ($keyword_coverage['total_tags'] ?? 0); ?> tags</div></div>
+                <?php $pipeline_summary = self::pipeline_summary(); ?>
+                <div class="k-stat"><div class="k-stat-label">Pipeline</div><div class="k-stat-value" data-k-stat="pipeline"><?php echo (int) array_sum(array_map(function($s){return (int)$s->count;}, $pipeline_summary['stages'])); ?></div><div class="k-stat-sub" data-k-sub="pipeline"><?php echo (int) $pipeline_summary['failed']; ?> failed</div></div>
             </div>
 
             <div class="k-panel k-fade k-fade-d3">
@@ -86,11 +77,21 @@ class Dashboard {
                     <div class="k-empty"><div class="k-empty-icon">📝</div>No AI-generated articles yet</div>
                     <?php else: ?>
                     <div class="k-table-wrap">
-                    <table class="k-table k-articles"><thead><tr><th>Title</th><th>Status</th><th>Quality</th><th>Date</th></tr></thead>
-                        <tbody><?php foreach ($articles as $a): ?>
+                    <table class="k-table k-articles"><thead><tr><th>Title</th><th>Status</th><th>Quality</th><th>Pipeline</th><th>Date</th></tr></thead>
+                        <tbody><?php foreach ($articles as $a):
+                            $stage = $a['pipeline_stage'] ?? 'pending';
+                            $error = $a['pipeline_error'] ?? '';
+                            $pct = self::pipeline_pct($stage);
+                        ?>
                         <tr><td><a href="<?php echo esc_url(get_edit_post_link($a['ID'])); ?>" class="k-cell-link"><?php echo esc_html($a['post_title']); ?></a></td>
                             <td><span class="k-tag <?php echo $a['post_status'] === 'publish' ? 'k-tag-active' : 'k-tag-yellow'; ?>"><?php echo $a['post_status'] === 'publish' ? 'Published' : 'Draft'; ?></span></td>
                             <td><?php echo esc_html($a['quality'] ?? '—'); ?></td>
+                            <td style="min-width:120px;">
+                                <div class="k-pipeline-bar" title="<?php echo $error ? esc_attr("Error: {$error}") : esc_attr("Stage: {$stage}"); ?>">
+                                    <div class="k-pipeline-fill" style="width:<?php echo (int) $pct; ?>%;background:<?php echo $error ? 'var(--k-red)' : ($pct >= 100 ? 'var(--k-green)' : 'var(--k-accent)'); ?>;"></div>
+                                    <span class="k-pipeline-label"><?php echo $error ? 'Failed' : esc_html($stage); ?></span>
+                                </div>
+                            </td>
                             <td class="k-text-mono"><?php echo esc_html(wp_date('M j, Y', strtotime($a['post_date']))); ?></td></tr>
                         <?php endforeach; ?></tbody>
                     </table>
@@ -118,16 +119,44 @@ class Dashboard {
         <?php
     }
 
+    /**
+     * Count articles by pipeline stage for summary stats.
+     */
+    private static function pipeline_summary(): array {
+        global $wpdb;
+        $stages = $wpdb->get_results(
+            "SELECT pm.meta_value AS stage, COUNT(*) AS count
+             FROM {$wpdb->postmeta} pm
+             INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+             WHERE pm.meta_key = '_kozmo_ai_pipeline_stage'
+               AND p.post_type = 'post'
+             GROUP BY pm.meta_value",
+            OBJECT_K
+        );
+        $failed = $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$wpdb->postmeta}
+             WHERE meta_key = '_kozmo_ai_pipeline_error'
+               AND meta_value != ''"
+        );
+        return [
+            'stages' => $stages ?: [],
+            'failed' => (int) $failed,
+        ];
+    }
+
     private static function recent_articles(int $limit = 5): array {
         global $wpdb;
         $rows = $wpdb->get_results($wpdb->prepare(
-            "SELECT p.ID, p.post_title, p.post_status, p.post_date, a.quality_score
+            "SELECT p.ID, p.post_title, p.post_status, p.post_date, a.quality_score, a.pipeline_status
              FROM {$wpdb->posts} p
              INNER JOIN {$wpdb->prefix}kozmo_ai_articles a ON p.ID = a.post_id
              ORDER BY a.created_at DESC LIMIT %d", $limit
         ), ARRAY_A);
         foreach ($rows as &$r) {
             $r['quality'] = $r['quality_score'] ? round((float) $r['quality_score']) : '—';
+            $r['pipeline_stage'] = get_post_meta($r['ID'], '_kozmo_ai_pipeline_stage', true) ?: ($r['pipeline_status'] ?? 'pending');
+            $r['pipeline_error'] = get_post_meta($r['ID'], '_kozmo_ai_pipeline_error', true);
+            $r['edit_link'] = get_edit_post_link($r['ID']);
         }
         return $rows;
     }
@@ -151,10 +180,23 @@ class Dashboard {
             'today_articles' => ContentGenerator::get_today_generation_count(),
             'recent_logs' => Logger::get_logs(5),
             'recent_articles' => self::recent_articles(5),
-            'backend_connected'  => self::safe_bool('BackendClient::is_configured'),
-            'backend_available'  => self::safe_bool('BackendClient::is_available'),
-            'graphify_available' => self::safe_bool('GraphifyClient::is_available'),
+            'pipeline_stages' => self::pipeline_summary(),
         ]);
+    }
+
+    /**
+     * Map pipeline stage name to a progress percentage.
+     */
+    private static function pipeline_pct(string $stage): int {
+        $map = [
+            'queued'            => 10,
+            'generating_article'=> 30,
+            'scoring'           => 60,
+            'publishing'        => 85,
+            'completed'         => 100,
+            'failed'            => 100,
+        ];
+        return $map[$stage] ?? 5;
     }
 
     /**
@@ -162,18 +204,11 @@ class Dashboard {
      */
     private static function safe_bool(string $callable): bool {
         try {
-            if (0 === strncmp($callable, 'BackendClient::', 15)) {
-                $method = substr($callable, 15);
-                return BackendClient::$method();
-            }
-            if (0 === strncmp($callable, 'GraphifyClient::', 16)) {
-                $method = substr($callable, 16);
-                return GraphifyClient::$method();
-            }
+            $ref = new \ReflectionMethod($callable);
+            return $ref->invoke(null);
         } catch (\Throwable $e) {
-            Logger::debug('safe_bool caught error', ['callable' => $callable, 'error' => $e->getMessage()]);
+            return false;
         }
-        return false;
     }
 
     public static function render_nav(string $active): void {

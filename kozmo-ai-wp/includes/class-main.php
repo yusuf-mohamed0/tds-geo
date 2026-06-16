@@ -119,9 +119,23 @@ class Main {
 
     private function init_hooks(): void {
         add_action('init', [$this, 'on_wp_init']);
+        add_action('init', [self::class, 'try_process']);
         add_action('wp', [$this, 'on_frontend']);
         add_action('rest_api_init', [$this, 'on_rest_init']);
         // Cron schedules are registered globally in kozmo-ai-wp.php (needed early for activation)
+    }
+
+    /**
+     * Fallback processor: runs queue processing and auto-generation on any page load.
+     * Transient-guarded to run at most once per 60s as a safety net when WP-Cron drops events.
+     */
+    public static function try_process(): void {
+        if (wp_doing_ajax() || wp_doing_cron()) return;
+        if (get_transient('kozmo_ai_try_process_lock')) return;
+        set_transient('kozmo_ai_try_process_lock', time(), 60);
+
+        Worker::process_queue();
+        Worker::maybe_auto_generate();
     }
 
     public function on_wp_init(): void {

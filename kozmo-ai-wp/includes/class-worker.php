@@ -220,6 +220,7 @@ class Worker {
                     return ['success' => false, 'message' => 'Topic required for article generation'];
                 }
                 try {
+                    Logger::info('Pipeline stage: generating_article', ['topic' => $topic, 'task_id' => $task['id']]);
                     $article = ContentGenerator::generate_article($topic);
                     $settings = get_option('kozmo_ai_wp_settings', []);
                     $status = ($settings['generate_as_draft'] ?? 'no') === 'yes' ? 'draft' : 'publish';

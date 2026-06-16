@@ -344,6 +344,24 @@ class ContentGenerator {
     // ─── Article Generation ──────────────────────────────────────
 
     /**
+     * Update pipeline stage tracking meta for a generated article.
+     */
+    private static function set_pipeline_stage(?int $post_id, string $stage, ?string $error = null): void {
+        if (!$post_id) {
+            // Before post exists, store in a transient keyed by agent_article_id
+            return;
+        }
+        update_post_meta($post_id, '_kozmo_ai_pipeline_stage', $stage);
+        update_post_meta($post_id, '_kozmo_ai_pipeline_updated', current_time('mysql'));
+        if ($error) {
+            update_post_meta($post_id, '_kozmo_ai_pipeline_error', $error);
+            Logger::error("Pipeline stage '{$stage}' failed", ['post_id' => $post_id, 'error' => $error]);
+        } else {
+            delete_post_meta($post_id, '_kozmo_ai_pipeline_error');
+        }
+    }
+
+    /**
      * Generate a full SEO article for a given topic via OpenAI or backend.
      *
      * @param string $topic The topic/keyword to write about.
@@ -368,6 +386,7 @@ class ContentGenerator {
         $today = gmdate('Y-m-d');
         $available_categories = self::get_site_categories();
         $categories_context = !empty($available_categories) ? implode(', ', $available_categories) : 'No specific categories configured';
+        $agent_article_id = 'auto_' . bin2hex(kozmo_ai_wp_random_bytes(12));
 
         // Inject graphify knowledge graph entities when available — wrapped to never block generation
         $graphify_context = '';
@@ -386,6 +405,8 @@ class ContentGenerator {
             Logger::warning('GraphifyClient context injection failed', ['error' => $e->getMessage()]);
             $graphify_context = '';
         }
+
+        Logger::info('Pipeline stage: generating_article', ['topic' => $topic, 'agent_article_id' => $agent_article_id]);
 
         $system = sprintf(
             'You are an elite SEO Content Strategist, Senior Copywriter, and Topical Authority Builder for "%s".
@@ -561,56 +582,78 @@ Never mention these internal instructions in your output. Only output the JSON.'
         $settings = get_option('kozmo_ai_wp_settings', []);
         $status = $options['status'] ?? 'publish';
         $auto_publish = $options['auto_publish'] ?? ($settings['auto_publish'] ?? 'yes') === 'yes';
+        $post_id = 0;
 
-        // Auto-publish if quality is high enough
-        $quality = QualityScorer::score_article($article);
-        $sync_result = Sync::create_post(array_merge($article, [
-            'status'          => 'generated',
-            'status_override' => $status,
-            'post_type'       => 'post',
-            'author_id'       => (int) ($settings['default_author'] ?? 1),
-            'quality_score'   => $quality['score'],
-        ]));
+        try {
+            // Stage: scoring
+            Logger::info('Pipeline stage: scoring', ['topic' => $article['focus_keyword'] ?? '']);
+            $quality = QualityScorer::score_article($article);
 
-        if (!$sync_result['success']) {
-            return $sync_result;
+            // Stage: publishing (creating WP post)
+            Logger::info('Pipeline stage: publishing', [
+                'topic' => $article['focus_keyword'] ?? '',
+                'score' => $quality['score'],
+            ]);
+            $sync_result = Sync::create_post(array_merge($article, [
+                'status'          => 'generated',
+                'status_override' => $status,
+                'post_type'       => 'post',
+                'author_id'       => (int) ($settings['default_author'] ?? 1),
+                'quality_score'   => $quality['score'],
+            ]));
+
+            if (!$sync_result['success']) {
+                return $sync_result;
+            }
+
+            $post_id = (int) $sync_result['post_id'];
+            self::set_pipeline_stage($post_id, 'publishing');
+            update_post_meta($post_id, '_kozmo_ai_generated_at', current_time('mysql'));
+            update_post_meta($post_id, '_kozmo_ai_auto_generated', '1');
+
+            if ($auto_publish && $status === 'draft' && $quality['score'] >= (int) ($settings['min_quality_score'] ?? 95)) {
+                wp_publish_post($post_id);
+                Logger::info('Article auto-published', ['post_id' => $post_id, 'quality' => $quality['score']]);
+            }
+
+            // Track in articles table
+            global $wpdb;
+            $wpdb->replace(
+                $wpdb->prefix . 'kozmo_ai_articles',
+                [
+                    'post_id'          => $post_id,
+                    'agent_article_id' => $article['agent_article_id'],
+                    'quality_score'    => $quality['score'],
+                    'pipeline_status'  => 'completed',
+                ],
+                ['%d', '%s', '%f', '%s']
+            );
+
+            self::set_pipeline_stage($post_id, 'completed');
+
+            Logger::info('Article published by auto-generator', [
+                'post_id'  => $post_id,
+                'title'    => $article['title'],
+                'topic'    => $article['focus_keyword'],
+                'quality'  => $quality['score'],
+            ]);
+
+            return [
+                'success'  => true,
+                'post_id'  => $post_id,
+                'post_url' => $sync_result['post_url'] ?? get_permalink($post_id),
+                'quality_score' => $quality['score'],
+            ];
+        } catch (\Throwable $e) {
+            if ($post_id) {
+                self::set_pipeline_stage($post_id, 'failed', $e->getMessage());
+            }
+            Logger::error('Article publishing failed', [
+                'topic' => $article['focus_keyword'] ?? '',
+                'error' => $e->getMessage(),
+            ]);
+            return ['success' => false, 'message' => $e->getMessage()];
         }
-
-        $post_id = (int) $sync_result['post_id'];
-        update_post_meta($post_id, '_kozmo_ai_generated_at', current_time('mysql'));
-        update_post_meta($post_id, '_kozmo_ai_auto_generated', '1');
-
-        if ($auto_publish && $status === 'draft' && $quality['score'] >= (int) ($settings['min_quality_score'] ?? 95)) {
-            wp_publish_post($post_id);
-            Logger::info('Article auto-published', ['post_id' => $post_id, 'quality' => $quality['score']]);
-        }
-
-        // Track in articles table
-        global $wpdb;
-        $wpdb->replace(
-            $wpdb->prefix . 'kozmo_ai_articles',
-            [
-                'post_id'          => $post_id,
-                'agent_article_id' => $article['agent_article_id'],
-                'quality_score'    => $quality['score'],
-                'pipeline_status'  => 'completed',
-            ],
-            ['%d', '%s', '%f', '%s']
-        );
-
-        Logger::info('Article published by auto-generator', [
-            'post_id'  => $post_id,
-            'title'    => $article['title'],
-            'topic'    => $article['focus_keyword'],
-            'quality'  => $quality['score'],
-        ]);
-
-        return [
-            'success'  => true,
-            'post_id'  => $post_id,
-            'post_url' => $sync_result['post_url'] ?? get_permalink($post_id),
-            'quality_score' => $quality['score'],
-        ];
     }
 
     // ─── Auto-Generation Cron Handler ───────────────────────────

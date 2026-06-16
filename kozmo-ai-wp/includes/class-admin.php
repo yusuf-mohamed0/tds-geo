@@ -148,124 +148,83 @@ class Admin {
                 <input type="hidden" name="action" value="kozmo_ai_save_settings">
 
                 <div class="k-section k-fade">
-                    <div class="k-section-header">⚙ AI Engine</div>
+                    <div class="k-section-header">⚙ OpenAI</div>
                     <div class="k-card">
-                        <div class="k-field"><label>OpenAI API Key</label><input type="password" name="openai_api_key" value="<?php echo !empty($settings['openai_api_key']) ? '********' : ''; ?>" placeholder="sk-..." /><div class="k-desc">Stored encrypted. Required for auto-generation.</div></div>
-                        <div class="k-field"><label>Model</label><select name="openai_model"><option value="gpt-4o" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o'); ?>>GPT-4o (recommended)</option><option value="gpt-4o-mini" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o-mini'); ?>>GPT-4o Mini</option><option value="gpt-4-turbo" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4-turbo'); ?>>GPT-4 Turbo</option></select></div>
+                        <div class="k-field"><label>API Key</label><input type="password" name="openai_api_key" value="<?php echo !empty($settings['openai_api_key']) ? '********' : ''; ?>" placeholder="sk-..." /><div class="k-desc">The only required field. Everything else auto-configures.</div></div>
+                        <div class="k-field"><label>Model</label><select name="openai_model"><option value="gpt-4o" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o'); ?>>GPT-4o (recommended)</option><option value="gpt-4o-mini" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o-mini'); ?>>GPT-4o Mini (cheaper)</option><option value="gpt-4-turbo" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4-turbo'); ?>>GPT-4 Turbo</option></select></div>
                     </div>
                 </div>
 
-                <div class="k-section k-fade k-fade-d1">
-                    <div class="k-section-header">📝 Generation</div>
-                    <div class="k-card">
-                        <div class="k-field k-field-checkbox"><input type="checkbox" name="enable_auto_generation" value="yes" id="k-enable-gen" <?php checked($settings['enable_auto_generation'] ?? 'yes', 'yes'); ?> /><label for="k-enable-gen">Enable auto-generation</label></div>
-                        <div class="k-field"><label>Frequency</label><select name="generation_frequency"><option value="kozmo_ai_every_15min" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_every_15min'); ?>>Every 15 minutes</option><option value="kozmo_ai_hourly" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_hourly'); ?>>Hourly</option><option value="kozmo_ai_twice_daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_twice_daily'); ?>>Twice daily</option><option value="daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'daily'); ?>>Once daily</option></select></div>
-                        <div class="k-field k-field-checkbox"><input type="checkbox" name="generate_as_draft" value="yes" id="k-gen-draft" <?php checked($settings['generate_as_draft'] ?? 'no', 'yes'); ?> /><label for="k-gen-draft">Save as draft (uncheck to publish immediately)</label></div>
-                        <div class="k-field"><label>Max articles per day</label><input type="number" name="max_articles_daily" value="<?php echo esc_attr($settings['max_articles_daily'] ?? 24); ?>" min="1" max="100" /></div>
-                        <div class="k-field k-field-checkbox"><input type="checkbox" name="auto_publish" value="yes" id="k-auto-pub" <?php checked($settings['auto_publish'] ?? 'yes', 'yes'); ?> /><label for="k-auto-pub">Auto-publish when quality score ≥ threshold</label></div>
-                        <div class="k-field"><label>Minimum quality score (1–100)</label><input type="number" name="min_quality_score" value="<?php echo esc_attr($settings['min_quality_score'] ?? 95); ?>" min="1" max="100" /></div>
-                    </div>
-                </div>
-
-                <details class="k-details k-fade k-fade-d2">
-                    <summary>🔑 Access & API Keys</summary>
+                <details class="k-details k-fade">
+                    <summary>⚡ Advanced</summary>
                     <div class="k-details-body">
-                        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-                            <div class="k-field" style="flex:1;min-width:160px;"><label>Label</label><input type="text" name="new_key_label" placeholder="e.g. Production" /></div>
-                            <div class="k-field" style="flex:0 0 140px;"><label>Permissions</label><select name="new_key_permissions"><option value="read,write">Read & Write</option><option value="read">Read Only</option><option value="write">Write Only</option></select></div>
-                            <div class="k-field" style="flex:0 0 120px;"><label>Expires</label><select name="new_key_expires"><option value="0">Never</option><option value="30">30 days</option><option value="90">90 days</option><option value="365">1 year</option></select></div>
-                            <div style="display:flex;align-items:flex-end;">
-                                <?php wp_nonce_field('kozmo_ai_generate_key', 'kozmo_ai_generate_nonce'); ?>
-                                <button type="submit" name="generate_key" value="1" class="k-btn k-btn-primary k-btn-sm">Generate Key</button>
+                        <div class="k-section-header" style="margin-top:0;">Generation</div>
+                        <div class="k-card">
+                            <div class="k-field"><label>Frequency</label><select name="generation_frequency"><option value="kozmo_ai_every_15min" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_every_15min'); ?>>Every 15 minutes</option><option value="kozmo_ai_hourly" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_hourly'); ?>>Hourly</option><option value="kozmo_ai_twice_daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_twice_daily'); ?>>Twice daily</option><option value="daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'daily'); ?>>Once daily</option></select></div>
+                            <div class="k-field"><label>Max articles per day</label><input type="number" name="max_articles_daily" value="<?php echo esc_attr($settings['max_articles_daily'] ?? 24); ?>" min="1" max="100" /></div>
+                            <div class="k-field k-field-checkbox"><input type="checkbox" name="generate_as_draft" value="yes" id="k-gen-draft" <?php checked($settings['generate_as_draft'] ?? 'no', 'yes'); ?> /><label for="k-gen-draft">Save as draft instead of publishing immediately</label></div>
+                        </div>
+
+                        <div class="k-section-header">API Keys</div>
+                        <div class="k-card">
+                            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+                                <div class="k-field" style="flex:1;min-width:160px;"><label>Label</label><input type="text" name="new_key_label" placeholder="e.g. Production" /></div>
+                                <div class="k-field" style="flex:0 0 140px;"><label>Permissions</label><select name="new_key_permissions"><option value="read,write">Read & Write</option><option value="read">Read Only</option><option value="write">Write Only</option></select></div>
+                                <div class="k-field" style="flex:0 0 120px;"><label>Expires</label><select name="new_key_expires"><option value="0">Never</option><option value="30">30 days</option><option value="90">90 days</option><option value="365">1 year</option></select></div>
+                                <div style="display:flex;align-items:flex-end;">
+                                    <?php wp_nonce_field('kozmo_ai_generate_key', 'kozmo_ai_generate_nonce'); ?>
+                                    <button type="submit" name="generate_key" value="1" class="k-btn k-btn-primary k-btn-sm">Generate Key</button>
+                                </div>
                             </div>
-                        </div>
 
-                        <?php if (isset($_GET['new_key'])): ?>
-                        <div class="k-key-display k-key-new"><code><?php echo esc_html(sanitize_text_field(wp_unslash($_GET['new_key']))); ?></code><button type="button" class="k-btn k-btn-secondary k-btn-sm" data-k-copy="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['new_key']))); ?>">Copy</button></div>
-                        <p style="font-size:12px;color:var(--k-text-tertiary);margin:-8px 0 16px 0;">Copy this now — it won't be shown again.</p>
-                        <?php endif; ?>
+                            <?php if (isset($_GET['new_key'])): ?>
+                            <div class="k-key-display k-key-new"><code><?php echo esc_html(sanitize_text_field(wp_unslash($_GET['new_key']))); ?></code><button type="button" class="k-btn k-btn-secondary k-btn-sm" data-k-copy="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['new_key']))); ?>">Copy</button></div>
+                            <p style="font-size:12px;color:var(--k-text-tertiary);margin:-8px 0 16px 0;">Copy this now — it won't be shown again.</p>
+                            <?php endif; ?>
 
-                        <?php if (empty($keys)): ?>
-                        <p style="color:var(--k-text-tertiary);font-size:13px;">No API keys generated yet.</p>
-                        <?php else: ?>
-                        <table class="k-key-table"><thead><tr><th>Label</th><th>Key</th><th>Permissions</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
-                            <tbody><?php foreach ($keys as $key): ?>
-                            <tr><td><?php echo esc_html($key['label'] ?: '—'); ?></td>
-                                <td class="k-masked"><?php echo esc_html($key['masked_key'] ?? '••••••••'); ?></td>
-                                <td><?php echo esc_html($key['permissions']); ?></td>
-                                <td><span class="k-tag <?php echo $key['is_active'] ? 'k-tag-active' : 'k-tag-red'; ?>"><?php echo $key['is_active'] ? 'Active' : 'Revoked'; ?></span></td>
-                                <td style="text-align:right;"><?php if ($key['is_active']): ?>
-                                    <?php wp_nonce_field('kozmo_ai_revoke_key', 'kozmo_ai_revoke_' . $key['id']); ?>
-                                    <button type="submit" name="revoke_key" value="<?php echo esc_attr($key['id']); ?>" class="k-btn k-btn-danger k-btn-sm" onclick="return confirm('Revoke this key?');">Revoke</button>
-                                <?php endif; ?></td>
-                            </tr><?php endforeach; ?></tbody>
-                        </table>
-                        <?php endif; ?>
-                    </div>
-                </details>
-
-                <div class="k-section k-fade k-fade-d3">
-                    <div class="k-section-header">🔗 Backend API</div>
-                    <div class="k-card">
-                        <div class="k-field"><label>Backend API URL</label><input type="url" name="backend_url" value="<?php echo esc_url($settings['backend_url'] ?? ''); ?>" placeholder="https://your-server.com:3000" /><div class="k-desc">When configured, generation requests route through the backend API (24-stage pipeline, BullMQ queues, SEO intelligence, multi-CMS). Leave empty to use direct OpenAI.</div></div>
-                        <?php if (!empty($settings['backend_url'])): $bk_health = []; try { $bk_health = BackendClient::check_health(); } catch (\Throwable $e) { $bk_health = ['overall' => 'error']; } ?>
-                        <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
-                            <span class="k-tag <?php echo ($bk_health['overall'] ?? 'error') === 'healthy' ? 'k-tag-active' : (($bk_health['overall'] ?? 'error') === 'error' ? 'k-tag-red' : 'k-tag-yellow'); ?>">
-                                <?php echo esc_html($bk_health['overall'] ?? 'error'); ?>
-                            </span>
-                            <span style="font-size:12px;color:var(--k-text-tertiary);"><?php echo esc_url($settings['backend_url']); ?></span>
-                        </div>
-                        <?php else: ?>
-                        <div style="margin-top:8px;"><span class="k-tag k-tag-blue">Not configured</span></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <div class="k-section k-fade k-fade-d4">
-                    <div class="k-section-header">🧠 Knowledge Graph Intelligence</div>
-                    <div class="k-card">
-                        <?php $gk_health = []; $gk_avail = false; try { $gk_health = GraphifyClient::check_health(); $gk_avail = GraphifyClient::is_available(); } catch (\Throwable $e) { $gk_health = ['overall' => 'error']; } ?>
-                        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-                            <span class="k-tag <?php echo $gk_health['overall'] === 'healthy' ? 'k-tag-active' : ($gk_health['overall'] === 'error' ? 'k-tag-red' : 'k-tag-yellow'); ?>">
-                                <?php echo esc_html($gk_health['overall']); ?>
-                            </span>
-                            <?php if ($gk_avail): $gk_size = round(filesize(KOZMO_AI_WP_DIR . '../graphify-out/graph.json') / 1048576, 1); ?>
-                            <span style="font-size:12px;color:var(--k-text-tertiary);">graphify-out/graph.json — <?php echo esc_html($gk_size); ?> MB, <?php echo esc_html((int) ($gk_health['checks']['graph_file']['status'] === 'healthy' ? 'loaded' : '0')); ?> entities cached</span>
+                            <?php if (empty($keys)): ?>
+                            <p style="color:var(--k-text-tertiary);font-size:13px;">No API keys generated yet.</p>
                             <?php else: ?>
-                            <span style="font-size:12px;color:var(--k-text-tertiary);">graphify-out/graph.json not found — entity injection disabled</span>
+                            <table class="k-key-table"><thead><tr><th>Label</th><th>Key</th><th>Permissions</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+                                <tbody><?php foreach ($keys as $key): ?>
+                                <tr><td><?php echo esc_html($key['label'] ?: '—'); ?></td>
+                                    <td class="k-masked"><?php echo esc_html($key['masked_key'] ?? '••••••••'); ?></td>
+                                    <td><?php echo esc_html($key['permissions']); ?></td>
+                                    <td><span class="k-tag <?php echo $key['is_active'] ? 'k-tag-active' : 'k-tag-red'; ?>"><?php echo $key['is_active'] ? 'Active' : 'Revoked'; ?></span></td>
+                                    <td style="text-align:right;"><?php if ($key['is_active']): ?>
+                                        <?php wp_nonce_field('kozmo_ai_revoke_key', 'kozmo_ai_revoke_' . $key['id']); ?>
+                                        <button type="submit" name="revoke_key" value="<?php echo esc_attr($key['id']); ?>" class="k-btn k-btn-danger k-btn-sm" onclick="return confirm('Revoke this key?');">Revoke</button>
+                                    <?php endif; ?></td>
+                                </tr><?php endforeach; ?></tbody>
+                            </table>
                             <?php endif; ?>
                         </div>
-                        <div style="margin-top:12px;font-size:12px;color:var(--k-text-tertiary);line-height:1.6;">
-                            When available, the knowledge graph provides entity context, topic clusters, and codebase intelligence for article generation prompts. No configuration needed — auto-detected from project structure.
-                        </div>
-                    </div>
-                </div>
 
-                <details class="k-details k-fade k-fade-d5">
-                    <summary>🔧 System</summary>
-                    <div class="k-details-body">
-                        <div class="k-field"><label>Log level</label><select name="log_level"><option value="debug" <?php selected($settings['log_level'] ?? 'info', 'debug'); ?>>Debug</option><option value="info" <?php selected($settings['log_level'] ?? 'info', 'info'); ?>>Info</option><option value="warning" <?php selected($settings['log_level'] ?? 'info', 'warning'); ?>>Warning</option><option value="error" <?php selected($settings['log_level'] ?? 'info', 'error'); ?>>Error</option></select></div>
-                        <div class="k-field k-field-checkbox" style="margin-bottom:20px;"><input type="checkbox" name="debug_mode" value="yes" id="k-debug" <?php checked($settings['debug_mode'] ?? 'no', 'yes'); ?> /><label for="k-debug">Verbose debug logging</label></div>
+                        <div class="k-section-header">System</div>
+                        <div class="k-card">
+                            <div class="k-field"><label>Log level</label><select name="log_level"><option value="debug" <?php selected($settings['log_level'] ?? 'info', 'debug'); ?>>Debug</option><option value="info" <?php selected($settings['log_level'] ?? 'info', 'info'); ?>>Info</option><option value="warning" <?php selected($settings['log_level'] ?? 'info', 'warning'); ?>>Warning</option><option value="error" <?php selected($settings['log_level'] ?? 'info', 'error'); ?>>Error</option></select></div>
+                            <div class="k-field k-field-checkbox" style="margin-bottom:20px;"><input type="checkbox" name="debug_mode" value="yes" id="k-debug" <?php checked($settings['debug_mode'] ?? 'no', 'yes'); ?> /><label for="k-debug">Verbose debug logging</label></div>
 
-                        <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
-                            <div><span class="k-tag k-tag-blue">PHP <?php echo esc_html($info['server']['php_version'] ?? PHP_VERSION); ?></span></div>
-                            <div><span class="k-tag k-tag-blue">MySQL <?php echo esc_html($info['server']['mysql_version'] ?? ''); ?></span></div>
-                            <div><span class="k-tag k-tag-<?php echo ($info['health']['overall'] ?? 'healthy') === 'healthy' ? 'green' : 'yellow'; ?>"><?php echo esc_html(ucfirst($info['health']['overall'] ?? 'healthy')); ?></span></div>
-                        </div>
+                            <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+                                <div><span class="k-tag k-tag-blue">PHP <?php echo esc_html($info['server']['php_version'] ?? PHP_VERSION); ?></span></div>
+                                <div><span class="k-tag k-tag-blue">MySQL <?php echo esc_html($info['server']['mysql_version'] ?? ''); ?></span></div>
+                                <div><span class="k-tag k-tag-<?php echo ($info['health']['overall'] ?? 'healthy') === 'healthy' ? 'green' : 'yellow'; ?>"><?php echo esc_html(ucfirst($info['health']['overall'] ?? 'healthy')); ?></span></div>
+                            </div>
 
-                        <div class="k-health"><?php foreach (($info['health']['checks'] ?? []) as $name => $check): ?>
-                            <div class="k-health-item"><span class="k-dot" style="background:<?php echo $check['status'] === 'healthy' ? 'var(--k-green)' : ($check['status'] === 'degraded' ? 'var(--k-yellow)' : 'var(--k-red)'); ?>"></span><?php echo esc_html(ucfirst($name)); ?> — <?php echo esc_html($check['status']); ?></div>
-                        <?php endforeach; ?></div>
+                            <div class="k-health"><?php foreach (($info['health']['checks'] ?? []) as $name => $check): ?>
+                                <div class="k-health-item"><span class="k-dot" style="background:<?php echo $check['status'] === 'healthy' ? 'var(--k-green)' : ($check['status'] === 'degraded' ? 'var(--k-yellow)' : 'var(--k-red)'); ?>"></span><?php echo esc_html(ucfirst($name)); ?> — <?php echo esc_html($check['status']); ?></div>
+                            <?php endforeach; ?></div>
 
-                        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--k-border);">
-                            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                                <span style="font-size:13px;color:var(--k-text-secondary);">Logs:</span>
-                                <span class="k-tag k-tag-red"><?php echo (int) ($info['logs']['error'] ?? 0); ?> errors</span>
-                                <span class="k-tag k-tag-yellow"><?php echo (int) ($info['logs']['warning'] ?? 0); ?> warnings</span>
-                                <span class="k-tag k-tag-blue"><?php echo (int) ($info['logs']['info'] ?? 0); ?> info</span>
-                                <span style="flex:1;"></span>
-                                <?php wp_nonce_field('kozmo_ai_clear_logs', 'kozmo_ai_clear_nonce'); ?>
-                                <button type="submit" name="clear_logs" value="1" class="k-btn k-btn-danger k-btn-sm" onclick="return confirm('Clear all logs?');">Clear Logs</button>
+                            <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--k-border);">
+                                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                                    <span style="font-size:13px;color:var(--k-text-secondary);">Logs:</span>
+                                    <span class="k-tag k-tag-red"><?php echo (int) ($info['logs']['error'] ?? 0); ?> errors</span>
+                                    <span class="k-tag k-tag-yellow"><?php echo (int) ($info['logs']['warning'] ?? 0); ?> warnings</span>
+                                    <span class="k-tag k-tag-blue"><?php echo (int) ($info['logs']['info'] ?? 0); ?> info</span>
+                                    <span style="flex:1;"></span>
+                                    <?php wp_nonce_field('kozmo_ai_clear_logs', 'kozmo_ai_clear_nonce'); ?>
+                                    <button type="submit" name="clear_logs" value="1" class="k-btn k-btn-danger k-btn-sm" onclick="return confirm('Clear all logs?');">Clear Logs</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -329,13 +288,12 @@ class Admin {
         }
 
         $settings = [
-            'backend_url'            => esc_url_raw(wp_unslash($_POST['backend_url'] ?? '')),
             'agent_url'              => esc_url_raw(wp_unslash($_POST['agent_url'] ?? KOZMO_AI_WP_AGENT_URL)),
             'api_enabled'            => sanitize_text_field(wp_unslash($_POST['api_enabled'] ?? 'no')),
             'webhook_secret'         => sanitize_text_field(wp_unslash($_POST['webhook_secret'] ?? '')),
             'log_level'              => sanitize_text_field(wp_unslash($_POST['log_level'] ?? 'info')),
             'debug_mode'             => sanitize_text_field(wp_unslash($_POST['debug_mode'] ?? 'no')),
-            'enable_auto_generation' => sanitize_text_field(wp_unslash($_POST['enable_auto_generation'] ?? 'no')),
+            'enable_auto_generation' => sanitize_text_field(wp_unslash($_POST['enable_auto_generation'] ?? 'yes')),
             'generation_frequency'   => sanitize_text_field(wp_unslash($_POST['generation_frequency'] ?? 'kozmo_ai_every_15min')),
             'openai_model'           => sanitize_text_field(wp_unslash($_POST['openai_model'] ?? 'gpt-4o')),
             'generate_as_draft'      => sanitize_text_field(wp_unslash($_POST['generate_as_draft'] ?? 'no')),

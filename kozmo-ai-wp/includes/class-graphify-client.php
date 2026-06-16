@@ -22,18 +22,16 @@ class GraphifyClient {
     public static function check_health(): array {
         $checks = [];
         $exists = file_exists(self::GRAPH_PATH);
-        $checks['graph_file'] = ['status' => $exists ? 'healthy' : 'missing'];
+        $checks['graph_file'] = ['status' => $exists ? 'healthy' : 'disabled'];
         if ($exists) {
             $size = filesize(self::GRAPH_PATH);
             $checks['graph_file']['size_mb'] = round($size / 1048576, 1);
-            $checks['graph_file']['status']  = $size > 100 ? 'healthy' : 'degraded';
         }
         $cached = get_transient('kozmo_ai_graphify_cached');
         $checks['cache'] = ['status' => false !== $cached ? 'healthy' : 'pending'];
-        $overall = 'healthy';
+        $overall = 'disabled';
         foreach ($checks as $c) {
-            if ($c['status'] === 'missing') { $overall = 'error'; break; }
-            if ($c['status'] === 'degraded') $overall = 'degraded';
+            if ($c['status'] === 'healthy') $overall = 'healthy';
         }
         return ['overall' => $overall, 'checks' => $checks];
     }

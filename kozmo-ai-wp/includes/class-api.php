@@ -147,9 +147,7 @@ class Api {
                 'site_name'          => get_bloginfo('name'),
                 'site_url'           => get_bloginfo('url'),
                 'agent_connected'    => !empty($settings['agent_url']),
-                'backend_connected'  => self::safe_bool('BackendClient::is_configured'),
-                'backend_available'  => self::safe_bool('BackendClient::is_available'),
-                'graphify_available' => self::safe_bool('GraphifyClient::is_available'),
+
                 'last_scan'          => $settings['last_scan_at'] ?? '',
                 'last_sync'          => $settings['last_sync_at'] ?? '',
                 'debug_mode'         => ($settings['debug_mode'] ?? 'no') === 'yes',
@@ -327,7 +325,7 @@ class Api {
 
         // General text/boolean settings
         $text_fields = [
-            'api_enabled', 'agent_url', 'backend_url', 'webhook_secret',
+            'api_enabled', 'agent_url', 'webhook_secret',
             'auto_discover', 'auto_publish', 'auto_fix_errors', 'debug_mode',
             'enable_auto_generation', 'generate_as_draft',
             'log_level', 'openai_model', 'generation_frequency',
@@ -516,18 +514,11 @@ class Api {
      */
     private static function safe_bool(string $callable): bool {
         try {
-            if (0 === strncmp($callable, 'BackendClient::', 15)) {
-                $method = substr($callable, 15);
-                return BackendClient::$method();
-            }
-            if (0 === strncmp($callable, 'GraphifyClient::', 16)) {
-                $method = substr($callable, 16);
-                return GraphifyClient::$method();
-            }
+            $ref = new \ReflectionMethod($callable);
+            return $ref->invoke(null);
         } catch (\Throwable $e) {
-            Logger::debug('safe_bool caught error', ['callable' => $callable, 'error' => $e->getMessage()]);
+            return false;
         }
-        return false;
     }
 
     private static function format_post(\WP_Post $post): array {

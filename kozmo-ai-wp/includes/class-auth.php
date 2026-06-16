@@ -63,7 +63,7 @@ class Auth {
                 'expires_at'  => $expires_at,
                 'created_by'  => $created_by ?: get_current_user_id(),
             ],
-            ['%s', '%s', '%s', '%d', '%s', '%d', '%d']
+            ['%s', '%s', '%s', '%s', '%d', '%s', '%d']
         );
 
         if (!$inserted) return ['success' => false, 'message' => __('Failed to generate API key.', 'kozmo-ai-wp')];
@@ -196,7 +196,7 @@ class Auth {
 
     public static function handle_generate_key(): void {
         if (!current_user_can('manage_options')) wp_die('Unauthorized');
-        check_admin_referer('kozmo_ai_generate_key', 'kozmo_ai_nonce');
+        check_admin_referer('kozmo_ai_generate_key', 'kozmo_ai_generate_nonce');
 
         $label       = sanitize_text_field(wp_unslash($_POST['label'] ?? ''));
         $permissions = sanitize_text_field(wp_unslash($_POST['permissions'] ?? 'read,write'));
@@ -212,7 +212,7 @@ class Auth {
 
     public static function handle_revoke_key(): void {
         if (!current_user_can('manage_options')) wp_die('Unauthorized');
-        check_admin_referer('kozmo_ai_revoke_key', 'kozmo_ai_nonce');
+        check_admin_referer('kozmo_ai_revoke_key', 'kozmo_ai_revoke_nonce');
 
         $key_id = absint(wp_unslash($_POST['key_id'] ?? 0));
         if ($key_id > 0) self::revoke_key_by_id($key_id);

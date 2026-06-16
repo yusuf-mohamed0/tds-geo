@@ -51,19 +51,6 @@
     }
   }
 
-  // ─── Update integration badges ───
-  function setIntegrationBadges(backendAvail, graphifyAvail) {
-    var $gen = $('.k-genz, .k-gen');
-    // Remove existing integration badges
-    $gen.find('.k-integration-badge').remove();
-    if (backendAvail) {
-      $gen.find('.k-gen-info').append('<span class="k-tag k-tag-green k-integration-badge">Backend</span>');
-    }
-    if (graphifyAvail) {
-      $gen.find('.k-gen-info').append('<span class="k-tag k-tag-violet k-integration-badge">Graph</span>');
-    }
-  }
-
   // ─── Load dashboard data ───
   function loadDashboard() {
     if (!k.ajaxUrl) return;
@@ -79,7 +66,6 @@
 
       setState(health.overall || 'healthy');
       setGenState(d.generation_enabled);
-      setIntegrationBadges(d.backend_available, d.graphify_available);
 
       setStat('health', health.score || 100, health.overall);
       setStat('queue', queue.pending || 0, (queue.failed || 0) + ' failed');
@@ -94,6 +80,20 @@
 
       var $scan = $('[data-k-scan]');
       if ($scan.length) $scan.text(d.last_scan || '—');
+
+      // Update pipeline summary
+      if (d.pipeline_stages) {
+        var failed = d.pipeline_stages.failed || 0;
+        var stages = d.pipeline_stages.stages || {};
+        var inProgress = 0;
+        for (var s in stages) {
+          if (s !== 'completed' && s !== 'failed') inProgress += parseInt(stages[s].count, 10);
+        }
+        var $pStat = $('[data-k-stat="pipeline"]');
+        if ($pStat.length) animateNumber($pStat, inProgress);
+        var $pSub = $('[data-k-sub="pipeline"]');
+        if ($pSub.length) $pSub.text(failed + ' failed');
+      }
 
       // Update recent activity
       if (d.recent_logs && d.recent_logs.length) {

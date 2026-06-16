@@ -45,17 +45,6 @@ class Health {
         $last_scan = $settings['last_scan_at'] ?? '';
         $checks['last_scan'] = ['status' => !empty($last_scan) ? 'healthy' : 'pending', 'timestamp' => $last_scan];
 
-        // Backend API connectivity (optional — disabled is not an error)
-        try {
-            $backend = BackendClient::check_health();
-            $checks['backend'] = [
-                'status'  => $backend['overall'] === 'healthy' ? 'healthy' : ($backend['overall'] === 'error' ? 'error' : 'disabled'),
-                'url'     => $settings['backend_url'] ?? '',
-            ];
-        } catch (\Throwable $e) {
-            $checks['backend'] = ['status' => 'disabled'];
-        }
-
         // Graphify knowledge graph (optional — missing file is not an error)
         try {
             $graphify = GraphifyClient::check_health();
