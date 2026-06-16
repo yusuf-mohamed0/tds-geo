@@ -4,12 +4,19 @@
 (function($) {
     'use strict';
 
+    $('.kozmo-reveal').each(function(index) {
+        this.style.animationDelay = (index * 0.05) + 's';
+    });
+
     // Toggle context JSON in log viewer
     $(document).on('click', '.toggle-context', function() {
         var pre = $(this).next('pre');
         if (pre.length) {
             pre.slideToggle(150);
-            $(this).text(pre.is(':visible') ? 'Hide' : 'Show');
+            var $btn = $(this);
+            setTimeout(function() {
+                $btn.text(pre.is(':visible') ? 'Hide' : 'Show');
+            }, 160);
         }
     });
 

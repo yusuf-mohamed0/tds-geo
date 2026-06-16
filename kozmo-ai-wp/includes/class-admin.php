@@ -62,14 +62,46 @@ class Admin {
     // ── Settings Page ──
     public static function render_settings(): void {
         $settings = get_option('kozmo_ai_wp_settings', []);
+        $generation_enabled = ($settings['enable_auto_generation'] ?? 'yes') === 'yes';
+        $publish_mode = ($settings['generate_as_draft'] ?? 'no') === 'yes' ? __('Draft-first review', 'kozmo-ai-wp') : __('Direct publish', 'kozmo-ai-wp');
+        $next_run = wp_next_scheduled('kozmo_ai_generate_articles');
         ?>
-        <div class="wrap kozmo-ai-wrap">
+        <div class="wrap kozmo-ai-wrap kozmo-admin-shell">
+            <div class="kozmo-brand-guidelines kozmo-reveal">
+                <span class="kozmo-guideline-dot"></span>
+                <strong><?php esc_html_e('Operator Mode', 'kozmo-ai-wp'); ?>:</strong>
+                <span><?php esc_html_e('Automation', 'kozmo-ai-wp'); ?></span>
+                <span><?php esc_html_e('Authority', 'kozmo-ai-wp'); ?></span>
+                <span><?php esc_html_e('Control', 'kozmo-ai-wp'); ?></span>
+            </div>
             <div class="kozmo-header"><h1><span class="kozmo-logo">K</span> <?php esc_html_e('KOZMO AI — Settings', 'kozmo-ai-wp'); ?></h1></div>
+            <div class="kozmo-page-intro kozmo-reveal">
+                <div>
+                    <span class="kozmo-kicker"><?php esc_html_e('AI Control Center', 'kozmo-ai-wp'); ?></span>
+                    <h2><?php esc_html_e('Shape the autonomous behavior without touching code.', 'kozmo-ai-wp'); ?></h2>
+                    <p><?php esc_html_e('These controls define how often KOZMO thinks, publishes, heals itself, and communicates with your site. The goal is hands-free execution with clear operator override.', 'kozmo-ai-wp'); ?></p>
+                </div>
+                <div class="kozmo-summary-grid kozmo-summary-grid-compact">
+                    <div class="kozmo-summary-card">
+                        <span><?php esc_html_e('Autonomy', 'kozmo-ai-wp'); ?></span>
+                        <strong><?php echo $generation_enabled ? esc_html__('Active', 'kozmo-ai-wp') : esc_html__('Paused', 'kozmo-ai-wp'); ?></strong>
+                    </div>
+                    <div class="kozmo-summary-card">
+                        <span><?php esc_html_e('Publish Mode', 'kozmo-ai-wp'); ?></span>
+                        <strong><?php echo esc_html($publish_mode); ?></strong>
+                    </div>
+                    <div class="kozmo-summary-card">
+                        <span><?php esc_html_e('Next Run', 'kozmo-ai-wp'); ?></span>
+                        <strong><?php echo $next_run ? esc_html(wp_date(get_option('date_format') . ' ' . get_option('time_format'), $next_run)) : esc_html__('Waiting', 'kozmo-ai-wp'); ?></strong>
+                    </div>
+                </div>
+            </div>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <?php wp_nonce_field('kozmo_ai_save_settings', 'kozmo_ai_nonce'); ?>
                 <input type="hidden" name="action" value="kozmo_ai_save_settings">
 
-                <div class="kozmo-card"><h2><?php esc_html_e('Connection', 'kozmo-ai-wp'); ?></h2>
+                <div class="kozmo-grid-2 kozmo-section-stack">
+                <div class="kozmo-card kozmo-reveal"><div class="kozmo-card-heading"><h2><?php esc_html_e('Connection', 'kozmo-ai-wp'); ?></h2><span class="kozmo-badge badge-info"><?php esc_html_e('Network Layer', 'kozmo-ai-wp'); ?></span></div>
                     <table class="form-table">
                         <tr><th><?php esc_html_e('Agent URL', 'kozmo-ai-wp'); ?></th>
                             <td><input type="url" name="agent_url" value="<?php echo esc_attr($settings['agent_url'] ?? KOZMO_AI_WP_AGENT_URL); ?>" class="regular-text" />
@@ -81,7 +113,7 @@ class Admin {
                                 <p class="description"><?php esc_html_e('Secret for webhook signature verification (min 16 chars).', 'kozmo-ai-wp'); ?></p></td></tr>
                     </table></div>
 
-                <div class="kozmo-card"><h2><?php esc_html_e('AI Content Generation', 'kozmo-ai-wp'); ?></h2>
+                <div class="kozmo-card kozmo-reveal"><div class="kozmo-card-heading"><h2><?php esc_html_e('AI Content Generation', 'kozmo-ai-wp'); ?></h2><span class="kozmo-badge badge-active"><?php esc_html_e('Publishing Brain', 'kozmo-ai-wp'); ?></span></div>
                     <p class="description" style="margin-bottom:15px;"><?php esc_html_e('Connect OpenAI to automatically generate and publish SEO-optimized articles. No external backend needed.', 'kozmo-ai-wp'); ?></p>
                     <table class="form-table">
                         <tr><th><?php esc_html_e('OpenAI API Key', 'kozmo-ai-wp'); ?></th>
@@ -113,15 +145,20 @@ class Admin {
                             <td><label><input type="checkbox" name="auto_publish" value="yes" <?php checked($settings['auto_publish'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Auto-publish drafts when quality score >= minimum threshold', 'kozmo-ai-wp'); ?></label></td></tr>
                     </table></div>
 
-                <div class="kozmo-card"><h2><?php esc_html_e('Automation', 'kozmo-ai-wp'); ?></h2>
+                <div class="kozmo-card kozmo-reveal"><div class="kozmo-card-heading"><h2><?php esc_html_e('Automation', 'kozmo-ai-wp'); ?></h2><span class="kozmo-badge badge-info"><?php esc_html_e('Self-Healing', 'kozmo-ai-wp'); ?></span></div>
                     <table class="form-table">
                         <tr><th><?php esc_html_e('Auto Fix Errors', 'kozmo-ai-wp'); ?></th>
                             <td><label><input type="checkbox" name="auto_fix_errors" value="yes" <?php checked($settings['auto_fix_errors'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Automatically attempt to repair errors', 'kozmo-ai-wp'); ?></label></td></tr>
                         <tr><th><?php esc_html_e('Auto Scan', 'kozmo-ai-wp'); ?></th>
                             <td><label><input type="checkbox" name="auto_discover" value="yes" <?php checked($settings['auto_discover'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Auto-discover site changes', 'kozmo-ai-wp'); ?></label></td></tr>
-                    </table></div>
+                    </table>
+                    <ul class="kozmo-insight-list">
+                        <li><?php esc_html_e('Use direct publish when you want KOZMO to behave like an always-on editorial machine.', 'kozmo-ai-wp'); ?></li>
+                        <li><?php esc_html_e('Use draft mode when your team still wants a human approval checkpoint.', 'kozmo-ai-wp'); ?></li>
+                    </ul>
+                </div>
 
-                <div class="kozmo-card"><h2><?php esc_html_e('Logging', 'kozmo-ai-wp'); ?></h2>
+                <div class="kozmo-card kozmo-reveal"><div class="kozmo-card-heading"><h2><?php esc_html_e('Logging', 'kozmo-ai-wp'); ?></h2><span class="kozmo-badge badge-info"><?php esc_html_e('Observability', 'kozmo-ai-wp'); ?></span></div>
                     <table class="form-table">
                         <tr><th><?php esc_html_e('Log Level', 'kozmo-ai-wp'); ?></th>
                             <td><select name="log_level">
@@ -133,8 +170,11 @@ class Admin {
                         <tr><th><?php esc_html_e('Debug Mode', 'kozmo-ai-wp'); ?></th>
                             <td><label><input type="checkbox" name="debug_mode" value="yes" <?php checked($settings['debug_mode'] ?? 'no', 'yes'); ?> /> <?php esc_html_e('Verbose request/response logging', 'kozmo-ai-wp'); ?></label></td></tr>
                     </table></div>
+                </div>
 
-                <?php submit_button(__('Save Settings', 'kozmo-ai-wp')); ?>
+                <div class="kozmo-actions kozmo-actions-hero">
+                    <?php submit_button(__('Save Settings', 'kozmo-ai-wp'), 'primary kozmo-button kozmo-button-primary', '', false); ?>
+                </div>
             </form>
         </div>
         <?php
@@ -200,10 +240,22 @@ class Admin {
     public static function render_keys(): void {
         $keys = Auth::list_keys();
         ?>
-        <div class="wrap kozmo-ai-wrap">
+        <div class="wrap kozmo-ai-wrap kozmo-admin-shell">
             <div class="kozmo-header"><h1><span class="kozmo-logo">K</span> <?php esc_html_e('KOZMO AI — API Keys', 'kozmo-ai-wp'); ?></h1></div>
+            <div class="kozmo-page-intro kozmo-reveal">
+                <div>
+                    <span class="kozmo-kicker"><?php esc_html_e('Secure Access Layer', 'kozmo-ai-wp'); ?></span>
+                    <h2><?php esc_html_e('Give clients or automation systems controlled access without exposing your control plane.', 'kozmo-ai-wp'); ?></h2>
+                    <p><?php esc_html_e('Newly generated keys are shown once, stored securely, and can be revoked instantly. Use the smallest permission set possible.', 'kozmo-ai-wp'); ?></p>
+                </div>
+                <div class="kozmo-summary-grid kozmo-summary-grid-compact">
+                    <div class="kozmo-summary-card"><span><?php esc_html_e('Storage', 'kozmo-ai-wp'); ?></span><strong><?php esc_html_e('Hashed', 'kozmo-ai-wp'); ?></strong></div>
+                    <div class="kozmo-summary-card"><span><?php esc_html_e('Keys Visible', 'kozmo-ai-wp'); ?></span><strong><?php echo (int) count($keys); ?></strong></div>
+                    <div class="kozmo-summary-card"><span><?php esc_html_e('Trust Model', 'kozmo-ai-wp'); ?></span><strong><?php esc_html_e('Least Privilege', 'kozmo-ai-wp'); ?></strong></div>
+                </div>
+            </div>
 
-            <div class="kozmo-card"><h2><?php esc_html_e('Generate New Key', 'kozmo-ai-wp'); ?></h2>
+            <div class="kozmo-card kozmo-reveal"><div class="kozmo-card-heading"><h2><?php esc_html_e('Generate New Key', 'kozmo-ai-wp'); ?></h2><span class="kozmo-badge badge-active"><?php esc_html_e('One-Time Secret', 'kozmo-ai-wp'); ?></span></div>
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="kozmo-flex">
                     <?php wp_nonce_field('kozmo_ai_generate_key', 'kozmo_ai_nonce'); ?>
                     <input type="hidden" name="action" value="kozmo_ai_generate_key">
@@ -227,12 +279,13 @@ class Admin {
                     <div class="kozmo-notice kozmo-notice-success">
                         <p><strong><?php esc_html_e('New Key Generated!', 'kozmo-ai-wp'); ?></strong></p>
                         <code style="font-size:14px;padding:8px;display:inline-block;background:#f0f0f1;border-radius:4px;"><?php echo esc_html(sanitize_text_field(wp_unslash($_GET['new_key']))); ?></code>
+                        <button type="button" class="button kozmo-button kozmo-button-secondary" data-copy="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['new_key']))); ?>"><?php esc_html_e('Copy Key', 'kozmo-ai-wp'); ?></button>
                         <p><em><?php esc_html_e('Copy this now — it won\'t be shown again.', 'kozmo-ai-wp'); ?></em></p>
                     </div>
                 <?php endif; ?>
             </div>
 
-            <div class="kozmo-card"><h2><?php esc_html_e('Existing Keys', 'kozmo-ai-wp'); ?></h2>
+            <div class="kozmo-card kozmo-reveal"><div class="kozmo-card-heading"><h2><?php esc_html_e('Existing Keys', 'kozmo-ai-wp'); ?></h2><span class="kozmo-badge badge-info"><?php esc_html_e('Secure Ledger', 'kozmo-ai-wp'); ?></span></div>
                 <?php if (empty($keys)): ?><p><?php esc_html_e('No keys generated yet.', 'kozmo-ai-wp'); ?></p>
                 <?php else: ?>
                 <table class="widefat striped">
@@ -264,9 +317,16 @@ class Admin {
         $logs = Logger::get_logs(200, $level, $service);
         $stats = Logger::get_stats();
         ?>
-        <div class="wrap kozmo-ai-wrap">
+        <div class="wrap kozmo-ai-wrap kozmo-admin-shell">
             <div class="kozmo-header"><h1><span class="kozmo-logo">K</span> <?php esc_html_e('KOZMO AI — Logs', 'kozmo-ai-wp'); ?></h1></div>
-            <div class="kozmo-card">
+            <div class="kozmo-page-intro kozmo-reveal">
+                <div>
+                    <span class="kozmo-kicker"><?php esc_html_e('Operational Memory', 'kozmo-ai-wp'); ?></span>
+                    <h2><?php esc_html_e('Read the reasoning trail behind every autonomous action.', 'kozmo-ai-wp'); ?></h2>
+                    <p><?php esc_html_e('This feed helps you spot publishing issues, content failures, and automation drift before they become customer-facing problems.', 'kozmo-ai-wp'); ?></p>
+                </div>
+            </div>
+            <div class="kozmo-card kozmo-reveal">
                 <div class="kozmo-flex" style="align-items:center;gap:8px;">
                     <span class="kozmo-badge badge-<?php echo $stats['error'] > 0 ? 'error' : 'active'; ?>"><?php echo (int) $stats['error']; ?> errors</span>
                     <span class="kozmo-badge badge-warning"><?php echo (int) $stats['warning']; ?> warnings</span>
@@ -314,8 +374,15 @@ class Admin {
     public static function render_diagnostics(): void {
         $info = Diagnostics::get_system_info();
         ?>
-        <div class="wrap kozmo-ai-wrap">
+        <div class="wrap kozmo-ai-wrap kozmo-admin-shell">
             <div class="kozmo-header"><h1><span class="kozmo-logo">K</span> <?php esc_html_e('KOZMO AI — Diagnostics', 'kozmo-ai-wp'); ?></h1></div>
+            <div class="kozmo-page-intro kozmo-reveal">
+                <div>
+                    <span class="kozmo-kicker"><?php esc_html_e('Systems Diagnostics', 'kozmo-ai-wp'); ?></span>
+                    <h2><?php esc_html_e('A deeper operator view of health, environment, storage, and queue execution.', 'kozmo-ai-wp'); ?></h2>
+                    <p><?php esc_html_e('Use this page when you need to understand why automation slowed down, why a sync failed, or whether the host environment is strong enough for continuous AI publishing.', 'kozmo-ai-wp'); ?></p>
+                </div>
+            </div>
 
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:20px;">
                 <div class="kozmo-card"><h2><?php esc_html_e('Plugin', 'kozmo-ai-wp'); ?></h2>
