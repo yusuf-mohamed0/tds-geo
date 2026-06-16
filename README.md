@@ -1,4 +1,4 @@
-# Vireon — AI SEO Automation System
+# KOZMO Core — AI SEO Automation System
 
 Multi-tenant SaaS platform that automates SEO content generation and publishing for Shopify stores. Uses AI (OpenAI GPT-4o) to research keywords, generate high-quality blog posts, optimize for SEO, and publish directly to Shopify — all with per-client rate limiting, cost tracking, and a full admin dashboard.
 
@@ -9,7 +9,7 @@ Multi-tenant SaaS platform that automates SEO content generation and publishing 
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql)](https://postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?style=flat-square&logo=openai)](https://openai.com/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow?style=flat-square)]()
-[![CI](https://github.com/yusuf-mohamed0/Vireon/actions/workflows/ci.yml/badge.svg)](https://github.com/yusuf-mohamed0/Vireon/actions/workflows/ci.yml)
+[![CI](https://github.com/yusuf-mohamed0/KOZMO Core/actions/workflows/ci.yml/badge.svg)](https://github.com/yusuf-mohamed0/KOZMO Core/actions/workflows/ci.yml)
 
 ## Features
 
@@ -85,7 +85,7 @@ Multi-tenant SaaS platform that automates SEO content generation and publishing 
 
 ## Quick Start (for New Users)
 
-Follow these steps to set up Vireon on your own machine. No private data from the original author is included — everything uses placeholder examples.
+Follow these steps to set up KOZMO Core on your own machine. No private data from the original author is included — everything uses placeholder examples.
 
 ### Prerequisites
 
@@ -114,8 +114,8 @@ You'll need these installed on your computer:
 ### Step 1: Clone the Project
 
 ```bash
-git clone https://github.com/yusuf-mohamed0/Vireon.git
-cd Vireon
+git clone https://github.com/yusuf-mohamed0/KOZMO Core.git
+cd KOZMO Core
 ```
 
 ### Step 2: Install Dependencies

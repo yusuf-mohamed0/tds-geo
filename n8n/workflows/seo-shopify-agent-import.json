@@ -57,7 +57,7 @@
     },
     {
       "id": "login",
-      "name": "Login to Vireon",
+      "name": "Login to KOZMO Core",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [450, 300],
@@ -116,7 +116,7 @@
             "parameters": [
               {
                 "name": "Authorization",
-                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+                "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"
               }
             ]
           }
@@ -152,7 +152,7 @@
             "parameters": [
               {
                 "name": "Authorization",
-                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+                "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"
               }
             ]
           }
@@ -188,7 +188,7 @@
             "parameters": [
               {
                 "name": "Authorization",
-                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+                "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"
               }
             ]
           }
@@ -201,9 +201,9 @@
       "main": [[{ "node": "Set Client ID", "type": "main", "index": 0 }]]
     },
     "Set Client ID": {
-      "main": [[{ "node": "Login to Vireon", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Login to KOZMO Core", "type": "main", "index": 0 }]]
     },
-    "Login to Vireon": {
+    "Login to KOZMO Core": {
       "main": [[{ "node": "Discover Keywords", "type": "main", "index": 0 }]]
     },
     "Discover Keywords": {

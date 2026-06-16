@@ -2909,112 +2909,112 @@
       "filePath": "/root/my-project/understand-anything-plugin/vitest.config.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/package.json",
+      "id": "file:/root/my-project/kozmo-core-nextjs/package.json",
       "type": "file",
       "name": "package.json",
-      "filePath": "/root/my-project/vireon-nextjs/package.json"
+      "filePath": "/root/my-project/kozmo-core-nextjs/package.json"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/README.md",
+      "id": "file:/root/my-project/kozmo-core-nextjs/README.md",
       "type": "file",
       "name": "README.md",
-      "filePath": "/root/my-project/vireon-nextjs/README.md"
+      "filePath": "/root/my-project/kozmo-core-nextjs/README.md"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/api/createPostHandler.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/api/createPostHandler.ts",
       "type": "file",
       "name": "createPostHandler.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/api/createPostHandler.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/api/createPostHandler.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/api/createPostsHandler.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/api/createPostsHandler.ts",
       "type": "file",
       "name": "createPostsHandler.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/api/createPostsHandler.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/api/createPostsHandler.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/api/createWebhookHandler.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/api/createWebhookHandler.ts",
       "type": "file",
       "name": "createWebhookHandler.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/api/createWebhookHandler.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/api/createWebhookHandler.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/components/index.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/components/index.ts",
       "type": "file",
       "name": "index.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/components/index.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/components/index.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/components/VireonBlogList.tsx",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/components/VireonBlogList.tsx",
       "type": "file",
       "name": "VireonBlogList.tsx",
-      "filePath": "/root/my-project/vireon-nextjs/src/components/VireonBlogList.tsx"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/components/VireonBlogList.tsx"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/components/VireonBlogPost.tsx",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/components/VireonBlogPost.tsx",
       "type": "file",
       "name": "VireonBlogPost.tsx",
-      "filePath": "/root/my-project/vireon-nextjs/src/components/VireonBlogPost.tsx"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/components/VireonBlogPost.tsx"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/components/VireonContent.tsx",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/components/VireonContent.tsx",
       "type": "file",
       "name": "VireonContent.tsx",
-      "filePath": "/root/my-project/vireon-nextjs/src/components/VireonContent.tsx"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/components/VireonContent.tsx"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/index.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/index.ts",
       "type": "file",
       "name": "index.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/index.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/index.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/lib/auth.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/lib/auth.ts",
       "type": "file",
       "name": "auth.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/lib/auth.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/lib/auth.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/lib/revalidation.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/lib/revalidation.ts",
       "type": "file",
       "name": "revalidation.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/lib/revalidation.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/lib/revalidation.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/lib/storage.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/lib/storage.ts",
       "type": "file",
       "name": "storage.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/lib/storage.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/lib/storage.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/lib/utils.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/lib/utils.ts",
       "type": "file",
       "name": "utils.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/lib/utils.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/lib/utils.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/server.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/server.ts",
       "type": "file",
       "name": "server.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/server.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/server.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/styles.css",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/styles.css",
       "type": "file",
       "name": "styles.css",
-      "filePath": "/root/my-project/vireon-nextjs/src/styles.css"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/styles.css"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/src/types/index.ts",
+      "id": "file:/root/my-project/kozmo-core-nextjs/src/types/index.ts",
       "type": "file",
       "name": "index.ts",
-      "filePath": "/root/my-project/vireon-nextjs/src/types/index.ts"
+      "filePath": "/root/my-project/kozmo-core-nextjs/src/types/index.ts"
     },
     {
-      "id": "file:/root/my-project/vireon-nextjs/tsconfig.json",
+      "id": "file:/root/my-project/kozmo-core-nextjs/tsconfig.json",
       "type": "file",
       "name": "tsconfig.json",
-      "filePath": "/root/my-project/vireon-nextjs/tsconfig.json"
+      "filePath": "/root/my-project/kozmo-core-nextjs/tsconfig.json"
     },
     {
       "id": "file:/root/my-project/vitest.config.ts",

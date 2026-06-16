@@ -128,7 +128,8 @@ export function createArticleRoutes(pool: Pool): Router {
         `INSERT INTO articles (client_id, keyword_id, title, slug, content_md, content_html,
                                meta_title, meta_description, tags, word_count, status, seo_score)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-         RETURNING id, title, slug, status, word_count, seo_score, created_at`,
+         RETURNING id, title, slug, content_md, content_html,
+                  meta_title, meta_description, tags, status, word_count, seo_score, created_at`,
         [
           clientId, keywordId, article.title, seoService.generateSlug(article.title),
           finalContent, contentHtml, article.metaTitle, article.metaDescription,
@@ -276,6 +277,47 @@ export function createArticleRoutes(pool: Pool): Router {
         return;
       }
       res.json(latestResult.rows[0]);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ─── Connector Version Check ─────────────────
+  router.get('/connector-version', async (_req: Request, res: Response) => {
+    const latestVersion = process.env.CONNECTOR_EXPECTED_VERSION || '3.0.0';
+    res.json({
+      success: true,
+      data: {
+        latest_version: latestVersion,
+        download_url: process.env.CONNECTOR_DOWNLOAD_URL || '',
+        min_php_version: '7.4',
+        min_wp_version: '5.8',
+        changelog: 'https://github.com/yusuf-mohamed0/KOZMO Core/releases',
+      },
+    });
+  });
+
+  // ─── Suggest Topics ──────────────────────────
+  router.post('/suggest-topics', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { count = 5 } = req.body;
+      const system = `You are a content strategist. Suggest ${count} specific, SEO-optimized blog post topics.`;
+      const user = `Suggest ${count} specific, engaging blog topic ideas. Make each topic specific and SEO-friendly. Return JSON: {"topics": ["topic1", "topic2", ...]}.`;
+
+      const result = await openaiService.chat([
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ], { maxTokens: 500 });
+
+      let topics: string[] = [];
+      try {
+        const parsed = JSON.parse(result || '{}');
+        topics = parsed.topics || [];
+      } catch {
+        topics = [];
+      }
+
+      res.json({ topics: topics.slice(0, count) });
     } catch (err) {
       next(err);
     }
@@ -562,6 +604,21 @@ export function createArticleRoutes(pool: Pool): Router {
     } catch (err) {
       next(err);
     }
+  });
+
+  // ─── Connector Version Check ─────────────────
+  router.get('/connector-version', async (_req: Request, res: Response) => {
+    const latestVersion = process.env.CONNECTOR_EXPECTED_VERSION || '3.0.0';
+    res.json({
+      success: true,
+      data: {
+        latest_version: latestVersion,
+        download_url: process.env.CONNECTOR_DOWNLOAD_URL || '',
+        min_php_version: '7.4',
+        min_wp_version: '5.8',
+        changelog: 'https://github.com/yusuf-mohamed0/KOZMO Core/releases',
+      },
+    });
   });
 
   // ─── SEO Analysis for Article ────────────────

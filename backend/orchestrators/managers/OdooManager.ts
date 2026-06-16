@@ -32,7 +32,7 @@ export class OdooManager extends DepartmentManager {
             model: task.payload.model,
             operation: task.payload.operation || 'sync',
             odooRecordId: task.payload.odooRecordId,
-            vireonRecordId: task.payload.vireonRecordId,
+            kozmoCoreRecordId: task.payload.kozmoCoreRecordId,
             data: task.payload.data,
             fieldMappingId: task.payload.fieldMappingId,
           },
@@ -113,7 +113,7 @@ export class OdooManager extends DepartmentManager {
       }
 
       case 'odoo_map_entities': {
-        // Map multiple Odoo models to Vireon entities in parallel
+        // Map multiple Odoo models to KOZMO Core entities in parallel
         if (task.payload.mappings && Array.isArray(task.payload.mappings)) {
           for (const mapping of task.payload.mappings as Array<Record<string, unknown>>) {
             subtasks.push({

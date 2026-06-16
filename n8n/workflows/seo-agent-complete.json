@@ -74,7 +74,7 @@
     },
     {
       "id": "login",
-      "name": "Login to Vireon",
+      "name": "Login to KOZMO Core",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [600, 300],
@@ -113,7 +113,7 @@
         "options": {
           "timeout": 30000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"}]
           }
         }
       }
@@ -157,7 +157,7 @@
         "options": {
           "timeout": 10000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"}]
           }
         }
       }
@@ -184,7 +184,7 @@
         "options": {
           "timeout": 180000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"}]
           }
         }
       }
@@ -215,7 +215,7 @@
         "options": {
           "timeout": 15000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"}]
           }
         }
       }
@@ -259,7 +259,7 @@
         "options": {
           "timeout": 10000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"}]
           }
         }
       }
@@ -285,7 +285,7 @@
         "options": {
           "timeout": 10000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Vireon').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to KOZMO Core').item.json.token }}"}]
           }
         }
       }
@@ -305,9 +305,9 @@
       ]
     },
     "Set Client ID": {
-      "main": [[{"node": "Login to Vireon", "type": "main", "index": 0}]]
+      "main": [[{"node": "Login to KOZMO Core", "type": "main", "index": 0}]]
     },
-    "Login to Vireon": {
+    "Login to KOZMO Core": {
       "main": [[{"node": "Discover Keywords", "type": "main", "index": 0}]]
     },
     "Discover Keywords": {

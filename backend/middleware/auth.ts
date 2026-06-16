@@ -41,6 +41,24 @@ export function verifyToken(token: string): JwtPayload & { jti?: string; deviceI
  */
 export function authenticate(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
+  const apiKey = req.headers['x-api-key'] as string | undefined;
+
+  // Allow API key auth for connector integrations (WordPress, etc.)
+  if (apiKey) {
+    const allowedKey = process.env.KOZMO_AI_WORDPRESS_API_KEY || process.env.API_KEY;
+    if (allowedKey && apiKey === allowedKey) {
+      (req as any).user = {
+        id: 'connector',
+        clientId: null,
+        role: 'connector',
+        email: 'connector@kozmocore.ai',
+      };
+      next();
+      return;
+    }
+    res.status(401).json({ error: 'Invalid API key' });
+    return;
+  }
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401).json({ error: 'Missing or invalid authorization header' });

@@ -185,12 +185,12 @@ pool.on('error', (err) => {
 if (process.env.NODE_ENV !== 'production') {
   app.get('/', (_req: Request, res: Response) => {
     res.json({
-      name: 'Vireon — AI SEO Automation System',
+      name: 'KOZMO Core — AI SEO Automation System',
       version: process.env.npm_package_version || '2.0.0',
       status: 'running',
       api: '/api',
       health: '/health',
-      docs: 'https://github.com/yusuf-mohamed0/Vireon'
+      docs: 'https://github.com/yusuf-mohamed0/KOZMO Core'
     });
   });
 }
@@ -385,6 +385,10 @@ app.use('/api/meta', createMetaRoutes(pool));
 
 // ═══════ Client Website Scanner Routes ═══════
 app.use('/api/scraper', createClientScraperRoutes(pool));
+
+// ═══════ Global Memory Routes ═════════════════
+import { createMemoryRoutes } from './routes/memory';
+app.use('/api/memory', createMemoryRoutes(pool));
 
 // ═══════ Worker Performance Scoring Routes ═══════
 app.use('/api/worker-scoring', createWorkerScoringRoutes(pool));

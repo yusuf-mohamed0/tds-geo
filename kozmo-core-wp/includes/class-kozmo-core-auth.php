@@ -1,0 +1,324 @@
+<?php
+/**
+ * KOZMO Core API Key Authentication
+ *
+ * Handles API key generation, validation, and permission checking
+ * for the KOZMO Core WordPress integration REST API.
+ *
+ * @package KOZMO_Core_Integration
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class KOZMO_Core_Auth {
+
+    /**
+     * @var self|null Singleton instance
+     */
+    private static ?self $instance = null;
+
+    /**
+     * @var array|null Cached active API keys
+     */
+    private static ?array $active_keys = null;
+
+    /**
+     * Initialize auth hooks.
+     */
+    public static function init(): void {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        self::ensure_schema();
+    }
+
+    private static function ensure_schema(): void {
+        global $wpdb;
+
+        $table = $wpdb->prefix . 'kozmo_core_api_keys';
+        $has_hash = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM {$table} LIKE %s", 'api_key_hash'));
+        if (!$has_hash) {
+            $wpdb->query("ALTER TABLE {$table} ADD COLUMN api_key_hash VARCHAR(255) DEFAULT NULL AFTER api_key");
+        }
+    }
+
+    private static function hash_api_key(string $api_key): string {
+        if (function_exists('wp_hash_password')) {
+            return wp_hash_password($api_key);
+        }
+
+        return password_hash($api_key, PASSWORD_DEFAULT);
+    }
+
+    private static function verify_api_key(string $api_key, string $hash): bool {
+        if (function_exists('wp_check_password')) {
+            return wp_check_password($api_key, $hash);
+        }
+
+        return password_verify($api_key, $hash);
+    }
+
+    private static function mask_key(?string $api_key): string {
+        if (!empty($api_key)) {
+            return substr($api_key, 0, 16) . '...';
+        }
+
+        return __('Stored securely', 'kozmo-core-integration');
+    }
+
+    /**
+     * Generate a new API key.
+     *
+     * @param string $label       Optional label for the key.
+     * @param string $permissions Comma-separated permissions (read, write).
+     * @param int    $created_by  WP user ID who created the key.
+     * @param int    $expires_in  Days until expiry (0 = never).
+     *
+     * @return array{success: bool, api_key?: string, message?: string}
+     */
+    public static function generate_key(
+        string $label = '',
+        string $permissions = 'read,write',
+        int $created_by = 0,
+        int $expires_in = 0
+    ): array {
+        global $wpdb;
+
+        $api_key = 'vrn_' . bin2hex(random_bytes(24));
+        $expires_at = $expires_in > 0
+            ? gmdate('Y-m-d H:i:s', time() + ($expires_in * DAY_IN_SECONDS))
+            : null;
+
+        $inserted = $wpdb->insert(
+            $wpdb->prefix . 'kozmo_core_api_keys',
+            [
+                'api_key'     => null,
+                'api_key_hash'=> self::hash_api_key($api_key),
+                'label'       => sanitize_text_field($label),
+                'permissions' => sanitize_text_field($permissions),
+                'is_active'   => 1,
+                'expires_at'  => $expires_at,
+                'created_by'  => $created_by ?: get_current_user_id(),
+            ],
+            ['%s', '%s', '%s', '%d', '%s', '%d', '%d']
+        );
+
+        if (!$inserted) {
+            return [
+                'success' => false,
+                'message' => __('Failed to generate API key.', 'kozmo-core-integration'),
+            ];
+        }
+
+        KOZMO_Core_Logger::info('API key generated', [
+            'label'       => $label,
+            'permissions' => $permissions,
+            'expires_in'  => $expires_in,
+        ]);
+
+        return [
+            'success' => true,
+            'api_key' => $api_key,
+            'message' => __('API key generated successfully.', 'kozmo-core-integration'),
+        ];
+    }
+
+    /**
+     * Validate an API key and return its permissions.
+     *
+     * @param string $api_key The key to validate.
+     *
+     * @return array{valid: bool, permissions: string[], message: string}
+     */
+    public static function validate_key(string $api_key): array {
+        global $wpdb;
+        if (self::$active_keys === null) {
+            self::$active_keys = $wpdb->get_results(
+                "SELECT id, api_key, api_key_hash, permissions
+                 FROM {$wpdb->prefix}kozmo_core_api_keys
+                 WHERE is_active = 1
+                 AND (expires_at IS NULL OR expires_at > NOW())",
+                ARRAY_A
+            );
+        }
+
+        foreach (self::$active_keys as $row) {
+            $legacy_match = !empty($row['api_key']) && hash_equals($row['api_key'], $api_key);
+            $hash_match = !empty($row['api_key_hash']) && self::verify_api_key($api_key, $row['api_key_hash']);
+
+            if (!$legacy_match && !$hash_match) {
+                continue;
+            }
+
+            $wpdb->update(
+                $wpdb->prefix . 'kozmo_core_api_keys',
+                ['last_used_at' => current_time('mysql')],
+                ['id' => (int) $row['id']],
+                ['%s'],
+                ['%d']
+            );
+
+            return [
+                'valid'       => true,
+                'permissions' => array_map('trim', explode(',', $row['permissions'])),
+                'message'     => 'Key is valid.',
+            ];
+        }
+
+        return [
+            'valid'       => false,
+            'permissions' => [],
+            'message'     => 'Invalid or revoked API key.',
+        ];
+    }
+
+    /**
+     * Revoke an API key (soft delete).
+     *
+     * @param string $api_key The key to revoke.
+     *
+     * @return bool
+     */
+    public static function revoke_key(string $api_key): bool {
+        global $wpdb;
+
+        $updated = $wpdb->update(
+            $wpdb->prefix . 'kozmo_core_api_keys',
+            ['is_active' => 0],
+            ['api_key' => $api_key],
+            ['%d'],
+            ['%s']
+        );
+
+        if ($updated) {
+            self::$active_keys = null; // bust cache
+            KOZMO_Core_Logger::info('API key revoked', ['api_key' => substr($api_key, 0, 12) . '...']);
+        }
+
+        return (bool) $updated;
+    }
+
+    /**
+     * List all API keys.
+     *
+     * @return array
+     */
+    public static function list_keys(): array {
+        global $wpdb;
+
+        $keys = $wpdb->get_results(
+            "SELECT id, api_key, label, permissions, is_active, last_used_at, expires_at, created_at
+             FROM {$wpdb->prefix}kozmo_core_api_keys
+             ORDER BY created_at DESC",
+            ARRAY_A
+        );
+
+        foreach ($keys as &$key) {
+            $key['masked_key'] = self::mask_key($key['api_key'] ?? '');
+        }
+
+        return $keys;
+    }
+
+    public static function revoke_key_by_id(int $key_id): bool {
+        global $wpdb;
+
+        $updated = $wpdb->update(
+            $wpdb->prefix . 'kozmo_core_api_keys',
+            ['is_active' => 0],
+            ['id' => $key_id],
+            ['%d'],
+            ['%d']
+        );
+
+        if ($updated) {
+            self::$active_keys = null;
+            KOZMO_Core_Logger::info('API key revoked', ['key_id' => $key_id]);
+        }
+
+        return (bool) $updated;
+    }
+
+    /**
+     * Check if a given permission is granted for the current request context.
+     *
+     * @param string $permission The permission to check (e.g., 'write').
+     * @param array  $key_data   The validated key data from validate_key().
+     *
+     * @return bool
+     */
+    public static function has_permission(string $permission, array $key_data): bool {
+        if (!$key_data['valid']) {
+            return false;
+        }
+        return in_array($permission, $key_data['permissions'], true);
+    }
+
+    /**
+     * Authenticate an incoming REST API request.
+     *
+     * Reads the X-KOZMO-Core-Key header and validates it.
+     *
+     * @return array{valid: bool, permissions: string[], message: string}
+     */
+    public static function authenticate_request(): array {
+        $api_key = '';
+
+        // Check header first
+        if (!empty($_SERVER['HTTP_X_KOZMO_CORE_KEY'])) {
+            $api_key = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_KOZMO_CORE_KEY']));
+        }
+
+        // Fallback: Authorization: Bearer <key>
+        if (empty($api_key) && !empty($_SERVER['HTTP_AUTHORIZATION'])) {
+            $auth = sanitize_text_field(wp_unslash($_SERVER['HTTP_AUTHORIZATION']));
+            if (str_starts_with($auth, 'Bearer ')) {
+                $api_key = trim(substr($auth, 7));
+            }
+        }
+
+        if (empty($api_key)) {
+            return [
+                'valid'       => false,
+                'permissions' => [],
+                'message'     => 'Missing API key. Provide via X-KOZMO-Core-Key header or Bearer token.',
+            ];
+        }
+
+        return self::validate_key($api_key);
+    }
+
+    /**
+     * Middleware-style REST permission callback.
+     *
+     * Usage: 'permission_callback' => ['KOZMO_Core_Auth', 'check_write_permission']
+     *
+     * @return bool
+     */
+    public static function check_read_permission(): bool {
+        $auth = self::authenticate_request();
+        return $auth['valid'] && self::has_permission('read', $auth);
+    }
+
+    /**
+     * Permission callback for write operations.
+     *
+     * @return bool
+     */
+    public static function check_write_permission(): bool {
+        $auth = self::authenticate_request();
+        return $auth['valid'] && self::has_permission('write', $auth);
+    }
+
+    /**
+     * Permission callback for admin operations.
+     *
+     * @return bool
+     */
+    public static function check_admin_permission(): bool {
+        // Admin operations also need WP admin privileges
+        return current_user_can('manage_options');
+    }
+}

@@ -842,7 +842,7 @@ const JOB_TYPE_ROUTING_RULES: JobTypeRoutingRule[] = [
     primaryQueue: QueueNames.ODOO_SYNC,
     primaryDepartment: 'odoo',
     fallbackDepartments: ['client_operations'],
-    description: 'Sync a single record between Vireon and Odoo',
+    description: 'Sync a single record between KOZMO Core and Odoo',
     requiresClientAuth: true,
     category: 'operations',
   },

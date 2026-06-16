@@ -5,17 +5,17 @@
  * @package           KozmoAI_WP
  * @author            KOZMO AI
  * @license           GPL-2.0-or-later
- * @link              https://vireon.io
+ * @link              https://kozmo-core.ai
  *
  * @wordpress-plugin
- * Plugin Name:       KOZMO AI — Autonomous WP Agent
- * Plugin URI:        https://vireon.io/wordpress
- * Description:       Autonomous AI agent for WordPress. Automatically understands, manages, optimizes, and grows your website with AI-powered SEO content automation.
- * Version:           2.3.3
+ * Plugin Name:       KOZMO AI — WordPress Connector
+ * Plugin URI:        https://kozmo-core.ai/wordpress
+ * Description:       Thin connector for KOZMO Core. Exposes REST API for post CRUD, media, taxonomies, and settings — all AI intelligence runs on the Core backend.
+ * Version:           3.0.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            KOZMO AI
- * Author URI:        https://vireon.io
+ * Author URI:        https://kozmo-core.ai
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       kozmo-ai-wp
@@ -90,14 +90,12 @@ if (!function_exists('mb_strtoupper')) {
 }
 
 // ─── Constants ───────────────────────────────────────
-define('KOZMO_AI_WP_VERSION', '2.3.3');
+define('KOZMO_AI_WP_VERSION', '3.0.0');
 define('KOZMO_AI_WP_FILE', __FILE__);
 define('KOZMO_AI_WP_DIR', plugin_dir_path(__FILE__));
 define('KOZMO_AI_WP_URL', plugin_dir_url(__FILE__));
 define('KOZMO_AI_WP_BASENAME', plugin_basename(__FILE__));
 define('KOZMO_AI_WP_API_NAMESPACE', 'kozmo-ai/v1');
-define('KOZMO_AI_WP_DB_VERSION', '2.3.3');
-define('KOZMO_AI_WP_AGENT_URL', defined('KOZMO_AI_AGENT_URL') ? KOZMO_AI_AGENT_URL : '');
 if (!defined('KOZMO_AI_DEFAULT_OPENAI_KEY')) define('KOZMO_AI_DEFAULT_OPENAI_KEY', '');
 if (!defined('KOZMO_AI_BACKEND_URL')) define('KOZMO_AI_BACKEND_URL', getenv('KOZMO_AI_BACKEND_URL') ?: '');
 
@@ -117,35 +115,7 @@ spl_autoload_register(function ($class) {
     if (file_exists($file)) require $file;
 });
 
-// ─── Custom cron schedules (registered early so available during activation) ───
-function kozmo_ai_wp_early_cron_schedules(array $schedules): array {
-    $schedules['kozmo_ai_every_minute'] = [
-        'interval' => 60,
-        'display'  => __('Every Minute', 'kozmo-ai-wp'),
-    ];
-    $schedules['kozmo_ai_every_5min'] = [
-        'interval' => 300,
-        'display'  => __('Every 5 Minutes', 'kozmo-ai-wp'),
-    ];
-    $schedules['kozmo_ai_every_15min'] = [
-        'interval' => 900,
-        'display'  => __('Every 15 Minutes', 'kozmo-ai-wp'),
-    ];
-    $schedules['kozmo_ai_hourly'] = [
-        'interval' => 3600,
-        'display'  => __('Hourly', 'kozmo-ai-wp'),
-    ];
-    $schedules['kozmo_ai_twice_daily'] = [
-        'interval' => 43200,
-        'display'  => __('Twice Daily', 'kozmo-ai-wp'),
-    ];
-    $schedules['kozmo_ai_daily'] = [
-        'interval' => 86400,
-        'display'  => __('Daily', 'kozmo-ai-wp'),
-    ];
-    return $schedules;
-}
-add_filter('cron_schedules', 'kozmo_ai_wp_early_cron_schedules');
+
 
 // ─── random_bytes polyfill for hardened PHP installs ──
 if (!function_exists('kozmo_ai_wp_random_bytes')) {

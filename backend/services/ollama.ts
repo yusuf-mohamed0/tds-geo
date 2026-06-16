@@ -12,6 +12,7 @@
 import { Ollama } from 'ollama';
 import { logger } from '../utils/logger';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
+import { writingSystemPrompt } from '../prompts';
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || '';
 const OLLAMA_API_KEY  = process.env.OLLAMA_API_KEY || '';
@@ -144,11 +145,14 @@ class OllamaService {
     const websiteIntelligence = (clientSettings as any).websiteIntelligence as string || '';
     const brandVoiceGuidance = (clientSettings as any).brandVoiceGuidance as string || '';
 
-    const systemPrompt = promptTemplate || this.defaultSystemPrompt({
-      tone, avoidKeywords,
-      ctaText: ctaText as string,
-      ctaUrl: ctaUrl as string,
-      minWords, maxWords,
+    const systemPrompt = promptTemplate || writingSystemPrompt({
+      TOPIC: keyword,
+      SITE_NAME: (clientSettings as any).siteName || process.env.SITE_NAME || 'Website',
+      SITE_DESCRIPTION: (clientSettings as any).siteDescription || process.env.SITE_DESCRIPTION || '',
+      CATEGORIES: (clientSettings as any).categories || '',
+      DATE: new Date().toISOString().split('T')[0],
+      YEAR: String(new Date().getFullYear()),
+      GRAPHIFY_CONTEXT: (clientSettings as any).graphifyContext || '',
     });
 
     let userPrompt = `Generate a complete SEO-optimized blog post about: "${keyword}"\n\n`;

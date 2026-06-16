@@ -32,7 +32,7 @@ class Sync {
         self::handle_featured_image($post_id, $article['featured_image_url'] ?? '');
         self::handle_meta($post_id, $article);
 
-        $agent_id = $article['agent_article_id'] ?? $article['vireon_article_id'] ?? $article['kozmo_ai_article_id'] ?? '';
+        $agent_id = $article['agent_article_id'] ?? $article['kozmo_core_article_id'] ?? $article['kozmo_ai_article_id'] ?? '';
         update_post_meta($post_id, '_kozmo_ai_article_id', $agent_id);
         update_post_meta($post_id, '_kozmo_ai_imported_at', current_time('mysql'));
 
@@ -86,8 +86,8 @@ class Sync {
 
     private static function build_post_data(array $article, ?\WP_Post $existing = null): array {
         $settings = get_option('kozmo_ai_wp_settings', []);
-        $vireon_status = strtolower($article['status'] ?? 'draft');
-        $wp_status = self::STATUS_MAP[$vireon_status] ?? 'draft';
+        $kozmo_core_status = strtolower($article['status'] ?? 'draft');
+        $wp_status = self::STATUS_MAP[$kozmo_core_status] ?? 'draft';
 
         $content = $article['content_html'] ?? $article['content'] ?? '';
         $content = wp_kses_post($content);

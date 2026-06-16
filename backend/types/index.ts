@@ -394,8 +394,8 @@ export type OdooModel =
   | 'res.users'
   | 'res.company';
 
-export type SyncDirection = 'bidirectional' | 'odoo_to_vireon' | 'vireon_to_odoo';
-export type ConflictStrategy = 'vireon_wins' | 'odoo_wins' | 'manual' | 'latest_wins';
+export type SyncDirection = 'bidirectional' | 'odoo_to_kozmo_core' | 'kozmo_core_to_odoo';
+export type ConflictStrategy = 'kozmo_core_wins' | 'odoo_wins' | 'manual' | 'latest_wins';
 export type SyncOperation = 'create' | 'update' | 'delete' | 'read' | 'sync';
 export type SyncStatus = 'success' | 'failed' | 'pending' | 'conflict' | 'skipped';
 
@@ -403,8 +403,8 @@ export interface OdooModelMapping {
   id: string;
   connection_id: string;
   odoo_model: OdooModel;
-  vireon_entity: string;
-  /** JSON object: { "odoo_field": "vireon_field" } */
+  kozmo_core_entity: string;
+  /** JSON object: { "odoo_field": "kozmo_core_field" } */
   field_mappings: Record<string, string>;
   sync_direction: SyncDirection;
   conflict_strategy: ConflictStrategy;
@@ -421,7 +421,7 @@ export interface OdooSyncLog {
   model: OdooModel;
   operation: SyncOperation;
   odoo_record_id?: number;
-  vireon_record_id?: string;
+  kozmo_core_record_id?: string;
   status: SyncStatus;
   /** Human-readable description of what changed */
   change_summary?: string;
@@ -515,7 +515,7 @@ export interface OdooSyncPayload {
   model: OdooModel;
   operation: SyncOperation;
   odooRecordId?: number;
-  vireonRecordId?: string;
+  kozmoCoreRecordId?: string;
   data?: Record<string, unknown>;
   fieldMappingId?: string;
 }

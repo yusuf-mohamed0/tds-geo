@@ -549,7 +549,7 @@ class OdooConnectorService {
     status: string,
     payload: {
       odooRecordId?: number;
-      vireonRecordId?: string;
+      kozmoCoreRecordId?: string;
       changeSummary?: string;
       errorMessage?: string;
       conflictDetails?: Record<string, unknown>;
@@ -561,12 +561,12 @@ class OdooConnectorService {
     try {
       await this.pool.query(
         `INSERT INTO odoo_sync_log
-         (connection_id, model, operation, odoo_record_id, vireon_record_id,
+         (connection_id, model, operation, odoo_record_id, kozmo_core_record_id,
           status, change_summary, error_message, conflict_details, duration_ms)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
           connectionId, model, operation, payload.odooRecordId || null,
-          payload.vireonRecordId || null, status, payload.changeSummary || null,
+          payload.kozmoCoreRecordId || null, status, payload.changeSummary || null,
           payload.errorMessage || null,
           payload.conflictDetails ? JSON.stringify(payload.conflictDetails) : null,
           payload.durationMs || null,
@@ -719,36 +719,36 @@ class OdooConnectorService {
   }
 
   /**
-   * Apply a field mapping to transform Odoo data to Vireon format.
+   * Apply a field mapping to transform Odoo data to KOZMO Core format.
    */
   applyFieldMapping(
     odooData: Record<string, unknown>,
     mapping: Record<string, string>
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    for (const [odooField, vireonField] of Object.entries(mapping)) {
+    for (const [odooField, kozmoCoreField] of Object.entries(mapping)) {
       if (odooData[odooField] !== undefined) {
-        result[vireonField] = odooData[odooField];
+        result[kozmoCoreField] = odooData[odooField];
       }
     }
     return result;
   }
 
   /**
-   * Reverse-apply a field mapping to transform Vireon data to Odoo format.
+   * Reverse-apply a field mapping to transform KOZMO Core data to Odoo format.
    */
   reverseFieldMapping(
-    vireonData: Record<string, unknown>,
+    kozmoCoreData: Record<string, unknown>,
     mapping: Record<string, string>
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     // Build reverse mapping
     const reverseMap: Record<string, string> = {};
-    for (const [odooField, vireonField] of Object.entries(mapping)) {
-      reverseMap[vireonField] = odooField;
+    for (const [odooField, kozmoCoreField] of Object.entries(mapping)) {
+      reverseMap[kozmoCoreField] = odooField;
     }
-    for (const [vireonField, value] of Object.entries(vireonData)) {
-      const odooField = reverseMap[vireonField];
+    for (const [kozmoCoreField, value] of Object.entries(kozmoCoreData)) {
+      const odooField = reverseMap[kozmoCoreField];
       if (odooField) {
         result[odooField] = value;
       }

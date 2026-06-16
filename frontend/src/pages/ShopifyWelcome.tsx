@@ -24,7 +24,7 @@ const STEPS = [
   {
     icon: '🔗',
     title: 'Connect Your Store',
-    desc: 'Your Shopify store is now connected. Vireon can access your products, content, and orders.',
+    desc: 'Your Shopify store is now connected. KOZMO Core can access your products, content, and orders.',
     done: true,
   },
   {
@@ -216,7 +216,7 @@ export default function ShopifyWelcome() {
           <div className="welcome-icon-wrap">
             <span className="welcome-icon">🎉</span>
           </div>
-          <h1>Welcome to Vireon!</h1>
+          <h1>Welcome to KOZMO Core!</h1>
           <p className="welcome-subtitle">
             Your store is now connected and ready for AI-powered content automation.
           </p>
@@ -407,7 +407,7 @@ export default function ShopifyWelcome() {
           </button>
           {isEmbedded && (
             <p className="welcome-embedded-note">
-              💡 Tip: You can always find Vireon in your Shopify admin under <strong>Apps → Vireon</strong>
+              💡 Tip: You can always find KOZMO Core in your Shopify admin under <strong>Apps → KOZMO Core</strong>
             </p>
           )}
         </div>

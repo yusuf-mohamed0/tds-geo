@@ -1,9 +1,9 @@
 {
-  "name": "@vireon/nextjs-integration",
+  "name": "@kozmo-core/nextjs-integration",
   "version": "1.0.0",
   "description": "Integrate KOZMO AI AI-generated content into your Next.js App Router site. Receive articles via API, store them with ISR revalidation, and render with pre-built blog components.",
   "keywords": [
-    "vireon",
+    "kozmo-core",
     "nextjs",
     "seo",
     "content",
@@ -12,13 +12,13 @@
     "headless-cms",
     "ai-content"
   ],
-  "homepage": "https://vireon.io",
+  "homepage": "https://kozmo-core.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yusuf-mohamed0/vireon-nextjs-integration"
+    "url": "https://github.com/yusuf-mohamed0/kozmo-core-nextjs-integration"
   },
   "license": "MIT",
-  "author": "KOZMO AI (https://vireon.io)",
+  "author": "KOZMO AI (https://kozmo-core.ai)",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
