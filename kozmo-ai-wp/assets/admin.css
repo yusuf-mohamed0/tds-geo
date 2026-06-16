@@ -204,6 +204,70 @@ details.k-details .k-details-body { padding: 20px; }
 .k-research-stat { font-size: 22px; font-weight: 700; color: var(--k-accent); }
 .k-research-label { font-size: 11px; color: var(--k-text-tertiary); text-transform: uppercase; letter-spacing: .03em; }
 
+/* ─── Daily Progress Ring ─── */
+.k-daily-ring { display: inline-flex; align-items: center; gap: 8px; }
+.k-ring-svg { width: 36px; height: 36px; transform: rotate(-90deg); }
+.k-ring-bg { fill: none; stroke: var(--k-bg-elevated); stroke-width: 3; }
+.k-ring-fg { fill: none; stroke: var(--k-accent); stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+.k-ring-text { position: absolute; font-size: 10px; font-weight: 700; color: var(--k-accent); }
+.k-gen-item { position: relative; }
+
+/* ─── Queue List ─── */
+.k-queue-list { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.k-queue-item { display: flex; align-items: center; gap: 8px; padding: 4px 8px; background: var(--k-bg-elevated); border-radius: var(--k-radius); font-size: 11px; }
+.k-queue-item .k-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--k-accent); animation: kPulse 1.5s ease-in-out infinite; flex-shrink: 0; }
+.k-queue-item .k-queue-label { color: var(--k-text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-queue-item .k-queue-eta { color: var(--k-text-tertiary); font-family: monospace; font-size: 10px; }
+
+/* ─── Milestone Banner ─── */
+.k-milestone { padding: 14px 18px; border-radius: var(--k-radius-lg); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; font-size: 13px; line-height: 1.5; background: linear-gradient(135deg, var(--k-accent-dim), var(--k-violet-dim)); border: 1px solid var(--k-accent); color: var(--k-accent); animation: kSlideIn .6s ease-out both; }
+@keyframes kSlideIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+.k-milestone-icon { font-size: 24px; flex-shrink: 0; }
+.k-milestone-text { flex: 1; }
+.k-milestone-close { background: none; border: none; color: var(--k-text-tertiary); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; }
+.k-milestone-close:hover { color: var(--k-text); background: var(--k-surface-hover); }
+
+/* ─── Generate Now Button Pulse ─── */
+#k-generate-now { position: relative; }
+#k-generate-now.k-generating:before { content: ''; position: absolute; inset: -2px; border-radius: 9999px; border: 2px solid var(--k-accent); animation: kRipple 1.5s ease-out infinite; }
+@keyframes kRipple { 0% { transform: scale(1); opacity: .6; } 100% { transform: scale(1.15); opacity: 0; } }
+
+/* ─── Test API Button ─── */
+.k-test-result { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 6px; padding: 4px 10px; border-radius: var(--k-radius); }
+.k-test-success { background: var(--k-green-dim); color: var(--k-green); }
+.k-test-fail { background: var(--k-red-dim); color: var(--k-red); }
+
+/* ─── Post List Columns ─── */
+.k-col-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 7px; border-radius: 9999px; font-weight: 500; }
+.k-col-badge.k-ai-gen { background: var(--k-accent-dim); color: var(--k-accent); }
+.k-col-badge.k-quality { background: var(--k-violet-dim); color: var(--k-violet); }
+.k-col-badge.k-draft { background: var(--k-yellow-dim); color: var(--k-yellow); }
+.k-col-pipeline { font-size: 11px; color: var(--k-text-tertiary); }
+
+/* ─── Mobile Responsive ─── */
+@media (max-width: 782px) {
+  .k-nav { flex-wrap: wrap; gap: 8px; }
+  .k-nav-items { order: 3; width: 100%; overflow-x: auto; }
+  .k-nav-status { margin-left: 0; }
+  .k-gen { flex-direction: column; align-items: stretch; }
+  .k-gen-info { justify-content: center; }
+  .k-gen-actions { margin-left: 0; justify-content: center; }
+  .k-grid { grid-template-columns: 1fr 1fr; }
+  .k-panel { grid-template-columns: 1fr; }
+  .k-table thead th, .k-table tbody td { padding: 6px 8px; font-size: 12px; }
+  .k-table thead th:last-child, .k-table tbody td:last-child { display: none; }
+  .k-research-grid { grid-template-columns: 1fr; }
+  .k-health { grid-template-columns: 1fr; }
+  .k-shell { padding: 16px 12px; }
+  .k-stat { padding: 12px 14px; }
+  .k-stat-value { font-size: 20px; }
+}
+@media (max-width: 480px) {
+  .k-grid { grid-template-columns: 1fr; }
+  .k-gen-info { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .k-stat-value { font-size: 18px; }
+}
+
 /* ─── Override WordPress Admin Noise ─── */
 body.kozmo-dark { background: var(--k-bg) !important; }
 body.kozmo-dark #wpcontent { background: var(--k-bg); }

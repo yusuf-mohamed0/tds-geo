@@ -298,6 +298,7 @@ class Worker {
             'failed'    => (int) $wpdb->get_var("SELECT COUNT(*) FROM {$table} WHERE status = 'failed'"),
             'total'     => (int) $wpdb->get_var("SELECT COUNT(*) FROM {$table}"),
             'by_type'   => $wpdb->get_results("SELECT task_type, COUNT(*) as count FROM {$table} WHERE status = 'pending' GROUP BY task_type", OBJECT_K),
+            'pending_tasks' => $wpdb->get_col("SELECT task_type FROM {$table} WHERE status = 'pending' ORDER BY priority ASC, created_at ASC LIMIT 10"),
         ];
     }
 }

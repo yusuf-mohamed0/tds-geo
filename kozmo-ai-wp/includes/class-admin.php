@@ -16,8 +16,13 @@ class Admin {
         add_action('wp_ajax_kozmo_ai_dashboard_data', [Dashboard::class, 'ajax_data']);
         add_action('wp_ajax_kozmo_ai_article_action', [self::class, 'handle_article_action']);
         add_action('wp_ajax_kozmo_ai_research_data', [self::class, 'handle_research_data']);
+        add_action('wp_ajax_kozmo_ai_generate_now', [self::class, 'handle_generate_now']);
+        add_action('wp_ajax_kozmo_ai_test_api', [self::class, 'handle_test_api']);
+        add_action('wp_ajax_kozmo_ai_dismiss_milestone', [self::class, 'handle_dismiss_milestone']);
         add_filter('plugin_action_links_' . KOZMO_AI_WP_BASENAME, [self::class, 'action_links']);
         add_filter('admin_body_class', [self::class, 'body_class']);
+        add_filter('manage_post_posts_columns', [self::class, 'post_columns']);
+        add_action('manage_post_posts_custom_column', [self::class, 'post_column_data'], 10, 2);
     }
 
     public static function body_class(string $classes): string {
@@ -163,7 +168,7 @@ class Admin {
                 <div class="k-section k-fade">
                     <div class="k-section-header">⚙ OpenAI</div>
                     <div class="k-card">
-                        <div class="k-field"><label>API Key</label><input type="password" name="openai_api_key" value="<?php echo !empty($settings['openai_api_key']) ? '********' : ''; ?>" placeholder="sk-..." /><div class="k-desc">The only required field. Everything else auto-configures.</div></div>
+                        <div class="k-field"><label>API Key</label><input type="password" name="openai_api_key" value="<?php echo !empty($settings['openai_api_key']) ? '********' : ''; ?>" placeholder="sk-..." /><div class="k-desc">The only required field. Everything else auto-configures.</div><button id="k-test-api" class="k-btn k-btn-secondary k-btn-sm" style="margin-top:8px;">Test Connection</button></div>
                         <div class="k-field"><label>Model</label><select name="openai_model"><option value="gpt-4o" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o'); ?>>GPT-4o (recommended)</option><option value="gpt-4o-mini" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4o-mini'); ?>>GPT-4o Mini (cheaper)</option><option value="gpt-4-turbo" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4-turbo'); ?>>GPT-4 Turbo</option></select></div>
                     </div>
                 </div>
@@ -546,5 +551,106 @@ class Admin {
         })(jQuery);
         </script>
         <?php
+    }
+
+    // ── Test API Key AJAX ──
+    public static function handle_test_api(): void {
+        check_ajax_referer('kozmo_ai_wp_ajax', 'nonce');
+        if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized']);
+
+        try {
+            $api_key = ContentGenerator::get_openai_key();
+            if (empty($api_key)) {
+                wp_send_json_error(['message' => 'No API key configured. Add one in Settings.']);
+                return;
+            }
+            $response = wp_remote_get('https://api.openai.com/v1/models', [
+                'timeout' => 15,
+                'headers' => ['Authorization' => 'Bearer ' . $api_key],
+            ]);
+            if (is_wp_error($response)) {
+                wp_send_json_error(['message' => 'Connection failed: ' . $response->get_error_message()]);
+                return;
+            }
+            $status = wp_remote_retrieve_response_code($response);
+            if ($status === 200) {
+                $body = json_decode(wp_remote_retrieve_body($response), true);
+                $model = $body['data'][0]['id'] ?? 'Connected';
+                $settings = get_option('kozmo_ai_wp_settings', []);
+                $configured = $settings['openai_model'] ?? 'gpt-4o';
+                wp_send_json_success(['model' => "Key works! Connected as '{$configured}'"]);
+            } elseif ($status === 401) {
+                wp_send_json_error(['message' => 'Invalid API key. Check your key in Settings.']);
+            } else {
+                wp_send_json_error(['message' => "HTTP {$status} — unexpected response from OpenAI"]);
+            }
+        } catch (\Throwable $e) {
+            wp_send_json_error(['message' => $e->getMessage()]);
+        }
+    }
+
+    // ── Generate Now AJAX ──
+    public static function handle_generate_now(): void {
+        check_ajax_referer('kozmo_ai_wp_ajax', 'nonce');
+        if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized']);
+
+        if (!ContentGenerator::is_configured()) {
+            wp_send_json_error(['message' => 'OpenAI key not configured. Go to Settings first.']);
+            return;
+        }
+        if (get_transient('kozmo_ai_generate_lock')) {
+            wp_send_json_error(['message' => 'Generation already in progress. Please wait.']);
+            return;
+        }
+
+        Worker::enqueue('discover_topics', ['trigger' => 'manual'], 1);
+        Logger::info('Manual generation triggered via Dashboard');
+
+        wp_send_json_success(['message' => 'Generation started — articles will appear in the queue shortly.']);
+    }
+
+    // ── Dismiss Milestone AJAX ──
+    public static function handle_dismiss_milestone(): void {
+        check_ajax_referer('kozmo_ai_wp_ajax', 'nonce');
+        if (!current_user_can('manage_options')) return;
+        update_user_meta(get_current_user_id(), 'kozmo_ai_milestone_dismissed', current_time('mysql'));
+        wp_send_json_success();
+    }
+
+    // ── Post List Columns ──
+    public static function post_columns(array $columns): array {
+        $columns['kozmo_ai_badge'] = 'KOZMO AI';
+        $columns['kozmo_ai_quality'] = 'Quality';
+        $columns['kozmo_ai_pipeline'] = 'Pipeline';
+        return $columns;
+    }
+
+    public static function post_column_data(string $column, int $post_id): void {
+        if ($column === 'kozmo_ai_badge') {
+            $generated = get_post_meta($post_id, '_kozmo_ai_auto_generated', true);
+            if ($generated) {
+                echo '<span class="k-col-badge k-ai-gen">AI</span>';
+            }
+        }
+        if ($column === 'kozmo_ai_quality') {
+            $score = get_post_meta($post_id, '_kozmo_ai_quality_score', true);
+            if (!$score) {
+                global $wpdb;
+                $score = $wpdb->get_var($wpdb->prepare(
+                    "SELECT quality_score FROM {$wpdb->prefix}kozmo_ai_articles WHERE post_id = %d", $post_id
+                ));
+            }
+            if ($score) {
+                $v = round((float) $score);
+                $cls = $v >= 90 ? 'k-quality' : ($v >= 70 ? 'k-tag-yellow' : 'k-tag-red');
+                echo '<span class="k-col-badge ' . $cls . '">' . $v . '</span>';
+            }
+        }
+        if ($column === 'kozmo_ai_pipeline') {
+            $stage = get_post_meta($post_id, '_kozmo_ai_pipeline_stage', true);
+            if ($stage) {
+                echo '<span class="k-col-pipeline">' . esc_html($stage) . '</span>';
+            }
+        }
     }
 }
