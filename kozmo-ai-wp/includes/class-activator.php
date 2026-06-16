@@ -69,7 +69,8 @@ class Activator {
         // API keys
         $tables[] = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}kozmo_ai_api_keys (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            api_key VARCHAR(64) NOT NULL UNIQUE,
+            api_key VARCHAR(64) DEFAULT NULL UNIQUE,
+            api_key_hash VARCHAR(255) DEFAULT NULL,
             label VARCHAR(100) DEFAULT NULL,
             permissions VARCHAR(255) NOT NULL DEFAULT 'read,write',
             is_active TINYINT(1) NOT NULL DEFAULT 1,
@@ -241,6 +242,8 @@ class Activator {
             'kozmo_ai_maintenance',
             'kozmo_ai_sync',
             'kozmo_ai_cleanup',
+            'kozmo_ai_generate_articles',
+            'kozmo_ai_discover_topics',
         ];
         foreach ($hooks as $hook) {
             $timestamp = wp_next_scheduled($hook);

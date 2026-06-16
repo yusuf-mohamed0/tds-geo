@@ -238,7 +238,7 @@ class Admin {
                     <thead><tr><th><?php esc_html_e('Label', 'kozmo-ai-wp'); ?></th><th><?php esc_html_e('Key', 'kozmo-ai-wp'); ?></th><th><?php esc_html_e('Permissions', 'kozmo-ai-wp'); ?></th><th><?php esc_html_e('Status', 'kozmo-ai-wp'); ?></th><th><?php esc_html_e('Actions', 'kozmo-ai-wp'); ?></th></tr></thead>
                     <tbody><?php foreach ($keys as $key): ?><tr>
                         <td><?php echo esc_html($key['label'] ?: '—'); ?></td>
-                        <td><code><?php echo esc_html(substr($key['api_key'], 0, 16) . '...'); ?></code></td>
+                        <td><code><?php echo esc_html($key['masked_key'] ?? __('Stored securely', 'kozmo-ai-wp')); ?></code></td>
                         <td><?php echo esc_html($key['permissions']); ?></td>
                         <td><span class="kozmo-badge <?php echo $key['is_active'] ? 'badge-active' : 'badge-inactive'; ?>"><?php echo $key['is_active'] ? __('Active', 'kozmo-ai-wp') : __('Revoked', 'kozmo-ai-wp'); ?></span></td>
                         <td><?php if ($key['is_active']): ?>

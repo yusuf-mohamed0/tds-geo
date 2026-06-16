@@ -21,8 +21,13 @@ class Scheduler {
      * Schedule the auto-generation cron job if it's not already scheduled.
      */
     public static function schedule_auto_generation(): void {
+        $settings = get_option('kozmo_ai_wp_settings', []);
+        if (($settings['enable_auto_generation'] ?? 'no') !== 'yes') {
+            self::clear_auto_generation();
+            return;
+        }
+
         if (!wp_next_scheduled('kozmo_ai_generate_articles')) {
-            $settings = get_option('kozmo_ai_wp_settings', []);
             // Check if auto-generation is enabled and OpenAI key is configured
             if (ContentGenerator::is_configured()) {
                 $frequency = $settings['generation_frequency'] ?? 'kozmo_ai_twice_daily';

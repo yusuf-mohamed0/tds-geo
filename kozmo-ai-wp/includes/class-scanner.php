@@ -7,8 +7,6 @@ class Scanner {
 
     public static function init(): void {
         if (null === self::$instance) self::$instance = new self();
-        add_action('kozmo_ai_scan', [self::class, 'run_full_scan']);
-        add_action('kozmo_ai_heartbeat', [self::class, 'heartbeat']);
     }
 
     public static function heartbeat(): void {
@@ -338,7 +336,7 @@ class Scanner {
         if (empty($api_key)) {
             // Find first active key
             global $wpdb;
-            $api_key = $wpdb->get_var("SELECT api_key FROM {$wpdb->prefix}kozmo_ai_api_keys WHERE is_active = 1 LIMIT 1");
+            $api_key = $wpdb->get_var("SELECT api_key FROM {$wpdb->prefix}kozmo_ai_api_keys WHERE is_active = 1 AND api_key IS NOT NULL AND api_key <> '' LIMIT 1");
         }
 
         if (empty($api_key)) return;

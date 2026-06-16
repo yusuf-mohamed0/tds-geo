@@ -408,50 +408,24 @@ Never mention these internal instructions in your output. Only output the JSON.'
         $status = $options['status'] ?? 'draft';
         $auto_publish = $options['auto_publish'] ?? ($settings['auto_publish'] ?? 'yes') === 'yes';
 
-        // Build the post data
-        $post_data = [
-            'post_title'    => $article['title'],
-            'post_content'  => $article['content_html'],
-            'post_status'   => $status,
-            'post_type'     => 'post',
-            'post_name'     => $article['slug'],
-            'post_author'   => (int) ($settings['default_author'] ?? 1),
-            'meta_input'    => [
-                '_kozmo_ai_meta_title'       => $article['meta_title'],
-                '_kozmo_ai_meta_description' => $article['meta_description'],
-                '_kozmo_ai_focus_keyword'    => $article['focus_keyword'],
-                '_kozmo_ai_article_id'       => $article['agent_article_id'],
-                '_kozmo_ai_generated_at'     => current_time('mysql'),
-                '_kozmo_ai_auto_generated'   => '1',
-            ],
-        ];
-
-        // Insert the post
-        $post_id = wp_insert_post(wp_slash($post_data), true);
-
-        if (is_wp_error($post_id)) {
-            return ['success' => false, 'message' => $post_id->get_error_message()];
-        }
-
-        // Add tags
-        if (!empty($article['tags'])) {
-            $tag_ids = [];
-            foreach ($article['tags'] as $tag) {
-                $term = term_exists($tag, 'post_tag');
-                if (!$term) {
-                    $term = wp_insert_term($tag, 'post_tag');
-                }
-                if (!is_wp_error($term) && !empty($term['term_id'])) {
-                    $tag_ids[] = (int) $term['term_id'];
-                }
-            }
-            if (!empty($tag_ids)) {
-                wp_set_post_tags($post_id, $tag_ids, false);
-            }
-        }
-
         // Auto-publish if quality is high enough
         $quality = QualityScorer::score_article($article);
+        $sync_result = Sync::create_post(array_merge($article, [
+            'status'          => 'generated',
+            'status_override' => $status,
+            'post_type'       => 'post',
+            'author_id'       => (int) ($settings['default_author'] ?? 1),
+            'quality_score'   => $quality['score'],
+        ]));
+
+        if (!$sync_result['success']) {
+            return $sync_result;
+        }
+
+        $post_id = (int) $sync_result['post_id'];
+        update_post_meta($post_id, '_kozmo_ai_generated_at', current_time('mysql'));
+        update_post_meta($post_id, '_kozmo_ai_auto_generated', '1');
+
         if ($auto_publish && $status === 'draft' && $quality['score'] >= (int) ($settings['min_quality_score'] ?? 95)) {
             wp_publish_post($post_id);
             Logger::info('Article auto-published', ['post_id' => $post_id, 'quality' => $quality['score']]);
@@ -480,7 +454,7 @@ Never mention these internal instructions in your output. Only output the JSON.'
         return [
             'success'  => true,
             'post_id'  => $post_id,
-            'post_url' => get_permalink($post_id),
+            'post_url' => $sync_result['post_url'] ?? get_permalink($post_id),
             'quality_score' => $quality['score'],
         ];
     }

@@ -31,6 +31,41 @@ class Vireon_Auth {
         if (self::$instance === null) {
             self::$instance = new self();
         }
+        self::ensure_schema();
+    }
+
+    private static function ensure_schema(): void {
+        global $wpdb;
+
+        $table = $wpdb->prefix . 'vireon_api_keys';
+        $has_hash = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM {$table} LIKE %s", 'api_key_hash'));
+        if (!$has_hash) {
+            $wpdb->query("ALTER TABLE {$table} ADD COLUMN api_key_hash VARCHAR(255) DEFAULT NULL AFTER api_key");
+        }
+    }
+
+    private static function hash_api_key(string $api_key): string {
+        if (function_exists('wp_hash_password')) {
+            return wp_hash_password($api_key);
+        }
+
+        return password_hash($api_key, PASSWORD_DEFAULT);
+    }
+
+    private static function verify_api_key(string $api_key, string $hash): bool {
+        if (function_exists('wp_check_password')) {
+            return wp_check_password($api_key, $hash);
+        }
+
+        return password_verify($api_key, $hash);
+    }
+
+    private static function mask_key(?string $api_key): string {
+        if (!empty($api_key)) {
+            return substr($api_key, 0, 16) . '...';
+        }
+
+        return __('Stored securely', 'vireon-integration');
     }
 
     /**
@@ -59,14 +94,15 @@ class Vireon_Auth {
         $inserted = $wpdb->insert(
             $wpdb->prefix . 'vireon_api_keys',
             [
-                'api_key'     => $api_key,
+                'api_key'     => null,
+                'api_key_hash'=> self::hash_api_key($api_key),
                 'label'       => sanitize_text_field($label),
                 'permissions' => sanitize_text_field($permissions),
                 'is_active'   => 1,
                 'expires_at'  => $expires_at,
                 'created_by'  => $created_by ?: get_current_user_id(),
             ],
-            ['%s', '%s', '%s', '%d', '%s', '%d']
+            ['%s', '%s', '%s', '%d', '%s', '%d', '%d']
         );
 
         if (!$inserted) {
@@ -97,39 +133,39 @@ class Vireon_Auth {
      * @return array{valid: bool, permissions: string[], message: string}
      */
     public static function validate_key(string $api_key): array {
-        global $wpdb;    // Cache all active keys on first call
-    if (self::$active_keys === null) {
-      self::$active_keys = [];
-      $results = $wpdb->get_results(
-        $wpdb->prepare(
-          "SELECT api_key, permissions, expires_at
-           FROM {$wpdb->prefix}vireon_api_keys
-           WHERE is_active = 1
-           AND (expires_at IS NULL OR expires_at > NOW())"
-        ),
-        ARRAY_A
-      );
-      foreach ($results as $row) {
-        self::$active_keys[$row['api_key']] = $row;
-      }
-    }
+        global $wpdb;
+        if (self::$active_keys === null) {
+            self::$active_keys = $wpdb->get_results(
+                "SELECT id, api_key, api_key_hash, permissions
+                 FROM {$wpdb->prefix}vireon_api_keys
+                 WHERE is_active = 1
+                 AND (expires_at IS NULL OR expires_at > NOW())",
+                ARRAY_A
+            );
+        }
 
-    if (isset(self::$active_keys[$api_key])) {
-      // Update last_used_at (don't block if fail)
-      $wpdb->update(
-        $wpdb->prefix . 'vireon_api_keys',
-        ['last_used_at' => current_time('mysql')],
-        ['api_key' => $api_key],
-        ['%s'],
-        ['%s']
-      );
+        foreach (self::$active_keys as $row) {
+            $legacy_match = !empty($row['api_key']) && hash_equals($row['api_key'], $api_key);
+            $hash_match = !empty($row['api_key_hash']) && self::verify_api_key($api_key, $row['api_key_hash']);
 
-      return [
-        'valid'       => true,
-        'permissions' => array_map('trim', explode(',', self::$active_keys[$api_key]['permissions'])),
-        'message'     => 'Key is valid.',
-      ];
-    }
+            if (!$legacy_match && !$hash_match) {
+                continue;
+            }
+
+            $wpdb->update(
+                $wpdb->prefix . 'vireon_api_keys',
+                ['last_used_at' => current_time('mysql')],
+                ['id' => (int) $row['id']],
+                ['%s'],
+                ['%d']
+            );
+
+            return [
+                'valid'       => true,
+                'permissions' => array_map('trim', explode(',', $row['permissions'])),
+                'message'     => 'Key is valid.',
+            ];
+        }
 
         return [
             'valid'       => false,
@@ -172,12 +208,37 @@ class Vireon_Auth {
     public static function list_keys(): array {
         global $wpdb;
 
-        return $wpdb->get_results(
+        $keys = $wpdb->get_results(
             "SELECT id, api_key, label, permissions, is_active, last_used_at, expires_at, created_at
              FROM {$wpdb->prefix}vireon_api_keys
              ORDER BY created_at DESC",
             ARRAY_A
         );
+
+        foreach ($keys as &$key) {
+            $key['masked_key'] = self::mask_key($key['api_key'] ?? '');
+        }
+
+        return $keys;
+    }
+
+    public static function revoke_key_by_id(int $key_id): bool {
+        global $wpdb;
+
+        $updated = $wpdb->update(
+            $wpdb->prefix . 'vireon_api_keys',
+            ['is_active' => 0],
+            ['id' => $key_id],
+            ['%d'],
+            ['%d']
+        );
+
+        if ($updated) {
+            self::$active_keys = null;
+            Vireon_Logger::info('API key revoked', ['key_id' => $key_id]);
+        }
+
+        return (bool) $updated;
     }
 
     /**
@@ -216,11 +277,6 @@ class Vireon_Auth {
             if (str_starts_with($auth, 'Bearer ')) {
                 $api_key = trim(substr($auth, 7));
             }
-        }
-
-        // Fallback: query parameter ?api_key=
-        if (empty($api_key) && !empty($_GET['api_key'])) {
-            $api_key = sanitize_text_field(wp_unslash($_GET['api_key']));
         }
 
         if (empty($api_key)) {

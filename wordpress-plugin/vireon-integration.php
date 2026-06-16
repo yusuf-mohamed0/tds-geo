@@ -144,7 +144,8 @@ function vireon_activate(): void {
     $keys_table = $wpdb->prefix . 'vireon_api_keys';
     $sql_keys = "CREATE TABLE IF NOT EXISTS {$keys_table} (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        api_key VARCHAR(64) NOT NULL UNIQUE,
+        api_key VARCHAR(64) DEFAULT NULL UNIQUE,
+        api_key_hash VARCHAR(255) DEFAULT NULL,
         label VARCHAR(100) DEFAULT NULL,
         permissions VARCHAR(255) NOT NULL DEFAULT 'read,write',
         is_active TINYINT(1) NOT NULL DEFAULT 1,

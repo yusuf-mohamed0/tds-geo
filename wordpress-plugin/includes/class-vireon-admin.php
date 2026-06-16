@@ -529,7 +529,7 @@ class Vireon_Admin {
                             <?php foreach ($keys as $key): ?>
                                 <tr>
                                     <td><?php echo esc_html($key['label'] ?: '—'); ?></td>
-                                    <td><code><?php echo esc_html(substr($key['api_key'], 0, 16) . '...'); ?></code></td>
+                                    <td><code><?php echo esc_html($key['masked_key'] ?? __('Stored securely', 'vireon-integration')); ?></code></td>
                                     <td><?php echo esc_html($key['permissions']); ?></td>
                                     <td>
                                         <span class="vireon-status-badge <?php echo $key['is_active'] ? 'badge-active' : 'badge-inactive'; ?>">
@@ -704,16 +704,8 @@ class Vireon_Admin {
 
         $key_id = absint(wp_unslash($_POST['key_id'] ?? 0));
 
-        global $wpdb;
-        $key_data = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT api_key FROM {$wpdb->prefix}vireon_api_keys WHERE id = %d",
-                $key_id
-            )
-        );
-
-        if ($key_data) {
-            Vireon_Auth::revoke_key($key_data);
+        if ($key_id > 0) {
+            Vireon_Auth::revoke_key_by_id($key_id);
         }
 
         wp_safe_redirect(admin_url('admin.php?page=vireon-keys'));
@@ -789,9 +781,12 @@ class Vireon_Admin {
         global $wpdb;
 
         // Get an active API key from the database
-        $api_key = $wpdb->get_var(
-            "SELECT api_key FROM {$wpdb->prefix}vireon_api_keys WHERE is_active = 1 AND (expires_at IS NULL OR expires_at > NOW()) LIMIT 1"
-        );
+        $api_key = get_option('vireon_initial_api_key', '');
+        if (empty($api_key)) {
+            $api_key = $wpdb->get_var(
+                "SELECT api_key FROM {$wpdb->prefix}vireon_api_keys WHERE is_active = 1 AND api_key IS NOT NULL AND api_key <> '' AND (expires_at IS NULL OR expires_at > NOW()) LIMIT 1"
+            );
+        }
 
         if (empty($api_key)) {
             wp_send_json_error([

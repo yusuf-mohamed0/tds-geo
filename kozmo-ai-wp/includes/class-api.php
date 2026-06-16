@@ -20,66 +20,107 @@ class Api {
         register_rest_route($ns, '/status', [
             'methods'             => 'GET',
             'callback'            => [self::class, 'get_status'],
-            'permission_callback' => [Auth::class, 'check_read_permission'],
+            'permission_callback' => [self::class, 'check_read_permission'],
         ]);
 
         // Posts CRUD
         register_rest_route($ns, '/posts', [
-            ['methods' => 'POST', 'callback' => [self::class, 'create_post'], 'permission_callback' => [Auth::class, 'check_write_permission'], 'args' => self::post_args()],
-            ['methods' => 'GET',  'callback' => [self::class, 'list_posts'], 'permission_callback' => [Auth::class, 'check_read_permission']],
+            ['methods' => 'POST', 'callback' => [self::class, 'create_post'], 'permission_callback' => [self::class, 'check_write_permission'], 'args' => self::post_args()],
+            ['methods' => 'GET',  'callback' => [self::class, 'list_posts'], 'permission_callback' => [self::class, 'check_read_permission']],
         ]);
         register_rest_route($ns, '/posts/(?P<id>\d+)', [
-            ['methods' => 'GET',    'callback' => [self::class, 'get_post'], 'permission_callback' => [Auth::class, 'check_read_permission']],
-            ['methods' => 'PUT',    'callback' => [self::class, 'update_post'], 'permission_callback' => [Auth::class, 'check_write_permission']],
-            ['methods' => 'DELETE', 'callback' => [self::class, 'delete_post'], 'permission_callback' => [Auth::class, 'check_write_permission']],
+            ['methods' => 'GET',    'callback' => [self::class, 'get_post'], 'permission_callback' => [self::class, 'check_read_permission']],
+            ['methods' => 'PUT',    'callback' => [self::class, 'update_post'], 'permission_callback' => [self::class, 'check_write_permission']],
+            ['methods' => 'DELETE', 'callback' => [self::class, 'delete_post'], 'permission_callback' => [self::class, 'check_write_permission']],
         ]);
 
         // Batch
         register_rest_route($ns, '/posts/batch', [
-            'methods' => 'POST', 'callback' => [self::class, 'batch_posts'], 'permission_callback' => [Auth::class, 'check_write_permission'],
+            'methods' => 'POST', 'callback' => [self::class, 'batch_posts'], 'permission_callback' => [self::class, 'check_write_permission'],
         ]);
 
         // Media
         register_rest_route($ns, '/media', [
-            'methods' => 'POST', 'callback' => [self::class, 'upload_media'], 'permission_callback' => [Auth::class, 'check_write_permission'],
+            'methods' => 'POST', 'callback' => [self::class, 'upload_media'], 'permission_callback' => [self::class, 'check_write_permission'],
         ]);
 
         // Taxonomies
-        register_rest_route($ns, '/categories', ['methods' => 'GET', 'callback' => [self::class, 'list_categories'], 'permission_callback' => [Auth::class, 'check_read_permission']]);
-        register_rest_route($ns, '/tags', ['methods' => 'GET', 'callback' => [self::class, 'list_tags'], 'permission_callback' => [Auth::class, 'check_read_permission']]);
-        register_rest_route($ns, '/authors', ['methods' => 'GET', 'callback' => [self::class, 'list_authors'], 'permission_callback' => [Auth::class, 'check_read_permission']]);
+        register_rest_route($ns, '/categories', ['methods' => 'GET', 'callback' => [self::class, 'list_categories'], 'permission_callback' => [self::class, 'check_read_permission']]);
+        register_rest_route($ns, '/tags', ['methods' => 'GET', 'callback' => [self::class, 'list_tags'], 'permission_callback' => [self::class, 'check_read_permission']]);
+        register_rest_route($ns, '/authors', ['methods' => 'GET', 'callback' => [self::class, 'list_authors'], 'permission_callback' => [self::class, 'check_read_permission']]);
 
         // Settings
         register_rest_route($ns, '/settings', [
-            ['methods' => 'GET', 'callback' => [self::class, 'get_settings'], 'permission_callback' => [Auth::class, 'check_read_permission']],
-            ['methods' => 'PUT', 'callback' => [self::class, 'update_settings'], 'permission_callback' => [Auth::class, 'check_write_permission']],
+            ['methods' => 'GET', 'callback' => [self::class, 'get_settings'], 'permission_callback' => [self::class, 'check_read_permission']],
+            ['methods' => 'PUT', 'callback' => [self::class, 'update_settings'], 'permission_callback' => [self::class, 'check_write_permission']],
         ]);
 
         // Scanner / knowledge base
-        register_rest_route($ns, '/scan', ['methods' => 'POST', 'callback' => [self::class, 'trigger_scan'], 'permission_callback' => [Auth::class, 'check_write_permission']]);
-        register_rest_route($ns, '/knowledge', ['methods' => 'GET', 'callback' => [self::class, 'get_knowledge'], 'permission_callback' => [Auth::class, 'check_read_permission']]);
+        register_rest_route($ns, '/scan', ['methods' => 'POST', 'callback' => [self::class, 'trigger_scan'], 'permission_callback' => [self::class, 'check_write_permission']]);
+        register_rest_route($ns, '/knowledge', ['methods' => 'GET', 'callback' => [self::class, 'get_knowledge'], 'permission_callback' => [self::class, 'check_read_permission']]);
 
         // Webhook receiver
         register_rest_route($ns, '/webhook', ['methods' => 'POST', 'callback' => [self::class, 'handle_webhook'], 'permission_callback' => '__return_true']);
 
         // Analytics / reporting
-        register_rest_route($ns, '/analytics', ['methods' => 'GET', 'callback' => [self::class, 'get_analytics'], 'permission_callback' => [Auth::class, 'check_read_permission']]);
+        register_rest_route($ns, '/analytics', ['methods' => 'GET', 'callback' => [self::class, 'get_analytics'], 'permission_callback' => [self::class, 'check_read_permission']]);
 
         // Queue management
-        register_rest_route($ns, '/queue', ['methods' => 'GET', 'callback' => [self::class, 'get_queue'], 'permission_callback' => [Auth::class, 'check_read_permission']]);
-        register_rest_route($ns, '/queue/process', ['methods' => 'POST', 'callback' => [self::class, 'process_queue'], 'permission_callback' => [Auth::class, 'check_write_permission']]);
+        register_rest_route($ns, '/queue', ['methods' => 'GET', 'callback' => [self::class, 'get_queue'], 'permission_callback' => [self::class, 'check_read_permission']]);
+        register_rest_route($ns, '/queue/process', ['methods' => 'POST', 'callback' => [self::class, 'process_queue'], 'permission_callback' => [self::class, 'check_write_permission']]);
 
         // AI Article Generation — calls OpenAI directly, no cron/queue needed
         register_rest_route($ns, '/generate', [
             'methods'             => 'POST',
             'callback'            => [self::class, 'generate_ai_article'],
-            'permission_callback' => [Auth::class, 'check_write_permission'],
+            'permission_callback' => [self::class, 'check_write_permission'],
             'args'                => [
                 'topic'        => ['type' => 'string', 'required' => true, 'sanitize_callback' => 'sanitize_text_field'],
                 'status'       => ['type' => 'string', 'default' => 'draft', 'sanitize_callback' => 'sanitize_text_field'],
                 'auto_publish' => ['type' => 'boolean', 'default' => true],
             ],
         ]);
+    }
+
+    private static function is_api_enabled(): bool {
+        $settings = get_option('kozmo_ai_wp_settings', []);
+        return ($settings['api_enabled'] ?? 'yes') === 'yes';
+    }
+
+    private static function get_rate_limit_key(string $scope): string {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $path = $_SERVER['REQUEST_URI'] ?? '';
+        return 'rest:' . $scope . ':' . $ip . ':' . md5($path);
+    }
+
+    private static function rate_limit_response(string $scope, int $max_requests, int $window): \WP_Error|true {
+        $key = self::get_rate_limit_key($scope);
+        if (RateLimiter::check($key, $max_requests, $window)) {
+            return true;
+        }
+
+        $retry_after = max(1, RateLimiter::get_reset_time($key) - time());
+        return new \WP_Error(
+            'kozmo_ai_rate_limited',
+            __('Rate limit exceeded. Please try again later.', 'kozmo-ai-wp'),
+            ['status' => 429, 'retry_after' => $retry_after]
+        );
+    }
+
+    public static function check_read_permission() {
+        if (!self::is_api_enabled() || !Auth::check_read_permission()) {
+            return false;
+        }
+
+        return self::rate_limit_response('read', 120, 60);
+    }
+
+    public static function check_write_permission() {
+        if (!self::is_api_enabled() || !Auth::check_write_permission()) {
+            return false;
+        }
+
+        return self::rate_limit_response('write', 30, 60);
     }
 
     // ── Status ──
@@ -328,6 +369,15 @@ class Api {
     // ── Webhook ──
     public static function handle_webhook(\WP_REST_Request $request): \WP_REST_Response {
         $settings = get_option('kozmo_ai_wp_settings', []);
+
+        if (($settings['enable_webhooks'] ?? 'yes') !== 'yes') {
+            return new \WP_REST_Response(['success' => false, 'message' => 'Webhooks are disabled.'], 403);
+        }
+
+        $rate_limit = self::rate_limit_response('webhook', 60, 60);
+        if (is_wp_error($rate_limit)) {
+            return new \WP_REST_Response(['success' => false, 'message' => $rate_limit->get_error_message()], 429);
+        }
 
         // Verify webhook secret if configured
         if (!empty($settings['webhook_secret'])) {

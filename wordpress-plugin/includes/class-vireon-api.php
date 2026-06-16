@@ -54,13 +54,13 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::CREATABLE,
                 'callback'            => [self::class, 'create_post'],
-                'permission_callback' => [Vireon_Auth::class, 'check_write_permission'],
+                'permission_callback' => [self::class, 'check_write_permission'],
                 'args'                => self::get_post_args(),
             ],
             [
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [self::class, 'list_posts'],
-                'permission_callback' => [Vireon_Auth::class, 'check_read_permission'],
+                'permission_callback' => [self::class, 'check_read_permission'],
                 'args'                => [
                     'status' => [
                         'type'              => 'string',
@@ -85,7 +85,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [self::class, 'get_post'],
-                'permission_callback' => [Vireon_Auth::class, 'check_read_permission'],
+                'permission_callback' => [self::class, 'check_read_permission'],
                 'args'                => [
                     'id' => [
                         'required'          => true,
@@ -97,7 +97,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::EDITABLE,
                 'callback'            => [self::class, 'update_post'],
-                'permission_callback' => [Vireon_Auth::class, 'check_write_permission'],
+                'permission_callback' => [self::class, 'check_write_permission'],
                 'args'                => [
                     'id' => [
                         'required'          => true,
@@ -109,7 +109,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::DELETABLE,
                 'callback'            => [self::class, 'delete_post'],
-                'permission_callback' => [Vireon_Auth::class, 'check_write_permission'],
+                'permission_callback' => [self::class, 'check_write_permission'],
                 'args'                => [
                     'id' => [
                         'required'          => true,
@@ -129,7 +129,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::CREATABLE,
                 'callback'            => [self::class, 'batch_posts'],
-                'permission_callback' => [Vireon_Auth::class, 'check_write_permission'],
+                'permission_callback' => [self::class, 'check_write_permission'],
                 'args'                => [
                     'posts' => [
                         'required'          => true,
@@ -145,7 +145,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [self::class, 'get_status'],
-                'permission_callback' => [Vireon_Auth::class, 'check_read_permission'],
+                'permission_callback' => [self::class, 'check_read_permission'],
             ],
         ]);
 
@@ -154,7 +154,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::CREATABLE,
                 'callback'            => [self::class, 'upload_media'],
-                'permission_callback' => [Vireon_Auth::class, 'check_write_permission'],
+                'permission_callback' => [self::class, 'check_write_permission'],
                 'args'                => [
                     'url' => [
                         'required'          => true,
@@ -175,7 +175,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [self::class, 'list_categories'],
-                'permission_callback' => [Vireon_Auth::class, 'check_read_permission'],
+                'permission_callback' => [self::class, 'check_read_permission'],
                 'args'                => [
                     'search' => [
                         'type'              => 'string',
@@ -189,7 +189,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [self::class, 'list_tags'],
-                'permission_callback' => [Vireon_Auth::class, 'check_read_permission'],
+                'permission_callback' => [self::class, 'check_read_permission'],
                 'args'                => [
                     'search' => [
                         'type'              => 'string',
@@ -204,7 +204,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [self::class, 'get_settings'],
-                'permission_callback' => [Vireon_Auth::class, 'check_read_permission'],
+                'permission_callback' => [self::class, 'check_read_permission'],
             ],
         ]);
 
@@ -213,7 +213,7 @@ class Vireon_API {
             [
                 'methods'             => WP_REST_Server::READABLE,
                 'callback'            => [self::class, 'list_authors'],
-                'permission_callback' => [Vireon_Auth::class, 'check_read_permission'],
+                'permission_callback' => [self::class, 'check_read_permission'],
             ],
         ]);
 
@@ -225,6 +225,55 @@ class Vireon_API {
                 'permission_callback' => '__return_true', // Validated inside callback
             ],
         ]);
+    }
+
+    private static function is_api_enabled(): bool {
+        $settings = get_option(VIREON_SETTINGS_OPTION, []);
+        return ($settings['api_enabled'] ?? 'yes') === 'yes';
+    }
+
+    private static function get_rate_limit_key(string $scope): string {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $path = $_SERVER['REQUEST_URI'] ?? '';
+        return 'vireon_ratelimit_' . md5($scope . ':' . $ip . ':' . $path);
+    }
+
+    private static function rate_limit_response(string $scope, int $max_requests, int $window): WP_Error|true {
+        $cache_key = self::get_rate_limit_key($scope);
+        $data = get_transient($cache_key);
+
+        if (!is_array($data) || ($data['reset'] ?? 0) < time()) {
+            $data = ['count' => 0, 'reset' => time() + $window];
+        }
+
+        $data['count']++;
+        set_transient($cache_key, $data, $window);
+
+        if ($data['count'] <= $max_requests) {
+            return true;
+        }
+
+        return new WP_Error(
+            'vireon_rate_limited',
+            __('Rate limit exceeded. Please try again later.', 'vireon-integration'),
+            ['status' => 429, 'retry_after' => max(1, $data['reset'] - time())]
+        );
+    }
+
+    public static function check_read_permission() {
+        if (!self::is_api_enabled() || !Vireon_Auth::check_read_permission()) {
+            return false;
+        }
+
+        return self::rate_limit_response('read', 120, 60);
+    }
+
+    public static function check_write_permission() {
+        if (!self::is_api_enabled() || !Vireon_Auth::check_write_permission()) {
+            return false;
+        }
+
+        return self::rate_limit_response('write', 30, 60);
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -439,6 +488,7 @@ class Vireon_API {
                 'wordpress_version'  => $wp_version,
                 'php_version'        => $php_version,
                 'database_connected' => $db_ok,
+                'api_enabled'        => self::is_api_enabled(),
                 'active_api_keys'    => $key_count,
                 'vireon_posts'       => $vireon_posts,
                 'site_name'          => get_bloginfo('name'),
@@ -647,6 +697,21 @@ class Vireon_API {
      */
     public static function handle_webhook(WP_REST_Request $request): WP_REST_Response {
         $settings = get_option(VIREON_SETTINGS_OPTION, []);
+
+        if (($settings['enable_webhooks'] ?? 'no') !== 'yes') {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Webhooks are disabled.', 'vireon-integration'),
+            ], 403);
+        }
+
+        $rate_limit = self::rate_limit_response('webhook', 60, 60);
+        if (is_wp_error($rate_limit)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $rate_limit->get_error_message(),
+            ], 429);
+        }
 
         // Verify webhook secret if configured
         if (!empty($settings['webhook_secret'])) {
