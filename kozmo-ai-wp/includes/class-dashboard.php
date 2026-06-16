@@ -147,14 +147,16 @@ class Dashboard {
     private static function recent_articles(int $limit = 5): array {
         global $wpdb;
         $rows = $wpdb->get_results($wpdb->prepare(
-            "SELECT p.ID, p.post_title, p.post_status, p.post_date, a.quality_score, a.pipeline_status
+            "SELECT p.ID, p.post_title, p.post_status, p.post_date, a.quality_score, a.pipeline_status, a.created_at
              FROM {$wpdb->posts} p
-             INNER JOIN {$wpdb->prefix}kozmo_ai_articles a ON p.ID = a.post_id
-             ORDER BY a.created_at DESC LIMIT %d", $limit
+             LEFT JOIN {$wpdb->prefix}kozmo_ai_articles a ON p.ID = a.post_id
+             WHERE p.post_type = 'post'
+               AND (a.agent_article_id IS NOT NULL OR p.ID IN (SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_kozmo_ai_auto_generated'))
+             ORDER BY COALESCE(a.created_at, p.post_date) DESC LIMIT %d", $limit
         ), ARRAY_A);
         foreach ($rows as &$r) {
             $r['quality'] = $r['quality_score'] ? round((float) $r['quality_score']) : '—';
-            $r['pipeline_stage'] = get_post_meta($r['ID'], '_kozmo_ai_pipeline_stage', true) ?: ($r['pipeline_status'] ?? 'pending');
+            $r['pipeline_stage'] = get_post_meta($r['ID'], '_kozmo_ai_pipeline_stage', true) ?: ($r['pipeline_status'] ?? 'completed');
             $r['pipeline_error'] = get_post_meta($r['ID'], '_kozmo_ai_pipeline_error', true);
             $r['edit_link'] = get_edit_post_link($r['ID']);
         }
