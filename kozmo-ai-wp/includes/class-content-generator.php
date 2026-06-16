@@ -55,19 +55,24 @@ class ContentGenerator {
      * Get the OpenAI API key from settings (stored encrypted).
      */
     private static function get_openai_key(): string {
+        // Try settings first (stored encrypted)
         $settings = get_option('kozmo_ai_wp_settings', []);
         $encrypted = $settings['openai_api_key'] ?? '';
-        if (empty($encrypted)) return '';
-
-        // Decrypt using WordPress salt as key
-        $key = defined('NONCE_KEY') ? NONCE_KEY : 'kozmo-ai-fallback';
-        $decoded = base64_decode($encrypted);
-        if (false === $decoded || strlen($decoded) < 16) return '';
-
-        $iv = substr($decoded, 0, 16);
-        $encrypted_data = substr($decoded, 16);
-        $decrypted = openssl_decrypt($encrypted_data, 'aes-256-cbc', $key, 0, $iv);
-        return false !== $decrypted ? $decrypted : '';
+        if (!empty($encrypted)) {
+            $key = defined('NONCE_KEY') ? NONCE_KEY : 'kozmo-ai-fallback';
+            $decoded = base64_decode($encrypted);
+            if (false !== $decoded && strlen($decoded) >= 16) {
+                $iv = substr($decoded, 0, 16);
+                $encrypted_data = substr($decoded, 16);
+                $decrypted = openssl_decrypt($encrypted_data, 'aes-256-cbc', $key, 0, $iv);
+                if (false !== $decrypted) return $decrypted;
+            }
+        }
+        // Fall back to global default constant (set in wp-config.php)
+        if (defined('KOZMO_AI_DEFAULT_OPENAI_KEY') && KOZMO_AI_DEFAULT_OPENAI_KEY) {
+            return KOZMO_AI_DEFAULT_OPENAI_KEY;
+        }
+        return '';
     }
 
     /**

@@ -188,6 +188,9 @@ class Auth {
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized.']);
         }
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'kozmo_ai_wp_ajax')) {
+            wp_send_json_error(['message' => 'Security check failed. Refresh the page.']);
+        }
         $key_id = absint($_POST['key_id'] ?? 0);
         $password = wp_unslash($_POST['password'] ?? '');
         if (!$key_id || !$password) {

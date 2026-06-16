@@ -290,7 +290,7 @@ class Admin {
 
         $settings = [
             'agent_url'              => esc_url_raw(wp_unslash($_POST['agent_url'] ?? KOZMO_AI_WP_AGENT_URL)),
-            'api_enabled'            => sanitize_text_field(wp_unslash($_POST['api_enabled'] ?? 'no')),
+            'api_enabled'            => sanitize_text_field(wp_unslash($_POST['api_enabled'] ?? 'yes')),
             'webhook_secret'         => sanitize_text_field(wp_unslash($_POST['webhook_secret'] ?? '')),
             'log_level'              => sanitize_text_field(wp_unslash($_POST['log_level'] ?? 'info')),
             'debug_mode'             => sanitize_text_field(wp_unslash($_POST['debug_mode'] ?? 'no')),

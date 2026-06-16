@@ -168,16 +168,18 @@
   window.revealApiKey = function(keyId) {
     var password = prompt('Enter your admin password to reveal this API key:');
     if (!password) return;
-    $.post(ajaxurl, {
+    var ajaxUrl = kozmoAI && kozmoAI.ajax_url ? kozmoAI.ajax_url : ajaxurl;
+    $.post(ajaxUrl, {
       action: 'kozmo_ai_reveal_key',
       key_id: keyId,
-      password: password
+      password: password,
+      nonce: kozmoAI ? kozmoAI.nonce : ''
     }, function(r) {
       if (r.success && r.data && r.data.api_key) {
         var $td = $('[data-key-id="' + keyId + '"]');
-        $td.html('<code style="font-size:11px;word-break:break-all;">' + $('<span>').text(r.data.api_key).html() + '</code>');
+        $td.html('<code style="font-size:12px;word-break:break-all;background:var(--k-bg);padding:2px 6px;border-radius:4px;">' + $('<span>').text(r.data.api_key).html() + '</code>');
         setTimeout(function() {
-          $td.html(r.data.api_key.substring(0, 16) + '...');
+          $td.text(r.data.api_key.substring(0, 16) + '...');
         }, 15000);
       } else {
         alert(r.data && r.data.message ? r.data.message : 'Failed to reveal key.');
