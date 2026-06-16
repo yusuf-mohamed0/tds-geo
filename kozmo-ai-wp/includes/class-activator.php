@@ -45,6 +45,40 @@ class Activator {
             update_option('kozmo_ai_wp_activation_errors', $errors, false);
             set_transient('kozmo_ai_wp_activation_notice', $errors, 30);
         }
+
+        update_option('kozmo_ai_wp_plugin_version', KOZMO_AI_WP_VERSION);
+    }
+
+    public static function upgrade(): array {
+        $errors = [];
+
+        try {
+            self::create_tables();
+        } catch (\Throwable $e) {
+            $errors[] = 'Table upgrade failed: ' . $e->getMessage();
+        }
+
+        try {
+            self::set_defaults();
+        } catch (\Throwable $e) {
+            $errors[] = 'Settings upgrade failed: ' . $e->getMessage();
+        }
+
+        try {
+            self::schedule_crons();
+        } catch (\Throwable $e) {
+            $errors[] = 'Cron upgrade failed: ' . $e->getMessage();
+        }
+
+        update_option('kozmo_ai_wp_db_version', KOZMO_AI_WP_DB_VERSION);
+        update_option('kozmo_ai_wp_plugin_version', KOZMO_AI_WP_VERSION);
+
+        if (!empty($errors)) {
+            update_option('kozmo_ai_wp_activation_errors', $errors, false);
+            set_transient('kozmo_ai_wp_activation_notice', $errors, 30);
+        }
+
+        return $errors;
     }
 
     private static function create_tables(): void {
@@ -163,16 +197,26 @@ class Activator {
             'min_quality_score'  => 95,
             'auto_fix_errors'    => 'yes',
             'cron_interval'      => 'kozmo_ai_every_15min',
-            'max_articles_daily' => 10,
+            'max_articles_daily' => 24,
             'enable_webhooks'    => 'yes',
+            'enable_auto_generation' => 'yes',
+            'generation_frequency'   => 'kozmo_ai_every_15min',
+            'generate_as_draft'      => 'no',
+            'openai_model'           => 'gpt-4o',
             'webhook_secret'     => '',
             'debug_mode'         => 'no',
             'last_scan_at'       => '',
             'last_sync_at'       => '',
         ];
 
-        if (!get_option('kozmo_ai_wp_settings')) {
+        $existing = get_option('kozmo_ai_wp_settings', null);
+        if (!is_array($existing)) {
             add_option('kozmo_ai_wp_settings', $defaults, '', 'yes');
+        } else {
+            $merged = array_merge($defaults, $existing);
+            if ($merged !== $existing) {
+                update_option('kozmo_ai_wp_settings', $merged);
+            }
         }
 
         // Auto-generate initial API key

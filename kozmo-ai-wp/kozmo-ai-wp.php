@@ -11,7 +11,7 @@
  * Plugin Name:       KOZMO AI — Autonomous WP Agent
  * Plugin URI:        https://vireon.io/wordpress
  * Description:       Autonomous AI agent for WordPress. Automatically understands, manages, optimizes, and grows your website with AI-powered SEO content automation.
- * Version:           2.0.0
+ * Version:           2.1.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            KOZMO AI
@@ -90,13 +90,13 @@ if (!function_exists('mb_strtoupper')) {
 }
 
 // ─── Constants ───────────────────────────────────────
-define('KOZMO_AI_WP_VERSION', '2.0.0');
+define('KOZMO_AI_WP_VERSION', '2.1.0');
 define('KOZMO_AI_WP_FILE', __FILE__);
 define('KOZMO_AI_WP_DIR', plugin_dir_path(__FILE__));
 define('KOZMO_AI_WP_URL', plugin_dir_url(__FILE__));
 define('KOZMO_AI_WP_BASENAME', plugin_basename(__FILE__));
 define('KOZMO_AI_WP_API_NAMESPACE', 'kozmo-ai/v1');
-define('KOZMO_AI_WP_DB_VERSION', '2.0.0');
+define('KOZMO_AI_WP_DB_VERSION', '2.1.0');
 define('KOZMO_AI_WP_AGENT_URL', defined('KOZMO_AI_AGENT_URL') ? KOZMO_AI_AGENT_URL : '');
 
 // ─── Autoloader ─────────────────────────────────────

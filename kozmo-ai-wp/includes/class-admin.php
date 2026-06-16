@@ -94,16 +94,16 @@ class Admin {
                                 <option value="gpt-4-turbo" <?php selected($settings['openai_model'] ?? 'gpt-4o', 'gpt-4-turbo'); ?>>GPT-4 Turbo</option>
                             </select></td></tr>
                         <tr><th><?php esc_html_e('Enable Auto-Generation', 'kozmo-ai-wp'); ?></th>
-                            <td><label><input type="checkbox" name="enable_auto_generation" value="yes" <?php checked($settings['enable_auto_generation'] ?? 'no', 'yes'); ?> /> <?php esc_html_e('Automatically discover topics and generate articles on a schedule', 'kozmo-ai-wp'); ?></label></td></tr>
+                            <td><label><input type="checkbox" name="enable_auto_generation" value="yes" <?php checked($settings['enable_auto_generation'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Automatically discover topics and generate articles on a schedule', 'kozmo-ai-wp'); ?></label></td></tr>
                         <tr><th><?php esc_html_e('Generation Frequency', 'kozmo-ai-wp'); ?></th>
                             <td><select name="generation_frequency">
-                                <option value="kozmo_ai_every_15min" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily', 'kozmo_ai_every_15min'); ?>><?php esc_html_e('Every 15 minutes', 'kozmo-ai-wp'); ?></option>
-                                <option value="kozmo_ai_hourly" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily', 'kozmo_ai_hourly'); ?>><?php esc_html_e('Every hour', 'kozmo-ai-wp'); ?></option>
-                                <option value="kozmo_ai_twice_daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily', 'kozmo_ai_twice_daily'); ?>><?php esc_html_e('Twice daily', 'kozmo-ai-wp'); ?></option>
-                                <option value="daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily', 'daily'); ?>><?php esc_html_e('Once daily', 'kozmo-ai-wp'); ?></option>
+                                <option value="kozmo_ai_every_15min" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_every_15min'); ?>><?php esc_html_e('Every 15 minutes', 'kozmo-ai-wp'); ?></option>
+                                <option value="kozmo_ai_hourly" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_hourly'); ?>><?php esc_html_e('Every hour', 'kozmo-ai-wp'); ?></option>
+                                <option value="kozmo_ai_twice_daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'kozmo_ai_twice_daily'); ?>><?php esc_html_e('Twice daily', 'kozmo-ai-wp'); ?></option>
+                                <option value="daily" <?php selected($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', 'daily'); ?>><?php esc_html_e('Once daily', 'kozmo-ai-wp'); ?></option>
                             </select></td></tr>
                         <tr><th><?php esc_html_e('Save as Draft', 'kozmo-ai-wp'); ?></th>
-                            <td><label><input type="checkbox" name="generate_as_draft" value="yes" <?php checked($settings['generate_as_draft'] ?? 'yes', 'yes'); ?> /> <?php esc_html_e('Save generated articles as drafts (uncheck to publish immediately)', 'kozmo-ai-wp'); ?></label></td></tr>
+                            <td><label><input type="checkbox" name="generate_as_draft" value="yes" <?php checked($settings['generate_as_draft'] ?? 'no', 'yes'); ?> /> <?php esc_html_e('Save generated articles as drafts (uncheck to publish immediately)', 'kozmo-ai-wp'); ?></label></td></tr>
                         <tr><th><?php esc_html_e('Max Articles/Day', 'kozmo-ai-wp'); ?></th>
                             <td><input type="number" name="max_articles_daily" value="<?php echo esc_attr($settings['max_articles_daily'] ?? 5); ?>" min="1" max="50" />
                                 <p class="description"><?php esc_html_e('Maximum articles to generate per day.', 'kozmo-ai-wp'); ?></p></td></tr>
@@ -171,18 +171,19 @@ class Admin {
             'debug_mode'             => sanitize_text_field(wp_unslash($_POST['debug_mode'] ?? 'no')),
             'enable_webhooks'        => 'yes',
             'enable_auto_generation' => sanitize_text_field(wp_unslash($_POST['enable_auto_generation'] ?? 'no')),
-            'generation_frequency'   => sanitize_text_field(wp_unslash($_POST['generation_frequency'] ?? 'kozmo_ai_twice_daily')),
+            'generation_frequency'   => sanitize_text_field(wp_unslash($_POST['generation_frequency'] ?? 'kozmo_ai_every_15min')),
             'openai_model'           => sanitize_text_field(wp_unslash($_POST['openai_model'] ?? 'gpt-4o')),
-            'generate_as_draft'      => sanitize_text_field(wp_unslash($_POST['generate_as_draft'] ?? 'yes')),
+            'generate_as_draft'      => sanitize_text_field(wp_unslash($_POST['generate_as_draft'] ?? 'no')),
             'openai_api_key'         => $encrypted_openai_key,
             'cron_interval'          => $old_settings['cron_interval'] ?? 'kozmo_ai_every_15min',
             'last_scan_at'           => $old_settings['last_scan_at'] ?? '',
             'last_sync_at'           => current_time('mysql'),
         ];
 
-        // Clear stale cron if auto-generation is disabled
         if (($settings['enable_auto_generation'] ?? 'no') !== 'yes') {
             Scheduler::clear_auto_generation();
+        } else {
+            Scheduler::schedule_auto_generation($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', true);
         }
 
         if (!empty($settings['webhook_secret']) && strlen($settings['webhook_secret']) < 16) {

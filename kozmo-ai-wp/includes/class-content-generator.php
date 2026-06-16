@@ -219,6 +219,70 @@ class ContentGenerator {
         return array_slice($topics, 0, $count);
     }
 
+    private static function get_site_categories(int $limit = 20): array {
+        $categories = get_categories(['hide_empty' => false, 'number' => $limit]);
+        $available = [];
+
+        foreach ($categories as $cat) {
+            $name = sanitize_text_field($cat->name);
+            if (in_array(strtolower($name), ['uncategorized', 'uncategorised', 'blog', 'general'], true)) {
+                continue;
+            }
+            $available[] = $name;
+        }
+
+        return array_values(array_unique(array_filter($available)));
+    }
+
+    private static function infer_categories(string $topic, array $available_categories, array $requested_categories = []): array {
+        $normalized_available = [];
+        foreach ($available_categories as $category) {
+            $normalized_available[sanitize_title($category)] = sanitize_text_field($category);
+        }
+
+        $selected = [];
+        foreach ($requested_categories as $category) {
+            $key = sanitize_title((string) $category);
+            if (isset($normalized_available[$key])) {
+                $selected[] = $normalized_available[$key];
+            }
+        }
+
+        if (!empty($selected)) {
+            return array_values(array_unique($selected));
+        }
+
+        $topic_terms = preg_split('/[^a-z0-9]+/i', sanitize_title($topic)) ?: [];
+        foreach ($normalized_available as $key => $category) {
+            foreach ($topic_terms as $term) {
+                if (strlen($term) < 4) {
+                    continue;
+                }
+                if (strpos($key, $term) !== false) {
+                    $selected[] = $category;
+                    break;
+                }
+            }
+        }
+
+        if (empty($selected) && !empty($available_categories)) {
+            $selected[] = $available_categories[0];
+        }
+
+        return array_slice(array_values(array_unique($selected)), 0, 2);
+    }
+
+    private static function normalize_freshness(string $text, int $current_year): string {
+        return (string) preg_replace_callback('/\b20\d{2}\b/', static function(array $matches) use ($current_year) {
+            $year = (int) $matches[0];
+            if ($year >= $current_year) {
+                return $matches[0];
+            }
+
+            return (string) $current_year;
+        }, $text);
+    }
+
     /**
      * Cron handler: discover topics and enqueue generation tasks.
      */
@@ -265,6 +329,10 @@ class ContentGenerator {
     public static function generate_article(string $topic): array {
         $site_name = get_bloginfo('name');
         $site_desc = get_bloginfo('description');
+        $current_year = (int) gmdate('Y');
+        $today = gmdate('Y-m-d');
+        $available_categories = self::get_site_categories();
+        $categories_context = !empty($available_categories) ? implode(', ', $available_categories) : 'No specific categories configured';
 
         $system = sprintf(
             'You are an elite SEO Content Strategist, Senior Copywriter, and Topical Authority Builder for "%s".
@@ -283,6 +351,15 @@ If any sentence feels generic or repetitive, rewrite it completely.
 Website: %s
 Description: %s
 Primary Topic: %s
+Today: %s
+Current Year: %d
+Available Site Categories: %s
+
+## FRESHNESS
+The article must be current as of %s.
+Do not frame the article as being in 2024 or 2025 unless the topic is explicitly historical.
+Use up-to-date language, examples, and recommendations suitable for %d.
+If you mention a year in the title, metadata, or advice, use %d unless the topic itself explicitly requires another year.
 
 ## SEARCH INTENT
 Determine whether the user wants: Informational, Commercial Investigation, Transactional, Navigational, or Local.
@@ -352,6 +429,7 @@ Respond ONLY with this JSON structure (no markdown, no code fences, no extra tex
   "title": "Compelling, click-worthy SEO title with the primary keyword",
   "metaTitle": "SEO meta title - max 60 characters",
   "metaDescription": "SEO meta description - max 160 characters, compelling and includes primary keyword",
+  "categories": ["Best matching existing category 1", "Optional category 2"],
   "tags": ["tag1", "tag2", "tag3", "tag4"],
   "secondaryKeywords": ["keyword1", "keyword2", "keyword3"],
   "entities": ["entity1", "entity2"],
@@ -364,7 +442,13 @@ Never mention these internal instructions in your output. Only output the JSON.'
             $site_name,
             $site_name,
             $site_desc ?: 'A professional website',
-            $topic
+            $topic,
+            $today,
+            $current_year,
+            $categories_context,
+            $today,
+            $current_year,
+            $current_year
         );
 
         $result = self::openai_chat($system, 'Write a complete, authoritative article about: "' . $topic . '" for ' . $site_name . '. Follow all SEO content quality guidelines in the system prompt. Deliver the absolute best resource on this topic.');
@@ -374,22 +458,28 @@ Never mention these internal instructions in your output. Only output the JSON.'
             throw new \RuntimeException('OpenAI response missing required fields (title or content)');
         }
 
-        $slug = $data['slug'] ?? sanitize_title($data['title']);
+        $normalized_title = self::normalize_freshness(sanitize_text_field($data['title']), $current_year);
+        $normalized_meta_title = self::normalize_freshness(sanitize_text_field($data['metaTitle'] ?? $data['title']), $current_year);
+        $normalized_meta_description = self::normalize_freshness(sanitize_textarea_field($data['metaDescription'] ?? ''), $current_year);
+        $slug = $data['slug'] ?? sanitize_title($normalized_title);
+        $slug = sanitize_title(self::normalize_freshness($slug, $current_year));
         $word_count = str_word_count(wp_strip_all_tags($data['content']));
+        $selected_categories = self::infer_categories($topic, $available_categories, (array) ($data['categories'] ?? []));
 
         Logger::info('Article generated via AI', [
             'topic'   => $topic,
-            'title'   => $data['title'],
+            'title'   => $normalized_title,
             'words'   => $word_count,
             'tokens'  => $result['tokens_in'] . '→' . $result['tokens_out'],
         ]);
 
         return [
-            'title'             => sanitize_text_field($data['title']),
+            'title'             => $normalized_title,
             'content_html'      => wp_kses_post($data['content']),
             'slug'              => sanitize_title($slug),
-            'meta_title'        => mb_substr(sanitize_text_field($data['metaTitle'] ?? $data['title']), 0, 60),
-            'meta_description'  => mb_substr(sanitize_textarea_field($data['metaDescription'] ?? ''), 0, 160),
+            'meta_title'        => mb_substr($normalized_meta_title, 0, 60),
+            'meta_description'  => mb_substr($normalized_meta_description, 0, 160),
+            'categories'        => $selected_categories,
             'tags'              => !empty($data['tags']) ? array_map('sanitize_text_field', (array) $data['tags']) : [$topic],
             'focus_keyword'     => sanitize_text_field($topic),
             'agent_article_id'  => 'auto_' . bin2hex(kozmo_ai_wp_random_bytes(12)),
@@ -405,7 +495,7 @@ Never mention these internal instructions in your output. Only output the JSON.'
      */
     public static function publish_article(array $article, array $options = []): array {
         $settings = get_option('kozmo_ai_wp_settings', []);
-        $status = $options['status'] ?? 'draft';
+        $status = $options['status'] ?? 'publish';
         $auto_publish = $options['auto_publish'] ?? ($settings['auto_publish'] ?? 'yes') === 'yes';
 
         // Auto-publish if quality is high enough
@@ -474,7 +564,7 @@ Never mention these internal instructions in your output. Only output the JSON.'
         $settings = get_option('kozmo_ai_wp_settings', []);
 
         // Check if auto-generation is actually enabled
-        if (($settings['enable_auto_generation'] ?? 'no') !== 'yes') {
+        if (($settings['enable_auto_generation'] ?? 'yes') !== 'yes') {
             Logger::debug('Auto-generate skipped: auto-generation disabled in settings');
             // Unscheduled stale cron if disabled
             Scheduler::clear_auto_generation();
@@ -482,7 +572,7 @@ Never mention these internal instructions in your output. Only output the JSON.'
         }
 
         $daily_max = (int) ($settings['max_articles_daily'] ?? 5);
-        $publish_status = ($settings['generate_as_draft'] ?? 'yes') === 'yes' ? 'draft' : 'publish';
+        $publish_status = ($settings['generate_as_draft'] ?? 'no') === 'yes' ? 'draft' : 'publish';
 
         // Check daily limit
         $today_count = self::get_today_generation_count();

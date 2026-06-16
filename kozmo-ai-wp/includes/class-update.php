@@ -10,8 +10,20 @@ class Update {
 
     public static function init(): void {
         if (null === self::$instance) self::$instance = new self();
+        add_action('plugins_loaded', [self::class, 'maybe_upgrade'], 5);
         add_filter('plugins_api', [self::class, 'plugin_info'], 20, 3);
         add_filter('site_transient_update_plugins', [self::class, 'check_update']);
+    }
+
+    public static function maybe_upgrade(): void {
+        $stored_db_version = (string) get_option('kozmo_ai_wp_db_version', '');
+        $stored_plugin_version = (string) get_option('kozmo_ai_wp_plugin_version', '');
+
+        if ($stored_db_version === KOZMO_AI_WP_DB_VERSION && $stored_plugin_version === KOZMO_AI_WP_VERSION) {
+            return;
+        }
+
+        Activator::upgrade();
     }
 
     public static function plugin_info($res, $action, $args) {
@@ -28,7 +40,7 @@ class Update {
         $res->tested = '6.4';
         $res->requires_php = '7.4';
         $res->downloaded = 0;
-        $res->last_updated = '2026-06-10';
+        $res->last_updated = '2026-06-16';
         $res->sections = [
             'description' => 'Autonomous AI agent for WordPress that automatically understands, manages, and grows your website.',
             'installation' => '1. Upload the plugin. 2. Activate. 3. Connect your API key. 4. The AI agent takes over.',

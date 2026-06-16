@@ -7,6 +7,9 @@ defined('ABSPATH') || exit;
  */
 class Worker {
     private static ?self $instance = null;
+    private const PROCESS_LOCK_KEY = 'kozmo_ai_worker_lock';
+    private const PROCESS_LOCK_TTL = 55;
+    private const STALE_TASK_SECONDS = 1200;
 
     public static function init(): void {
         if (null === self::$instance) self::$instance = new self();
@@ -36,61 +39,112 @@ class Worker {
         );
     }
 
-    public static function process_queue(): int {
-        global $wpdb;
-        $processed = 0;
-
-        $tasks = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}kozmo_ai_queue
-                 WHERE status = 'pending'
-                   AND scheduled_at <= %s
-                 ORDER BY priority ASC, created_at ASC
-                 LIMIT %d",
-                current_time('mysql'),
-                10
-            ),
-            ARRAY_A
-        );
-
-        foreach ($tasks as $task) {
-            $result = self::execute($task);
-            if ($result['success']) {
-                $wpdb->update(
-                    $wpdb->prefix . 'kozmo_ai_queue',
-                    ['status' => 'completed', 'completed_at' => current_time('mysql')],
-                    ['id' => $task['id']],
-                    ['%s', '%s'],
-                    ['%d']
-                );
-                $processed++;
-            } else {
-                $retries = (int) $task['retries'] + 1;
-                $max = (int) $task['max_retries'];
-
-                if ($retries >= $max) {
-                    $wpdb->update(
-                        $wpdb->prefix . 'kozmo_ai_queue',
-                        ['status' => 'failed', 'retries' => $retries, 'error_message' => $result['message']],
-                        ['id' => $task['id']],
-                        ['%s', '%d', '%s'],
-                        ['%d']
-                    );
-                    HealEngine::record_error('task_failed', $result['message'], ['task_id' => $task['id'], 'task_type' => $task['task_type']], 'warning');
-                } else {
-                    $backoff = min(300, pow(2, $retries) * 30);
-                    $wpdb->update(
-                        $wpdb->prefix . 'kozmo_ai_queue',
-                        ['retries' => $retries, 'status' => 'pending', 'scheduled_at' => gmdate('Y-m-d H:i:s', time() + $backoff)],
-                        ['id' => $task['id']],
-                        ['%d', '%s', '%s'],
-                        ['%d']
-                    );
-                }
-            }
+    private static function acquire_lock(): bool {
+        if (get_transient(self::PROCESS_LOCK_KEY)) {
+            return false;
         }
 
-        return $processed;
+        return set_transient(self::PROCESS_LOCK_KEY, time(), self::PROCESS_LOCK_TTL);
+    }
+
+    private static function release_lock(): void {
+        delete_transient(self::PROCESS_LOCK_KEY);
+    }
+
+    private static function reclaim_stale_tasks(): void {
+        global $wpdb;
+
+        $cutoff = gmdate('Y-m-d H:i:s', time() - self::STALE_TASK_SECONDS);
+        $recovered = (int) $wpdb->query($wpdb->prepare(
+            "UPDATE {$wpdb->prefix}kozmo_ai_queue
+             SET status = 'pending', started_at = NULL, scheduled_at = %s
+             WHERE status = 'running' AND started_at IS NOT NULL AND started_at < %s",
+            current_time('mysql'),
+            $cutoff
+        ));
+
+        if ($recovered > 0) {
+            Logger::warning('Recovered stale queue tasks', ['count' => $recovered]);
+        }
+    }
+
+    public static function process_queue(): int {
+        global $wpdb;
+        if (!self::acquire_lock()) {
+            return 0;
+        }
+
+        $processed = 0;
+
+        try {
+            self::reclaim_stale_tasks();
+
+            $tasks = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM {$wpdb->prefix}kozmo_ai_queue
+                     WHERE status = 'pending'
+                       AND scheduled_at <= %s
+                     ORDER BY priority ASC, created_at ASC
+                     LIMIT %d",
+                    current_time('mysql'),
+                    10
+                ),
+                ARRAY_A
+            );
+
+            foreach ($tasks as $task) {
+                $claimed = (int) $wpdb->update(
+                    $wpdb->prefix . 'kozmo_ai_queue',
+                    ['status' => 'running', 'started_at' => current_time('mysql')],
+                    ['id' => $task['id'], 'status' => 'pending'],
+                    ['%s', '%s'],
+                    ['%d', '%s']
+                );
+
+                if ($claimed !== 1) {
+                    continue;
+                }
+
+                $result = self::execute($task);
+                if ($result['success']) {
+                    $wpdb->update(
+                        $wpdb->prefix . 'kozmo_ai_queue',
+                        ['status' => 'completed', 'completed_at' => current_time('mysql'), 'error_message' => null],
+                        ['id' => $task['id']],
+                        ['%s', '%s', '%s'],
+                        ['%d']
+                    );
+                    $processed++;
+                } else {
+                    $retries = (int) $task['retries'] + 1;
+                    $max = (int) $task['max_retries'];
+
+                    if ($retries >= $max) {
+                        $wpdb->update(
+                            $wpdb->prefix . 'kozmo_ai_queue',
+                            ['status' => 'failed', 'retries' => $retries, 'error_message' => $result['message'], 'completed_at' => current_time('mysql'), 'started_at' => null],
+                            ['id' => $task['id']],
+                            ['%s', '%d', '%s', '%s', '%s'],
+                            ['%d']
+                        );
+                        HealEngine::record_error('task_failed', $result['message'], ['task_id' => $task['id'], 'task_type' => $task['task_type']], 'warning');
+                    } else {
+                        $backoff = min(300, pow(2, $retries) * 30);
+                        $wpdb->update(
+                            $wpdb->prefix . 'kozmo_ai_queue',
+                            ['retries' => $retries, 'status' => 'pending', 'scheduled_at' => gmdate('Y-m-d H:i:s', time() + $backoff), 'started_at' => null, 'error_message' => $result['message']],
+                            ['id' => $task['id']],
+                            ['%d', '%s', '%s', '%s', '%s'],
+                            ['%d']
+                        );
+                    }
+                }
+            }
+
+            return $processed;
+        } finally {
+            self::release_lock();
+        }
     }
 
     private static function execute(array $task): array {
@@ -167,7 +221,7 @@ class Worker {
                 try {
                     $article = ContentGenerator::generate_article($topic);
                     $settings = get_option('kozmo_ai_wp_settings', []);
-                    $status = ($settings['generate_as_draft'] ?? 'yes') === 'yes' ? 'draft' : 'publish';
+                    $status = ($settings['generate_as_draft'] ?? 'no') === 'yes' ? 'draft' : 'publish';
                     $result  = ContentGenerator::publish_article($article, ['status' => $status]);
                     return $result;
                 } catch (\Throwable $e) {

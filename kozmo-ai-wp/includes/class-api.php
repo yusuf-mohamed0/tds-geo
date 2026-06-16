@@ -76,7 +76,7 @@ class Api {
             'permission_callback' => [self::class, 'check_write_permission'],
             'args'                => [
                 'topic'        => ['type' => 'string', 'required' => true, 'sanitize_callback' => 'sanitize_text_field'],
-                'status'       => ['type' => 'string', 'default' => 'draft', 'sanitize_callback' => 'sanitize_text_field'],
+                'status'       => ['type' => 'string', 'default' => 'publish', 'sanitize_callback' => 'sanitize_text_field'],
                 'auto_publish' => ['type' => 'boolean', 'default' => true],
             ],
         ]);
@@ -340,8 +340,8 @@ class Api {
 
         // Reschedule cron if generation frequency changed
         if (isset($body['enable_auto_generation']) || isset($body['generation_frequency'])) {
-            if (($settings['enable_auto_generation'] ?? 'no') === 'yes') {
-                Scheduler::schedule_auto_generation($settings['generation_frequency'] ?? 'kozmo_ai_twice_daily');
+            if (($settings['enable_auto_generation'] ?? 'yes') === 'yes') {
+                Scheduler::schedule_auto_generation($settings['generation_frequency'] ?? 'kozmo_ai_every_15min', true);
             } else {
                 Scheduler::clear_auto_generation();
             }
@@ -465,7 +465,7 @@ class Api {
         }
 
         $topic       = $request->get_param('topic');
-        $status      = $request->get_param('status') ?: 'draft';
+        $status      = $request->get_param('status') ?: 'publish';
         $auto_publish = $request->get_param('auto_publish');
 
         try {

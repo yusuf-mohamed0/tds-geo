@@ -10,27 +10,27 @@ class Scheduler {
 
     public static function init(): void {
         if (null === self::$instance) self::$instance = new self();
-
-        // Register cron hooks for auto-generation (admin only to avoid wasted DB queries)
-        if (is_admin()) {
-            add_action('init', [self::class, 'schedule_auto_generation']);
-        }
+        add_action('init', [self::class, 'schedule_auto_generation']);
     }
 
     /**
      * Schedule the auto-generation cron job if it's not already scheduled.
      */
-    public static function schedule_auto_generation(): void {
+    public static function schedule_auto_generation(?string $frequency = null, bool $force_reschedule = false): void {
         $settings = get_option('kozmo_ai_wp_settings', []);
         if (($settings['enable_auto_generation'] ?? 'no') !== 'yes') {
             self::clear_auto_generation();
             return;
         }
 
+        $frequency = $frequency ?: ($settings['generation_frequency'] ?? 'kozmo_ai_every_15min');
+
+        if ($force_reschedule) {
+            self::clear_auto_generation();
+        }
+
         if (!wp_next_scheduled('kozmo_ai_generate_articles')) {
-            // Check if auto-generation is enabled and OpenAI key is configured
             if (ContentGenerator::is_configured()) {
-                $frequency = $settings['generation_frequency'] ?? 'kozmo_ai_twice_daily';
                 wp_schedule_event(time() + 600, $frequency, 'kozmo_ai_generate_articles');
             }
         }
