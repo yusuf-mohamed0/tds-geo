@@ -205,6 +205,7 @@ class Admin {
                         <div class="k-card">
                             <div class="k-field"><label>Log level</label><select name="log_level"><option value="debug" <?php selected($settings['log_level'] ?? 'info', 'debug'); ?>>Debug</option><option value="info" <?php selected($settings['log_level'] ?? 'info', 'info'); ?>>Info</option><option value="warning" <?php selected($settings['log_level'] ?? 'info', 'warning'); ?>>Warning</option><option value="error" <?php selected($settings['log_level'] ?? 'info', 'error'); ?>>Error</option></select></div>
                             <div class="k-field k-field-checkbox" style="margin-bottom:20px;"><input type="checkbox" name="debug_mode" value="yes" id="k-debug" <?php checked($settings['debug_mode'] ?? 'no', 'yes'); ?> /><label for="k-debug">Verbose debug logging</label></div>
+                            <div class="k-field"><label>Telemetry URL (optional)</label><input type="url" name="telemetry_url" value="<?php echo esc_url($settings['telemetry_url'] ?? ''); ?>" placeholder="https://your-server.com/telemetry" /><div class="k-desc">Daily health ping with version, article counts, queue stats. Leave empty to disable. Last ping: <?php echo esc_html(\KozmoAI_WP\Telemetry::last_ping()); ?></div></div>
 
                             <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
                                 <div><span class="k-tag k-tag-blue">PHP <?php echo esc_html($info['server']['php_version'] ?? PHP_VERSION); ?></span></div>
@@ -306,9 +307,13 @@ class Admin {
             'auto_fix_errors'        => $old_settings['auto_fix_errors'] ?? 'yes',
             'enable_webhooks'        => 'yes',
             'cron_interval'          => $old_settings['cron_interval'] ?? 'kozmo_ai_every_15min',
+            'telemetry_url'          => esc_url_raw(wp_unslash($_POST['telemetry_url'] ?? '')),
             'last_scan_at'           => $old_settings['last_scan_at'] ?? '',
             'last_sync_at'           => current_time('mysql'),
         ];
+
+        // Reschedule telemetry if URL changed
+        Telemetry::schedule();
 
         if (!empty($settings['webhook_secret']) && strlen($settings['webhook_secret']) < 16) {
             $settings['webhook_secret'] = $old_settings['webhook_secret'] ?? '';

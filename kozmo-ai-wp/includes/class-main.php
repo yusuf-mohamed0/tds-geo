@@ -71,6 +71,9 @@ class Main {
         Diagnostics::init();
         Update::init();
 
+        // Telemetry (daily health ping)
+        Telemetry::init();
+
         // Sync & pipeline
         Sync::init();
 
@@ -106,6 +109,7 @@ class Main {
             'update'           => Update::class,
             'sync'             => Sync::class,
             'heal'             => HealEngine::class,
+            'telemetry'        => Telemetry::class,
             'backend'          => BackendClient::class,
             'graphify'         => GraphifyClient::class,
         ];

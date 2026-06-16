@@ -258,6 +258,8 @@ class Activator {
         if (!wp_next_scheduled('kozmo_ai_cleanup')) {
             wp_schedule_event(time() + 3600, 'daily', 'kozmo_ai_cleanup');
         }
+
+        Telemetry::schedule();
     }
 
     private static function trigger_initial_scan(): void {

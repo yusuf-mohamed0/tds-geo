@@ -68,6 +68,8 @@ class Dashboard {
                 <div class="k-stat"><div class="k-stat-label">Taxonomy Coverage</div><div class="k-stat-value" data-k-stat="taxonomy"><?php echo (int) ($keyword_coverage['total_cats'] ?? 0); ?></div><div class="k-stat-sub" data-k-sub="taxonomy"><?php echo (int) ($keyword_coverage['total_tags'] ?? 0); ?> tags</div></div>
                 <?php $pipeline_summary = self::pipeline_summary(); ?>
                 <div class="k-stat"><div class="k-stat-label">Pipeline</div><div class="k-stat-value" data-k-stat="pipeline"><?php echo (int) array_sum(array_map(function($s){return (int)$s->count;}, $pipeline_summary['stages'])); ?></div><div class="k-stat-sub" data-k-sub="pipeline"><?php echo (int) $pipeline_summary['failed']; ?> failed</div></div>
+                <?php $telemetry_url = $settings['telemetry_url'] ?? ''; ?>
+                <div class="k-stat"><div class="k-stat-label">Telemetry</div><div class="k-stat-value"><?php echo $telemetry_url ? '✓' : '○'; ?></div><div class="k-stat-sub"><?php echo $telemetry_url ? esc_html(parse_url($telemetry_url, PHP_URL_HOST)) : 'Not configured'; ?></div></div>
             </div>
 
             <div class="k-panel k-fade k-fade-d3">
