@@ -45,7 +45,7 @@ class Health {
         $last_scan = $settings['last_scan_at'] ?? '';
         $checks['last_scan'] = ['status' => !empty($last_scan) ? 'healthy' : 'pending', 'timestamp' => $last_scan];
 
-        // Backend API connectivity
+        // Backend API connectivity (optional — disabled is not an error)
         try {
             $backend = BackendClient::check_health();
             $checks['backend'] = [
@@ -53,23 +53,26 @@ class Health {
                 'url'     => $settings['backend_url'] ?? '',
             ];
         } catch (\Throwable $e) {
-            $checks['backend'] = ['status' => 'error'];
+            $checks['backend'] = ['status' => 'disabled'];
         }
 
-        // Graphify knowledge graph
+        // Graphify knowledge graph (optional — missing file is not an error)
         try {
             $graphify = GraphifyClient::check_health();
-            $checks['graphify'] = [
-                'status' => $graphify['overall'] === 'healthy' ? 'healthy' : ($graphify['overall'] === 'error' ? 'error' : 'disabled'),
-            ];
+            if ($graphify['overall'] === 'error') {
+                // Missing graph file is 'disabled', not 'error' — it's optional
+                $checks['graphify'] = ['status' => 'disabled'];
+            } else {
+                $checks['graphify'] = ['status' => $graphify['overall'] === 'healthy' ? 'healthy' : 'disabled'];
+            }
         } catch (\Throwable $e) {
-            $checks['graphify'] = ['status' => 'error'];
+            $checks['graphify'] = ['status' => 'disabled'];
         }
 
-        // Overall
+        // Overall — only error/degraded from REQUIRED services count; optional features are excluded
         $unhealthy = count(array_filter($checks, fn($c) => $c['status'] === 'error'));
-        $degraded = count(array_filter($checks, fn($c) => $c['status'] === 'degraded'));
-        $overall = $unhealthy > 0 ? 'error' : ($degraded > 0 ? 'degraded' : 'healthy');
+        $degraded  = count(array_filter($checks, fn($c) => $c['status'] === 'degraded'));
+        $overall   = $unhealthy > 0 ? 'error' : ($degraded > 0 ? 'degraded' : 'healthy');
 
         return ['overall' => $overall, 'checks' => $checks, 'unhealthy' => $unhealthy, 'degraded' => $degraded];
     }
