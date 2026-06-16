@@ -18,7 +18,7 @@ class Scheduler {
      */
     public static function schedule_auto_generation(?string $frequency = null, bool $force_reschedule = false): void {
         $settings = get_option('kozmo_ai_wp_settings', []);
-        if (($settings['enable_auto_generation'] ?? 'no') !== 'yes') {
+        if (($settings['enable_auto_generation'] ?? 'yes') !== 'yes') {
             self::clear_auto_generation();
             return;
         }

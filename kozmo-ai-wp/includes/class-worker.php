@@ -14,6 +14,7 @@ class Worker {
     public static function init(): void {
         if (null === self::$instance) self::$instance = new self();
         add_action('kozmo_ai_heartbeat', [self::class, 'process_queue']);
+        add_action('kozmo_ai_heartbeat', [self::class, 'maybe_auto_generate']);
         add_action('kozmo_ai_scan', [self::class, 'handle_scan_task']);
         add_action('kozmo_ai_maintenance', [self::class, 'handle_maintenance']);
         add_action('kozmo_ai_sync', [self::class, 'handle_sync']);
@@ -246,6 +247,30 @@ class Worker {
             default:
                 return ['success' => false, 'message' => "Unknown task type: {$type}"];
         }
+    }
+
+    public static function maybe_auto_generate(): void {
+        // Fallback: run auto-generation from heartbeat in case WP-Cron drops events
+        if (!ContentGenerator::is_configured()) {
+            return;
+        }
+
+        $settings = get_option('kozmo_ai_wp_settings', []);
+        if (($settings['enable_auto_generation'] ?? 'yes') !== 'yes') {
+            return;
+        }
+
+        $frequency = $settings['generation_frequency'] ?? 'kozmo_ai_every_15min';
+        $intervals = wp_get_schedules();
+        $interval = $intervals[$frequency]['interval'] ?? 900;
+
+        $last_run = (int) get_transient('kozmo_ai_auto_generate_last_run');
+        if ($last_run && (time() - $last_run) < $interval) {
+            return;
+        }
+
+        set_transient('kozmo_ai_auto_generate_last_run', time(), $interval * 2);
+        ContentGenerator::auto_generate();
     }
 
     public static function handle_scan_task(): void {

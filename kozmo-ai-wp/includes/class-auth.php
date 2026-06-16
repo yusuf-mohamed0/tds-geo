@@ -203,7 +203,7 @@ class Auth {
         $expires_in  = absint(wp_unslash($_POST['expires_in'] ?? 0));
         $result = self::generate_key($label, $permissions, get_current_user_id(), $expires_in);
 
-        $redirect = admin_url('admin.php?page=kozmo-ai-wp-keys');
+        $redirect = admin_url('admin.php?page=kozmo-ai-wp-settings');
         if ($result['success']) $redirect = add_query_arg('new_key', $result['api_key'], $redirect);
 
         wp_safe_redirect($redirect);
@@ -217,7 +217,7 @@ class Auth {
         $key_id = absint(wp_unslash($_POST['key_id'] ?? 0));
         if ($key_id > 0) self::revoke_key_by_id($key_id);
 
-        wp_safe_redirect(admin_url('admin.php?page=kozmo-ai-wp-keys'));
+        wp_safe_redirect(admin_url('admin.php?page=kozmo-ai-wp-settings&updated=1'));
         exit;
     }
 }

@@ -571,7 +571,7 @@ Never mention these internal instructions in your output. Only output the JSON.'
             return;
         }
 
-        $daily_max = (int) ($settings['max_articles_daily'] ?? 5);
+        $daily_max = (int) ($settings['max_articles_daily'] ?? 24);
         $publish_status = ($settings['generate_as_draft'] ?? 'no') === 'yes' ? 'draft' : 'publish';
 
         // Check daily limit
@@ -588,6 +588,14 @@ Never mention these internal instructions in your output. Only output the JSON.'
 
         try {
             $topics = self::discover_topics($batch);
+            if (empty($topics)) {
+                Logger::warning('Auto-generate skipped: no topics discovered', [
+                    'batch' => $batch,
+                    'daily_limit' => $daily_max,
+                    'today_count' => $today_count,
+                ]);
+                return;
+            }
             Logger::info('Auto-generate starting', ['topics' => $topics, 'status' => $publish_status]);
 
             $generated = 0;

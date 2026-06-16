@@ -127,6 +127,7 @@ class Api {
     public static function get_status(): \WP_REST_Response {
         // Auto-process pending queue items (poor man's cron)
         Worker::process_queue();
+        Worker::maybe_auto_generate();
 
         global $wpdb;
         $settings = get_option('kozmo_ai_wp_settings', []);
