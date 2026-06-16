@@ -261,7 +261,7 @@ const kozmo-core = createKozmoCoreServer({
 ## Development
 
 ```bash
-git clone https://github.com/yusuf-mohamed0/kozmo-core-nextjs-integration
+git clone https://github.com/yusuf-mohamed0/KOZMO-Core
 cd kozmo-core-nextjs-integration
 npm install
 npm run build

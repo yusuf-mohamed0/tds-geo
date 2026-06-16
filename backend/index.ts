@@ -190,7 +190,7 @@ if (process.env.NODE_ENV !== 'production') {
       status: 'running',
       api: '/api',
       health: '/health',
-      docs: 'https://github.com/yusuf-mohamed0/KOZMO Core'
+      docs: 'https://github.com/yusuf-mohamed0/KOZMO-Core'
     });
   });
 }

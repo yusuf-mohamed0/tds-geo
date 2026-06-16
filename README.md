@@ -9,7 +9,7 @@ Multi-tenant SaaS platform that automates SEO content generation and publishing 
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql)](https://postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?style=flat-square&logo=openai)](https://openai.com/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow?style=flat-square)]()
-[![CI](https://github.com/yusuf-mohamed0/KOZMO Core/actions/workflows/ci.yml/badge.svg)](https://github.com/yusuf-mohamed0/KOZMO Core/actions/workflows/ci.yml)
+[![CI](https://github.com/yusuf-mohamed0/KOZMO-Core/actions/workflows/ci.yml/badge.svg)](https://github.com/yusuf-mohamed0/KOZMO-Core/actions/workflows/ci.yml)
 
 ## Features
 
@@ -114,7 +114,7 @@ You'll need these installed on your computer:
 ### Step 1: Clone the Project
 
 ```bash
-git clone https://github.com/yusuf-mohamed0/KOZMO Core.git
+git clone https://github.com/yusuf-mohamed0/KOZMO-Core.git
 cd KOZMO Core
 ```
 

@@ -292,7 +292,7 @@ export function createArticleRoutes(pool: Pool): Router {
         download_url: process.env.CONNECTOR_DOWNLOAD_URL || '',
         min_php_version: '7.4',
         min_wp_version: '5.8',
-        changelog: 'https://github.com/yusuf-mohamed0/KOZMO Core/releases',
+        changelog: 'https://github.com/yusuf-mohamed0/KOZMO-Core/releases',
       },
     });
   });
@@ -616,7 +616,7 @@ export function createArticleRoutes(pool: Pool): Router {
         download_url: process.env.CONNECTOR_DOWNLOAD_URL || '',
         min_php_version: '7.4',
         min_wp_version: '5.8',
-        changelog: 'https://github.com/yusuf-mohamed0/KOZMO Core/releases',
+        changelog: 'https://github.com/yusuf-mohamed0/KOZMO-Core/releases',
       },
     });
   });
