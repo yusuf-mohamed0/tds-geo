@@ -5,6 +5,7 @@
 // ══════════════════════════════════════════════
 
 import { logger } from '../utils/logger';
+import { escapeRegExp, splitSentences } from '../utils/stringUtils';
 import openaiService from './openai';
 
 export interface QualityScore {
@@ -78,7 +79,7 @@ class QualityScorer {
    * Readability Score (Flesch-style heuristic, 0-100).
    */
   private scoreReadability(content: string): number {
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const sentences = splitSentences(content);
     const words = content.split(/\s+/).filter(w => w.length > 0);
     const totalWords = words.length;
     const totalSentences = sentences.length || 1;
@@ -132,7 +133,7 @@ class QualityScorer {
     if (first100.includes(lowerKw)) score += 10;
 
     // Keyword density (0.5-2.5% is ideal)
-    const kwCount = (lower.match(new RegExp(this.escapeRegExp(lowerKw), 'g')) || []).length;
+    const kwCount = (lower.match(new RegExp(escapeRegExp(lowerKw), 'g')) || []).length;
     const words = content.split(/\s+/).length;
     const density = words > 0 ? (kwCount / words) * 100 : 0;
     if (density >= 0.5 && density <= 2.5) score += 10;
@@ -397,10 +398,6 @@ class QualityScorer {
     }
 
     return baseWord.length > 2 ? [baseWord] : [];
-  }
-
-  private escapeRegExp(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   private countSyllables(text: string): number {

@@ -6,6 +6,7 @@
 
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { countKeywordOccurrences, splitSentences } from '../utils/stringUtils';
 import openaiService from './openai';
 import {
   BenchmarkDataset, BenchmarkTestCase,
@@ -106,8 +107,8 @@ Be critical and specific. This is production evaluation.`
 
   private fallbackEvaluation(content: string, keyword: string): QualityScore {
     const words = content.split(/\s+/).length;
-    const keywordCount = (content.toLowerCase().match(new RegExp(keyword.toLowerCase(), 'g')) || []).length;
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const keywordCount = countKeywordOccurrences(content, keyword);
+    const sentences = splitSentences(content);
 
     const seoScore = Math.min(100, keywordCount > 0 ? 60 + Math.min(keywordCount * 5, 30) : 30);
     const readabilityScore = sentences.length > 0

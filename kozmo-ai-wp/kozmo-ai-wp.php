@@ -99,6 +99,15 @@ define('KOZMO_AI_WP_API_NAMESPACE', 'kozmo-ai/v1');
 if (!defined('KOZMO_AI_DEFAULT_OPENAI_KEY')) define('KOZMO_AI_DEFAULT_OPENAI_KEY', '');
 if (!defined('KOZMO_AI_BACKEND_URL')) define('KOZMO_AI_BACKEND_URL', getenv('KOZMO_AI_BACKEND_URL') ?: '');
 
+// Backward compatibility: define kozmo-core-wp constants so existing integrations work
+if (!defined('KOZMO_CORE_VERSION')) define('KOZMO_CORE_VERSION', KOZMO_AI_WP_VERSION);
+if (!defined('KOZMO_CORE_API_NAMESPACE')) define('KOZMO_CORE_API_NAMESPACE', 'kozmo-core/v1');
+if (!defined('KOZMO_CORE_LOG_TABLE')) define('KOZMO_CORE_LOG_TABLE', 'kozmo_ai_logs');
+if (!defined('KOZMO_CORE_SETTINGS_OPTION')) define('KOZMO_CORE_SETTINGS_OPTION', 'kozmo_ai_wp_settings');
+if (!defined('KOZMO_CORE_PLUGIN_FILE')) define('KOZMO_CORE_PLUGIN_FILE', KOZMO_AI_WP_FILE);
+if (!defined('KOZMO_CORE_PLUGIN_DIR')) define('KOZMO_CORE_PLUGIN_DIR', KOZMO_AI_WP_DIR);
+if (!defined('KOZMO_CORE_PLUGIN_URL')) define('KOZMO_CORE_PLUGIN_URL', KOZMO_AI_WP_URL);
+
 // ─── Autoloader ─────────────────────────────────────
 spl_autoload_register(function ($class) {
     $prefix = 'KozmoAI_WP\\';

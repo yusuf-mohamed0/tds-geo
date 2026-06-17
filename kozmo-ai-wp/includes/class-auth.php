@@ -229,6 +229,9 @@ class Auth {
         if (!empty($_SERVER['HTTP_X_KOZMO_AI_KEY'])) {
             $api_key = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_KOZMO_AI_KEY']));
         }
+        if (empty($api_key) && !empty($_SERVER['HTTP_X_KOZMO_CORE_KEY'])) {
+            $api_key = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_KOZMO_CORE_KEY']));
+        }
         if (empty($api_key) && !empty($_SERVER['HTTP_AUTHORIZATION'])) {
             $auth = sanitize_text_field(wp_unslash($_SERVER['HTTP_AUTHORIZATION']));
             if (str_starts_with($auth, 'Bearer ')) {
@@ -236,7 +239,7 @@ class Auth {
             }
         }
         if (empty($api_key)) {
-            return ['valid' => false, 'permissions' => [], 'message' => 'Missing API key. Provide it via X-KOZMO-AI-Key or Authorization: Bearer.'];
+            return ['valid' => false, 'permissions' => [], 'message' => 'Missing API key. Provide it via X-KOZMO-AI-Key, X-KOZMO-Core-Key, or Authorization: Bearer.'];
         }
 
         return self::validate_key($api_key);

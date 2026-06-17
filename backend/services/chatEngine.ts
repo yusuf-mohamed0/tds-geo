@@ -6,6 +6,7 @@
 
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { generateSlug } from '../utils/stringUtils';
 import { addJob, getJobStatus } from '../utils/queue';
 import { QueueNames, JobTypes } from '../queues/definitions';
 import openaiService from './openai';
@@ -380,7 +381,7 @@ export class ChatEngine {
       case 'create_client': {
         if (!this.pool) return { success: false, error: 'Database not connected', requiresApproval: false };
         const { name, shop, token } = command.params;
-        const slug = (name as string).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const slug = generateSlug(name as string);
         const result = await this.pool.query(
           `INSERT INTO clients (name, slug, shopify_shop, shopify_token)
            VALUES ($1, $2, $3, $4) RETURNING id, name`,

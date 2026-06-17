@@ -11,6 +11,7 @@
 
 import { Ollama } from 'ollama';
 import { logger } from '../utils/logger';
+import { countKeywordOccurrences } from '../utils/stringUtils';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
 import { writingSystemPrompt } from '../prompts';
 
@@ -500,7 +501,7 @@ FORMATTING: Markdown, bullet points and lists where appropriate`;
 
   private mockAnalyzeSEO(content: string, keyword: string): Record<string, unknown> {
     const wordCount = content.split(/\s+/).length;
-    const keywordCount = (content.toLowerCase().match(new RegExp(keyword.toLowerCase(), 'g')) || []).length;
+    const keywordCount = countKeywordOccurrences(content, keyword);
     return {
       score: 75,
       keywordDensity: wordCount > 0 ? Math.round((keywordCount / wordCount) * 10000) / 100 : 0,

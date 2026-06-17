@@ -6,6 +6,7 @@
 
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { splitSentences } from '../utils/stringUtils';
 import openaiService from './openai';
 import { FactCheck, Citation, TrustedSource, HighRiskTopic, VerificationStatus } from '../types';
 
@@ -320,7 +321,7 @@ Rules:
 
   private regexFallbackExtraction(content: string, highRiskTopics: HighRiskTopic[]): ClaimExtractionResult[] {
     const claims: ClaimExtractionResult[] = [];
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 20);
+    const sentences = splitSentences(content, 20);
 
     for (const sentence of sentences) {
       // Look for sentences with numbers, percentages, dates

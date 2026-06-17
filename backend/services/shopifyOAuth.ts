@@ -6,6 +6,7 @@
 import crypto from 'crypto';
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { generateSlug } from '../utils/stringUtils';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
@@ -335,7 +336,7 @@ async function ensureClientForShop(pool: Pool, shop: string, accessToken: string
 
   // Create a new client for this shop
   const name = normalizedShop.replace('.myshopify.com', '');
-  const slug = name.replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  const slug = generateSlug(name);
 
   const result = await pool.query(
     `INSERT INTO clients (name, slug, shopify_shop, shopify_token, shopify_api_version, is_active)

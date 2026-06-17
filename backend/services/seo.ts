@@ -3,6 +3,7 @@
 // ──────────────────────────────────────────────
 
 import { logger } from '../utils/logger';
+import { escapeRegExp, countKeywordOccurrences, splitSentences, generateSlug } from '../utils/stringUtils';
 import openaiService from './openai';
 import { SeoAnalysis } from '../types';
 
@@ -30,7 +31,7 @@ class SeoService {
     const lowerKeyword = keyword.toLowerCase();
 
     const words = content.split(/\s+/).length;
-    const keywordCount = (lowerContent.match(new RegExp(this.escapeRegExp(lowerKeyword), 'g')) || []).length;
+    const keywordCount = countKeywordOccurrences(content, lowerKeyword);
     const density = words > 0 ? (keywordCount / words) * 100 : 0;
 
     const h2Count = (content.match(/^## /gm) || []).length;
@@ -40,7 +41,7 @@ class SeoService {
     const first100Words = content.split(/\s+/).slice(0, 100).join(' ').toLowerCase();
     const keywordInIntro = first100Words.includes(lowerKeyword);
 
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const sentences = splitSentences(content);
     const avgSentenceLength = sentences.length > 0 ? words / sentences.length : 0;
 
     // E-E-A-T Scoring
@@ -98,13 +99,7 @@ class SeoService {
   }
 
   generateSlug(title: string): string {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 200);
+    return generateSlug(title);
   }
 
   validateContent(article: { title?: string; content?: string; metaTitle?: string; metaDescription?: string; tags?: string[] }): {
@@ -147,9 +142,6 @@ class SeoService {
       : plain;
   }
 
-  private escapeRegExp(string: string): string {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
 }
 
 export default new SeoService();

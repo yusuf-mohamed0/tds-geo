@@ -179,6 +179,14 @@ class ContentSafetyService {
         severity: 'medium'
       },
 
+      // ── Roofing / Chimney Hazards ──
+      {
+        pattern: /replace\s+(roof|chimney)/i,
+        category: 'roofing_hazard',
+        severity: 'high',
+        suggestion: 'Roofing and chimney work should be done by licensed professionals'
+      },
+
       // ── Specific Dangerous Instructions ──
       {
         pattern: /\b(asbestos\s+(removal|abatement|testing))\s+(yourself|diy|guide|how.?to)/i,

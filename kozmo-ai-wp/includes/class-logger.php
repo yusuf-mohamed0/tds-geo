@@ -121,4 +121,17 @@ class Logger {
         global $wpdb;
         return (int) $wpdb->query("TRUNCATE TABLE {$wpdb->prefix}kozmo_ai_logs");
     }
+
+    public static function cleanup(int $days_retain = 30): int {
+        global $wpdb;
+        $table = $wpdb->prefix . 'kozmo_ai_logs';
+        $cutoff = gmdate('Y-m-d H:i:s', time() - ($days_retain * DAY_IN_SECONDS));
+        return (int) $wpdb->query(
+            $wpdb->prepare("DELETE FROM {$table} WHERE created_at < %s", $cutoff)
+        );
+    }
+
+    public static function clear_logs(): int {
+        return self::clear();
+    }
 }

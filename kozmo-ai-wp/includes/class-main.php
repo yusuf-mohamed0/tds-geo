@@ -28,22 +28,20 @@ class Main {
     private function init_services(): void {
         Database::init();
         Logger::init();
-        Security::init();
-        Cache::init();
         RateLimiter::init();
         Auth::init();
         Api::init();
         Sync::init();
+        Admin::init();
 
         $this->services = [
             'database'    => Database::class,
             'logger'      => Logger::class,
-            'security'    => Security::class,
-            'cache'       => Cache::class,
             'ratelimiter' => RateLimiter::class,
             'auth'        => Auth::class,
             'api'         => Api::class,
             'sync'        => Sync::class,
+            'admin'       => Admin::class,
         ];
     }
 

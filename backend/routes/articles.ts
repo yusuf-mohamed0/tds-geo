@@ -606,21 +606,6 @@ export function createArticleRoutes(pool: Pool): Router {
     }
   });
 
-  // ─── Connector Version Check ─────────────────
-  router.get('/connector-version', async (_req: Request, res: Response) => {
-    const latestVersion = process.env.CONNECTOR_EXPECTED_VERSION || '3.0.0';
-    res.json({
-      success: true,
-      data: {
-        latest_version: latestVersion,
-        download_url: process.env.CONNECTOR_DOWNLOAD_URL || '',
-        min_php_version: '7.4',
-        min_wp_version: '5.8',
-        changelog: 'https://github.com/yusuf-mohamed0/KOZMO-Core/releases',
-      },
-    });
-  });
-
   // ─── SEO Analysis for Article ────────────────
   router.get('/:id/seo', requireResourceOwnership(pool, 'articles'), async (req: Request, res: Response, next: NextFunction) => {
     try {

@@ -36,6 +36,7 @@ import contentIntelligence from '../services/contentIntelligence';
 import aiEvaluationService from '../services/aiEvaluation';
 import pexelsService from '../services/pexelsService';
 import multiCmsPublisher from '../services/multiCmsPublisher';
+import contentSafetyService from '../services/contentSafety';
 import CostOptimizationService from '../services/costOptimization';
 import observabilityService from '../services/observability';
 import enterpriseSecurity from '../services/enterpriseSecurity';
@@ -581,8 +582,8 @@ export class EnterprisePipelineOrchestrator {
       await this.runStage('content_safety', stages, async () => {
         const span = observabilityService.startSpan({ name: 'pipeline.safety', traceId });
         try {
-          const safetyResult = await this.checkContentSafety(contentMd);
-          return safetyResult;
+          const safetyResult = await contentSafetyService.checkContent(contentMd);
+          return safetyResult as unknown as Record<string, unknown>;
         } finally {
           observabilityService.endSpan(span);
         }
@@ -1033,38 +1034,6 @@ export class EnterprisePipelineOrchestrator {
   // ══════════════════════════════════════════════
   // PRIVATE HELPERS
   // ══════════════════════════════════════════════
-
-  private checkContentSafety(content: string): Record<string, unknown> {
-    const lower = content.toLowerCase();
-    const dangerPatterns = [
-      { pattern: /cut\s+(gas|propane|natural\s*gas)\s+(line|pipe|supply)/i, risk: 'high', category: 'gas' },
-      { pattern: /replace\s+(electrical\s+)?wiring/i, risk: 'high', category: 'electrical' },
-      { pattern: /remove\s+(load-bearing|structural)\s+(wall|beam|support)/i, risk: 'critical', category: 'structural' },
-      { pattern: /fix\s+(gas|water\s+heater|furnace|boiler)/i, risk: 'high', category: 'hvac' },
-      { pattern: /install\s+(electrical\s+)?panel/i, risk: 'critical', category: 'electrical' },
-      { pattern: /repair\s+sewer\s+line/i, risk: 'high', category: 'plumbing' },
-      { pattern: /replace\s+(roof|chimney)/i, risk: 'high', category: 'roofing' },
-      { pattern: /(cure|treat|diagnose|prescribe)\s+(disease|illness|symptom|medical)/i, risk: 'critical', category: 'medical' },
-      { pattern: /guarantee\s+(results|cure|fix|100%)/i, risk: 'medium', category: 'legal' },
-      { pattern: /always\s+(works|fixes|solves)/i, risk: 'medium', category: 'overpromise' }
-    ];
-
-    const findings: Array<{ pattern: string; risk: string; category: string }> = [];
-    for (const dp of dangerPatterns) {
-      if (dp.pattern.test(lower)) {
-        findings.push({ pattern: dp.pattern.source, risk: dp.risk, category: dp.category });
-      }
-    }
-
-    if (findings.length > 0) logger.warn('Content safety warnings', { findings });
-
-    return {
-      safe: findings.filter(f => f.risk === 'critical').length === 0,
-      warnings: findings,
-      criticalCount: findings.filter(f => f.risk === 'critical').length,
-      highCount: findings.filter(f => f.risk === 'high').length
-    };
-  }
 
   private insertCTA(content: string, ctaText: string, ctaUrl: string): string {
     const ctaSection = `\n\n---\n\n### Ready to Get Professional Help?\n\n${ctaText ? `[${ctaText}](${ctaUrl})` : ''}`;

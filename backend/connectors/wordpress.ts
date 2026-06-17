@@ -10,6 +10,7 @@
 
 import { Article, PublishResult, PublisherAdapter } from '../types';
 import { logger } from '../utils/logger';
+import { generateSlug } from '../utils/stringUtils';
 
 // Plugin REST API namespaces
 const KOZMO_CORE_API_NAMESPACE = 'kozmo-core/v1';
@@ -245,7 +246,7 @@ export class WordPressConnector implements PublisherAdapter {
   ): Record<string, unknown> {
     const base = {
       title: article.title,
-      slug: article.slug || article.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || '',
+      slug: article.slug || (article.title ? generateSlug(article.title) : '') || '',
       status: (config.status as string) || 'draft',
       tags: article.tags || [],
       categories: (config.categories as string[]) || [],

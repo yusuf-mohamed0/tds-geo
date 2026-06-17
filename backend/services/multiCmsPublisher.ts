@@ -6,19 +6,12 @@
 
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
-import { Article, PublishResult, CmsProvider, CmsConnection, PublisherAdapter } from '../types';
-import shopifyService from './shopify';
+import { Article, PublishResult, CmsProvider, CmsConnection, PublisherAdapter, PublisherCapabilities } from '../types';
+import { generateSlug } from '../utils/stringUtils';
 import { wordpressConnector } from '../connectors/wordpress';
-
-interface PublisherCapabilities {
-  supportsMedia: boolean;
-  supportsTags: boolean;
-  supportsCustomFields: boolean;
-  supportsScheduling: boolean;
-  supportsMultipleAuthors: boolean;
-  maxTitleLength: number;
-  contentFormat: 'html' | 'markdown' | 'rich_text';
-}
+import { webflowConnector } from '../connectors/webflow';
+import { ghostConnector } from '../connectors/ghost';
+import { shopifyConnector } from '../connectors/shopify';
 
 class MultiCmsPublisherService {
   private adapters: Map<CmsProvider, PublisherAdapter> = new Map();
@@ -35,75 +28,17 @@ class MultiCmsPublisherService {
   }
 
   private registerBuiltInAdapters(): void {
-    // Shopify adapter wraps the existing shopifyService
-    this.adapters.set('shopify', {
-      provider: 'shopify',
-      name: 'Shopify Online Store',
-      capabilities: this.getDefaultCapabilities('shopify'),
-      testConnection: async () => {
-        try {
-          await shopifyService.fetchBlogs({ shop: '', accessToken: '' });
-          return true;
-        } catch { return false; }
-      },
-      publish: async (article: Article, config: Record<string, unknown>) => {
-        const shopConfig = { shop: config.shop as string || '', accessToken: config.accessToken as string || '' };
-        const blogId = (config.blogId as number) || 1;
-        const result = await shopifyService.publishArticle(shopConfig, blogId, {
-          title: article.title,
-          contentHtml: article.content_html || article.content_md,
-          metaTitle: article.meta_title,
-          metaDescription: article.meta_description,
-          tags: article.tags,
-          published: config.publishImmediately !== false
-        });
-        return { id: result.id, blogId: result.blogId, url: result.url, handle: result.handle };
-      },
-      update: async (articleId: string, _article: Partial<Article>) => {
-        const legacyUrl = `https://shopify.com/articles/${articleId}`;
-        return { id: parseInt(articleId), blogId: 1, url: legacyUrl, handle: '' };
-      },
-      delete: async (_articleId: string) => {
-        logger.warn('Shopify article deletion not implemented via adapter');
-        return true;
-      },
-      getBlogs: async () => {
-        const blogs = await shopifyService.fetchBlogs({ shop: '', accessToken: '' });
-        return (blogs || []).map((b: any) => ({ id: b.id, title: b.title || '', handle: b.handle || '' }));
-      }
-    });
+    // Shopify adapter — standalone connector from backend/connectors/
+    this.adapters.set('shopify', shopifyConnector);
 
     // WordPress adapter — standalone connector from backend/connectors/
     this.adapters.set('wordpress', wordpressConnector);
 
-    // Webflow adapter (placeholder)
-    this.adapters.set('webflow', {
-      provider: 'webflow',
-      name: 'Webflow',
-      capabilities: this.getDefaultCapabilities('webflow'),
-      testConnection: async () => { return this.testWebflowConnection(); },
-      publish: async (article: Article, config: Record<string, unknown>) => this.publishToWebflow(article, config),
-      update: async (articleId: string, article: Partial<Article>) => {
-        logger.info(`Webflow update not fully implemented yet for ${articleId}`);
-        return { id: 0, blogId: 0, url: '', handle: '' };
-      },
-      delete: async (articleId: string) => { return true; },
-      getBlogs: async () => { return []; }
-    });
+    // Webflow adapter — standalone connector from backend/connectors/
+    this.adapters.set('webflow', webflowConnector);
 
-    // Ghost adapter (placeholder)
-    this.adapters.set('ghost', {
-      provider: 'ghost',
-      name: 'Ghost',
-      capabilities: this.getDefaultCapabilities('ghost'),
-      testConnection: async () => { return true; },
-      publish: async (article: Article, config: Record<string, unknown>) => this.publishToGhost(article, config),
-      update: async (articleId: string, article: Partial<Article>) => {
-        return { id: 0, blogId: 0, url: '', handle: '' };
-      },
-      delete: async (articleId: string) => { return true; },
-      getBlogs: async () => { return []; }
-    });
+    // Ghost adapter — standalone connector from backend/connectors/
+    this.adapters.set('ghost', ghostConnector);
 
     // ── Custom REST (Next.js KOZMO Core Plugin) adapter ──
     // Publishes articles to any site running @kozmo-core/nextjs-integration
@@ -205,16 +140,7 @@ class MultiCmsPublisherService {
 
     // Fall back to Shopify (default provider)
     logger.info('No target provider specified, publishing to Shopify (default)');
-    const shopConfig = { shop: '', accessToken: '' };
-    const result = await shopifyService.publishArticle(shopConfig, 1, {
-      title: article.title,
-      contentHtml: article.content_html || article.content_md,
-      metaTitle: article.meta_title,
-      metaDescription: article.meta_description,
-      tags: article.tags,
-      published: true
-    });
-    return { id: result.id, blogId: result.blogId, url: result.url, handle: result.handle };
+    return shopifyConnector.publish(article, { publishImmediately: true });
   }
 
   /**
@@ -266,88 +192,6 @@ class MultiCmsPublisherService {
     }
 
     return results;
-  }
-
-  // ══════════════════════════════════════════════════════════════
-  // PROVIDER-SPECIFIC ADAPTERS
-  // ══════════════════════════════════════════════════════════════
-
-  private async testWebflowConnection(): Promise<boolean> {
-    const webflowToken = process.env.WEBFLOW_API_KEY || '';
-    if (!webflowToken) return false;
-    try {
-      const response = await fetch('https://api.webflow.com/v2/sites', {
-        headers: { Authorization: `Bearer ${webflowToken}` },
-        signal: AbortSignal.timeout(5000)
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  }
-
-  private async publishToWebflow(article: Article, config: Record<string, unknown>): Promise<PublishResult> {
-    // Webflow CMS API v2
-    const webflowToken = (config.webflowToken as string) || process.env.WEBFLOW_API_KEY || '';
-    const collectionId = (config.collectionId as string) || process.env.WEBFLOW_COLLECTION_ID || '';
-
-    const response = await fetch(`https://api.webflow.com/v2/collections/${collectionId}/items`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${webflowToken}`
-      },
-      body: JSON.stringify({
-        isArchived: false,
-        isDraft: false,
-        fieldData: {
-          name: article.title,
-          slug: article.slug,
-          'post-body': article.content_html || `<p>${article.content_md}</p>`,
-          'post-summary': article.meta_description,
-          'main-image': ''
-        }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Webflow publish failed: ${response.status}`);
-    }
-
-    const data: any = await response.json();
-    return { id: data.id, blogId: 0, url: `/${article.slug}`, handle: article.slug };
-  }
-
-  private async publishToGhost(article: Article, config: Record<string, unknown>): Promise<PublishResult> {
-    const ghostUrl = (config.ghostUrl as string) || process.env.GHOST_API_URL || '';
-    const ghostKey = (config.ghostKey as string) || process.env.GHOST_ADMIN_API_KEY || '';
-
-    const response = await fetch(`${ghostUrl}/ghost/api/admin/posts/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Ghost ${ghostKey}`
-      },
-      body: JSON.stringify({
-        posts: [{
-          title: article.title,
-          slug: article.slug,
-          html: article.content_html || `<p>${article.content_md}</p>`,
-          status: config.status || 'draft',
-          tags: article.tags.map(t => ({ name: t })),
-          meta_title: article.meta_title,
-          meta_description: article.meta_description
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Ghost publish failed: ${response.status}`);
-    }
-
-    const data: any = await response.json();
-    const post = data.posts?.[0] || data;
-    return { id: post.id, blogId: 1, url: `/${post.slug}`, handle: post.slug };
   }
 
   // ══════════════════════════════════════════════════════════════
@@ -431,7 +275,7 @@ class MultiCmsPublisherService {
       title: article.title,
       content: article.content_md,
       contentHtml: article.content_html || '',
-      slug: article.slug || article.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      slug: article.slug || generateSlug(article.title),
       excerpt: (article.meta_description || '').slice(0, 300),
       metaTitle: article.meta_title || '',
       metaDescription: article.meta_description || '',

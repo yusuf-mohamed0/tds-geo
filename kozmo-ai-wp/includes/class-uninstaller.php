@@ -9,6 +9,7 @@ class Uninstaller {
         $tables = [
             'kozmo_ai_logs',
             'kozmo_ai_api_keys',
+            'kozmo_ai_articles',
         ];
         foreach ($tables as $table) {
             $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}{$table}");

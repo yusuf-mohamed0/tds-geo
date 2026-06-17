@@ -5,6 +5,7 @@
 
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { splitSentences } from '../utils/stringUtils';
 import openaiService from './openai';
 import vectorMemory from './vectorMemory';
 import { BrandVoiceProfile } from '../types';
@@ -167,7 +168,7 @@ class BrandVoiceService {
     }
 
     const allContent = profile.sample_content.join(' ');
-    const sentences = allContent.split(/[.!?]+/).filter(s => s.trim());
+    const sentences = splitSentences(allContent);
     const words = allContent.split(/\s+/);
     const uniqueWords = new Set(words.map(w => w.toLowerCase().replace(/[^a-z]/g, '')).filter(w => w.length > 0));
 

@@ -32,16 +32,21 @@ class Sync {
         self::handle_featured_image($post_id, $article['featured_image_url'] ?? '');
         self::handle_meta($post_id, $article);
 
+        if (!empty($article['custom_fields'])) {
+            self::set_custom_fields($post_id, $article['custom_fields']);
+        }
+
         $agent_id = $article['agent_article_id'] ?? $article['kozmo_core_article_id'] ?? $article['kozmo_ai_article_id'] ?? '';
         update_post_meta($post_id, '_kozmo_ai_article_id', $agent_id);
+        update_post_meta($post_id, '_kozmo_core_article_id', $agent_id);
         update_post_meta($post_id, '_kozmo_ai_imported_at', current_time('mysql'));
+        update_post_meta($post_id, '_kozmo_core_imported_at', current_time('mysql'));
 
-        // Track in articles table
         global $wpdb;
         $wpdb->replace($wpdb->prefix . 'kozmo_ai_articles', [
             'post_id'          => $post_id,
             'agent_article_id' => $agent_id,
-            'quality_score'    => $article['quality_score'] ?? 0,
+            'quality_score'    => $article['quality_score'] ?? $article['quality'] ?? 0,
         ], ['%d', '%s', '%f']);
 
         Logger::info('Post created by agent', ['post_id' => $post_id, 'title' => $post_data['post_title']]);
@@ -63,6 +68,12 @@ class Sync {
         if (!empty($article['featured_image_url'])) self::handle_featured_image($post_id, $article['featured_image_url']);
         self::handle_meta($post_id, $article);
 
+        if (!empty($article['custom_fields'])) {
+            self::set_custom_fields($post_id, $article['custom_fields']);
+        }
+
+        update_post_meta($post_id, '_kozmo_core_last_updated', current_time('mysql'));
+
         return ['success' => true, 'post_id' => $post_id];
     }
 
@@ -76,6 +87,15 @@ class Sync {
     public static function get_post_by_agent_id(string $agent_id): ?\WP_Post {
         $posts = get_posts([
             'meta_key'   => '_kozmo_ai_article_id',
+            'meta_value' => $agent_id,
+            'post_type'  => 'any',
+            'post_status' => 'any',
+            'numberposts' => 1,
+        ]);
+        if (!empty($posts)) return $posts[0];
+
+        $posts = get_posts([
+            'meta_key'   => '_kozmo_core_article_id',
             'meta_value' => $agent_id,
             'post_type'  => 'any',
             'post_status' => 'any',
@@ -98,19 +118,36 @@ class Sync {
         }
 
         $data = [
-            'post_title'   => sanitize_text_field($article['title'] ?? $existing->post_title ?? ''),
-            'post_content' => $content,
-            'post_excerpt' => $excerpt,
-            'post_status'  => $article['status_override'] ?? $wp_status,
-            'post_type'    => $article['post_type'] ?? 'post',
-            'post_name'    => $article['slug'] ?? '',
+            'post_title'    => sanitize_text_field($article['title'] ?? $existing->post_title ?? ''),
+            'post_content'  => $content,
+            'post_excerpt'  => sanitize_text_field($excerpt),
+            'post_status'   => $article['status_override'] ?? $wp_status,
+            'post_type'     => $article['post_type'] ?? 'post',
+            'post_name'     => $article['slug'] ?? '',
+            'comment_status' => $article['comment_status'] ?? 'closed',
+            'ping_status'   => $article['ping_status'] ?? 'closed',
         ];
 
         if (!empty($article['publish_date'])) {
             $data['post_date'] = $article['publish_date'];
             $data['post_date_gmt'] = get_gmt_from_date($article['publish_date']);
+            if ($kozmo_core_status === 'scheduled') {
+                $data['post_status'] = 'future';
+            }
         }
         if (!empty($article['author_id'])) $data['post_author'] = (int) $article['author_id'];
+        if (!empty($article['author_email'])) {
+            $user = get_user_by('email', $article['author_email']);
+            if ($user) $data['post_author'] = $user->ID;
+        }
+
+        if ($existing) {
+            foreach ($data as $key => $value) {
+                if (empty($value) && $key !== 'ID') {
+                    unset($data[$key]);
+                }
+            }
+        }
 
         return $data;
     }
@@ -171,20 +208,32 @@ class Sync {
         $md = $article['meta_description'] ?? '';
         $kw = $article['focus_keyword'] ?? '';
 
-        // SEO plugins
+        // Yoast SEO
         if (defined('WPSEO_VERSION') || defined('WPSEO_PREMIUM_VERSION')) {
             if ($mt) update_post_meta($post_id, '_yoast_wpseo_title', $mt);
             if ($md) update_post_meta($post_id, '_yoast_wpseo_metadesc', $md);
             if ($kw) update_post_meta($post_id, '_yoast_wpseo_focuskw', $kw);
         }
+        // Rank Math
         if (defined('RANK_MATH_VERSION')) {
             if ($mt) update_post_meta($post_id, 'rank_math_title', $mt);
             if ($md) update_post_meta($post_id, 'rank_math_description', $md);
             if ($kw) update_post_meta($post_id, 'rank_math_focus_keyword', $kw);
         }
+        // AIOSEO
         if (defined('AIOSEO_VERSION')) {
             if ($mt) update_post_meta($post_id, '_aioseo_title', $mt);
             if ($md) update_post_meta($post_id, '_aioseo_description', $md);
+        }
+        // SEOPress
+        if (defined('SEOPRESS_VERSION')) {
+            if ($mt) update_post_meta($post_id, '_seopress_titles_title', $mt);
+            if ($md) update_post_meta($post_id, '_seopress_titles_desc', $md);
+        }
+        // The SEO Framework
+        if (defined('THE_SE_FRAMEWORK_VERSION')) {
+            if ($mt) update_post_meta($post_id, '_genesis_title', $mt);
+            if ($md) update_post_meta($post_id, '_genesis_description', $md);
         }
 
         // Always store
@@ -192,9 +241,47 @@ class Sync {
         if ($md) update_post_meta($post_id, '_kozmo_ai_meta_description', $md);
         if ($kw) update_post_meta($post_id, '_kozmo_ai_focus_keyword', $kw);
 
-        // Schema
         if (!empty($article['schema'])) {
             update_post_meta($post_id, '_kozmo_ai_schema', $article['schema']);
         }
+    }
+
+    private static function set_custom_fields(int $post_id, array $custom_fields): void {
+        foreach ($custom_fields as $key => $value) {
+            if (str_starts_with($key, '_kozmo_')) continue;
+            if (is_array($value)) $value = wp_json_encode($value);
+            update_post_meta($post_id, sanitize_key($key), sanitize_text_field((string) $value));
+        }
+    }
+
+    private static function should_import(string $setting_key, array $settings): bool {
+        return ($settings[$setting_key] ?? 'yes') === 'yes';
+    }
+
+    public static function get_agent_posts(int $limit = 50, string $status = ''): array {
+        $args = [
+            'meta_key'   => '_kozmo_ai_imported_at',
+            'post_type'  => 'any',
+            'post_status' => $status ?: 'any',
+            'numberposts' => $limit,
+            'orderby'    => 'meta_value',
+            'order'      => 'DESC',
+        ];
+
+        $posts = get_posts($args);
+        $results = [];
+
+        foreach ($posts as $post) {
+            $results[] = [
+                'post_id'           => $post->ID,
+                'title'             => $post->post_title,
+                'status'            => $post->post_status,
+                'url'               => get_permalink($post->ID),
+                'agent_article_id'  => get_post_meta($post->ID, '_kozmo_ai_article_id', true),
+                'imported_at'       => get_post_meta($post->ID, '_kozmo_ai_imported_at', true),
+            ];
+        }
+
+        return $results;
     }
 }

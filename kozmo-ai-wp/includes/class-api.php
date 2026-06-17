@@ -4,7 +4,7 @@ defined('ABSPATH') || exit;
 
 /**
  * REST API endpoints — thin connector for KOZMO Core.
- * Only exposes post CRUD, taxonomies, media, settings, webhook.
+ * Registers both kozmo-ai/v1 and (for backward compat) kozmo-core/v1.
  */
 class Api {
     private static ?self $instance = null;
@@ -15,8 +15,15 @@ class Api {
     }
 
     public static function register_routes(): void {
-        $ns = 'kozmo-ai/v1';
+        self::register_route_set(KOZMO_AI_WP_API_NAMESPACE);
 
+        if (!defined('KOZMO_CORE_API_NAMESPACE')) {
+            define('KOZMO_CORE_API_NAMESPACE', 'kozmo-core/v1');
+        }
+        self::register_route_set(KOZMO_CORE_API_NAMESPACE);
+    }
+
+    private static function register_route_set(string $ns): void {
         register_rest_route($ns, '/status', [
             'methods'             => 'GET',
             'callback'            => [self::class, 'get_status'],
@@ -90,18 +97,29 @@ class Api {
         global $wpdb;
         $settings = get_option('kozmo_ai_wp_settings', []);
         $key_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}kozmo_ai_api_keys WHERE is_active = 1");
+        $db_ok = !is_wp_error($wpdb->check_database_version());
+        $imported_posts = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '_kozmo_ai_imported_at'"
+        );
 
         return new \WP_REST_Response([
             'success' => true,
             'data'    => [
-                'status'          => 'ok',
-                'version'         => KOZMO_AI_WP_VERSION,
-                'wp_version'      => get_bloginfo('version'),
-                'php_version'     => PHP_VERSION,
-                'active_keys'     => $key_count,
-                'site_name'       => get_bloginfo('name'),
-                'site_url'        => get_bloginfo('url'),
-                'modules'         => Main::get_instance()->get_services(),
+                'status'           => 'ok',
+                'version'          => KOZMO_AI_WP_VERSION,
+                'wp_version'       => get_bloginfo('version'),
+                'php_version'      => PHP_VERSION,
+                'database_ok'      => $db_ok,
+                'api_enabled'      => self::is_api_enabled(),
+                'active_keys'      => $key_count,
+                'imported_posts'   => $imported_posts,
+                'site_name'        => get_bloginfo('name'),
+                'site_url'         => get_bloginfo('url'),
+                'admin_email'      => get_bloginfo('admin_email'),
+                'timezone'         => wp_timezone_string(),
+                'locale'           => get_locale(),
+                'seo_plugins'      => self::detect_seo_plugins(),
+                'modules'          => Main::get_instance()->get_services(),
             ],
         ], 200);
     }
@@ -187,8 +205,13 @@ class Api {
                 $results[] = ['index' => $i, 'action' => 'create', 'result' => Sync::create_post($article)];
             }
         }
-        $success = count(array_filter($results, fn($r) => $r['result']['success']));
-        return new \WP_REST_Response(['success' => $success === count($posts), 'data' => $results, 'summary' => ['total' => count($posts), 'success' => $success]], 200);
+        $success_count = count(array_filter($results, fn($r) => $r['result']['success']));
+        $fail_count = count($results) - $success_count;
+        return new \WP_REST_Response([
+            'success' => $fail_count === 0,
+            'data'    => $results,
+            'summary' => ['total' => count($results), 'success' => $success_count, 'failed' => $fail_count],
+        ], $fail_count === 0 ? 200 : 207);
     }
 
     // ── Media ──
@@ -212,20 +235,34 @@ class Api {
         @unlink($tmp);
         if (!empty($alt_text)) update_post_meta($attachment_id, '_wp_attachment_image_alt', sanitize_text_field($alt_text));
 
+        $attachment = get_post($attachment_id);
         return new \WP_REST_Response(['success' => true, 'data' => [
-            'id' => $attachment_id, 'url' => wp_get_attachment_url($attachment_id), 'mime' => get_post_mime_type($attachment_id),
+            'id' => $attachment_id,
+            'url' => wp_get_attachment_url($attachment_id),
+            'mime' => get_post_mime_type($attachment_id),
+            'filesize' => filesize(get_attached_file($attachment_id)),
+            'width' => wp_get_attachment_metadata($attachment_id)['width'] ?? 0,
+            'height' => wp_get_attachment_metadata($attachment_id)['height'] ?? 0,
         ]], 201);
     }
 
     // ── Taxonomies ──
-    public static function list_categories(): \WP_REST_Response {
-        $terms = get_terms(['taxonomy' => 'category', 'hide_empty' => false, 'orderby' => 'name']);
+    public static function list_categories(\WP_REST_Request $request): \WP_REST_Response {
+        $search = $request->get_param('search');
+        $args = ['taxonomy' => 'category', 'hide_empty' => false, 'orderby' => 'name'];
+        if (!empty($search)) $args['name__like'] = sanitize_text_field($search);
+        $terms = get_terms($args);
+        if (is_wp_error($terms)) return new \WP_REST_Response(['success' => false, 'message' => $terms->get_error_message()], 500);
         $cats = array_map(fn($t) => ['id' => $t->term_id, 'name' => $t->name, 'slug' => $t->slug, 'count' => $t->count, 'parent' => $t->parent], $terms);
         return new \WP_REST_Response(['success' => true, 'data' => $cats, 'total' => count($cats)], 200);
     }
 
-    public static function list_tags(): \WP_REST_Response {
-        $terms = get_terms(['taxonomy' => 'post_tag', 'hide_empty' => false, 'orderby' => 'name']);
+    public static function list_tags(\WP_REST_Request $request): \WP_REST_Response {
+        $search = $request->get_param('search');
+        $args = ['taxonomy' => 'post_tag', 'hide_empty' => false, 'orderby' => 'name'];
+        if (!empty($search)) $args['name__like'] = sanitize_text_field($search);
+        $terms = get_terms($args);
+        if (is_wp_error($terms)) return new \WP_REST_Response(['success' => false, 'message' => $terms->get_error_message()], 500);
         $tags = array_map(fn($t) => ['id' => $t->term_id, 'name' => $t->name, 'slug' => $t->slug, 'count' => $t->count], $terms);
         return new \WP_REST_Response(['success' => true, 'data' => $tags, 'total' => count($tags)], 200);
     }
@@ -242,6 +279,8 @@ class Api {
         if (!empty($settings['openai_api_key'])) {
             $settings['openai_api_key'] = '********';
         }
+        $settings['seo_plugins'] = self::detect_seo_plugins();
+        $settings['version'] = KOZMO_AI_WP_VERSION;
         return new \WP_REST_Response(['success' => true, 'data' => $settings], 200);
     }
 
@@ -263,7 +302,8 @@ class Api {
 
         $text_fields = [
             'api_enabled', 'agent_url', 'webhook_secret',
-            'debug_mode', 'log_level',
+            'debug_mode', 'log_level', 'default_status', 'default_author',
+            'auto_import_tags', 'auto_import_cats',
         ];
         foreach ($text_fields as $k) {
             if (isset($body[$k])) $settings[$k] = sanitize_text_field($body[$k]);
@@ -285,12 +325,23 @@ class Api {
             return new \WP_REST_Response(['success' => false, 'message' => $rate_limit->get_error_message()], 429);
         }
 
+        $webhook_ok = false;
+
         if (!empty($settings['webhook_secret'])) {
-            $signature = $request->get_header('X-KOZMO-AI-Signature');
+            $signature = $request->get_header('X-KOZMO-AI-Signature') ?: $request->get_header('X-KOZMO-Core-Signature');
             $payload   = $request->get_body();
             if (empty($signature)) return new \WP_REST_Response(['success' => false, 'message' => 'Missing signature.'], 401);
             $expected = 'sha256=' . hash_hmac('sha256', $payload, $settings['webhook_secret']);
-            if (!hash_equals($expected, $signature)) return new \WP_REST_Response(['success' => false, 'message' => 'Invalid signature.'], 401);
+            if (hash_equals($expected, $signature)) $webhook_ok = true;
+        }
+
+        if (!$webhook_ok) {
+            $auth = Auth::authenticate_request();
+            if ($auth['valid'] && in_array('write', $auth['permissions'], true)) $webhook_ok = true;
+        }
+
+        if (!$webhook_ok) {
+            return new \WP_REST_Response(['success' => false, 'message' => 'Authentication required.'], 401);
         }
 
         $event = $request->get_param('event');
@@ -304,7 +355,7 @@ class Api {
                 break;
             case 'article.updated':
                 $post_id = $data['post_id'] ?? 0;
-                $agent_id = $data['agent_article_id'] ?? $data['kozmo_ai_article_id'] ?? '';
+                $agent_id = $data['agent_article_id'] ?? $data['kozmo_ai_article_id'] ?? $data['kozmo_core_article_id'] ?? '';
                 if (!$post_id && !empty($agent_id)) {
                     $post = Sync::get_post_by_agent_id($agent_id);
                     $post_id = $post ? $post->ID : 0;
@@ -313,7 +364,7 @@ class Api {
                 break;
             case 'article.deleted':
                 $post_id = $data['post_id'] ?? 0;
-                $agent_id = $data['agent_article_id'] ?? $data['kozmo_ai_article_id'] ?? '';
+                $agent_id = $data['agent_article_id'] ?? $data['kozmo_ai_article_id'] ?? $data['kozmo_core_article_id'] ?? '';
                 if (!$post_id && !empty($agent_id)) {
                     $post = Sync::get_post_by_agent_id($agent_id);
                     $post_id = $post ? $post->ID : 0;
@@ -335,23 +386,35 @@ class Api {
         $cats = wp_get_post_categories($post->ID, ['fields' => 'all']);
         $tags = wp_get_post_tags($post->ID, ['fields' => 'all']);
         return [
-            'id'             => $post->ID,
-            'title'          => $post->post_title,
-            'slug'           => $post->post_name,
-            'content'        => $post->post_content,
-            'excerpt'        => $post->post_excerpt,
-            'status'         => $post->post_status,
-            'type'           => $post->post_type,
-            'author'         => ['id' => (int) $post->post_author, 'name' => get_the_author_meta('display_name', $post->post_author)],
-            'categories'     => array_map(fn($c) => ['id' => $c->term_id, 'name' => $c->name, 'slug' => $c->slug], $cats),
-            'tags'           => array_map(fn($t) => ['id' => $t->term_id, 'name' => $t->name, 'slug' => $t->slug], $tags),
-            'featured_image' => get_the_post_thumbnail_url($post->ID, 'full'),
-            'permalink'      => get_permalink($post->ID),
-            'meta'           => ['title' => get_post_meta($post->ID, '_kozmo_ai_meta_title', true), 'description' => get_post_meta($post->ID, '_kozmo_ai_meta_description', true)],
-            'agent_id'       => get_post_meta($post->ID, '_kozmo_ai_article_id', true),
-            'created_at'     => $post->post_date,
-            'updated_at'     => $post->post_modified,
+            'id'                => $post->ID,
+            'title'             => $post->post_title,
+            'slug'              => $post->post_name,
+            'content'           => $post->post_content,
+            'excerpt'           => $post->post_excerpt,
+            'status'            => $post->post_status,
+            'type'              => $post->post_type,
+            'author'            => ['id' => (int) $post->post_author, 'name' => get_the_author_meta('display_name', $post->post_author)],
+            'categories'        => array_map(fn($c) => ['id' => $c->term_id, 'name' => $c->name, 'slug' => $c->slug], $cats),
+            'tags'              => array_map(fn($t) => ['id' => $t->term_id, 'name' => $t->name, 'slug' => $t->slug], $tags),
+            'featured_image'    => get_the_post_thumbnail_url($post->ID, 'full'),
+            'featured_image_id' => get_post_thumbnail_id($post->ID),
+            'permalink'         => get_permalink($post->ID),
+            'meta'              => ['title' => get_post_meta($post->ID, '_kozmo_ai_meta_title', true), 'description' => get_post_meta($post->ID, '_kozmo_ai_meta_description', true)],
+            'agent_id'          => get_post_meta($post->ID, '_kozmo_ai_article_id', true),
+            'imported_at'       => get_post_meta($post->ID, '_kozmo_ai_imported_at', true),
+            'created_at'        => $post->post_date,
+            'updated_at'        => $post->post_modified,
         ];
+    }
+
+    public static function detect_seo_plugins(): array {
+        $plugins = [];
+        if (defined('WPSEO_VERSION')) $plugins['yoast'] = WPSEO_VERSION;
+        if (defined('RANK_MATH_VERSION')) $plugins['rank_math'] = RANK_MATH_VERSION;
+        if (defined('AIOSEO_VERSION')) $plugins['aioseo'] = AIOSEO_VERSION;
+        if (defined('SEOPRESS_VERSION')) $plugins['seopress'] = SEOPRESS_VERSION;
+        if (defined('THE_SE_FRAMEWORK_VERSION')) $plugins['the_seo_framework'] = THE_SE_FRAMEWORK_VERSION;
+        return $plugins;
     }
 
     private static function post_args(): array {
@@ -369,11 +432,14 @@ class Api {
             'featured_image_url' => ['type' => 'string', 'format' => 'uri', 'sanitize_callback' => 'esc_url_raw'],
             'publish_date' => ['type' => 'string', 'format' => 'date-time'],
             'author_id' => ['type' => 'integer', 'sanitize_callback' => 'absint'],
+            'author_email' => ['type' => 'string', 'format' => 'email'],
             'post_type' => ['type' => 'string', 'default' => 'post', 'sanitize_callback' => 'sanitize_text_field'],
             'agent_article_id' => ['type' => 'string', 'sanitize_callback' => 'sanitize_text_field'],
             'schema' => ['type' => 'string'],
             'auto_publish' => ['type' => 'boolean'],
             'comment_status' => ['type' => 'string', 'sanitize_callback' => 'sanitize_text_field'],
+            'custom_fields' => ['type' => 'object'],
+            'quality_score' => ['type' => 'number'],
         ];
     }
 }

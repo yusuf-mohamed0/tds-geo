@@ -4,6 +4,7 @@
 
 import OpenAI from 'openai';
 import { logger } from '../utils/logger';
+import { countKeywordOccurrences } from '../utils/stringUtils';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
 import { writingSystemPrompt } from '../prompts';
 
@@ -997,7 +998,7 @@ FORMATTING:
 
   private async mockAnalyzeSEO(content: string, keyword: string): Promise<Record<string, unknown>> {
     const wordCount = content.split(/\s+/).length;
-    const keywordCount = (content.toLowerCase().match(new RegExp(keyword.toLowerCase(), 'g')) || []).length;
+    const keywordCount = countKeywordOccurrences(content, keyword);
     const density = wordCount > 0 ? (keywordCount / wordCount) * 100 : 0;
 
     const score = Math.min(100, Math.max(40,

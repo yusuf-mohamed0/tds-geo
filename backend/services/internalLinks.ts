@@ -4,6 +4,7 @@
 
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { escapeRegExp } from '../utils/stringUtils';
 import shopifyService from './shopify';
 import { ShopifyConfig } from '../types';
 
@@ -121,7 +122,7 @@ class InternalLinksService {
     const sortedLinks = [...links].sort((a, b) => b.text.length - a.text.length);
 
     for (const link of sortedLinks) {
-      const regex = new RegExp(`\\b${this.escapeRegExp(link.text)}\\b`, 'i');
+      const regex = new RegExp(`\\b${escapeRegExp(link.text)}\\b`, 'i');
       result = result.replace(regex, (match) => `[${match}](${link.url})`);
     }
 
@@ -146,10 +147,6 @@ class InternalLinksService {
     }
 
     return Array.from(terms);
-  }
-
-  private escapeRegExp(string: string): string {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   async close(): Promise<void> {
