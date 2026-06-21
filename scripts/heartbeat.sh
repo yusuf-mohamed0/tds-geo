@@ -55,31 +55,31 @@ HTML_BODY=$(cat <<EOF
   <style>
     body { margin: 0; padding: 0; background-color: #f4f4f8; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
-    .header { background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%); padding: 36px 40px; text-align: center; }
-    .header h1 { margin: 0; font-size: 14px; font-weight: 600; color: #8888bb; letter-spacing: 3px; text-transform: uppercase; }
-    .header .status-badge { display: inline-block; margin-top: 16px; padding: 8px 24px; border-radius: 24px; background: #ff2d55; color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-    .header .logo { font-size: 28px; font-weight: 800; color: #ffffff; margin-bottom: 8px; letter-spacing: 1px; }
-    .header .logo span { color: #6366f1; }
+    .header { background: #171414; padding: 36px 40px; text-align: center; }
+    .header h1 { margin: 0; font-size: 14px; font-weight: 600; color: #838081; letter-spacing: 3px; text-transform: uppercase; }
+    .header .status-badge { display: inline-block; margin-top: 16px; padding: 8px 24px; border-radius: 24px; background: #FCB900; color: #171414; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .header .logo { font-size: 28px; font-weight: 800; color: #FCF6F2; margin-bottom: 8px; letter-spacing: 2px; }
+    .header .logo span { color: #FCB900; }
     .body { padding: 32px 40px; }
-    .body h2 { margin: 0 0 8px 0; font-size: 18px; color: #1a1a2e; font-weight: 600; }
-    .body p { margin: 0 0 24px 0; font-size: 14px; color: #666680; line-height: 1.6; }
-    .details { background: #f8f8fc; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; }
-    .details .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eaeaef; font-size: 14px; }
+    .body h2 { margin: 0 0 8px 0; font-size: 18px; color: #171414; font-weight: 600; }
+    .body p { margin: 0 0 24px 0; font-size: 14px; color: #3D3B3B; line-height: 1.6; }
+    .details { background: #FCF6F2; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; }
+    .details .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8ddd5; font-size: 14px; }
     .details .row:last-child { border-bottom: none; }
-    .details .label { color: #8888aa; font-weight: 500; }
-    .details .value { color: #1a1a2e; font-weight: 600; font-family: 'SF Mono', 'Fira Code', monospace; }
-    .details .value.error { color: #ff2d55; }
+    .details .label { color: #838081; font-weight: 500; }
+    .details .value { color: #171414; font-weight: 600; font-family: 'SF Mono', 'Fira Code', monospace; }
+    .details .value.error { color: #F89D4B; }
     .causes { margin-bottom: 24px; }
-    .causes h3 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 0 0 12px 0; }
+    .causes h3 { font-size: 14px; font-weight: 600; color: #171414; margin: 0 0 12px 0; }
     .causes ul { margin: 0; padding: 0; list-style: none; }
-    .causes li { padding: 6px 0 6px 20px; font-size: 13px; color: #666680; position: relative; }
-    .causes li::before { content: "›"; position: absolute; left: 4px; color: #ff2d55; font-weight: 700; font-size: 16px; }
-    .action-box { background: #fff3f5; border: 1px solid #ffd5db; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
-    .action-box h3 { font-size: 14px; font-weight: 600; color: #cc2244; margin: 0 0 8px 0; }
-    .action-box p { margin: 0; font-size: 13px; color: #883344; line-height: 1.5; }
-    .action-box code { display: inline-block; background: #ffe8eb; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #aa2244; font-family: 'SF Mono', 'Fira Code', monospace; }
-    .footer { padding: 20px 40px; background: #f8f8fc; text-align: center; font-size: 12px; color: #9999bb; border-top: 1px solid #eaeaef; }
-    .footer .brand { font-weight: 700; color: #6366f1; }
+    .causes li { padding: 6px 0 6px 20px; font-size: 13px; color: #3D3B3B; position: relative; }
+    .causes li::before { content: "›"; position: absolute; left: 4px; color: #FCB900; font-weight: 700; font-size: 16px; }
+    .action-box { background: #FFF7E6; border: 1px solid #FCB900; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
+    .action-box h3 { font-size: 14px; font-weight: 600; color: #142444; margin: 0 0 8px 0; }
+    .action-box p { margin: 0; font-size: 13px; color: #3D3B3B; line-height: 1.5; }
+    .action-box code { display: inline-block; background: #FFF0CC; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #171414; font-family: 'SF Mono', 'Fira Code', monospace; }
+    .footer { padding: 20px 40px; background: #FCF6F2; text-align: center; font-size: 12px; color: #838081; border-top: 1px solid #e8ddd5; }
+    .footer .brand { font-weight: 700; color: #FCB900; }
   </style>
 </head>
 <body>
@@ -167,7 +167,7 @@ Recommended actions:
   3. Run: tail -100 /var/log/tdsgeo-heartbeat.log
   4. Verify process: pm2 status or systemctl status tds-geo
 
-This is an automated alert from TDS Geo Heartbeat Monitor.
+This is an automated alert from Traffic Digital Solutions GEO Heartbeat Monitor.
 EOF
 )
 
