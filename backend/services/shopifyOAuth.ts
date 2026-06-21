@@ -132,7 +132,7 @@ function buildInstallUrl(shop: string): { url: string; state: string } {
   }
 
   const state = generateAndStoreState(normalizedShop);
-  const redirectUri = `${SHOPIFY_APP_URL}/auth/callback`;
+  const redirectUri = `${SHOPIFY_APP_URL}/api/auth/callback`;
 
   const params = new URLSearchParams({
     client_id: SHOPIFY_API_KEY,
@@ -160,7 +160,7 @@ function buildOfflineInstallUrl(shop: string): { url: string; state: string } {
   }
 
   const state = generateAndStoreState(normalizedShop);
-  const redirectUri = `${SHOPIFY_APP_URL}/auth/callback`;
+  const redirectUri = `${SHOPIFY_APP_URL}/api/auth/callback`;
 
   const params = new URLSearchParams({
     client_id: SHOPIFY_API_KEY,

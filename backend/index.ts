@@ -487,6 +487,7 @@ app.post('/api/webhooks/events/receive', async (req: Request, res: Response) => 
 // ══════════════════════════════════════════════
 
 app.use('/auth', createShopifyAuthRoutes(pool));
+app.use('/api/auth', createShopifyAuthRoutes(pool));
 
 // ═══ Shopify Store Info Route (inside /api/ for auth) ════
 app.use('/api/shopify', createShopifyStoreRoutes(pool));  // ─── Keyword Discovery Endpoint ─────────────
