@@ -17,10 +17,13 @@ function generateState(): string {
   return randomBytes(16).toString('hex');
 }
 
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'store';
+}
+
 export function createShopifyInstallRoutes(pool: Pool): Router {
   const router = Router();
 
-  // GET /api/shopify/install?shop=store.myshopify.com
   router.get('/install', (req: Request, res: Response) => {
     const shop = ((req.query.shop as string) || '').trim().toLowerCase();
     if (!shop || !isValidShop(shop)) {
@@ -30,7 +33,6 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
 
     const state = generateState();
 
-    // Store state temporarily (expires in 10 min)
     pool.query(
       `INSERT INTO shopify_oauth_states (state, shop, created_at)
        VALUES ($1, $2, NOW())
@@ -47,19 +49,17 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
     res.redirect(302, installUrl);
   });
 
-  // GET /api/shopify/callback
   router.get('/callback', async (req: Request, res: Response) => {
-    const shop = req.query.shop as string;
-    const code = req.query.code as string;
-    const state = req.query.state as string;
-    const hmac = req.query.hmac as string;
+    const shop = String(req.query.shop || '');
+    const code = String(req.query.code || '');
+    const state = String(req.query.state || '');
+    const hmac = String(req.query.hmac || '');
 
     if (!shop || !code || !state || !hmac) {
       res.redirect(`${SHOPIFY_APP_URL}/shopify/error?msg=missing_params`);
       return;
     }
 
-    // Verify state
     try {
       const result = await pool.query(
         'DELETE FROM shopify_oauth_states WHERE state = $1 AND created_at > NOW() - INTERVAL \'10 minutes\' RETURNING shop',
@@ -74,10 +74,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
       return;
     }
 
-    // State verification above is sufficient for our use case
-
     try {
-      // Exchange code for access token
       const tokenResponse = await axios.post(`https://${shop}/admin/oauth/access_token`, {
         client_id: SHOPIFY_API_KEY,
         client_secret: SHOPIFY_API_SECRET,
@@ -86,41 +83,36 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
 
       const accessToken = tokenResponse.data.access_token;
 
-      // Get store info
       const storeResponse = await axios.get(`https://${shop}/admin/api/2024-07/shop.json`, {
         headers: { 'X-Shopify-Access-Token': accessToken }
       });
       const storeName = storeResponse.data.shop.name;
 
-      // Check if we already have this shop
       const existing = await pool.query(
         'SELECT id FROM clients WHERE shopify_shop = $1',
         [shop]
       );
 
       if (existing.rows.length > 0) {
-        // Update existing client
         await pool.query(
           'UPDATE clients SET shopify_token = $1, is_active = true WHERE id = $2',
           [accessToken, existing.rows[0].id]
         );
       } else {
-        // Create new client
+        const slug = slugify(storeName);
         await pool.query(
-          `INSERT INTO clients (name, shopify_shop, shopify_token, shopify_api_version, approval_mode, publish_frequency, is_active)
-           VALUES ($1, $2, $3, $4, 'auto', 'weekly', true)`,
-          [storeName, shop, accessToken, '2024-07']
+          `INSERT INTO clients (name, slug, shopify_shop, shopify_token, shopify_api_version, approval_mode, publish_frequency, is_active)
+           VALUES ($1, $2, $3, $4, $5, 'auto', 'weekly', true)`,
+          [storeName, slug, shop, accessToken, '2024-07']
         );
       }
 
-      // Get client ID (after possible insert)
       const client = await pool.query(
         'SELECT id FROM clients WHERE shopify_shop = $1',
         [shop]
       );
       const clientId = client.rows[0]?.id;
 
-      // Upsert CMS connection
       if (clientId) {
         const existingConn = await pool.query(
           'SELECT id FROM cms_connections WHERE client_id = $1 AND provider = \'shopify\'',
@@ -128,14 +120,14 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
         );
         if (existingConn.rows.length > 0) {
           await pool.query(
-            `UPDATE cms_connections SET config = jsonb_build_object('shop', $1, 'accessToken', $2, 'apiVersion', '2024-07'), is_active = true, label = $3 WHERE id = $4`,
-            [shop, accessToken, storeName, existingConn.rows[0].id]
+            `UPDATE cms_connections SET config = $1::jsonb, is_active = true, label = $2 WHERE id = $3`,
+            [JSON.stringify({ shop, accessToken, apiVersion: '2024-07' }), storeName, existingConn.rows[0].id]
           );
         } else {
           await pool.query(
             `INSERT INTO cms_connections (client_id, label, provider, endpoint_url, config, capabilities, is_primary, is_active)
-             VALUES ($1, $2, 'shopify', $3, jsonb_build_object('shop', $3, 'accessToken', $4, 'apiVersion', '2024-07'), ARRAY['publish','read'], false, true)`,
-            [clientId, storeName, shop, accessToken]
+             VALUES ($1, $2, 'shopify', $3, $4::jsonb, ARRAY['publish','read'], false, true)`,
+            [clientId, storeName, shop, JSON.stringify({ shop, accessToken, apiVersion: '2024-07' })]
           );
         }
       }
@@ -146,7 +138,8 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
     } catch (err: any) {
       logger.error('Shopify OAuth callback failed', {
         shop,
-        error: err.response?.data || err.message
+        error: err.message,
+        stack: err.stack?.split('\n').slice(0, 3).join('; ')
       });
       res.redirect(`${SHOPIFY_APP_URL}/shopify/error?msg=token_exchange_failed`);
     }
