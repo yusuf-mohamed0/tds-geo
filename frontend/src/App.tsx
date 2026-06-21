@@ -36,6 +36,11 @@ import CopywriterDashboard from './pages/CopywriterDashboard'
 import OnboardShopify from './pages/OnboardShopify'
 import ShopifySuccess from './pages/ShopifySuccess'
 import ShopifyError from './pages/ShopifyError'
+import ClientLayout from './pages/portal/ClientLayout'
+import ClientDashboard from './pages/portal/ClientDashboard'
+import ClientArticles from './pages/portal/ClientArticles'
+import ClientSettings from './pages/portal/ClientSettings'
+import ClientLogs from './pages/portal/ClientLogs'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth()
@@ -87,6 +92,12 @@ export default function App() {
         <Route path="config" element={<Config />} />
         <Route path="improvements" element={<Improvements />} />
         <Route path="admin" element={<Admin />} />
+      </Route>
+      <Route path="portal" element={<ProtectedRoute><ClientLayout /></ProtectedRoute>}>
+        <Route index element={<ClientDashboard />} />
+        <Route path="articles" element={<ClientArticles />} />
+        <Route path="settings" element={<ClientSettings />} />
+        <Route path="logs" element={<ClientLogs />} />
       </Route>
       <Route path="shopify/success" element={<ShopifySuccess />} />
       <Route path="shopify/error" element={<ShopifyError />} />
