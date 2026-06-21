@@ -114,7 +114,7 @@ class Admin {
         ?>
         <div class="k-shell">
             <div class="k-nav">
-                <div class="k-nav-logo">K</div>
+                <div class="k-nav-logo"><img src="<?php echo esc_url(TDS_GEO_WP_URL . 'assets/tds-geo-white.png'); ?>" alt="TDS Geo" style="height:28px;width:auto;"></div>
                 <span class="k-nav-title">Traffic Digital Solutions GEO — Settings</span>
                 <div class="k-nav-items">
                     <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp')); ?>" class="k-nav-item">Dashboard</a>
@@ -212,7 +212,7 @@ class Admin {
         ?>
         <div class="k-shell">
             <div class="k-nav">
-                <div class="k-nav-logo">K</div>
+                <div class="k-nav-logo"><img src="<?php echo esc_url(TDS_GEO_WP_URL . 'assets/tds-geo-white.png'); ?>" alt="TDS Geo" style="height:28px;width:auto;"></div>
                 <span class="k-nav-title">Traffic Digital Solutions GEO — API Keys</span>
                 <div class="k-nav-items">
                     <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp')); ?>" class="k-nav-item">Dashboard</a>
@@ -313,7 +313,7 @@ class Admin {
         ?>
         <div class="k-shell">
             <div class="k-nav">
-                <div class="k-nav-logo">K</div>
+                <div class="k-nav-logo"><img src="<?php echo esc_url(TDS_GEO_WP_URL . 'assets/tds-geo-white.png'); ?>" alt="TDS Geo" style="height:28px;width:auto;"></div>
                 <span class="k-nav-title">Traffic Digital Solutions GEO — Activity Logs</span>
                 <div class="k-nav-items">
                     <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp')); ?>" class="k-nav-item">Dashboard</a>
