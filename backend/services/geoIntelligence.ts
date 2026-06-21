@@ -317,7 +317,8 @@ const AI_ENGINES: Array<{ name: string; criteria: GeoCriterion[] }> = [
             const matches = content.match(pattern);
             if (matches && matches.length > 1) {
               totalTerms += matches.length;
-              const preferredMatches = content.match(new RegExp(preferred.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'));
+              const preferredStr = preferred as string;
+              const preferredMatches = content.match(new RegExp(preferredStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'));
               if (preferredMatches) dominantTermCount += preferredMatches.length;
             }
           }
@@ -504,7 +505,7 @@ export class GeoIntelligenceService {
       const contextWindow = content.length / CHARS_PER_TOKEN + improvementPrompt.length / CHARS_PER_TOKEN;
       const maxNewTokens = Math.min(4096, Math.max(1024, Math.round(content.length / CHARS_PER_TOKEN * 0.5)));
 
-      const response = await openaiService.getClient()!.chat.completions.create({
+      const response = await (openaiService as any).getClient()!.chat.completions.create({
         model: openaiService.defaultModel,
         messages: [
           { role: 'system', content: 'You are a GEO content optimization specialist. Improve content for AI search engine visibility. Return only the improved content, no explanations.' },

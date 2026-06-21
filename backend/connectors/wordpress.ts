@@ -97,7 +97,7 @@ export class WordPressConnector implements PublisherAdapter {
         req.baseUrl,
         req.headers,
       );
-      article = { ...article, tags: resolvedIds };
+      article = { ...article, tags: resolvedIds as unknown as string[] };
     }
 
     const body = this.buildPublishBody(article, config, req.mode);
@@ -235,7 +235,7 @@ export class WordPressConnector implements PublisherAdapter {
           signal: AbortSignal.timeout(10000),
         });
         if (res.ok) {
-          const existingTags: any[] = await res.json();
+          const existingTags = await res.json() as any[];
           const existingMap = new Map<string, number>();
           for (const t of existingTags) {
             existingMap.set(t.name.toLowerCase(), t.id);
@@ -256,7 +256,7 @@ export class WordPressConnector implements PublisherAdapter {
                   signal: AbortSignal.timeout(10000),
                 });
                 if (createRes.ok) {
-                  const newTag = await createRes.json();
+                  const newTag = await createRes.json() as {id: number};
                   this.tagCache.set(name.toLowerCase(), newTag.id);
                   ids.push(newTag.id);
                 }
