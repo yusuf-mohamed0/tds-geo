@@ -49,7 +49,10 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
 
   // GET /api/shopify/callback
   router.get('/callback', async (req: Request, res: Response) => {
-    const { shop, code, state, hmac } = req.query;
+    const shop = req.query.shop as string;
+    const code = req.query.code as string;
+    const state = req.query.state as string;
+    const hmac = req.query.hmac as string;
 
     if (!shop || !code || !state || !hmac) {
       res.redirect(`${SHOPIFY_APP_URL}/shopify/error?msg=missing_params`);
