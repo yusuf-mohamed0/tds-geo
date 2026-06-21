@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════════
-// KOZMO Core — Shopify Connector
+// TDS Geo — Shopify Connector
 //
 // Publishes/updates/deletes articles to Shopify blogs
 // via the Shopify Admin REST API.

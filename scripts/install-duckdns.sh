@@ -2,27 +2,27 @@
 set -euo pipefail
 
 # ══════════════════════════════════════════════════════════════════
-# KOZMO Core — Duck DNS Auto-Updater
+# TDS Geo — Duck DNS Auto-Updater
 #
 # Keeps your free Duck DNS subdomain pointed at your server IP.
 # Runs every 5 minutes via cron.
 #
 # Setup:
 #   1. Go to https://duckdns.org and sign in
-#   2. Create a subdomain (e.g. "kozmocore")
+#   2. Create a subdomain (e.g. "tdsgeo")
 #   3. Copy your token
 #   4. Run: bash scripts/install-duckdns.sh
 # ══════════════════════════════════════════════════════════════════
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-LOG_FILE="/var/log/kozmocore-duckdns.log"
+LOG_FILE="/var/log/tdsgeo-duckdns.log"
 
 echo "════════════════════════════════════════════════"
-echo "  KOZMO Core — Duck DNS Installer"
+echo "  TDS Geo — Duck DNS Installer"
 echo "════════════════════════════════════════════════"
 echo ""
 
-read -p "Enter your Duck DNS subdomain (e.g. kozmocore): " DUCK_NAME
+read -p "Enter your Duck DNS subdomain (e.g. tdsgeo): " DUCK_NAME
 read -p "Enter your Duck DNS token: " DUCK_TOKEN
 
 if [ -z "$DUCK_NAME" ] || [ -z "$DUCK_TOKEN" ]; then

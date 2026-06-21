@@ -1,5 +1,5 @@
 /**
- * ESLint Configuration — KOZMO AI Backend
+ * ESLint Configuration — Traffic Digital Solutions GEO Backend
  */
 module.exports = {
   root: true,

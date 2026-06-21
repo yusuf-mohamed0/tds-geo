@@ -1,9 +1,9 @@
 <?php
 /**
- * KOZMO AI Telemetry Receiver
+ * Traffic Digital Solutions GEO Telemetry Receiver
  *
  * Host this file on any server to receive daily pings from all sites running
- * the KOZMO AI plugin. Data is logged as JSONL (one JSON object per line).
+ * the Traffic Digital Solutions GEO plugin. Data is logged as JSONL (one JSON object per line).
  *
  * Usage:
  *   1. Upload this file to your server (e.g., https://your-server.com/telemetry.php)

@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════════
-// KOZMO Core — Shopify Client Factory
+// TDS Geo — Shopify Client Factory
 //
 // Shared Axios client factory for Shopify Admin API.
 // Used by the Shopify connector and any other code (OAuth routes,

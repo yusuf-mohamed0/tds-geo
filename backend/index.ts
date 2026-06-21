@@ -185,7 +185,7 @@ pool.on('error', (err) => {
 if (process.env.NODE_ENV !== 'production') {
   app.get('/', (_req: Request, res: Response) => {
     res.json({
-      name: 'KOZMO Core — AI SEO Automation System',
+      name: 'TDS Geo — AI SEO Automation System',
       version: process.env.npm_package_version || '2.0.0',
       status: 'running',
       api: '/api',
@@ -368,6 +368,10 @@ app.use('/api/security', createSecurityRoutes(pool));
 // Content intelligence routes
 app.use('/api/content-intel', createContentIntelRoutes(pool));
 
+// GEO (Generative Engine Optimization) routes
+import { createGeoRoutes } from './routes/geo';
+app.use('/api/geo', createGeoRoutes());
+
 // AI evaluation routes
 app.use('/api/evaluation', createEvaluationRoutes(pool));
 
@@ -536,6 +540,11 @@ app.post('/api/seo/analyze', authenticate, validate(seoAnalyzeSchema), async (re
     res.status(502).json({ success: false, error: (err as Error).message });
   }
 });
+
+// ─── Serve Brand Assets (logos, icons) ──────
+const assetsDir = path.join(__dirname, 'public', 'assets');
+app.use('/assets', express.static(assetsDir));
+app.use('/api/assets', express.static(assetsDir));
 
 // ─── Serve Frontend (production) ────────────
 if (process.env.NODE_ENV === 'production') {

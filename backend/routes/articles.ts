@@ -131,7 +131,7 @@ export function createArticleRoutes(pool: Pool): Router {
          RETURNING id, title, slug, content_md, content_html,
                   meta_title, meta_description, tags, status, word_count, seo_score, created_at`,
         [
-          clientId, keywordId, article.title, seoService.generateSlug(article.title),
+          clientId, keywordId, article.title, seoService.generateSlug(article.title) + '-' + Date.now().toString(36).slice(-4),
           finalContent, contentHtml, article.metaTitle, article.metaDescription,
           article.tags, article.content.split(/\s+/).length,
           status, seoAnalysis.score

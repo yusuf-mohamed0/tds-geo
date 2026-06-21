@@ -1,13 +1,13 @@
-# KOZMO Core — Architecture Plan
+# TDS Geo — Architecture Plan
 
 ## Current State Assessment
 
 | Component | Lines | Role | Fate |
 |-----------|-------|------|------|
-| `backend/` | 15,000+ | Partial Core (basic AI, 25-stage pipeline, Shopify connector) | **Evolve → KOZMO Core** |
-| `kozmo-ai-wp/` | 6,386 | Fat plugin with full AI, prompts, research, queue, scoring | **Strip → thin connector** |
+| `backend/` | 15,000+ | Partial Core (basic AI, 25-stage pipeline, Shopify connector) | **Evolve → TDS Geo** |
+| `tds-geo-wp/` | 6,386 | Fat plugin with full AI, prompts, research, queue, scoring | **Strip → thin connector** |
 | `frontend/` | — | Dashboard for backend | **Keep → talks to Core** |
-| `kozmo-core-nextjs/` | — | Next.js blog components | **Keep** |
+| `tds-geo-nextjs/` | — | Next.js blog components | **Keep** |
 
 ### Critical Duplication (features in BOTH):
 
@@ -26,7 +26,7 @@
 
 ### 1.1 Move the 18k-char System Prompt
 
-**From:** `kozmo-ai-wp/includes/class-content-generator.php:432-677`
+**From:** `tds-geo-wp/includes/class-content-generator.php:432-677`
 **To:** `backend/prompts/writing-system-prompt.md`
 
 The prompt file becomes a standalone text file loaded at runtime. The backend's `OpenAIService` reads it and uses it for all article generation. This single file is the source of truth — the plugin no longer owns the prompt.
@@ -102,8 +102,8 @@ The `WordPressConnector` class implements `PublisherAdapter` with three auth mod
 
 | Mode | Header | Endpoint | Use Case |
 |------|--------|----------|----------|
-| `kozmo_ai` | `X-KOZMO-AI-Key` | `kozmo-ai/v1/posts` | This project's KOZMO WordPress plugin |
-| `kozmo-core` | `X-KOZMO-Core-Key` | `kozmo-core/v1/posts` | Legacy KOZMO Core WP plugin |
+| `tds_geo` | `X-TDS-GEO-Key` | `tds-geo/v1/posts` | This project's TDS GEO WordPress plugin |
+| `tds-geo` | `X-TDS-GEO-Key` | `tds-geo/v1/posts` | Legacy TDS Geo WP plugin |
 | `native` | Basic Auth (App Passwords) | `wp/v2/posts` | Any vanilla WordPress site |
 
 **Key details:**
@@ -113,7 +113,7 @@ The `WordPressConnector` class implements `PublisherAdapter` with three auth mod
 
 ### 2.3 Plugin Becomes Thin Connector (Phase 3 prep)
 
-The plugin's REST API (`/kozmo-ai/v1/*`) serves as the WordPress-side endpoint that the Core WordPress connector calls. The plugin files to be removed in Phase 3:
+The plugin's REST API (`/tds-geo/v1/*`) serves as the WordPress-side endpoint that the Core WordPress connector calls. The plugin files to be removed in Phase 3:
 
 | Plugin File | Lines | Replaced By |
 |------------|-------|-------------|

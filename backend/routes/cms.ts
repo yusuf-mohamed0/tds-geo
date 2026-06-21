@@ -42,7 +42,7 @@ export function createCmsRoutes(pool: Pool): Router {
   });
 
   // Publish an article via specific connection
-  router.post('/publish', authenticate, authorize('editor'), async (req: Request, res: Response) => {
+  router.post('/publish', authenticate, authorize('admin', 'editor'), async (req: Request, res: Response) => {
     try {
       const { article_id, connection_id } = req.body;
       const connections = await multiCmsPublisher.getConnections(req.body.client_id || (req as any).user.clientId);
@@ -60,7 +60,7 @@ export function createCmsRoutes(pool: Pool): Router {
   });
 
   // Publish to all active connections
-  router.post('/publish-all', authenticate, authorize('editor'), async (req: Request, res: Response) => {
+  router.post('/publish-all', authenticate, authorize('admin', 'editor'), async (req: Request, res: Response) => {
     try {
       const { article_id, client_id } = req.body;
       const article = await pool.query('SELECT * FROM articles WHERE id = $1', [article_id]);

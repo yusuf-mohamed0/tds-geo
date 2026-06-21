@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════════
-// KOZMO Core — Webflow Connector
+// TDS Geo — Webflow Connector
 //
 // Publishes/updates/deletes articles to Webflow CMS collections
 // via the Webflow CMS API v2.

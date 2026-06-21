@@ -1,26 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'ai-seo-ngrok',
-      script: 'ngrok',
-      // Point at Vite dev server (5173) which proxies API calls to backend (3000)
-      args: 'http 5173 --url mothproof-choosy-irritable.ngrok-free.dev',
-      exec_interpreter: 'none',
-      exec_mode: 'fork',
-      env: {
-        NODE_ENV: 'development',
-      },
-      watch: false,
-      autorestart: true,
-      max_restarts: 5,
-      restart_delay: 3000,
-      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
-      error_file: 'logs/ngrok-err.log',
-      out_file: 'logs/ngrok-out.log',
-      merge_logs: true,
-    },
-    {
-      name: 'ai-seo-backend',
+      name: 'tds-geo-backend',
       script: 'backend/index.ts',
       interpreter: 'npx',
       interpreter_args: 'tsx',
@@ -39,7 +20,6 @@ module.exports = {
       max_restarts: 10,
       restart_delay: 5000,
       kill_timeout: 10000,
-      wait_ready: true,
       listen_timeout: 10000,
     },
   ],

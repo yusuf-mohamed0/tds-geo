@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ══════════════════════════════════════════════════════════════════
-# KOZMO Core — Heartbeat Monitor
+# TDS Geo — Heartbeat Monitor
 #
 # Checks the server health endpoint and sends an email alert if
 # the server is unreachable or returns a non-200 status.
@@ -45,7 +45,7 @@ fi
 
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S %Z")
 HOSTNAME=$(hostname 2>/dev/null || echo "unknown")
-EMAIL_SUBJECT="[KOZMO CORE] Server Down Alert — HTTP $HTTP_CODE"
+EMAIL_SUBJECT="[TDS GEO] Server Down Alert — HTTP $HTTP_CODE"
 
 HTML_BODY=$(cat <<EOF
 <!DOCTYPE html>
@@ -91,7 +91,7 @@ HTML_BODY=$(cat <<EOF
     </div>
     <div class="body">
       <h2>Heartbeat Check Failed</h2>
-      <p>KOZMO Core could not reach the server at the configured endpoint. Immediate attention is required.</p>
+      <p>TDS Geo could not reach the server at the configured endpoint. Immediate attention is required.</p>
 
       <div class="details">
         <div class="row">
@@ -130,13 +130,13 @@ HTML_BODY=$(cat <<EOF
       <div class="action-box">
         <h3>Recommended Actions</h3>
         <p>SSH into the server and check the logs:</p>
-        <p><code>journalctl -u kozmo-core --since "5 minutes ago"</code></p>
-        <p><code>tail -100 /var/log/kozmocore-heartbeat.log</code></p>
-        <p style="margin-top: 8px;">Verify PostgreSQL is reachable and the API process is running with <code>pm2 status</code> or <code>systemctl status kozmo-core</code>.</p>
+        <p><code>journalctl -u tds-geo --since "5 minutes ago"</code></p>
+        <p><code>tail -100 /var/log/tdsgeo-heartbeat.log</code></p>
+        <p style="margin-top: 8px;">Verify PostgreSQL is reachable and the API process is running with <code>pm2 status</code> or <code>systemctl status tds-geo</code>.</p>
       </div>
     </div>
     <div class="footer">
-      <p style="margin: 0 0 4px 0;">Sent by <span class="brand">KOZMO Core</span> Heartbeat Monitor</p>
+      <p style="margin: 0 0 4px 0;">Sent by <span class="brand">TDS Geo</span> Heartbeat Monitor</p>
       <p style="margin: 0;">This is an automated alert. Do not reply to this email.</p>
     </div>
   </div>
@@ -146,7 +146,7 @@ EOF
 )
 
 TEXT_BODY=$(cat <<EOF
-KOZMO CORE — Server Down Alert
+TDS GEO — Server Down Alert
 ================================
 
 Heartbeat check failed for $HEARTBEAT_URL
@@ -163,11 +163,11 @@ Possible causes:
 
 Recommended actions:
   1. SSH into the server
-  2. Run: journalctl -u kozmo-core --since "5 minutes ago"
-  3. Run: tail -100 /var/log/kozmocore-heartbeat.log
-  4. Verify process: pm2 status or systemctl status kozmo-core
+  2. Run: journalctl -u tds-geo --since "5 minutes ago"
+  3. Run: tail -100 /var/log/tdsgeo-heartbeat.log
+  4. Verify process: pm2 status or systemctl status tds-geo
 
-This is an automated alert from KOZMO Core Heartbeat Monitor.
+This is an automated alert from TDS Geo Heartbeat Monitor.
 EOF
 )
 
@@ -176,7 +176,7 @@ BOUNDARY="----=_Part_$(date +%s)_$$"
 EMAIL_FILE=$(mktemp)
 
 cat > "$EMAIL_FILE" <<EOF
-From: KOZMO Core Monitor <$HEARTBEAT_EMAIL_FROM>
+From: TDS Geo Monitor <$HEARTBEAT_EMAIL_FROM>
 To: $HEARTBEAT_EMAIL_TO
 Subject: $EMAIL_SUBJECT
 MIME-Version: 1.0

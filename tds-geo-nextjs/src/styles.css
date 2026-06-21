@@ -1,0 +1,528 @@
+/* ══════════════════════════════════════════════════════════════════
+   TDS Geo Next.js Integration — Component Styles
+   ══════════════════════════════════════════════════════════════════
+   Import these styles in your layout or global CSS:
+     import '@tds-geo/nextjs-integration/styles.css';
+   
+   Or copy this file into your project and import it directly.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ─── Blog List ──────────────────────────────── */
+
+.tds-geo-blog-list {
+  width: 100%;
+}
+
+.tds-geo-blog-list--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.tds-geo-empty-state {
+  text-align: center;
+  color: #6b7280;
+}
+
+.tds-geo-empty-icon {
+  margin: 0 auto 1rem;
+  opacity: 0.4;
+}
+
+.tds-geo-empty-text {
+  font-size: 1.125rem;
+  color: #9ca3af;
+}
+
+/* Blog Grid */
+
+.tds-geo-blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .tds-geo-blog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Blog Card */
+
+.tds-geo-blog-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #ffffff;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.tds-geo-blog-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.tds-geo-blog-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.tds-geo-blog-card-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.tds-geo-blog-card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.tds-geo-blog-card:hover .tds-geo-blog-card-image {
+  transform: scale(1.05);
+}
+
+.tds-geo-blog-card-body {
+  padding: 1.25rem;
+}
+
+.tds-geo-blog-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 0.5rem;
+  color: #111827;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tds-geo-blog-card-excerpt {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tds-geo-blog-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tds-geo-blog-card-date {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.tds-geo-blog-card-tags {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+/* ─── Tags ──────────────────────────────────── */
+
+.tds-geo-tag {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #6366f1;
+  background: #eef2ff;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* ─── Pagination ───────────────────────────── */
+
+.tds-geo-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tds-geo-pagination-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tds-geo-pagination-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.tds-geo-pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tds-geo-pagination-info {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* ─── Blog Post (Single) ────────────────────── */
+
+.tds-geo-blog-post {
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+.tds-geo-blog-post-header {
+  margin-bottom: 2rem;
+}
+
+.tds-geo-blog-post-title {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #111827;
+  margin: 0 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .tds-geo-blog-post-title {
+    font-size: 2.5rem;
+  }
+}
+
+.tds-geo-blog-post-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.tds-geo-blog-post-date {
+  color: #9ca3af;
+}
+
+.tds-geo-blog-post-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tds-geo-author-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.tds-geo-reading-time {
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
+
+/* Featured Image */
+
+.tds-geo-blog-post-image-wrapper {
+  margin-bottom: 2rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.tds-geo-blog-post-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 0.75rem;
+}
+
+.tds-geo-image-caption {
+  display: block;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Post Content */
+
+.tds-geo-blog-post-content {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: #374151;
+}
+
+.tds-geo-blog-post-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 2rem 0 1rem;
+  color: #111827;
+}
+
+.tds-geo-blog-post-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+  color: #1f2937;
+}
+
+.tds-geo-blog-post-content p {
+  margin: 0 0 1.25rem;
+}
+
+.tds-geo-blog-post-content ul,
+.tds-geo-blog-post-content ol {
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.tds-geo-blog-post-content li {
+  margin-bottom: 0.375rem;
+}
+
+.tds-geo-blog-post-content blockquote {
+  border-left: 4px solid #6366f1;
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.25rem;
+  background: #f9fafb;
+  border-radius: 0 0.375rem 0.375rem 0;
+  font-style: italic;
+  color: #4b5563;
+}
+
+.tds-geo-blog-post-content code {
+  font-size: 0.875em;
+  padding: 0.125rem 0.375rem;
+  background: #f3f4f6;
+  border-radius: 0.25rem;
+  color: #dc2626;
+}
+
+.tds-geo-blog-post-content pre {
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+}
+
+.tds-geo-blog-post-content pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+.tds-geo-blog-post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.tds-geo-blog-post-content a {
+  color: #6366f1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tds-geo-blog-post-content a:hover {
+  color: #4f46e5;
+}
+
+.tds-geo-blog-post-content hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2rem 0;
+}
+
+/* Post Tags */
+
+.tds-geo-blog-post-tags {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tds-geo-tags-heading {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem;
+}
+
+.tds-geo-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Share Buttons */
+
+.tds-geo-share-buttons {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tds-geo-share-heading {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.75rem;
+}
+
+.tds-geo-share-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tds-geo-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  color: #6b7280;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.tds-geo-share-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.tds-geo-share-twitter:hover {
+  color: #1da1f2;
+  border-color: #1da1f2;
+}
+
+.tds-geo-share-linkedin:hover {
+  color: #0a66c2;
+  border-color: #0a66c2;
+}
+
+/* ─── Generic Content Renderer ──────────────── */
+
+.tds-geo-content {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: #374151;
+}
+
+.tds-geo-content h1,
+.tds-geo-content h2,
+.tds-geo-content h3,
+.tds-geo-content h4 {
+  color: #111827;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.tds-geo-content h1 { font-size: 2rem; }
+.tds-geo-content h2 { font-size: 1.5rem; }
+.tds-geo-content h3 { font-size: 1.25rem; }
+.tds-geo-content h4 { font-size: 1.125rem; }
+
+.tds-geo-content p {
+  margin-bottom: 1.25rem;
+}
+
+.tds-geo-content ul,
+.tds-geo-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.tds-geo-content li {
+  margin-bottom: 0.25rem;
+}
+
+.tds-geo-content blockquote {
+  border-left: 4px solid #6366f1;
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.25rem;
+  background: #f9fafb;
+  border-radius: 0 0.375rem 0.375rem 0;
+  font-style: italic;
+  color: #4b5563;
+}
+
+.tds-geo-content code {
+  font-size: 0.875em;
+  padding: 0.125rem 0.375rem;
+  background: #f3f4f6;
+  border-radius: 0.25rem;
+  color: #dc2626;
+}
+
+.tds-geo-content pre {
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+}
+
+.tds-geo-content pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+.tds-geo-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.tds-geo-content a {
+  color: #6366f1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tds-geo-content a:hover {
+  color: #4f46e5;
+}
+
+.tds-geo-content hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2rem 0;
+}

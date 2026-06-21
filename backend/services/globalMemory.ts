@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════════
-// KOZMO Core — Global Memory Store
+// TDS Geo — Global Memory Store
 //
 // Semantic memory layer across ALL connected sites.
 // Stores site context, article history, entity relationships,

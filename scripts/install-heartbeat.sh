@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ══════════════════════════════════════════════════════════════════
-# KOZMO Core — Install Heartbeat Cron Job
+# TDS Geo — Install Heartbeat Cron Job
 #
 # Adds a crontab entry that runs the heartbeat monitor every 5 minutes.
 #
@@ -17,7 +17,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 HEARTBEAT_SCRIPT="$SCRIPT_DIR/heartbeat.sh"
-LOG_FILE="/var/log/kozmocore-heartbeat.log"
+LOG_FILE="/var/log/tdsgeo-heartbeat.log"
 
 # Ensure script exists
 if [ ! -f "$HEARTBEAT_SCRIPT" ]; then

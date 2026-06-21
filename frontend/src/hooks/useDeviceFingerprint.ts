@@ -18,7 +18,7 @@ export interface DeviceFingerprint {
   platform: string;
 }
 
-const FINGERPRINT_KEY = 'kozmo_core_device_fingerprint';
+const FINGERPRINT_KEY = 'tds_geo_device_fingerprint';
 
 /**
  * Generate a canvas-based browser fingerprint.
@@ -40,7 +40,7 @@ async function generateCanvasFingerprint(): Promise<string> {
 
     ctx.fillStyle = '#069';
     ctx.font = '16px Times New Roman';
-    ctx.fillText('KOZMO Core OS', 2, 15);
+    ctx.fillText('TDS Geo OS', 2, 15);
     ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
     ctx.font = '14px Courier New';
     ctx.fillText('DeviceAuth', 4, 34);

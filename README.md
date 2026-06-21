@@ -1,4 +1,4 @@
-# KOZMO Core — AI SEO Automation System
+# TDS Geo — AI SEO Automation System
 
 Multi-tenant SaaS platform that automates SEO content generation and publishing for Shopify stores. Uses AI (OpenAI GPT-4o) to research keywords, generate high-quality blog posts, optimize for SEO, and publish directly to Shopify — all with per-client rate limiting, cost tracking, and a full admin dashboard.
 
@@ -85,7 +85,7 @@ Multi-tenant SaaS platform that automates SEO content generation and publishing 
 
 ## Quick Start (for New Users)
 
-Follow these steps to set up KOZMO Core on your own machine. No private data from the original author is included — everything uses placeholder examples.
+Follow these steps to set up TDS Geo on your own machine. No private data from the original author is included — everything uses placeholder examples.
 
 ### Prerequisites
 
@@ -115,7 +115,7 @@ You'll need these installed on your computer:
 
 ```bash
 git clone https://github.com/yusuf-mohamed0/KOZMO-Core.git
-cd KOZMO Core
+cd TDS Geo
 ```
 
 ### Step 2: Install Dependencies

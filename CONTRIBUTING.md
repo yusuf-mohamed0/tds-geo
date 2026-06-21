@@ -1,4 +1,4 @@
-# Contributing to KOZMO Core
+# Contributing to TDS Geo
 
 Thank you for considering contributing! Here's how to get started.
 
@@ -6,7 +6,7 @@ Thank you for considering contributing! Here's how to get started.
 
 ```bash
 git clone https://github.com/yusuf-mohamed0/KOZMO-Core.git
-cd KOZMO Core
+cd TDS Geo
 npm install
 cd frontend && npm install && cd ..
 cp .env.example .env

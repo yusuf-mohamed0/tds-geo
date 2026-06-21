@@ -1,10 +1,10 @@
 // ══════════════════════════════════════════════════════════════════
-// KOZMO Core — WordPress Connector
+// TDS Geo — WordPress Connector
 //
 // Publishes/updates/deletes articles to WordPress sites.
 // Supports three auth modes (auto-detected from config):
-//   1. KOZMO AI WP Plugin  → X-KOZMO-AI-Key header + kozmo-ai/v1/
-//   2. KOZMO Core WP Plugin    → X-KOZMO-Core-Key header + kozmo-core/v1/
+//   1. Traffic Digital Solutions GEO WP Plugin  → X-TDS-GEO-Key header + tds-geo/v1/
+//   2. TDS Geo WP Plugin    → X-TDS-GEO-Key header + tds-geo/v1/
 //   3. Native WP REST API  → Basic Auth (App Passwords) + wp/v2/
 // ══════════════════════════════════════════════════════════════════
 
@@ -13,13 +13,12 @@ import { logger } from '../utils/logger';
 import { generateSlug } from '../utils/stringUtils';
 
 // Plugin REST API namespaces
-const KOZMO_CORE_API_NAMESPACE = 'kozmo-core/v1';
-const KOZMO_AI_API_NAMESPACE = 'kozmo-ai/v1';
+const TDS_GEO_API_NAMESPACE = 'tds-geo/v1';
 
 interface WordPressRequestConfig {
   baseUrl: string;
   headers: Record<string, string>;
-  mode: 'kozmo_ai' | 'kozmo-core' | 'native';
+  mode: 'tds_geo' | 'tds-geo' | 'native';
 }
 
 export class WordPressConnector implements PublisherAdapter {
@@ -38,29 +37,32 @@ export class WordPressConnector implements PublisherAdapter {
   // Per-article connection config storage for update/delete
   private connectionConfigs: Map<string, Record<string, unknown>> = new Map();
 
+  // Tag name → ID cache for native WP REST API
+  private tagCache: Map<string, number> = new Map();
+
   // ── Public API ──────────────────────────────
 
   async testConnection(): Promise<boolean> {
-    const kozmoAiWpUrl = process.env.KOZMO_AI_WORDPRESS_URL;
-    const kozmoAiKey = process.env.KOZMO_AI_WORDPRESS_API_KEY;
-    if (kozmoAiWpUrl && kozmoAiKey) {
+    const tdsGeoAiWpUrl = process.env.TDS_GEO_WORDPRESS_URL;
+    const tdsGeoAiKey = process.env.TDS_GEO_WORDPRESS_API_KEY;
+    if (tdsGeoAiWpUrl && tdsGeoAiKey) {
       try {
-        const baseSiteUrl = kozmoAiWpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
-        const res = await fetch(`${baseSiteUrl}/wp-json/${KOZMO_AI_API_NAMESPACE}/status`, {
-          headers: { 'X-KOZMO-AI-Key': kozmoAiKey },
+        const baseSiteUrl = tdsGeoAiWpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
+        const res = await fetch(`${baseSiteUrl}/wp-json/${TDS_GEO_API_NAMESPACE}/status`, {
+          headers: { 'X-TDS-GEO-Key': tdsGeoAiKey },
           signal: AbortSignal.timeout(5000),
         });
         if (res.ok) return true;
       } catch { /* fall through */ }
     }
 
-    const kozmoCoreWpUrl = process.env.KOZMO_CORE_WORDPRESS_URL;
-    const kozmoCoreApiKey = process.env.KOZMO_CORE_WORDPRESS_API_KEY;
-    if (kozmoCoreWpUrl && kozmoCoreApiKey) {
+    const tdsGeoWpUrl = process.env.TDS_GEO_WORDPRESS_URL;
+    const tdsGeoApiKey = process.env.TDS_GEO_WORDPRESS_API_KEY;
+    if (tdsGeoWpUrl && tdsGeoApiKey) {
       try {
-        const baseSiteUrl = kozmoCoreWpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
-        const res = await fetch(`${baseSiteUrl}/wp-json/kozmo-core/v1/status`, {
-          headers: { 'X-KOZMO-Core-Key': kozmoCoreApiKey },
+        const baseSiteUrl = tdsGeoWpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
+        const res = await fetch(`${baseSiteUrl}/wp-json/tds-geo/v1/status`, {
+          headers: { 'X-TDS-GEO-Key': tdsGeoApiKey },
           signal: AbortSignal.timeout(5000),
         });
         if (res.ok) return true;
@@ -87,6 +89,17 @@ export class WordPressConnector implements PublisherAdapter {
     const req = this.buildRequest(config);
 
     const endpoint = `${req.baseUrl}/posts`;
+
+    // Resolve tag names → IDs for native WP REST API
+    if (req.mode === 'native' && article.tags && article.tags.length > 0) {
+      const resolvedIds = await this.resolveTagIds(
+        article.tags as string[],
+        req.baseUrl,
+        req.headers,
+      );
+      article = { ...article, tags: resolvedIds };
+    }
+
     const body = this.buildPublishBody(article, config, req.mode);
 
     const response = await fetch(endpoint, {
@@ -134,7 +147,7 @@ export class WordPressConnector implements PublisherAdapter {
     // Remove undefined values
     Object.keys(body).forEach(k => { if (body[k] === undefined) delete body[k]; });
 
-    const method = req.mode === 'kozmo_ai' ? 'PUT' : 'POST';
+    const method = req.mode === 'tds_geo' ? 'PUT' : 'POST';
     const response = await fetch(endpoint, {
       method,
       headers: req.headers,
@@ -192,6 +205,75 @@ export class WordPressConnector implements PublisherAdapter {
     return [{ id: 1, title: 'Main Blog', handle: 'blog' }];
   }
 
+  /**
+   * Resolve tag names to WP tag IDs via REST API.
+   * Caches results to avoid repeated lookups.
+   */
+  private async resolveTagIds(
+    tagNames: string[],
+    baseUrl: string,
+    headers: Record<string, string>,
+  ): Promise<number[]> {
+    if (tagNames.length === 0) return [];
+
+    const ids: number[] = [];
+    const uncached: string[] = [];
+
+    for (const name of tagNames) {
+      const cached = this.tagCache.get(name.toLowerCase());
+      if (cached !== undefined) {
+        ids.push(cached);
+      } else {
+        uncached.push(name);
+      }
+    }
+
+    if (uncached.length > 0) {
+      try {
+        const res = await fetch(`${baseUrl}/tags?search=${encodeURIComponent(uncached.join(','))}&per_page=100`, {
+          headers,
+          signal: AbortSignal.timeout(10000),
+        });
+        if (res.ok) {
+          const existingTags: any[] = await res.json();
+          const existingMap = new Map<string, number>();
+          for (const t of existingTags) {
+            existingMap.set(t.name.toLowerCase(), t.id);
+          }
+
+          // Try to create missing tags
+          for (const name of uncached) {
+            const existing = existingMap.get(name.toLowerCase());
+            if (existing !== undefined) {
+              this.tagCache.set(name.toLowerCase(), existing);
+              ids.push(existing);
+            } else {
+              try {
+                const createRes = await fetch(`${baseUrl}/tags`, {
+                  method: 'POST',
+                  headers,
+                  body: JSON.stringify({ name }),
+                  signal: AbortSignal.timeout(10000),
+                });
+                if (createRes.ok) {
+                  const newTag = await createRes.json();
+                  this.tagCache.set(name.toLowerCase(), newTag.id);
+                  ids.push(newTag.id);
+                }
+              } catch {
+                // Silently skip tags we can't create
+              }
+            }
+          }
+        }
+      } catch {
+        // Fall through with whatever we resolved
+      }
+    }
+
+    return ids;
+  }
+
   // ── Internal ────────────────────────────────
 
   private buildRequest(config: Record<string, unknown>): WordPressRequestConfig {
@@ -199,12 +281,12 @@ export class WordPressConnector implements PublisherAdapter {
       (config.endpoint_url as string) ||
       process.env.WORDPRESS_API_URL ||
       '';
-    const kozmoAiKey = (config.kozmoAiKey as string) ||
-      (config.kozmo_ai_api_key as string) ||
-      process.env.KOZMO_AI_WORDPRESS_API_KEY ||
+    const tdsGeoAiKey = (config.tdsGeoAiKey as string) ||
+      (config.tds_geo_api_key as string) ||
+      process.env.TDS_GEO_WORDPRESS_API_KEY ||
       '';
-    const kozmoCoreKey = (config.apiKey as string) ||
-      (config.kozmo_core_api_key as string) ||
+    const tdsGeoKey = (config.apiKey as string) ||
+      (config.tds_geo_api_key as string) ||
       '';
     const wpToken = (config.wpToken as string) ||
       (config.wpAppPassword as string) ||
@@ -213,19 +295,19 @@ export class WordPressConnector implements PublisherAdapter {
 
     const baseSiteUrl = wpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
 
-    if (kozmoAiKey) {
+    if (tdsGeoAiKey) {
       return {
-        baseUrl: `${baseSiteUrl}/wp-json/${KOZMO_AI_API_NAMESPACE}`,
-        headers: { 'Content-Type': 'application/json', 'X-KOZMO-AI-Key': kozmoAiKey },
-        mode: 'kozmo_ai',
+        baseUrl: `${baseSiteUrl}/wp-json/${TDS_GEO_API_NAMESPACE}`,
+        headers: { 'Content-Type': 'application/json', 'X-TDS-GEO-Key': tdsGeoAiKey },
+        mode: 'tds_geo',
       };
     }
 
-    if (kozmoCoreKey) {
+    if (tdsGeoKey) {
       return {
-        baseUrl: `${baseSiteUrl}/wp-json/${KOZMO_CORE_API_NAMESPACE}`,
-        headers: { 'Content-Type': 'application/json', 'X-KOZMO-Core-Key': kozmoCoreKey },
-        mode: 'kozmo-core',
+        baseUrl: `${baseSiteUrl}/wp-json/${TDS_GEO_API_NAMESPACE}`,
+        headers: { 'Content-Type': 'application/json', 'X-TDS-GEO-Key': tdsGeoKey },
+        mode: 'tds-geo',
       };
     }
 
@@ -242,17 +324,17 @@ export class WordPressConnector implements PublisherAdapter {
   private buildPublishBody(
     article: Article,
     config: Record<string, unknown>,
-    mode: 'kozmo_ai' | 'kozmo-core' | 'native',
+    mode: 'tds_geo' | 'tds-geo' | 'native',
   ): Record<string, unknown> {
     const base = {
       title: article.title,
       slug: article.slug || (article.title ? generateSlug(article.title) : '') || '',
-      status: (config.status as string) || 'draft',
+      status: (config.status as string) || 'publish',
       tags: article.tags || [],
       categories: (config.categories as string[]) || [],
     };
 
-    if (mode === 'kozmo_ai') {
+    if (mode === 'tds_geo') {
       return {
         ...base,
         content_html: article.content_html || article.content_md || '',
@@ -267,7 +349,7 @@ export class WordPressConnector implements PublisherAdapter {
       };
     }
 
-    if (mode === 'kozmo-core') {
+    if (mode === 'tds-geo') {
       return {
         ...base,
         content: article.content_html || article.content_md,
@@ -278,12 +360,12 @@ export class WordPressConnector implements PublisherAdapter {
         featured_image_url: (config.featured_image_url as string) || '',
         publish_date: (config.publish_date as string) || '',
         author_id: (config.author_id as number) || 0,
-        kozmo_core_article_id: article.id,
+        tds_geo_article_id: article.id,
         custom_fields: (config.custom_fields as Record<string, unknown>) || {},
       };
     }
 
-    // native
+    // native (tags already resolved to IDs in publish())
     return {
       ...base,
       content: article.content_html || article.content_md,
@@ -295,7 +377,7 @@ export class WordPressConnector implements PublisherAdapter {
   }
 
   private parseResponse(data: any, mode: string): PublishResult {
-    if ((mode === 'kozmo_ai' || mode === 'kozmo-core') && data.data) {
+    if ((mode === 'tds_geo' || mode === 'tds-geo') && data.data) {
       return {
         id: data.data.post_id,
         blogId: 1,

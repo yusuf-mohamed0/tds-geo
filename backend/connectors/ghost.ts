@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════════
-// KOZMO Core — Ghost Connector
+// TDS Geo — Ghost Connector
 //
 // Publishes/updates/deletes articles to Ghost sites
 // via the Ghost Admin API.

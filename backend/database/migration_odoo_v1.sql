@@ -36,12 +36,12 @@ CREATE INDEX IF NOT EXISTS idx_oc_active ON odoo_connections(is_active);
 -- ══════════════════════════════════════════════════════════════════
 
 DO $$ BEGIN
-  CREATE TYPE odoo_sync_direction AS ENUM ('bidirectional', 'odoo_to_kozmo_core', 'kozmo_core_to_odoo');
+  CREATE TYPE odoo_sync_direction AS ENUM ('bidirectional', 'odoo_to_tds_geo', 'tds_geo_to_odoo');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 DO $$ BEGIN
-  CREATE TYPE odoo_conflict_strategy AS ENUM ('kozmo_core_wins', 'odoo_wins', 'manual', 'latest_wins');
+  CREATE TYPE odoo_conflict_strategy AS ENUM ('tds_geo_wins', 'odoo_wins', 'manual', 'latest_wins');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS odoo_model_mappings (
   id                 UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   connection_id      UUID REFERENCES odoo_connections(id) ON DELETE CASCADE,
   odoo_model         VARCHAR(255) NOT NULL,
-  kozmo_core_entity      VARCHAR(255) NOT NULL,
+  tds_geo_entity      VARCHAR(255) NOT NULL,
   field_mappings     JSONB NOT NULL DEFAULT '{}',
   sync_direction     odoo_sync_direction DEFAULT 'bidirectional',
   conflict_strategy  odoo_conflict_strategy DEFAULT 'latest_wins',
@@ -58,12 +58,12 @@ CREATE TABLE IF NOT EXISTS odoo_model_mappings (
   created_at         TIMESTAMPTZ DEFAULT NOW(),
   updated_at         TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(connection_id, odoo_model),
-  UNIQUE(connection_id, kozmo_core_entity)
+  UNIQUE(connection_id, tds_geo_entity)
 );
 
 CREATE INDEX IF NOT EXISTS idx_omm_connection ON odoo_model_mappings(connection_id);
 CREATE INDEX IF NOT EXISTS idx_omm_model ON odoo_model_mappings(odoo_model);
-CREATE INDEX IF NOT EXISTS idx_omm_entity ON odoo_model_mappings(kozmo_core_entity);
+CREATE INDEX IF NOT EXISTS idx_omm_entity ON odoo_model_mappings(tds_geo_entity);
 CREATE INDEX IF NOT EXISTS idx_omm_active ON odoo_model_mappings(is_active);
 
 -- ══════════════════════════════════════════════════════════════════
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS odoo_sync_log (
   model             VARCHAR(255) NOT NULL,
   operation         odoo_sync_operation NOT NULL,
   odoo_record_id    INTEGER,
-  kozmo_core_record_id  UUID,
+  tds_geo_record_id  UUID,
   status            odoo_sync_status NOT NULL DEFAULT 'pending',
   change_summary    TEXT,
   error_message     TEXT,
@@ -102,7 +102,7 @@ CREATE INDEX IF NOT EXISTS idx_osl_model ON odoo_sync_log(model);
 CREATE INDEX IF NOT EXISTS idx_osl_status ON odoo_sync_log(status);
 CREATE INDEX IF NOT EXISTS idx_osl_created ON odoo_sync_log(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_osl_odoo_record ON odoo_sync_log(odoo_record_id);
-CREATE INDEX IF NOT EXISTS idx_osl_kozmo_core_record ON odoo_sync_log(kozmo_core_record_id);
+CREATE INDEX IF NOT EXISTS idx_osl_tds_geo_record ON odoo_sync_log(tds_geo_record_id);
 
 -- ─── Sync Log Auto-Cleanup (keep 90 days) ─────
 CREATE OR REPLACE FUNCTION cleanup_odoo_sync_log()
