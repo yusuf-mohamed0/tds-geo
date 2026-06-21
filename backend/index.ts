@@ -67,12 +67,6 @@ import contentIntelligence from './services/contentIntelligence';
 import aiEvaluation from './services/aiEvaluation';
 import resilience from './services/circuitBreaker';
 
-// ═══ Shopify OAuth Route Factory ═════════════
-import { createShopifyAuthRoutes } from './routes/shopifyAuth';
-
-// ═══ Shopify Store Info Route Factory ════════
-import { createShopifyStoreRoutes } from './routes/shopifyStore';
-
 // ═══ Device Auth Route Factory ═══════════════
 import { createDeviceRoutes } from './routes/devices';
 
@@ -493,16 +487,7 @@ app.post('/api/webhooks/events/receive', async (req: Request, res: Response) => 
   }
 });
 
-// ══════════════════════════════════════════════
-// Shopify OAuth Routes (registered OUTSIDE /api/ for Shopify compliance)
-// ══════════════════════════════════════════════
-
-app.use('/auth', createShopifyAuthRoutes(pool));
-app.use('/api/auth', createShopifyAuthRoutes(pool));
-
-// ═══ Shopify Store Info Route (inside /api/ for auth) ════
-app.use('/api/shopify', createShopifyStoreRoutes(pool));  // ─── Keyword Discovery Endpoint ─────────────
-  app.post('/api/clients/:clientId/keywords/discover', authenticate, authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
+app.post('/api/clients/:clientId/keywords/discover', authenticate, authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { industry, seedKeywords, count } = req.body;
     const keywords = await keywordService.discoverKeywords(
