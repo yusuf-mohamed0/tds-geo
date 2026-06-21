@@ -261,7 +261,7 @@ const tds-geo = createTdsGeoServer({
 ## Development
 
 ```bash
-git clone https://github.com/yusuf-mohamed0/KOZMO-Core
+git clone https://github.com/yusuf-mohamed0/tds-geo
 cd tds-geo-nextjs-integration
 npm install
 npm run build

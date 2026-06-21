@@ -26,7 +26,8 @@
   --k-radius-lg: 14px;
   --k-radius-xl: 20px;
 }
-.k-shell { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif; color: var(--k-text); max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; }
+@import url('/assets/fonts/fonts.css');
+.k-shell { font-family: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif; color: var(--k-text); max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; }
 .k-shell * { box-sizing: border-box; }
 body.toplevel_page_tds-geo-wp, body.tds-geo_page_tds-geo-wp-settings, body.tds-geo_page_tds-geo-wp-content { background: var(--k-bg) !important; }
 body.toplevel_page_tds-geo-wp #wpcontent, body.tds-geo_page_tds-geo-wp-settings #wpcontent, body.tds-geo_page_tds-geo-wp-content #wpcontent { background: var(--k-bg); padding-left: 0; }

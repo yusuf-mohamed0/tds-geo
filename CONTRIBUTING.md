@@ -5,7 +5,7 @@ Thank you for considering contributing! Here's how to get started.
 ## Development Setup
 
 ```bash
-git clone https://github.com/yusuf-mohamed0/KOZMO-Core.git
+git clone https://github.com/yusuf-mohamed0/tds-geo.git
 cd TDS Geo
 npm install
 cd frontend && npm install && cd ..
