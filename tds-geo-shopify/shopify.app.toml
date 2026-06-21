@@ -3,8 +3,8 @@
 name = "TDS Geo"
 handle = "tds-geo"
 description = "AI-powered SEO content engine for your Shopify store. Generate, optimize, and publish blog articles that rank."
-url = "https://your-app-domain.com"
-icon = "https://your-app-domain.com/assets/icon.png"
+url = "https://13.48.59.201.nip.io"
+icon = "https://13.48.59.201.nip.io/assets/logos/tds-geo-white.png"
 
 [access_scopes]
 scopes = [
@@ -16,11 +16,11 @@ scopes = [
 
 [auth]
 redirect_urls = [
-  "https://your-app-domain.com/api/auth/callback",
+  "https://13.48.59.201.nip.io/api/auth/callback",
 ]
 
 [webhooks]
-api_version = "2024-07"
+api_version = "2026-04"
 
   [[webhooks.subscriptions]]
   topic = "app/uninstalled"
