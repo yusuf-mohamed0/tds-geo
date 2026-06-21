@@ -1,0 +1,41 @@
+# ─── Traffic Digital Solutions GEO — Shopify App Manifest ───
+
+name = "TDS Geo"
+handle = "tds-geo"
+description = "AI-powered SEO content engine for your Shopify store. Generate, optimize, and publish blog articles that rank."
+url = "https://your-app-domain.com"
+icon = "https://your-app-domain.com/assets/icon.png"
+
+[access_scopes]
+scopes = [
+  "read_content",
+  "write_content",
+  "read_products",
+  "write_products",
+]
+
+[auth]
+redirect_urls = [
+  "https://your-app-domain.com/api/auth/callback",
+]
+
+[webhooks]
+api_version = "2024-07"
+
+  [[webhooks.subscriptions]]
+  topic = "app/uninstalled"
+  uri = "/api/webhooks/app/uninstalled"
+  format = "json"
+
+  [[webhooks.subscriptions]]
+  topic = "shop/update"
+  uri = "/api/webhooks/shop/update"
+  format = "json"
+
+[extensions]
+  [extensions.embedded]
+  type = "ui_extension"
+  name = "TDS Geo Dashboard"
+  handle = "tds-geo-dashboard"
+  category = "ADMIN_LINK"
+  location = "Admin::App::Index"
