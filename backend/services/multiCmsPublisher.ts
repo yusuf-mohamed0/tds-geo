@@ -225,7 +225,7 @@ class MultiCmsPublisherService {
       headers: {
         'Content-Type': 'application/json',
         'X-TDS-GEO-Key': apiKey,
-        'User-Agent': 'KOZMO Core-Backend/2.0',
+        'User-Agent': 'TDS-Geo-Backend/3.0',
       },
     };
   }

@@ -48,7 +48,8 @@ body.toplevel_page_tds-geo-wp #wpcontent, body.tds-geo_page_tds-geo-wp-settings 
 
 /* ─── Top Navigation Bar ─── */
 .k-nav { display: flex; align-items: center; gap: 4px; margin-bottom: 40px; padding: 0; position: relative; }
-.k-nav-logo { width: 34px; height: 34px; background: linear-gradient(135deg, var(--k-accent), var(--k-violet)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #000; flex-shrink: 0; }
+.k-nav-logo { width: auto; height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.k-nav-logo img { height: 28px; width: auto; display: block; }
 .k-nav-title { font-size: 17px; font-weight: 600; color: var(--k-text); margin: 0 24px 0 10px; letter-spacing: -0.01em; }
 .k-nav-items { display: flex; gap: 2px; }
 .k-nav-item { padding: 8px 14px; font-size: 13px; font-weight: 500; color: var(--k-text-secondary); text-decoration: none; border-radius: var(--k-radius); transition: all .15s; background: transparent; }

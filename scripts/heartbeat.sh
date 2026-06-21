@@ -85,7 +85,7 @@ HTML_BODY=$(cat <<EOF
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">KOZMO <span>CORE</span></div>
+      <div class="logo">TDS <span>GEO</span></div>
       <h1>Infrastructure Monitor</h1>
       <div class="status-badge">● Server Down</div>
     </div>
