@@ -91,8 +91,8 @@ export function ShopifyAppProvider({ children }: { children: ReactNode }) {
     setShop(captured.shop);
     setHost(captured.host);
     setIsEmbeddedParam(captured.embedded);
-    setIsEmbedded(!!(captured.shop && captured.host));
-    setIsJustInstalled(captured.justInstalled);
+    setIsEmbedded(false);
+    setIsJustInstalled(false);
 
     // ── Handle JWT token from OAuth success redirect ──
     if (captured.token && !tokenProcessed.current) {
@@ -108,16 +108,9 @@ export function ShopifyAppProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // ── Redirect to OAuth if embedded with no auth ──
-    const existingToken = localStorage.getItem(TOKEN_KEY);
-    if (captured.shop && captured.host && !existingToken && !captured.token && !oauthRedirected.current) {
-      oauthRedirected.current = true;
-      // For embedded apps, redirecting to /auth?shop=... triggers OAuth.
-      // Shopify intercepts this redirect and shows the OAuth approval page.
-      // Include host so the backend can redirect back with embedded params.
-      window.location.href = `/auth?shop=${encodeURIComponent(captured.shop)}&host=${encodeURIComponent(captured.host)}`;
-      return; // Stop rendering — navigation will happen
-    }
+    // ── (disabled) OAuth redirect for embedded apps ──
+    // Shopify adds shop/host params to the URL even for non-embedded apps.
+    // We don't redirect — the user logs in with email/password.
 
     // ── Handle error params from OAuth failures ──
     if (captured.error && !oauthRedirected.current) {
@@ -148,11 +141,7 @@ export function ShopifyAppProvider({ children }: { children: ReactNode }) {
    * Redirect to the Shopify OAuth install flow.
    */
   const redirectToOAuth = () => {
-    if (shop && !oauthRedirected.current) {
-      oauthRedirected.current = true;
-      const hostParam = host ? `&host=${encodeURIComponent(host)}` : '';
-      window.location.href = `/auth?shop=${encodeURIComponent(shop)}${hostParam}`;
-    }
+    // Non-embedded app — OAuth is handled by the one-click install flow
   };
 
   return (
