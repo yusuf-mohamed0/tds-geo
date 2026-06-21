@@ -70,6 +70,9 @@ import resilience from './services/circuitBreaker';
 // ═══ Device Auth Route Factory ═══════════════
 import { createDeviceRoutes } from './routes/devices';
 
+// ═══ Shopify Install Route Factory ═══════════
+import { createShopifyInstallRoutes } from './routes/shopifyInstall';
+
 // ═══ Enterprise Route Factories ═══════════════
 import { createEditorialRoutes } from './routes/editorial';
 import { createFactCheckRoutes } from './routes/factCheck';
@@ -501,6 +504,9 @@ app.post('/api/clients/:clientId/keywords/discover', authenticate, authorizeClie
     next(err);
   }
 });
+
+// ═══ Shopify Install Route (one-click OAuth) ═══
+app.use('/api/shopify', createShopifyInstallRoutes(pool));
 
 // ─── SEO Analysis Endpoint ──────────────────
 app.post('/api/seo/analyze', authenticate, validate(seoAnalyzeSchema), async (req: Request, res: Response, next: NextFunction) => {

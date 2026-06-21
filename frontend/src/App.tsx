@@ -34,6 +34,8 @@ import Pexels from './pages/Pexels'
 import ShopifyWelcome from './pages/ShopifyWelcome'
 import CopywriterDashboard from './pages/CopywriterDashboard'
 import OnboardShopify from './pages/OnboardShopify'
+import ShopifySuccess from './pages/ShopifySuccess'
+import ShopifyError from './pages/ShopifyError'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth()
@@ -86,6 +88,8 @@ export default function App() {
         <Route path="improvements" element={<Improvements />} />
         <Route path="admin" element={<Admin />} />
       </Route>
+      <Route path="shopify/success" element={<ShopifySuccess />} />
+      <Route path="shopify/error" element={<ShopifyError />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
     </ToastProvider>
