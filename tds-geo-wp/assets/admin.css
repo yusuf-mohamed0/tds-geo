@@ -1,32 +1,45 @@
 /* Traffic Digital Solutions GEO — Design System (2026) */
+@import url('/assets/fonts/fonts.css');
+@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
 :root {
-  --k-bg: #0b0b12;
-  --k-bg-elevated: #10101c;
-  --k-surface: #161625;
-  --k-surface-hover: #1c1c30;
-  --k-border: #24243d;
-  --k-border-active: #3c3c60;
-  --k-text: #eaeaf2;
-  --k-text-secondary: #8888aa;
-  --k-text-tertiary: #5c5c7a;
-  --k-accent: #5ffbf1;
-  --k-accent-dim: rgba(95, 251, 241, 0.12);
-  --k-accent-glow: rgba(95, 251, 241, 0.25);
-  --k-violet: #7c5cff;
-  --k-violet-dim: rgba(124, 92, 255, 0.12);
+  /* Brand Primary */
+  --k-bg: #171414;
+  --k-bg-elevated: #1f1b1b;
+  --k-surface: #2a2525;
+  --k-surface-hover: #343030;
+  --k-border: #3D3B3B;
+  --k-border-active: #838081;
+  --k-text: #FCF6F2;
+  --k-text-secondary: #c4bdb8;
+  --k-text-tertiary: #838081;
+
+  /* Brand Accent = Traffic Orange */
+  --k-accent: #FCB900;
+  --k-accent-dim: rgba(252, 185, 0, 0.12);
+  --k-accent-glow: rgba(252, 185, 0, 0.25);
+
+  /* Secondary Palette */
+  --k-navy: #142444;
+  --k-navy-dim: rgba(20, 36, 68, 0.25);
+  --k-blue: #769ACC;
+  --k-blue-dim: rgba(118, 154, 204, 0.12);
+  --k-orange-deep: #F89D4B;
+  --k-peach: #FFD498;
+  --k-gray-dark: #3D3B3B;
+  --k-gray-mid: #838081;
+
+  /* Semantic Colors */
   --k-green: #34d399;
   --k-green-dim: rgba(52, 211, 153, 0.12);
   --k-yellow: #f59e0b;
   --k-yellow-dim: rgba(245, 158, 11, 0.12);
   --k-red: #ef4444;
   --k-red-dim: rgba(239, 68, 68, 0.12);
-  --k-blue: #60a5fa;
-  --k-blue-dim: rgba(96, 165, 250, 0.12);
+
   --k-radius: 8px;
   --k-radius-lg: 14px;
   --k-radius-xl: 20px;
 }
-@import url('/assets/fonts/fonts.css');
 .k-shell { font-family: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif; color: var(--k-text); max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; }
 .k-shell * { box-sizing: border-box; }
 body.toplevel_page_tds-geo-wp, body.tds-geo_page_tds-geo-wp-settings, body.tds-geo_page_tds-geo-wp-content { background: var(--k-bg) !important; }
