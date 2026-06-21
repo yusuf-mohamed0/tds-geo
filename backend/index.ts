@@ -110,8 +110,19 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // ─── Security Middleware ──────────────────────
 app.use(helmet({
-  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
-  crossOriginEmbedderPolicy: false
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? {
+    useDefaults: true,
+    directives: {
+      frameAncestors: ["'self'", 'https://*.myshopify.com', 'https://admin.shopify.com'],
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'https://*.myshopify.com', 'wss://*.myshopify.com'],
+    }
+  } : false,
+  crossOriginEmbedderPolicy: false,
+  frameguard: false
 }));
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
