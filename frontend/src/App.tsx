@@ -33,6 +33,7 @@ import Security from './pages/Security'
 import Pexels from './pages/Pexels'
 import ShopifyWelcome from './pages/ShopifyWelcome'
 import CopywriterDashboard from './pages/CopywriterDashboard'
+import OnboardShopify from './pages/OnboardShopify'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth()
@@ -72,6 +73,7 @@ export default function App() {
         <Route path="security" element={<Security />} />
         <Route path="pexels" element={<Pexels />} />
         <Route path="clients" element={<Clients />} />
+        <Route path="clients/onboard" element={<OnboardShopify />} />
         <Route path="webhooks" element={<Webhooks />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="api-usage" element={<ApiUsage />} />
