@@ -117,10 +117,11 @@ app.use(helmet({
     directives: {
       frameAncestors: ["'self'", 'https://*.myshopify.com', 'https://admin.shopify.com'],
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'", 'https://*.myshopify.com', 'wss://*.myshopify.com'],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.shopify.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com'],
+      imgSrc: ["'self'", 'data:', 'https:', 'https://cdn.shopify.com'],
+      connectSrc: ["'self'", 'https://*.myshopify.com', 'wss://*.myshopify.com', 'https://cdn.shopify.com'],
+      fontSrc: ["'self'", 'https://cdn.shopify.com'],
     }
   } : false,
   crossOriginEmbedderPolicy: false,
