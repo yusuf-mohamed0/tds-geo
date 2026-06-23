@@ -32,7 +32,6 @@ import { createChatRoutes } from './routes/chat';
 import { createSystemConfigRoutes } from './routes/systemConfig';
 
 // ─── Services ─────────────────────────────────
-import shopifyService from './services/shopify';
 import openaiService from './services/openai';
 import ollamaService from './services/ollama';
 import seoService from './services/seo';
@@ -102,6 +101,12 @@ import odooConnector from './services/odooConnector';
 // ═══ Prompt Hardening Routes ═════════════════
 import { createMetaRoutes } from './routes/meta';
 
+// ═══ TDS GEO Core Engine Imports ════════════════
+import { initializeEngines, analyticsEngine } from './engines';
+import { eventBus } from './event-bus';
+import { connectorManager } from './connector-manager';
+import { registerBuiltinConnectors } from './connectors';
+
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
@@ -151,6 +156,33 @@ const authLimiter = rateLimit({
   message: { error: 'Too many authentication attempts, please try again later' }
 });
 
+// ══════════════════════════════════════════════
+// Database Connection (before routes that need it)
+// ══════════════════════════════════════════════
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 10,
+  idleTimeoutMillis: 30000
+});
+
+pool.on('error', (err) => {
+  logger.error('Unexpected database pool error', { error: err.message });
+});
+
+// ═══ Shopify Compliance Webhooks (MUST be before body parsers for raw body HMAC) ═══
+import shopifyService from './services/shopify';
+shopifyService.init(pool);
+
+import { createComplianceWebhookRoutes } from './routes/complianceWebhooks';
+app.use('/api/webhooks/compliance', (req, res, next) => {
+  if (req.path === '/subscribe') {
+    return express.json({ limit: '10mb' })(req, res, next);
+  }
+  next();
+});
+app.use('/api/webhooks/compliance', createComplianceWebhookRoutes(pool));
+
 // ─── Body Parsing ─────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -169,20 +201,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     });
   });
   next();
-});
-
-// ══════════════════════════════════════════════
-// Database Connection
-// ══════════════════════════════════════════════
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 10,
-  idleTimeoutMillis: 30000
-});
-
-pool.on('error', (err) => {
-  logger.error('Unexpected database pool error', { error: err.message });
 });
 
 // ══════════════════════════════════════════════
@@ -505,6 +523,10 @@ app.post('/api/clients/:clientId/keywords/discover', authenticate, authorizeClie
   }
 });
 
+// ═══ Embedded App API (session token auth) ═══
+import { createEmbeddedRoutes } from './routes/embedded';
+app.use('/api/embedded', createEmbeddedRoutes(pool));
+
 // ═══ Shopify Install Route (one-click OAuth) ═══
 app.use('/api/shopify', createShopifyInstallRoutes(pool));
 
@@ -517,37 +539,61 @@ app.post('/api/seo/analyze', authenticate, validate(seoAnalyzeSchema), async (re
   } catch (err) {
     next(err);
   }
-});  // ─── Shopify Connection Test ────────────────
-  app.post('/api/clients/:clientId/test-shopify', authenticate, authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const clientResult = await pool.query('SELECT * FROM clients WHERE id = $1', [req.params.clientId]);
-    if (clientResult.rows.length === 0) {
-      res.status(404).json({ error: 'Client not found' });
-      return;
-    }
+});
 
-    const client = clientResult.rows[0];
-    const blogs = await shopifyService.fetchBlogs({
-      shop: client.shopify_shop,
-      accessToken: client.shopify_token,
-      apiVersion: client.shopify_api_version
-    });
-
-    res.json({
-      success: true,
-      shop: client.shopify_shop,
-      blogCount: blogs.length,
-      blogs: blogs.map((b: any) => ({ id: b.id, title: b.title, handle: b.handle }))
-    });
-  } catch (err) {
-    res.status(502).json({ success: false, error: (err as Error).message });
-  }
+// ─── Privacy Policy ────────────────────────
+app.get('/privacy', (_req: Request, res: Response) => {
+  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Privacy Policy - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}h1{color:#171414;border-bottom:2px solid #FCB900;padding-bottom:8px}h2{color:#142444;margin-top:32px}p{margin:8px 0}ul{list-style:disc;padding-left:20px}li{margin:4px 0}</style></head><body>
+<h1>Privacy Policy</h1>
+<p><strong>TDS Geo</strong> — <em>Last updated: June 23, 2026</em></p>
+<h2>Data We Collect</h2>
+<ul>
+<li><strong>Shop Information</strong>: Store name, domain, and API access token (for content publishing via Shopify Admin API).</li>
+<li><strong>Content Data</strong>: Generated articles, keywords, SEO scores, and GEO analysis results.</li>
+<li><strong>Usage Data</strong>: App interaction logs, feature usage, and API call records for service improvement and billing.</li>
+</ul>
+<h2>How We Use Your Data</h2>
+<ul>
+<li>To generate and publish AI-optimized content to your Shopify store.</li>
+<li>To analyze content for Generative Engine Optimization (GEO).</li>
+<li>To improve our AI models and service quality.</li>
+<li>To provide customer support and track billing.</li>
+</ul>
+<h2>Data Sharing</h2>
+<p>We do <strong>not</strong> sell, trade, or share your personal data with third parties except as required to operate the service (e.g., AI inference via OpenRouter API).</p>
+<h2>Data Retention</h2>
+<p>We retain your data for as long as your app is installed. Upon uninstall, we delete all shop-specific data (articles, keywords, logs) within 48 hours.</p>
+<h2>Your Rights</h2>
+<p>You may request a copy of your data or request deletion at any time via <a href="mailto:web.development@trafficdigitalsolutions.com">web.development@trafficdigitalsolutions.com</a>.</p>
+<h2>Contact</h2>
+<p>Traffic Digital Solutions<br>Villa 125 Axis 80, Cairo, Egypt<br>Email: <a href="mailto:web.development@trafficdigitalsolutions.com">web.development@trafficdigitalsolutions.com</a></p>
+</body></html>`);
 });
 
 // ─── Serve Brand Assets (logos, icons) ──────
 const assetsDir = path.join(__dirname, 'public', 'assets');
 app.use('/assets', express.static(assetsDir));
 app.use('/api/assets', express.static(assetsDir));
+
+// ─── Shopify OAuth Redirect Pages ─────────
+app.get('/shopify/success', (_req: Request, res: Response) => {
+  const shop = String(_req.query.shop || '');
+  const name = String(_req.query.name || shop.replace('.myshopify.com', ''));
+  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connected - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#171414;color:#FCF6F2;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#FCB900;font-size:24px;margin:0 0 8px}p{color:#838081;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#FCB900;color:#171414;border-radius:8px;text-decoration:none;font-weight:600;margin:0 6px}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✓</div><h1>Connected!</h1><p><strong>${name}</strong><br>${shop} — ready to generate and publish articles.</p><a class="btn" href="https://${shop}/admin">Return to Admin</a></div></body></html>`);
+});
+
+app.get('/shopify/error', (_req: Request, res: Response) => {
+  const errors: Record<string, string> = {
+    invalid_shop: 'Invalid Shopify store URL. Use store.myshopify.com format.',
+    missing_params: 'Missing OAuth parameters. Please try installing again.',
+    invalid_state: 'Session expired. Please try installing again.',
+    state_error: 'Verification failed. Please try again.',
+    token_exchange_failed: 'Could not get access token. The app may not be properly configured.',
+  };
+  const msg = String(_req.query.msg || 'unknown');
+  const errorText = errors[msg] || 'Something went wrong. Please try again.';
+  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Error - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#171414;color:#FCF6F2;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#ff6b6b;font-size:24px;margin:0 0 8px}p{color:#FCF6F2;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#FCB900;color:#171414;border-radius:8px;text-decoration:none;font-weight:600}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✕</div><h1>Connection Failed</h1><p>${errorText}</p></div></body></html>`);
+});
 
 // ─── Serve Frontend (production) ────────────
 if (process.env.NODE_ENV === 'production') {
@@ -648,6 +694,14 @@ async function start(): Promise<void> {
     // ═══ Odoo ERP Integration ═══════════════════
     odooConnector.initialize(pool);
 
+    // ════════════════════════════════════════════
+    // TDS GEO CORE ENGINE INITIALIZATION
+    // ════════════════════════════════════════════
+    await initializeEngines(pool);
+    connectorManager.initialize(pool);
+    registerBuiltinConnectors(pool);
+    connectorManager.startPeriodicHealthChecks();
+
     logger.info('All enterprise services initialized successfully');
 
     app.listen(PORT, () => {
@@ -684,6 +738,10 @@ async function shutdown(signal: string): Promise<void> {
   await odooConnector.close().catch(() => {});
   await ceoOrchestrator.close().catch(() => {});
   await CostOptimizationService.getInstance().close().catch(() => {});
+
+  // TDS GEO Core engine cleanup
+  connectorManager.stopPeriodicHealthChecks();
+  eventBus.clear();
 
   logger.info('Server shut down');
   process.exit(0);

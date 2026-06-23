@@ -8,10 +8,14 @@ import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import { Article, PublishResult, CmsProvider, CmsConnection, PublisherAdapter, PublisherCapabilities } from '../types';
 import { generateSlug } from '../utils/stringUtils';
-import { wordpressConnector } from '../connectors/wordpress';
-import { webflowConnector } from '../connectors/webflow';
-import { ghostConnector } from '../connectors/ghost';
-import { shopifyConnector } from '../connectors/shopify';
+import { wordpressConnector as _wp } from '../connectors/wordpress';
+import { webflowConnector as _wf } from '../connectors/webflow';
+import { ghostConnector as _gh } from '../connectors/ghost';
+import { shopifyConnector as _sh } from '../connectors/shopify';
+const wordpressConnector: PublisherAdapter = _wp as any;
+const webflowConnector: PublisherAdapter = _wf as any;
+const ghostConnector: PublisherAdapter = _gh as any;
+const shopifyConnector: PublisherAdapter = _sh as any;
 
 class MultiCmsPublisherService {
   private adapters: Map<CmsProvider, PublisherAdapter> = new Map();

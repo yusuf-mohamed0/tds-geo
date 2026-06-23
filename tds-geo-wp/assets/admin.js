@@ -91,49 +91,9 @@
     $('.tds-ring-text').text(current);
   }
 
-  // ─── Generate Now ───
-  function generateNow() {
-    if (!tds.ajaxUrl || tds.loading) return;
-    var $btn = $('#tds-generate-now');
-    $btn.prop('disabled', true).addClass('tds-generating').text('⟳ Generating...');
-    $.post(tds.ajaxUrl, { action: 'tds_geo_generate_now', nonce: tds.nonce }, function(r) {
-      if (r.success) {
-        showToast(r.data?.message || 'Generation started! Articles will appear shortly.', 'success');
-        setTimeout(loadDashboard, 2000);
-      } else {
-        showToast(r.data?.message || 'Generation failed to start', 'error');
-      }
-    }).fail(function() {
-      showToast('Server error', 'error');
-    }).always(function() {
-      $btn.prop('disabled', false).removeClass('tds-generating').text('⟳ Generate Now');
-    });
-  }
-
-  // ─── Test API Key ───
-  function testApiKey() {
-    var $btn = $('#tds-test-api');
-    var $result = $('.tds-test-result');
-    $btn.prop('disabled', true).text('Testing...');
-    $result.remove();
-    $.post(tds.ajaxUrl, { action: 'tds_geo_test_api', nonce: tds.nonce }, function(r) {
-      var html = r.success
-        ? '<div class="tds-test-result tds-test-success">✓ ' + (r.data?.model || 'Key works') + '</div>'
-        : '<div class="tds-test-result tds-test-fail">✕ ' + (r.data?.message || 'Invalid key') + '</div>';
-      $btn.after(html);
-    }).fail(function() {
-      $btn.after('<div class="tds-test-result tds-test-fail">✕ Connection failed</div>');
-    }).always(function() {
-      $btn.prop('disabled', false).text('Test Connection');
-    });
-  }
-
   // ─── Dismiss milestone ───
   function dismissMilestone() {
     $('.tds-milestone').slideUp(300, function() { $(this).remove(); });
-    if (tds.ajaxUrl) {
-      $.post(tds.ajaxUrl, { action: 'tds_geo_dismiss_milestone', nonce: tds.nonce });
-    }
   }
 
   // ─── Load dashboard data ───
@@ -253,18 +213,7 @@
   }
 
   // ─── Article actions ───
-  function articleAction(postId, action) {
-    if (!tds.ajaxUrl) return;
-    var $btns = $('[data-tds-action="' + postId + '"]');
-    var label = action === 'publish' ? 'Publish' : action === 'draft' ? 'Draft' : 'Delete';
-    if (action === 'delete' && !confirm('Delete this article permanently?')) return;
-    $btns.prop('disabled', true);
-    $.post(tds.ajaxUrl, { action: 'tds_geo_article_action', post_id: postId, act: action, nonce: tds.nonce }, function(r) {
-      if (r.success) { showToast('Article ' + action + 'ed successfully'); loadDashboard(); }
-      else { showToast(r.data?.message || 'Action failed', 'error'); $btns.prop('disabled', false); }
-    }).fail(function() { showToast('Server error', 'error'); $btns.prop('disabled', false); });
-  }
-  window.articleAction = articleAction;
+  window.articleAction = function() {};
 
   // ─── Reveal API key ───
   window.revealApiKey = function(keyId) {
@@ -296,8 +245,6 @@
     });
 
     $(document).on('click', '#tds-refresh', function(e) { e.preventDefault(); loadDashboard(); });
-    $(document).on('click', '#tds-generate-now', function(e) { e.preventDefault(); generateNow(); });
-    $(document).on('click', '#tds-test-api', function(e) { e.preventDefault(); testApiKey(); });
     $(document).on('click', '.tds-milestone-close', function() { dismissMilestone(); });
 
     if ($('.tds-dashboard').length) { loadDashboard(); scheduleRefresh(); }

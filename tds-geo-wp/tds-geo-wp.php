@@ -91,12 +91,13 @@ if (!function_exists('mb_strtoupper')) {
 
 // ─── Constants ───────────────────────────────────────
 define('TDS_GEO_WP_VERSION', '3.0.0');
+define('TDS_GEO_CONNECTOR_VERSION', '1.0.0');
 define('TDS_GEO_WP_FILE', __FILE__);
 define('TDS_GEO_WP_DIR', plugin_dir_path(__FILE__));
 define('TDS_GEO_WP_URL', plugin_dir_url(__FILE__));
 define('TDS_GEO_WP_BASENAME', plugin_basename(__FILE__));
 define('TDS_GEO_WP_API_NAMESPACE', 'tds-geo/v1');
-if (!defined('TDS_GEO_DEFAULT_OPENAI_KEY')) define('TDS_GEO_DEFAULT_OPENAI_KEY', '');
+
 if (!defined('TDS_GEO_BACKEND_URL')) define('TDS_GEO_BACKEND_URL', getenv('TDS_GEO_BACKEND_URL') ?: '');
 
 // Backward compatibility: define tds-geo-wp constants so existing integrations work

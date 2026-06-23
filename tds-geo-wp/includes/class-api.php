@@ -276,9 +276,7 @@ class Api {
     // ── Settings ──
     public static function get_settings(): \WP_REST_Response {
         $settings = get_option('tds_geo_wp_settings', []);
-        if (!empty($settings['openai_api_key'])) {
-            $settings['openai_api_key'] = '********';
-        }
+        unset($settings['openai_api_key'], $settings['agent_url']);
         $settings['seo_plugins'] = self::detect_seo_plugins();
         $settings['version'] = TDS_GEO_WP_VERSION;
         return new \WP_REST_Response(['success' => true, 'data' => $settings], 200);
@@ -288,20 +286,8 @@ class Api {
         $body = $request->get_json_params();
         $settings = get_option('tds_geo_wp_settings', []);
 
-        if (isset($body['openai_api_key'])) {
-            $raw_key = sanitize_text_field($body['openai_api_key']);
-            if (!empty($raw_key) && $raw_key !== '********') {
-                $key = defined('NONCE_KEY') ? NONCE_KEY : 'tds-geo-fallback';
-                $iv = openssl_random_pseudo_bytes(16);
-                $encrypted = openssl_encrypt($raw_key, 'aes-256-cbc', $key, 0, $iv);
-                if (false !== $encrypted) {
-                    $settings['openai_api_key'] = base64_encode($iv . $encrypted);
-                }
-            }
-        }
-
         $text_fields = [
-            'api_enabled', 'agent_url', 'webhook_secret',
+            'api_enabled', 'webhook_secret',
             'debug_mode', 'log_level', 'default_status', 'default_author',
             'auto_import_tags', 'auto_import_cats',
         ];

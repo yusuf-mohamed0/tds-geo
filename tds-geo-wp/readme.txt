@@ -1,61 +1,52 @@
-=== Traffic Digital Solutions GEO — Autonomous WP Agent ===
+=== TDS GEO WordPress Connector ===
 Contributors: tdsgeo
-Tags: AI, SEO, content, automation, autonomous, agent, artificial intelligence, content generation, SEO optimization
+Tags: AI, SEO, content, connector, rest-api, shopify, automation
 Requires at least: 5.8
 Tested up to: 6.4
-Stable tag: 2.0.0
+Stable tag: 3.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Autonomous AI agent for WordPress. Automatically understands, manages, optimizes, and grows your website with AI-powered SEO content automation.
+Thin connector for TDS GEO Core — exposes WordPress REST API for post CRUD, media, taxonomies, and settings. All AI intelligence runs on the Core backend.
 
 == Description ==
 
-Traffic Digital Solutions GEO transforms your WordPress site into an AI-powered autonomous content platform. After installation and API connection, the AI agent:
+TDS GEO WordPress Connector is a lightweight REST API bridge between your WordPress site and TDS GEO Core (the central AI engine). After installation and API connection, TDS GEO Core can create, update, delete, and sync content on your WordPress site through this connector.
 
-* **Discovers** your entire website — structure, content, theme, plugins, SEO config
-* **Analyzes** content quality, keyword coverage, topical authority, and gaps
-* **Generates** high-quality, SEO-optimized articles with full pipeline (keyword research → writing → optimization → publishing)
-* **Scores** every article for quality (meta, readability, images, links, schema) with automatic rewriting until score ≥ 95
-* **Monitors** site health with self-healing error recovery
-* **Maintains** content freshness — updates old posts, improves internal linking, repairs broken links
-* **Reports** continuously through a modern admin dashboard
+= What it does =
 
-== Features ==
-
-* **Website Discovery Engine** — Full scan of site structure, content, taxonomies, media, theme, plugins, SEO, users
-* **Knowledge Base** — Persistent storage of all website intelligence synced with the AI agent
-* **Content Intelligence** — Thin content detection, duplicate titles, keyword coverage, outdated content, cannibalization
-* **Article Pipeline** — Full creation pipeline with quality scoring (title, content length, readability, images, meta, keywords, links, schema)
-* **Quality Threshold** — Articles score ≥ 95 are auto-published; below threshold triggers automatic rewriting
-* **Self-Healing Engine** — Automatic error detection, root cause analysis, and recovery with exponential backoff
-* **SEO Plugin Support** — Native integration with Yoast, Rank Math, All in One SEO, SEOPress
-* **Background Workers** — Queue-based async processing with cron scheduling
-* **REST API** — Full CRUD for posts, media, taxonomies, settings, webhooks
-* **Webhook Support** — Signature-verified incoming webhooks from the AI agent
-* **API Key Auth** — Multi-key management with read/write/admin permissions and expiry
+* **Post CRUD** — Create, read, update, and delete posts with full metadata
+* **Media Sideloading** — Download and attach images from remote URLs
+* **Taxonomy Sync** — Auto-create categories and tags as needed
+* **SEO Plugin Integration** — Writes meta titles, descriptions, and focus keywords into Yoast SEO, Rank Math, All in One SEO, and SEOPress
+* **Webhook Support** — Signature-verified incoming webhooks from TDS GEO Core
+* **Batch Operations** — Create or update multiple posts in a single request
+* **Activity Logging** — Structured logging with level filtering and context
+* **API Key Auth** — Multi-key management with permissions and expiry
 * **Rate Limiting** — Per-key rate limiting for API endpoints
-* **Modern Dashboard** — Live stats, health monitoring, queue status, activity feed
-* **Secure** — Nonce verification, capability checks, input sanitization, output escaping, CSRF protection
-* **Automatic Cleanup** — Log rotation, old error cleanup, queue maintenance
+
+= What it does NOT do =
+
+* ❌ No content generation — all AI writing runs on TDS GEO Core
+* ❌ No SEO analysis — all scoring runs on TDS GEO Core
+* ❌ No research — all keyword research runs on TDS GEO Core
+* ❌ No memory or knowledge base — that lives on TDS GEO Core
+* ❌ No self-healing — that's managed by TDS GEO Core
 
 == Installation ==
 
 1. Upload the `tds-geo-wp` folder to the `/wp-content/plugins/` directory, or upload the ZIP directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Go to Traffic Digital Solutions GEO → API Keys to get your initial API key.
-4. Enter your API key and agent URL in the Traffic Digital Solutions GEO Settings page.
-5. The AI agent will automatically scan your website and begin operations.
-6. Monitor activity from the Traffic Digital Solutions GEO Dashboard.
-
-No additional configuration required — the agent handles everything automatically.
+3. Go to TDS GEO Connector → API Keys to generate an API key.
+4. Enter the TDS GEO Core URL and API key in the Settings page.
+5. The connector will register with TDS GEO Core and begin accepting commands.
 
 == Frequently Asked Questions ==
 
-= What does the plugin do automatically? =
+= Does this plugin generate content? =
 
-After activation and API connection, the plugin automatically scans your website, builds a knowledge base, analyzes content health, and processes tasks from the AI agent including article creation, updates, SEO optimization, and maintenance.
+No. All content generation, SEO analysis, and research runs on TDS GEO Core. This plugin only provides the REST API endpoints for TDS GEO Core to manage content on your WordPress site.
 
 = Does it work with existing SEO plugins? =
 
@@ -63,27 +54,28 @@ Yes! The plugin natively supports Yoast SEO, Rank Math, All in One SEO, and SEOP
 
 = Is my data secure? =
 
-Yes. All API communication requires authentication. Webhooks can be signed with a secret key. All input is sanitized. All output is escaped. SQL queries use prepared statements.
+Yes. All API communication requires authentication via API key. Webhooks are signed with a secret key. All input is sanitized, all output is escaped, and SQL queries use prepared statements.
 
-= How do I control what gets published? =
+= How do I connect this to TDS GEO Core? =
 
-Configure the minimum quality score (default 95) and auto-publish settings in the Settings page. You can also set the default post status. The AI agent can override these per-article.
-
-= What happens if something fails? =
-
-The self-healing engine detects failures, logs them, and automatically attempts recovery. Tasks are retried with exponential backoff. Critical errors are flagged in the dashboard.
+Go to TDS GEO Connector → API Keys, generate a new API key, then enter the TDS GEO Core URL and your API key in the Settings page. TDS GEO Core will then be able to communicate with your site.
 
 == Changelog ==
 
+= 3.0.0 =
+* Complete rewrite as thin connector — all AI logic moved to TDS GEO Core
+* Stripped OpenAI key storage (unused vestigial code)
+* Stripped agent_url setting (unused vestigial code)
+* Updated plugin description to accurately reflect connector-only architecture
+* Removed stale admin JS AJAX handlers with no PHP backing
+* Full REST API for posts, media, taxonomies, settings, webhooks
+* SEO plugin integration (Yoast, Rank Math, AIOSEO, SEOPress)
+* Multi-key authentication with permissions and rate limiting
+* Webhook support with HMAC signature verification
+
 = 2.0.0 =
-* Initial release — complete autonomous AI agent for WordPress
+* Initial autonomous agent architecture
 * Website discovery and knowledge base
 * AI-powered content pipeline with quality scoring
-* Self-healing error recovery system
-* Modern admin dashboard with live statistics
-* Full REST API with webhook support
+* REST API with webhook support
 * Background worker queue with cron scheduling
-* Multi-key authentication with permissions
-* SEO plugin integration (Yoast, Rank Math, AIOSEO, SEOPress)
-* Rate limiting and security hardening
-* Database migrations and automatic cleanup

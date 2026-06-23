@@ -60,6 +60,7 @@ function initializeServices(): void {
     logger.warn(`OpenAI not configured for workers: ${(e as Error).message}`);
   }
 
+  shopifyService.init(pool);
   keywordService.initialize(pool);
   internalLinksService.initialize(pool);
   vectorMemoryService.initialize(pool);

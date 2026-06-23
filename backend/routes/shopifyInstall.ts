@@ -1,13 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { randomBytes } from 'crypto';
 import { Pool } from 'pg';
-import axios from 'axios';
 import { logger } from '../utils/logger';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://13.48.59.201.nip.io';
-const SCOPES = 'read_content,write_content,read_products,write_products';
+const SCOPES = 'read_content,read_products,write_content,write_products';
 
 function isValidShop(shop: string): boolean {
   return /^[a-zA-Z0-9][a-zA-Z0-9-]*\.myshopify\.com$/.test(shop);
@@ -75,61 +74,75 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
     }
 
     try {
-      const tokenResponse = await axios.post(`https://${shop}/admin/oauth/access_token`, {
+      // Step 1: Exchange OAuth code for expiring access token
+      const params = new URLSearchParams({
         client_id: SHOPIFY_API_KEY,
         client_secret: SHOPIFY_API_SECRET,
         code,
+        expiring: '1',
+      });
+      const tokenResp = await fetch(`https://${shop}/admin/oauth/access_token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
       });
 
-      const accessToken = tokenResponse.data.access_token;
-
-      const storeResponse = await axios.get(`https://${shop}/admin/api/2024-07/shop.json`, {
-        headers: { 'X-Shopify-Access-Token': accessToken }
-      });
-      const storeName = storeResponse.data.shop.name;
-
-      const existing = await pool.query(
-        'SELECT id FROM clients WHERE shopify_shop = $1',
-        [shop]
-      );
-
-      if (existing.rows.length > 0) {
-        await pool.query(
-          'UPDATE clients SET shopify_token = $1, is_active = true WHERE id = $2',
-          [accessToken, existing.rows[0].id]
-        );
-      } else {
-        const slug = slugify(storeName);
-        await pool.query(
-          `INSERT INTO clients (name, slug, shopify_shop, shopify_token, shopify_api_version, approval_mode, publish_frequency, is_active)
-           VALUES ($1, $2, $3, $4, $5, 'auto', 'weekly', true)`,
-          [storeName, slug, shop, accessToken, '2024-07']
-        );
+      if (!tokenResp.ok) {
+        const body = await tokenResp.text();
+        logger.error('Shopify OAuth token exchange failed', { shop, status: tokenResp.status, body: body.substring(0, 500) });
+        res.redirect(`${SHOPIFY_APP_URL}/shopify/error?msg=token_exchange_failed`);
+        return;
       }
 
-      const client = await pool.query(
-        'SELECT id FROM clients WHERE shopify_shop = $1',
-        [shop]
-      );
-      const clientId = client.rows[0]?.id;
+      const tokenData: any = await tokenResp.json();
+      const accessToken = tokenData.access_token;
+      const refreshToken = tokenData.refresh_token || null;
+      const expiresIn = tokenData.expires_in || null;
+      const tokenExpiresAt = expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null;
 
+      // Step 2: Save token to DB immediately
+      await pool.query(
+        `UPDATE clients SET shopify_token = $1, shopify_refresh_token = $2, shopify_token_expires_at = $3, is_active = true WHERE shopify_shop = $4`,
+        [accessToken, refreshToken, tokenExpiresAt, shop]
+      );
+
+      // Step 3: Update CMS connection
+      const clientResult = await pool.query('SELECT id FROM clients WHERE shopify_shop = $1', [shop]);
+      const clientId = clientResult.rows[0]?.id;
       if (clientId) {
         const existingConn = await pool.query(
           'SELECT id FROM cms_connections WHERE client_id = $1 AND provider = \'shopify\'',
           [clientId]
         );
+        const storeName = shop.replace('.myshopify.com', '').replace(/^[a-z0-9]-/, match => match.toUpperCase());
+        const connConfig = JSON.stringify({ shop, accessToken, apiVersion: '2024-07' });
         if (existingConn.rows.length > 0) {
           await pool.query(
-            `UPDATE cms_connections SET config = $1::jsonb, is_active = true, label = $2 WHERE id = $3`,
-            [JSON.stringify({ shop, accessToken, apiVersion: '2024-07' }), storeName, existingConn.rows[0].id]
+            `UPDATE cms_connections SET config = $1::jsonb, is_active = true WHERE id = $2`,
+            [connConfig, existingConn.rows[0].id]
           );
         } else {
           await pool.query(
             `INSERT INTO cms_connections (client_id, label, provider, endpoint_url, config, capabilities, is_primary, is_active)
              VALUES ($1, $2, 'shopify', $3, $4::jsonb, ARRAY['publish','read'], false, true)`,
-            [clientId, storeName, shop, JSON.stringify({ shop, accessToken, apiVersion: '2024-07' })]
+            [clientId, storeName, shop, connConfig]
           );
         }
+      }
+
+      // Step 4: Try fetching shop info (non-fatal if fails)
+      let storeName = shop.replace('.myshopify.com', '');
+      try {
+        const shopResp = await fetch(`https://${shop}/admin/api/2024-07/shop.json`, {
+          headers: { 'X-Shopify-Access-Token': accessToken }
+        });
+        if (shopResp.ok) {
+          const shopData: any = await shopResp.json();
+          storeName = shopData.shop?.name || storeName;
+          await pool.query('UPDATE clients SET name = $1 WHERE shopify_shop = $2', [storeName, shop]);
+        }
+      } catch (shopErr) {
+        logger.warn('Failed to fetch shop info (non-fatal)', { shop, error: (shopErr as Error).message });
       }
 
       logger.info('Shopify store installed successfully', { shop, storeName });
