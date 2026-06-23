@@ -120,6 +120,8 @@ function DashboardContent() {
       if (data) {
         setPubMsg(`Synced ${data.synced} articles from Shopify`)
         fetchArticles()
+      } else {
+        setPubMsg('Sync failed — check console or try again')
       }
     } catch {
       setPubMsg('Sync failed')
@@ -138,14 +140,16 @@ function DashboardContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keyword: genKeyword.trim() }),
       })
-      if (data?.error) {
+      if (!data) {
+        setGenError('Request failed — server returned an error. Check console for details.')
+      } else if (data.error) {
         setGenError(data.error)
-      } else if (data?.article) {
+      } else if (data.article) {
         setArticles(prev => [data.article, ...prev])
         setStats(prev => ({ ...prev, total: prev.total + 1 }))
         setGenKeyword('')
         setActiveTab('articles')
-      } else if (data?.id) {
+      } else if (data.id) {
         setArticles(prev => [data, ...prev])
         setStats(prev => ({ ...prev, total: prev.total + 1 }))
         setGenKeyword('')
