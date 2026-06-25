@@ -1,5 +1,4 @@
 /* Traffic Digital Solutions GEO — Design System (2026) */
-@import url('/assets/fonts/fonts.css');
 :root {
   --tds-bg: #171414;
   --tds-bg-elevated: #1f1b1b;
@@ -36,6 +35,27 @@
   --tds-radius-xl: 20px;
 }
 
+/* ─── Global Page Background (all plugin pages) ─── */
+body[class*="tds-geo-wp"] { background: var(--tds-bg) !important; }
+body[class*="tds-geo-wp"] #wpcontent { background: var(--tds-bg); padding-left: 0; }
+body[class*="tds-geo-wp"] #wpbody { background: var(--tds-bg); }
+body[class*="tds-geo-wp"] #wpfooter { background: var(--tds-bg-elevated); border-top: 1px solid var(--tds-border); color: var(--tds-text-tertiary); padding: 10px 20px; }
+body[class*="tds-geo-wp"] #wpfooter a { color: var(--tds-text-secondary); }
+#wpbody-content .tds-geo-wrap, #wpbody-content .tds-shell { padding-left: 0; background: transparent; }
+
+/* ─── Kill WP admin white boxes / notices bleed ─── */
+body[class*="tds-geo-wp"] .notice { margin: 12px 24px !important; border-radius: var(--tds-radius); }
+body[class*="tds-geo-wp"] .update-nag { display: none; }
+body[class*="tds-geo-wp"] #screen-meta-links { display: none; }
+body[class*="tds-geo-wp"] .wrap { margin: 0; }
+body[class*="tds-geo-wp"] .tds-shell .notice { margin-left: 0 !important; margin-right: 0 !important; }
+
+/* ─── Scrollbar (dark theme) ─── */
+body[class*="tds-geo-wp"] ::-webkit-scrollbar { width: 8px; height: 8px; }
+body[class*="tds-geo-wp"] ::-webkit-scrollbar-track { background: var(--tds-bg); }
+body[class*="tds-geo-wp"] ::-webkit-scrollbar-thumb { background: var(--tds-border); border-radius: 4px; }
+body[class*="tds-geo-wp"] ::-webkit-scrollbar-thumb:hover { background: var(--tds-border-active); }
+
 /* ─── WP Admin Sidebar Logo ─── */
 #adminmenu .tds-sidebar-logo {
   display: flex;
@@ -52,22 +72,20 @@
   display: block;
 }
 
+/* ─── Shell Layout ─── */
 .tds-shell { font-family: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif; color: var(--tds-text); max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; }
 .tds-shell * { box-sizing: border-box; }
-body.toplevel_page_tds-geo-wp, body.tds-geo_page_tds-geo-wp-settings, body.tds-geo_page_tds-geo-wp-content { background: var(--tds-bg) !important; }
-body.toplevel_page_tds-geo-wp #wpcontent, body.tds-geo_page_tds-geo-wp-settings #wpcontent, body.tds-geo_page_tds-geo-wp-content #wpcontent { background: var(--tds-bg); padding-left: 0; }
-#wpbody-content .tds-geo-wrap, #wpbody-content .tds-shell { padding-left: 0; background: transparent; }
 
 /* ─── Top Navigation Bar ─── */
 .tds-nav { display: flex; align-items: center; gap: 4px; margin-bottom: 40px; padding: 0; position: relative; }
 .tds-nav-logo { width: auto; height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .tds-nav-logo img { height: 28px; width: auto; display: block; }
-.tds-nav-title { font-size: 17px; font-weight: 600; color: var(--tds-text); margin: 0 24px 0 10px; letter-spacing: -0.01em; }
-.tds-nav-items { display: flex; gap: 2px; }
+.tds-nav-title { font-size: 17px; font-weight: 600; color: var(--tds-text); margin: 0 24px 0 10px; letter-spacing: -0.01em; white-space: nowrap; }
+.tds-nav-items { display: flex; gap: 2px; flex-wrap: wrap; }
 .tds-nav-item { padding: 8px 14px; font-size: 13px; font-weight: 500; color: var(--tds-text-secondary); text-decoration: none; border-radius: var(--tds-radius); transition: all .15s; background: transparent; }
 .tds-nav-item:hover { color: var(--tds-text); background: var(--tds-surface); }
 .tds-nav-item.active { color: var(--tds-accent); background: var(--tds-accent-dim); }
-.tds-nav-status { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--tds-text-tertiary); }
+.tds-nav-status { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--tds-text-tertiary); white-space: nowrap; }
 .tds-nav-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 .tds-nav-dot.healthy { background: var(--tds-green); box-shadow: 0 0 6px var(--tds-green-dim); }
 .tds-nav-dot.warning { background: var(--tds-yellow); box-shadow: 0 0 6px var(--tds-yellow-dim); }
@@ -90,8 +108,8 @@ body.toplevel_page_tds-geo-wp #wpcontent, body.tds-geo_page_tds-geo-wp-settings 
 
 /* ─── Stat Grid ─── */
 .tds-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
-.tds-stat { padding: 18px 20px; background: var(--tds-surface); border: 1px solid var(--tds-border); border-radius: var(--tds-radius-lg); transition: border-color .15s; }
-.tds-stat:hover { border-color: var(--tds-border-active); }
+.tds-stat { padding: 18px 20px; background: var(--tds-surface); border: 1px solid var(--tds-border); border-radius: var(--tds-radius-lg); transition: border-color .15s, background .15s; }
+.tds-stat:hover { border-color: var(--tds-border-active); background: var(--tds-surface-hover); }
 .tds-stat-label { font-size: 12px; font-weight: 500; color: var(--tds-text-secondary); margin-bottom: 4px; }
 .tds-stat-value { font-size: 26px; font-weight: 700; color: var(--tds-text); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .tds-stat-sub { font-size: 12px; color: var(--tds-text-tertiary); margin-top: 4px; }
@@ -99,7 +117,7 @@ body.toplevel_page_tds-geo-wp #wpcontent, body.tds-geo_page_tds-geo-wp-settings 
 /* ─── Content Cards ─── */
 .tds-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
 @media (max-width: 900px) { .tds-panel { grid-template-columns: 1fr; } }
-.tds-card { background: var(--tds-surface); border: 1px solid var(--tds-border); border-radius: var(--tds-radius-xl); padding: 24px; }
+.tds-card { background: var(--tds-surface); border: 1px solid var(--tds-border); border-radius: var(--tds-radius-xl); padding: 24px; margin-bottom: 16px; }
 .tds-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .tds-card-header h2 { font-size: 14px; font-weight: 600; color: var(--tds-text); margin: 0; }
 
@@ -133,20 +151,24 @@ body.toplevel_page_tds-geo-wp #wpcontent, body.tds-geo_page_tds-geo-wp-settings 
 .tds-btn-icon { padding: 6px; border-radius: var(--tds-radius); background: transparent; color: var(--tds-text-secondary); border: none; cursor: pointer; font-size: 14px; }
 .tds-btn-icon:hover { color: var(--tds-text); background: var(--tds-surface-hover); }
 
-/* ─── Settings ─── */
+/* ─── Forms (dark theme overrides for WP defaults) ─── */
 .tds-settings { max-width: 720px; }
 .tds-section { margin-bottom: 24px; }
 .tds-section-header { font-size: 13px; font-weight: 600; color: var(--tds-text); padding: 12px 0; border-bottom: 1px solid var(--tds-border); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .tds-field { margin-bottom: 16px; }
 .tds-field label { display: block; font-size: 13px; font-weight: 500; color: var(--tds-text-secondary); margin-bottom: 4px; }
-.tds-field input[type=text], .tds-field input[type=url], .tds-field input[type=password], .tds-field input[type=number], .tds-field input[type=email], .tds-field select, .tds-field textarea { width: 100%; max-width: 480px; padding: 8px 12px; background: var(--tds-bg-elevated); border: 1px solid var(--tds-border); border-radius: var(--tds-radius); color: var(--tds-text); font-size: 14px; transition: border-color .15s; line-height: 1.4; }
+.tds-field input[type=text], .tds-field input[type=url], .tds-field input[type=password], .tds-field input[type=number], .tds-field input[type=email], .tds-field select, .tds-field textarea {
+  width: 100%; max-width: 480px; padding: 8px 12px; background: var(--tds-bg-elevated); border: 1px solid var(--tds-border); border-radius: var(--tds-radius); color: var(--tds-text); font-size: 14px; transition: border-color .15s, box-shadow .15s; line-height: 1.4;
+  box-shadow: none;
+}
 .tds-field input:focus, .tds-field select:focus { outline: none; border-color: var(--tds-accent); box-shadow: 0 0 0 3px var(--tds-accent-dim); }
 .tds-field .tds-desc { font-size: 12px; color: var(--tds-text-tertiary); margin-top: 4px; }
 .tds-field-checkbox { display: flex; align-items: center; gap: 8px; }
 .tds-field-checkbox input[type=checkbox] { accent-color: var(--tds-accent); }
 .tds-field-checkbox label { margin: 0; font-size: 13px; color: var(--tds-text); cursor: pointer; }
-.tds-field select { cursor: pointer; }
+.tds-field select { cursor: pointer; min-height: 36px; }
 .tds-field input[type=number] { max-width: 120px; }
+.tds-field textarea { min-height: 80px; }
 
 /* ─── Collapsible Sections ─── */
 details.tds-details { background: var(--tds-surface); border: 1px solid var(--tds-border); border-radius: var(--tds-radius-lg); margin-bottom: 16px; overflow: hidden; }
@@ -159,6 +181,10 @@ details.tds-details .tds-details-body { padding: 20px; }
 .tds-key-display { display: flex; align-items: center; gap: 8px; background: var(--tds-bg-elevated); border: 1px solid var(--tds-border); border-radius: var(--tds-radius); padding: 10px 12px; margin-bottom: 12px; }
 .tds-key-display code { font-size: 14px; color: var(--tds-accent); flex: 1; word-break: break-all; }
 .tds-key-new { border-color: var(--tds-accent); background: var(--tds-accent-dim); }
+
+/* ─── Key Generate Form ─── */
+.tds-key-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.tds-key-form .tds-field { margin: 0; }
 
 /* ─── Key Table ─── */
 .tds-key-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
@@ -269,6 +295,14 @@ details.tds-details .tds-details-body { padding: 20px; }
 .tds-col-badge.tds-quality { background: var(--tds-accent-dim); color: var(--tds-accent); }
 .tds-col-badge.tds-draft { background: var(--tds-yellow-dim); color: var(--tds-yellow); }
 .tds-col-pipeline { font-size: 11px; color: var(--tds-text-tertiary); }
+
+/* ─── Dashboard Connection Steps ─── */
+.tds-geo-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--tds-accent-dim); color: var(--tds-accent); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+.tds-geo-steps li strong { display: block; margin-bottom: 4px; color: var(--tds-text); font-size: 14px; }
+.tds-geo-steps li p { margin: 0; color: var(--tds-text-secondary); font-size: 13px; line-height: 1.5; }
+
+/* ─── Logs Filter Bar ─── */
+.tds-filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
 
 /* ─── Mobile Responsive ─── */
 @media (max-width: 782px) {

@@ -16,11 +16,6 @@ class Api {
 
     public static function register_routes(): void {
         self::register_route_set(TDS_GEO_WP_API_NAMESPACE);
-
-        if (!defined('TDS_GEO_API_NAMESPACE')) {
-            define('TDS_GEO_API_NAMESPACE', 'tds-geo/v1');
-        }
-        self::register_route_set(TDS_GEO_API_NAMESPACE);
     }
 
     private static function register_route_set(string $ns): void {
@@ -314,7 +309,7 @@ class Api {
         $webhook_ok = false;
 
         if (!empty($settings['webhook_secret'])) {
-            $signature = $request->get_header('X-TDS-GEO-Signature') ?: $request->get_header('X-TDS-GEO-Signature');
+            $signature = $request->get_header('X-TDS-GEO-Signature') ?: $request->get_header('X-TDS-GEO-Signature-256');
             $payload   = $request->get_body();
             if (empty($signature)) return new \WP_REST_Response(['success' => false, 'message' => 'Missing signature.'], 401);
             $expected = 'sha256=' . hash_hmac('sha256', $payload, $settings['webhook_secret']);
@@ -341,7 +336,7 @@ class Api {
                 break;
             case 'article.updated':
                 $post_id = $data['post_id'] ?? 0;
-                $agent_id = $data['agent_article_id'] ?? $data['tds_geo_article_id'] ?? $data['tds_geo_article_id'] ?? '';
+                $agent_id = $data['agent_article_id'] ?? $data['tds_geo_article_id'] ?? '';
                 if (!$post_id && !empty($agent_id)) {
                     $post = Sync::get_post_by_agent_id($agent_id);
                     $post_id = $post ? $post->ID : 0;
@@ -350,7 +345,7 @@ class Api {
                 break;
             case 'article.deleted':
                 $post_id = $data['post_id'] ?? 0;
-                $agent_id = $data['agent_article_id'] ?? $data['tds_geo_article_id'] ?? $data['tds_geo_article_id'] ?? '';
+                $agent_id = $data['agent_article_id'] ?? $data['tds_geo_article_id'] ?? '';
                 if (!$post_id && !empty($agent_id)) {
                     $post = Sync::get_post_by_agent_id($agent_id);
                     $post_id = $post ? $post->ID : 0;

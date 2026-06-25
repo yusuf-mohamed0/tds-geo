@@ -16,6 +16,7 @@ class Admin {
         add_action('admin_post_tds_geo_save_settings', [self::class, 'handle_save_settings']);
         add_action('admin_post_tds_geo_clear_logs', [self::class, 'handle_clear_logs']);
         add_action('wp_ajax_tds_geo_test_connection', [self::class, 'ajax_test_connection']);
+        add_action('wp_ajax_tds_geo_dashboard_data', [self::class, 'ajax_dashboard_data']);
     }
 
     public static function add_admin_menu(): void {
@@ -90,7 +91,7 @@ class Admin {
         ?>
         <div class="tds-shell tds-admin-dashboard">
             <div class="tds-nav">
-                <div class="tds-nav-logo"><img src="<?php echo esc_url(TDS_GEO_WP_URL . 'assets/tds-geo-white.png'); ?>" alt="TDS Geo" style="height:28px;width:auto;"></div>
+                <div class="tds-nav-logo"><img src="<?php echo esc_url(TDS_GEO_WP_URL . 'assets/tds-geo-white.png'); ?>" alt="TDS Geo"></div>
                 <span class="tds-nav-title">Traffic Digital Solutions GEO</span>
                 <div class="tds-nav-items">
                     <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp')); ?>" class="tds-nav-item active">Dashboard</a>
@@ -126,11 +127,11 @@ class Admin {
             </div>
 
             <div class="tds-card">
-                <h2>How to Connect</h2>
-                <ol class="tds-geo-steps" style="counter-reset:step;list-style:none;padding:0;">
-                    <li style="counter-increment:step;position:relative;padding:0 0 20px 48px;"><strong>Generate an API Key</strong><p>Go to the API Keys page and create a new key. Copy it — you will need to enter it in the TDS Geo dashboard.</p></li>
-                    <li style="counter-increment:step;position:relative;padding:0 0 20px 48px;"><strong>Enter in TDS Geo</strong><p>In your TDS Geo dashboard, go to CMS Connections → Add WordPress connection. Enter your site URL and API key.</p></li>
-                    <li style="counter-increment:step;position:relative;padding:0 0 20px 48px;"><strong>Start Publishing</strong><p>Once connected, TDS Geo can create, update, and publish articles directly to your WordPress site.</p></li>
+                <div class="tds-card-header"><h2>How to Connect</h2></div>
+                <ol class="tds-geo-steps">
+                    <li><strong>Generate an API Key</strong><p>Go to the API Keys page and create a new key. Copy it — you will need to enter it in the TDS Geo dashboard.</p></li>
+                    <li><strong>Enter in TDS Geo</strong><p>In your TDS Geo dashboard, go to CMS Connections → Add WordPress connection. Enter your site URL and API key.</p></li>
+                    <li><strong>Start Publishing</strong><p>Once connected, TDS Geo can create, update, and publish articles directly to your WordPress site.</p></li>
                 </ol>
             </div>
         </div>
@@ -256,14 +257,14 @@ class Admin {
 
             <div class="tds-card">
                 <div class="tds-card-header"><h2>Generate New API Key</h2></div>
-                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="tds-key-form">
                     <?php wp_nonce_field('tds_geo_generate_key', 'tds_geo_generate_nonce'); ?>
                     <input type="hidden" name="action" value="tds_geo_generate_key">
-                    <div class="tds-field" style="margin:0;">
+                    <div class="tds-field">
                         <label for="key_label">Label</label>
                         <input type="text" id="key_label" name="label" placeholder="e.g., TDS Geo Production">
                     </div>
-                    <div class="tds-field" style="margin:0;">
+                    <div class="tds-field">
                         <label for="key_permissions">Permissions</label>
                         <select id="key_permissions" name="permissions">
                             <option value="read,write">Read & Write (full access)</option>
@@ -271,7 +272,7 @@ class Admin {
                             <option value="write">Write Only</option>
                         </select>
                     </div>
-                    <div class="tds-field" style="margin:0;">
+                    <div class="tds-field">
                         <label for="key_expiry">Expires</label>
                         <select id="key_expiry" name="expires_in">
                             <option value="0">Never</option>
@@ -355,7 +356,7 @@ class Admin {
                 </div>
             </div>
 
-            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+            <div class="tds-filter-bar">
                 <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp-logs')); ?>" class="tds-btn tds-btn-sm <?php echo empty($level) ? 'tds-btn-primary' : 'tds-btn-secondary'; ?>">All</a>
                 <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp-logs&level=error')); ?>" class="tds-btn tds-btn-sm <?php echo $level === 'error' ? 'tds-btn-primary' : 'tds-btn-secondary'; ?>">Errors</a>
                 <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp-logs&level=warning')); ?>" class="tds-btn tds-btn-sm <?php echo $level === 'warning' ? 'tds-btn-primary' : 'tds-btn-secondary'; ?>">Warnings</a>
@@ -421,6 +422,88 @@ class Admin {
         Logger::clear_logs();
         wp_safe_redirect(admin_url('admin.php?page=tds-geo-wp-logs'));
         exit;
+    }
+
+    public static function ajax_dashboard_data(): void {
+        check_ajax_referer('tds_geo_wp_ajax');
+        if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized.']);
+
+        global $wpdb;
+        $settings = get_option('tds_geo_wp_settings', []);
+        $api_enabled = ($settings['api_enabled'] ?? 'yes') === 'yes';
+        $key_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tds_geo_api_keys WHERE is_active = 1");
+        $error_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tds_geo_logs WHERE level IN ('error','critical')");
+        $imported_posts = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '_tds_geo_imported_at'");
+        $today_start = wp_date('Y-m-d 00:00:00');
+        $today_articles = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->postmeta} pm JOIN {$wpdb->posts} p ON p.ID = pm.post_id WHERE pm.meta_key = '_tds_geo_imported_at' AND p.post_date >= %s",
+                $today_start
+            )
+        );
+
+        $overall = $api_enabled && $key_count > 0 ? 'healthy' : ($key_count === 0 ? 'warning' : 'critical');
+
+        $recent_logs = $wpdb->get_results(
+            "SELECT level, service, message, created_at FROM {$wpdb->prefix}tds_geo_logs ORDER BY created_at DESC LIMIT 10",
+            ARRAY_A
+        );
+
+        $recent_articles = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT p.ID, p.post_title, p.post_status, p.post_date, COALESCE(ga.quality_score, 0) as quality
+                 FROM {$wpdb->postmeta} pm
+                 JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+                 LEFT JOIN {$wpdb->prefix}tds_geo_articles ga ON ga.post_id = p.ID
+                 WHERE pm.meta_key = '_tds_geo_imported_at'
+                 ORDER BY p.post_date DESC LIMIT %d",
+                10
+            ),
+            ARRAY_A
+        );
+
+        $cat_count = (int) wp_count_terms(['taxonomy' => 'category']);
+        $tag_count = (int) wp_count_terms(['taxonomy' => 'post_tag']);
+
+        wp_send_json_success([
+            'health' => [
+                'overall' => $overall,
+                'score'   => $api_enabled ? ($error_count === 0 ? 100 : max(0, 100 - ($error_count * 10))) : 50,
+            ],
+            'generation_enabled' => $api_enabled,
+            'queue' => [
+                'pending'       => 0,
+                'failed'        => 0,
+                'pending_tasks' => [],
+            ],
+            'errors' => [
+                'unresolved' => $error_count,
+                'healed'     => 0,
+            ],
+            'kb' => [
+                'total'    => 0,
+                'unsynced' => 0,
+            ],
+            'content' => [
+                'thin_content'        => 0,
+                'no_featured_images'  => 0,
+            ],
+            'keywords' => [
+                'total_cats' => $cat_count,
+                'total_tags' => $tag_count,
+            ],
+            'today_articles'  => $today_articles,
+            'daily_max'       => 24,
+            'pipeline_count'  => 0,
+            'pipeline_failed' => 0,
+            'pipeline_stages' => [
+                'failed'  => 0,
+                'stages'  => [],
+            ],
+            'next_run'        => null,
+            'recent_logs'     => $recent_logs,
+            'recent_articles' => $recent_articles,
+        ]);
     }
 
     public static function ajax_test_connection(): void {

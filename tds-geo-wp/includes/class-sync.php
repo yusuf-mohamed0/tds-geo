@@ -36,10 +36,8 @@ class Sync {
             self::set_custom_fields($post_id, $article['custom_fields']);
         }
 
-        $agent_id = $article['agent_article_id'] ?? $article['tds_geo_article_id'] ?? $article['tds_geo_article_id'] ?? '';
+        $agent_id = $article['agent_article_id'] ?? $article['tds_geo_article_id'] ?? '';
         update_post_meta($post_id, '_tds_geo_article_id', $agent_id);
-        update_post_meta($post_id, '_tds_geo_article_id', $agent_id);
-        update_post_meta($post_id, '_tds_geo_imported_at', current_time('mysql'));
         update_post_meta($post_id, '_tds_geo_imported_at', current_time('mysql'));
 
         global $wpdb;
@@ -85,15 +83,6 @@ class Sync {
     }
 
     public static function get_post_by_agent_id(string $agent_id): ?\WP_Post {
-        $posts = get_posts([
-            'meta_key'   => '_tds_geo_article_id',
-            'meta_value' => $agent_id,
-            'post_type'  => 'any',
-            'post_status' => 'any',
-            'numberposts' => 1,
-        ]);
-        if (!empty($posts)) return $posts[0];
-
         $posts = get_posts([
             'meta_key'   => '_tds_geo_article_id',
             'meta_value' => $agent_id,

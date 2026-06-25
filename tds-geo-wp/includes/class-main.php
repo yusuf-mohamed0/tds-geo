@@ -29,6 +29,7 @@ class Main {
         Database::init();
         Logger::init();
         RateLimiter::init();
+        Cache::init();
         Auth::init();
         Api::init();
         Sync::init();
@@ -38,6 +39,7 @@ class Main {
             'database'    => Database::class,
             'logger'      => Logger::class,
             'ratelimiter' => RateLimiter::class,
+            'cache'       => Cache::class,
             'auth'        => Auth::class,
             'api'         => Api::class,
             'sync'        => Sync::class,
