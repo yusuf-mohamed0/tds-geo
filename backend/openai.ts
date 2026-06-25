@@ -1047,7 +1047,7 @@ FORMATTING:
 // When AI_PROVIDER=ollama, the default export from this
 // module is the OllamaService instead of OpenAIService.
 // This makes ALL consumers work without import changes.
-import ollamaService from './ollama';
+import ollamaService from './services/ollama';
 import type { AIService } from './types';
 
 const openaiSingleton = new OpenAIService();

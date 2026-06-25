@@ -77,8 +77,8 @@ class MultiCmsPublisherService {
         const health = await connector.health();
         return health.status === 'healthy';
       },
-      publish: async (article, config) => {
-        const result = await connector.publish(article as any, config as any);
+      publish: async (article) => {
+        const result = await connector.publish(article as any);
         return {
           id: result.externalId ? Number(result.externalId) : 0,
           blogId: 0,
