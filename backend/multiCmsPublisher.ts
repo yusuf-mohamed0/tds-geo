@@ -5,13 +5,13 @@
 // ══════════════════════════════════════════════════════════════════
 
 import { Pool } from 'pg';
-import { logger } from '../utils/logger';
-import { Article, PublishResult, CmsProvider, CmsConnection, PublisherAdapter, PublisherCapabilities } from '../types';
-import { generateSlug } from '../utils/stringUtils';
-import { wordpressConnector } from '../connectors/wordpress';
-import { webflowConnector } from '../connectors/webflow';
-import { ghostConnector } from '../connectors/ghost';
-import { shopifyConnector } from '../connectors/shopify';
+import { logger } from './utils/logger';
+import { Article, PublishResult, CmsProvider, CmsConnection, PublisherAdapter, PublisherCapabilities } from './types';
+import { generateSlug } from './utils/stringUtils';
+import { wordpressConnector } from './connectors/wordpress';
+import { webflowConnector } from './connectors/webflow';
+import { ghostConnector } from './connectors/ghost';
+import { shopifyConnector } from './connectors/shopify';
 
 class MultiCmsPublisherService {
   private adapters: Map<CmsProvider, PublisherAdapter> = new Map();

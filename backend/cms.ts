@@ -4,8 +4,8 @@
 
 import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
-import { authenticate, authorize } from '../middleware/auth';
-import multiCmsPublisher from '../services/multiCmsPublisher';
+import { authenticate, authorize } from './middleware/auth';
+import multiCmsPublisher from './services/multiCmsPublisher';
 
 export function createCmsRoutes(pool: Pool): Router {
   const router = Router();

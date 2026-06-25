@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { authenticate, authorize } from '../middleware/auth';
-import geoIntelligence from '../services/geoIntelligence';
+import { authenticate, authorize } from './middleware/auth';
+import geoIntelligence from './services/geoIntelligence';
 
 export function createGeoRoutes(): Router {
   const router = Router();

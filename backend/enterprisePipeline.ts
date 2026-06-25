@@ -5,21 +5,21 @@
 
 import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
-import { authenticate, authorize } from '../middleware/auth';
-import { logger } from '../utils/logger';
-import openaiService from '../services/openai';
-import seoService from '../services/seo';
-import seoIntelligence from '../services/seoIntelligence';
-import factCheckService from '../services/factCheckService';
-import brandVoice from '../services/brandVoice';
-import editorialWorkflow from '../services/editorialWorkflow';
-import contentIntelligence from '../services/contentIntelligence';
-import aiEvaluation from '../services/aiEvaluation';
-import pexelsService from '../services/pexelsService';
-import enterpriseSecurity from '../services/enterpriseSecurity';
-import CostOptimizationService from '../services/costOptimization';
-import observability from '../services/observability';
-import geoIntelligence from '../services/geoIntelligence';
+import { authenticate, authorize } from './middleware/auth';
+import { logger } from './utils/logger';
+import openaiService from './services/openai';
+import seoService from './services/seo';
+import seoIntelligence from './services/seoIntelligence';
+import factCheckService from './services/factCheckService';
+import brandVoice from './services/brandVoice';
+import editorialWorkflow from './services/editorialWorkflow';
+import contentIntelligence from './services/contentIntelligence';
+import aiEvaluation from './services/aiEvaluation';
+import pexelsService from './services/pexelsService';
+import enterpriseSecurity from './services/enterpriseSecurity';
+import CostOptimizationService from './services/costOptimization';
+import observability from './services/observability';
+import geoIntelligence from './services/geoIntelligence';
 
 export function createEnterprisePipelineRoutes(pool: Pool): Router {
   const router = Router();
