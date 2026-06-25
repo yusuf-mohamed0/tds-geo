@@ -264,12 +264,18 @@ class HeartbeatService {
       return { status: 'not_configured', message: 'No connectors registered', details };
     }
 
-    const down = details.filter(d => !d.healthy);
+    const healthy = details.filter(d => d.healthy);
+    const unhealthy = details.filter(d => !d.healthy);
+
+    if (unhealthy.length === 0) {
+      return { status: 'healthy', message: `${healthy.length} connectors healthy`, details };
+    }
+
     return {
-      status: down.length === 0 ? 'healthy' : down.length === details.length ? 'down' : 'degraded',
-      message: down.length > 0
-        ? `${down.length}/${details.length} connectors down: ${down.map(d => d.provider).join(', ')}`
-        : `${details.length} connectors healthy`,
+      status: healthy.length === 0 ? 'not_configured' : 'degraded',
+      message: healthy.length > 0
+        ? `${healthy.length} healthy, ${unhealthy.length} not configured`
+        : 'No connectors connected. Use POST /api/connector/connect/:provider to set up.',
       details,
     };
   }
@@ -399,21 +405,22 @@ ${uniqueFailures.map(f => `<div style="background:#FCF6F2;border-radius:10px;pad
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#FCF6F2;margin:0;padding:0}
   .container{max-width:600px;margin:24px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)}
   .header{background:#171414;padding:0}
-  .header-top{padding:28px 32px 16px;display:flex;justify-content:space-between;align-items:flex-start}
-  .header-logo{display:flex;align-items:center;gap:12px}
-  .header-logo-icon{width:36px;height:36px;background:#FCB900;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#171414;line-height:1}
-  .header-logo-text{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.3px}
-  .header-logo-text span{color:#FCB900}
-  .header-status-badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;line-height:1;white-space:nowrap}
+  .header-top{padding:24px 32px 14px}
+  .header-logo{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px}
+  .header-logo-gold{color:#FCB900}
+  .header-top-row{display:table;width:100%}
+  .header-top-left{display:table-cell;vertical-align:middle}
+  .header-top-right{display:table-cell;vertical-align:middle;text-align:right}
+  .header-status-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
   .header-status-badge.critical{background:#c0392b;color:#fff}
   .header-status-badge.degraded{background:#F89D4B;color:#171414}
   .header-status-badge.healthy{background:#27ae60;color:#fff}
-  .header-bar{height:4px}
+  .header-bar{height:4px;margin-top:14px}
   .header-bar.critical{background:#c0392b}
   .header-bar.degraded{background:#FCB900}
   .header-bar.healthy{background:#27ae60}
-  .header-meta{padding:0 32px 20px;font-size:12px;color:#838081;display:flex;gap:16px;flex-wrap:wrap}
-  .header-meta span{white-space:nowrap}
+  .header-meta{padding:10px 32px 16px;font-size:12px;color:#838081}
+  .header-meta span{margin-right:14px;white-space:nowrap}
   .body{padding:20px 32px 28px}
   .summary{font-size:14px;padding:14px 18px;border-radius:10px;margin-bottom:24px;line-height:1.5}
   .summary.critical{background:#fdedec;color:#922b21;border-left:4px solid #c0392b}
@@ -425,78 +432,95 @@ ${uniqueFailures.map(f => `<div style="background:#FCF6F2;border-radius:10px;pad
   th{text-align:left;padding:8px 12px;background:#FCF6F2;color:#142444;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
   td{padding:7px 12px;border-top:1px solid #FCF6F2;color:#3D3B3B}
   td code{font-size:12px;background:#FCF6F2;padding:1px 6px;border-radius:3px;color:#3D3B3B}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
-  .grid .item{background:#FCF6F2;border-radius:10px;padding:12px 14px;border:1px solid #FCF6F2}
-  .grid .item .label{font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
-  .grid .item .value{font-size:15px;font-weight:600;color:#171414}
-  .grid .item .sub{font-size:11px;color:#838081;margin-top:2px}
-  .ai-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid #FCF6F2;font-size:13px}
-  .ai-row:first-child{border-top:none}
-  .ai-row .name{font-weight:600;color:#171414}
-  .ai-row .status{font-size:12px}
-  .card{background:#FCF6F2;border-radius:10px;border:1px solid #FCF6F2;overflow:hidden}
+  .ai-table{width:100%;border-collapse:collapse;font-size:13px;background:#FCF6F2;border-radius:10px;overflow:hidden;border:1px solid #FCF6F2}
+  .ai-table td{padding:8px 12px;border-top:1px solid #e8ddd5}
+  .ai-table tr:first-child td{border-top:none}
+  .ai-table .name{font-weight:600;color:#171414}
+  .ai-table .status{text-align:right}
   .footnote{padding:0 32px 24px;font-size:11px;color:#838081;text-align:center;line-height:1.6}
   .footnote a{color:#769ACC;text-decoration:none}
-  .footnote a:hover{color:#142444}
   hr{border:none;border-top:1px solid #FCF6F2;margin:20px 0}
 </style></head><body>
 <div class="container">
   <div class="header">
     <div class="header-top">
-      <div class="header-logo">
-        <div class="header-logo-icon">T</div>
-        <div class="header-logo-text">TDS <span>GEO</span></div>
+      <div class="header-top-row">
+        <div class="header-top-left">
+          <div class="header-logo">TDS <span class="header-logo-gold">GEO</span></div>
+        </div>
+        <div class="header-top-right">
+          <div class="header-status-badge ${report.status}">${report.status.toUpperCase()}</div>
+        </div>
       </div>
-      <div class="header-status-badge ${report.status}">${report.status.toUpperCase()}</div>
-    </div>
-    <div class="header-bar ${report.status}"></div>
-    <div class="header-meta">
-      <span>&#128339; ${hostname}</span>
-      <span>&#128197; ${time}</span>
-      <span>&#9201; ${report.duration_ms}ms</span>
+      <div class="header-bar ${report.status}"></div>
+      <div class="header-meta">
+        <span>&#128339; ${hostname}</span>
+        <span>&#128197; ${time}</span>
+        <span>&#9201; ${report.duration_ms}ms</span>
+      </div>
     </div>
   </div>
   <div class="body">
     <div class="summary ${report.status}">${report.summary}</div>
 
     <div class="section-title">Server</div>
-    <div class="grid">
-      <div class="item"><span class="label">CPU</span><div class="value">${report.checks.server.cpu || 'n/a'}</div></div>
-      <div class="item"><span class="label">Memory</span><div class="value">${report.checks.server.memory || 'n/a'}</div><div class="sub">Heap used</div></div>
-      <div class="item"><span class="label">Disk</span><div class="value">${report.checks.server.disk || 'n/a'}</div></div>
-      <div class="item"><span class="label">Uptime</span><div class="value">${report.checks.server.uptime || 'n/a'}</div></div>
-      <div class="item"><span class="label">Node</span><div class="value">${report.checks.server.nodeVersion || 'n/a'}</div></div>
-      <div class="item"><span class="label">Database</span><div class="value">${statusIcon(report.checks.database.status)} ${report.checks.database.status}</div><div class="sub">${report.checks.database.message}</div></div>
-    </div>
+    <table style="width:100%;border-collapse:separate;border-spacing:0 6px;font-size:13px">
+      <tr>
+        <td style="width:50%;background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">CPU</div>
+          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.cpu || 'n/a'}</div>
+        </td>
+        <td style="width:50%;background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Memory</div>
+          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.memory || 'n/a'}</div>
+          <div style="font-size:11px;color:#838081;margin-top:2px">Heap used</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Disk</div>
+          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.disk || 'n/a'}</div>
+        </td>
+        <td style="background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Uptime</div>
+          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.uptime || 'n/a'}</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Node</div>
+          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.nodeVersion || 'n/a'}</div>
+        </td>
+        <td style="background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Database</div>
+          <div style="font-size:15px;font-weight:600;color:#171414">${statusIcon(report.checks.database.status)} ${report.checks.database.status}</div>
+          <div style="font-size:11px;color:#838081;margin-top:2px">${report.checks.database.message}</div>
+        </td>
+      </tr>
+    </table>
 
     <div class="section-title">AI Providers</div>
-    <div class="card">
-      <div class="ai-row"><span><span class="name">OpenAI</span></span><span class="status">${statusIcon(report.checks.openai.status)} ${report.checks.openai.message}</span></div>
-      <div class="ai-row"><span><span class="name">Ollama</span></span><span class="status">${statusIcon(report.checks.ollama.status)} ${report.checks.ollama.message}</span></div>
-    </div>
+    <table class="ai-table">
+      <tr><td><span class="name">OpenAI</span></td><td class="status">${statusIcon(report.checks.openai.status)} ${report.checks.openai.message}</td></tr>
+      <tr><td><span class="name">Ollama</span></td><td class="status">${statusIcon(report.checks.ollama.status)} ${report.checks.ollama.message}</td></tr>
+    </table>
 
     <div class="section-title">Connectors</div>
-    <div class="card">
-      <table>
-        <tr><th></th><th>Provider</th><th>ID</th><th>Status</th></tr>
-        ${connectorRows || '<tr><td colspan="4" style="text-align:center;padding:16px;color:#838081">No connectors registered</td></tr>'}
-      </table>
-    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;background:#FCF6F2;border-radius:10px;overflow:hidden;border:1px solid #FCF6F2">
+      <tr><th></th><th>Provider</th><th>ID</th><th>Status</th></tr>
+      ${connectorRows || '<tr><td colspan="4" style="text-align:center;padding:16px;color:#838081">No connectors registered</td></tr>'}
+    </table>
 
     <div class="section-title">Connected Sites</div>
-    <div class="card">
-      <table>
-        <tr><th></th><th>Platform</th><th>Domain</th><th>Connection</th><th>Health</th></tr>
-        ${siteRows || '<tr><td colspan="5" style="text-align:center;padding:16px;color:#838081">No sites connected</td></tr>'}
-      </table>
-    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;background:#FCF6F2;border-radius:10px;overflow:hidden;border:1px solid #FCF6F2">
+      <tr><th></th><th>Platform</th><th>Domain</th><th>Connection</th><th>Health</th></tr>
+      ${siteRows || '<tr><td colspan="5" style="text-align:center;padding:16px;color:#838081">No sites connected</td></tr>'}
+    </table>
 
     <div class="section-title">Recent Errors</div>
-    <div class="card">
-      <div style="padding:10px 14px;font-size:13px;color:#3D3B3B">
-        ${statusIcon(report.checks.recentErrors.status)} ${report.checks.recentErrors.message}
-      </div>
-    </div>
+    <table style="width:100%;font-size:13px;background:#FCF6F2;border-radius:10px;overflow:hidden;border:1px solid #FCF6F2">
+      <tr><td style="padding:10px 14px;color:#3D3B3B">${statusIcon(report.checks.recentErrors.status)} ${report.checks.recentErrors.message}</td></tr>
+    </table>
 
     ${causesHtml}
 

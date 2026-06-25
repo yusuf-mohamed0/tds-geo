@@ -82,7 +82,10 @@ export class ConnectorManager {
 
       if (!conn.healthy) {
         eventBus.emit(Events.CONNECTOR_HEALTH_CHANGED, { id, status: status.status });
-        heartbeatService.run().catch(() => {});
+        // Don't trigger heartbeat for stub connectors (webflow, ghost)
+        if (!['webflow', 'ghost'].includes(id)) {
+          heartbeatService.run().catch(() => {});
+        }
       }
       return status;
     } catch {
@@ -98,7 +101,9 @@ export class ConnectorManager {
       }
 
       eventBus.emit(Events.CONNECTOR_HEALTH_CHANGED, { id, status: 'down' });
-      heartbeatService.run().catch(() => {});
+      if (!['webflow', 'ghost'].includes(id)) {
+        heartbeatService.run().catch(() => {});
+      }
 
       return { status: 'down', version: 'unknown', lastSync: null, uptime: 0, errors: ['Health check failed'] };
     }
