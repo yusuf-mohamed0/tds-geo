@@ -782,6 +782,8 @@ async function shutdown(signal: string): Promise<void> {
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-start();
+if (process.env.VITEST_WORKER_ID === undefined) {
+  start();
+}
 
 export default app;
