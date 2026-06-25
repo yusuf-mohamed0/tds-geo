@@ -10,7 +10,7 @@ RUN apk add --no-cache python3 make g++
 COPY package.json package-lock.json ./
 
 # Install all dependencies (including devDependencies for build)
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy source files
 COPY tsconfig.json ./
@@ -26,7 +26,7 @@ WORKDIR /app/frontend
 
 # Copy frontend package files and install dependencies
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy frontend source files
 COPY frontend/ ./
@@ -45,7 +45,7 @@ RUN addgroup -g 1001 -S appgroup && \
 
 # Install only production dependencies
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev && \
+RUN npm ci --omit=dev --legacy-peer-deps && \
     npm cache clean --force
 
 # Copy compiled output from backend builder
