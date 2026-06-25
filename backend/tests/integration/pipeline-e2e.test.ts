@@ -77,7 +77,7 @@ vi.mock('../../services/shopify', () => ({
       handle: 'test-article'
     }),
     uploadImage: vi.fn().mockResolvedValue({ id: 888 }),
-    initialize: vi.fn()
+    init: vi.fn()
   }
 }));
 

@@ -66,7 +66,7 @@ vi.mock('../../services/openai', () => ({
   }
 }));
 
-vi.mock('../../services/shopify', () => ({ default: { initialize: vi.fn(), fetchBlogs: vi.fn().mockResolvedValue([]), publishArticle: vi.fn(), uploadImage: vi.fn() } }));
+vi.mock('../../services/shopify', () => ({ default: { init: vi.fn(), fetchBlogs: vi.fn().mockResolvedValue([]), publishArticle: vi.fn(), uploadImage: vi.fn() } }));
 vi.mock('../../services/seo', () => ({ default: { initialize: vi.fn() } }));
 vi.mock('../../services/keywords', () => ({ default: { initialize: vi.fn(), close: vi.fn() } }));
 vi.mock('../../services/webhooks', () => ({ default: { initialize: vi.fn(), trigger: vi.fn() } }));

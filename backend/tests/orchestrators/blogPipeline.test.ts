@@ -72,6 +72,7 @@ vi.mock('../../services/webhooks', () => ({
 
 vi.mock('../../services/shopify', () => ({
   default: {
+    init: vi.fn(),
     fetchBlogs: vi.fn().mockResolvedValue([{ id: 123, title: 'Blog', handle: 'blog' }]),
     publishArticle: vi.fn().mockResolvedValue({ id: 999, blogId: 123, url: 'https://test.com/post', handle: 'test-post' }),
     uploadImage: vi.fn().mockResolvedValue({ id: 888 })
