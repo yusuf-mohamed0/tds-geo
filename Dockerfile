@@ -45,7 +45,7 @@ RUN addgroup -g 1001 -S appgroup && \
 
 # Install only production dependencies
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev --legacy-peer-deps && \
+RUN npm ci --omit=dev --legacy-peer-deps --ignore-scripts && \
     npm cache clean --force
 
 # Copy compiled output from backend builder
