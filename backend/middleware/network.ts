@@ -47,10 +47,16 @@ export function isInternalIp(ip: string): boolean {
  *
  * Usage: app.use(requireVpnAccess())
  */
-export function requireVpnAccess(): RequestHandler {
+export function requireVpnAccess(excludedPaths: string[] = []): RequestHandler {
   return (req: Request, res: Response, next: NextFunction): void => {
     // Skip in development mode
     if (process.env.NODE_ENV === 'development' || process.env.DISABLE_VPN_CHECK === 'true') {
+      next();
+      return;
+    }
+
+    // Skip excluded paths (Shopify OAuth, webhooks, compliance, embedded app)
+    if (excludedPaths.some(p => req.path.startsWith(p) || req.originalUrl.startsWith(p))) {
       next();
       return;
     }

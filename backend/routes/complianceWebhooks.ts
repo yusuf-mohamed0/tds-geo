@@ -47,7 +47,7 @@ async function handleAppUninstalled(req: Request, res: Response, pool: Pool) {
   logger.info('APP_UNINSTALLED webhook received', { shop });
   try {
     await pool.query(
-      `UPDATE clients SET is_active = false, shopify_shop = NULL
+      `UPDATE clients SET is_active = false, shopify_shop = NULL, billing_status = 'cancelled'
        WHERE shopify_shop = $1`,
       [shop]
     );
@@ -56,6 +56,12 @@ async function handleAppUninstalled(req: Request, res: Response, pool: Pool) {
        WHERE provider = 'shopify' AND config->>'shop' = $1`,
       [shop]
     );
+    await pool.query(
+      `INSERT INTO billing_events (client_id, event_type, status, metadata)
+       SELECT id, 'app_uninstalled', 'cancelled', $2::jsonb
+       FROM clients WHERE shopify_shop = $1`,
+      [shop, JSON.stringify({ source: 'app/uninstalled webhook' })]
+    );
     logger.info('Shop deactivated after uninstall', { shop });
   } catch (err) {
     logger.error('Failed to process app uninstall', { shop, error: (err as Error).message });
@@ -63,19 +69,72 @@ async function handleAppUninstalled(req: Request, res: Response, pool: Pool) {
   res.status(200).json({ success: true });
 }
 
-async function handleCustomersDataRequest(req: Request, res: Response, _pool: Pool) {
+async function handleCustomersDataRequest(req: Request, res: Response, pool: Pool) {
   const shop = req.body?.shop_domain || req.body?.shop || req.headers['x-shopify-shop-domain'] || 'unknown';
   const customerId = req.body?.customer?.id || null;
   const requestId = req.body?.data_request?.id || null;
   logger.info('CUSTOMERS_DATA_REQUEST webhook received', { shop, customerId, requestId });
-  res.status(200).json({ success: true });
+
+  try {
+    // Query customer data from our system
+    const articles = await pool.query(
+      `SELECT id, title, created_at FROM articles
+       WHERE client_id IN (SELECT id FROM clients WHERE shopify_shop = $1)
+       ORDER BY created_at DESC`,
+      [shop]
+    );
+
+    const result = {
+      shopify_domain: shop,
+      customer_id: customerId,
+      request_id: requestId,
+      data: {
+        articles: articles.rows.map(a => ({
+          id: a.id,
+          title: a.title,
+          created_at: a.created_at,
+        })),
+        article_count: articles.rows.length,
+      },
+      generated_at: new Date().toISOString(),
+    };
+
+    // Log the data request fulfillment
+    await pool.query(
+      `INSERT INTO activity_logs (client_id, action, entity_type, level, message, metadata)
+       VALUES (NULL, 'gdpr_data_request', 'compliance', 'info', $1, $2)`,
+      [`GDPR data request processed for shop ${shop}, customer ${customerId}`,
+       JSON.stringify({ shop, customerId, requestId, articleCount: articles.rows.length })]
+    );
+
+    res.status(200).json(result);
+  } catch (err) {
+    logger.error('Failed to process GDPR data request', { shop, customerId, error: (err as Error).message });
+    res.status(200).json({ success: true, error: 'Internal processing error' });
+  }
 }
 
-async function handleCustomersRedact(req: Request, res: Response, _pool: Pool) {
+async function handleCustomersRedact(req: Request, res: Response, pool: Pool) {
   const shop = req.body?.shop_domain || req.body?.shop || req.headers['x-shopify-shop-domain'] || 'unknown';
   const customerId = req.body?.customer?.id || null;
   logger.info('CUSTOMERS_REDACT webhook received', { shop, customerId });
-  res.status(200).json({ success: true });
+
+  try {
+    // TDS Geo does not store individual customer PII — articles are linked
+    // to the shop (client), not the customer. Acknowledge and log redact request.
+    await pool.query(
+      `INSERT INTO activity_logs (client_id, action, entity_type, level, message, metadata)
+       VALUES (NULL, 'gdpr_customer_redact', 'compliance', 'info', $1, $2)`,
+      [`GDPR customer redact processed for shop ${shop}, customer ${customerId}`,
+       JSON.stringify({ shop, customerId })]
+    );
+
+    logger.info('Customer redact acknowledged', { shop, customerId, note: 'No customer PII stored by app' });
+    res.status(200).json({ success: true });
+  } catch (err) {
+    logger.error('Failed to process GDPR customer redact', { shop, customerId, error: (err as Error).message });
+    res.status(200).json({ success: true, error: 'Internal processing error' });
+  }
 }
 
 async function handleShopRedact(req: Request, res: Response, pool: Pool) {
@@ -113,6 +172,7 @@ export function createComplianceWebhookRoutes(pool: Pool): Router {
       { topic: 'customers/data_request', path: '/api/webhooks/compliance/customers-data-request' },
       { topic: 'customers/redact', path: '/api/webhooks/compliance/customers-redact' },
       { topic: 'shop/redact', path: '/api/webhooks/compliance/shop-redact' },
+      { topic: 'app/uninstalled', path: '/api/webhooks/compliance/app-uninstalled' },
     ];
 
     const results: { topic: string; created: boolean; error?: string }[] = [];

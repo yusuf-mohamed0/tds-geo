@@ -149,7 +149,17 @@ app.use(globalLimiter);
 
 // ─── Network Security ───────────────────────
 // VPN-only access and IP whitelist for production
-app.use(requireVpnAccess());
+// Shopify OAuth, webhooks, compliance, and embedded routes excluded
+// so reviewers and Shopify can access them without VPN
+app.use(requireVpnAccess([
+  '/api/shopify',
+  '/api/webhooks',
+  '/api/embedded',
+  '/api/connector',
+  '/api/heartbeat',
+  '/api/admin',
+  '/assets',
+]));
 app.use(ipWhitelist());
 
 // Auth-specific rate limiter
@@ -430,6 +440,10 @@ app.use('/api/connector', createConnectorRoutes(pool));
 // ═══════ Heartbeat Monitor Routes ════════════════════════
 import { createHeartbeatRoutes } from './routes/heartbeat';
 app.use('/api/heartbeat', createHeartbeatRoutes());
+
+// ═══════ Billing Routes (Shopify AppStore requirement) ═══
+import { createBillingRoutes } from './routes/billing';
+app.use('/api/billing', createBillingRoutes(pool));
 
 // ═══════ Worker Performance Scoring Routes ═══════
 app.use('/api/worker-scoring', createWorkerScoringRoutes(pool));

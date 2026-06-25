@@ -8,6 +8,7 @@ const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://13.48.59.201.nip.io';
 const SCOPES = 'read_content,read_products,write_content,write_products';
+const WEBHOOK_API_VERSION = '2024-07';
 
 function isValidShop(shop: string): boolean {
   return /^[a-zA-Z0-9][a-zA-Z0-9-]*\.myshopify\.com$/.test(shop);
@@ -155,6 +156,34 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
         encrypted_credentials: accessToken,
         connection_status: 'connected',
       });
+
+      // Step 5: Subscribe GDPR compliance webhooks (non-fatal)
+      try {
+        const complianceTopics = [
+          { topic: 'customers/data_request', path: '/api/webhooks/compliance/customers-data-request' },
+          { topic: 'customers/redact', path: '/api/webhooks/compliance/customers-redact' },
+          { topic: 'shop/redact', path: '/api/webhooks/compliance/shop-redact' },
+          { topic: 'app/uninstalled', path: '/api/webhooks/compliance/app-uninstalled' },
+        ];
+        for (const { topic, path } of complianceTopics) {
+          const webhookUrl = `${SHOPIFY_APP_URL}${path}`;
+          const existingRes = await fetch(`https://${shop}/admin/api/${WEBHOOK_API_VERSION}/webhooks.json?topic=${encodeURIComponent(topic)}&address=${encodeURIComponent(webhookUrl)}`, {
+            headers: { 'X-Shopify-Access-Token': accessToken },
+          });
+          const existingData: any = await existingRes.json();
+          const alreadyExists = existingData?.webhooks?.length > 0;
+          if (!alreadyExists) {
+            await fetch(`https://${shop}/admin/api/${WEBHOOK_API_VERSION}/webhooks.json`, {
+              method: 'POST',
+              headers: { 'X-Shopify-Access-Token': accessToken, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ webhook: { topic, address: webhookUrl, format: 'json' } }),
+            });
+            logger.info('Compliance webhook registered', { shop, topic });
+          }
+        }
+      } catch (webhookErr) {
+        logger.warn('Failed to subscribe compliance webhooks (non-fatal)', { shop, error: (webhookErr as Error).message });
+      }
 
       logger.info('Shopify store installed successfully', { shop, storeName });
       res.redirect(`${SHOPIFY_APP_URL}/shopify/success?shop=${encodeURIComponent(shop)}&name=${encodeURIComponent(storeName)}`);
