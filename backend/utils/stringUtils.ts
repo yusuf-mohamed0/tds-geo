@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════════
-// TDS Geo — Shared String Utilities
+// KOZMO Core — Shared String Utilities
 //
 // Single source of truth for common string operations
 // previously duplicated across services.

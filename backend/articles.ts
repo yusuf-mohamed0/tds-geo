@@ -5,21 +5,21 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
-import { authenticate, authorize, authorizeClientAccess, scopeQueryByClient, requireResourceOwnership } from '../middleware/auth';
-import { validate } from '../validators/index';
+import { authenticate, authorize, authorizeClientAccess, scopeQueryByClient, requireResourceOwnership } from './middleware/auth';
+import { validate } from './validators/index';
 import {
   generateArticleSchema, updateArticleSchema,
   publishArticleSchema, generateImageSchema
-} from '../validators/index';
-import { logger, logActivity } from '../utils/logger';
-import openaiService from '../services/openai';
-import shopifyService from '../services/shopify';
-import seoService from '../services/seo';
-import internalLinksService from '../services/internalLinks';
-import keywordService from '../services/keywords';
-import vectorMemoryService from '../services/vectorMemory';
-import costTracker from '../services/costTracker';
-import { convert } from '../utils/markdownToHtml';
+} from './validators/index';
+import { logger, logActivity } from './utils/logger';
+import openaiService from './services/openai';
+import shopifyService from './services/shopify';
+import seoService from './services/seo';
+import internalLinksService from './services/internalLinks';
+import keywordService from './services/keywords';
+import vectorMemoryService from './services/vectorMemory';
+import costTracker from './services/costTracker';
+import { convert } from './utils/markdownToHtml';
 
 export function createArticleRoutes(pool: Pool): Router {
   const router = Router();
@@ -292,7 +292,7 @@ export function createArticleRoutes(pool: Pool): Router {
         download_url: process.env.CONNECTOR_DOWNLOAD_URL || '',
         min_php_version: '7.4',
         min_wp_version: '5.8',
-        changelog: 'https://github.com/yusuf-mohamed0/KOZMO-Core/releases',
+        changelog: 'https://github.com/yusuf-mohamed0/tds-geo/releases',
       },
     });
   });

@@ -2,6 +2,8 @@ import { logger } from '../utils/logger';
 import { eventBus } from '../event-bus';
 import { Events } from '../event-bus/events';
 import { ConnectorConfig, ConnectorRegistration, HealthStatus, ConnectorInterface } from '../sdk/connector-interface';
+import { sitesService } from '../services/sitesService';
+import { heartbeatService } from '../services/heartbeatService';
 
 interface RegisteredConnector {
   id: string;
@@ -69,13 +71,35 @@ export class ConnectorManager {
       const status = await conn.instance.health();
       conn.healthy = status.status === 'healthy';
       conn.lastHealthCheck = new Date();
+
+      const config = this.getConfig(id);
+      if (config?.endpointUrl) {
+        try {
+          const domain = new URL(config.endpointUrl).hostname;
+          await sitesService.updateHealth(domain, id as any, status.status as any);
+        } catch { /* non-fatal */ }
+      }
+
       if (!conn.healthy) {
         eventBus.emit(Events.CONNECTOR_HEALTH_CHANGED, { id, status: status.status });
+        heartbeatService.run().catch(() => {});
       }
       return status;
     } catch {
       conn.healthy = false;
       conn.lastHealthCheck = new Date();
+
+      const config = this.getConfig(id);
+      if (config?.endpointUrl) {
+        try {
+          const domain = new URL(config.endpointUrl).hostname;
+          await sitesService.updateHealth(domain, id as any, 'down');
+        } catch { /* non-fatal */ }
+      }
+
+      eventBus.emit(Events.CONNECTOR_HEALTH_CHANGED, { id, status: 'down' });
+      heartbeatService.run().catch(() => {});
+
       return { status: 'down', version: 'unknown', lastSync: null, uptime: 0, errors: ['Health check failed'] };
     }
   }

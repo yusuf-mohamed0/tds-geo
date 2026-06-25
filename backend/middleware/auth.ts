@@ -45,13 +45,13 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
 
   // Allow API key auth for connector integrations (WordPress, etc.)
   if (apiKey) {
-    const allowedKey = process.env.TDS_GEO_WORDPRESS_API_KEY || process.env.API_KEY;
+    const allowedKey = process.env.KOZMO_AI_WORDPRESS_API_KEY || process.env.API_KEY;
     if (allowedKey && apiKey === allowedKey) {
       (req as any).user = {
         id: 'connector',
         clientId: null,
         role: 'connector',
-        email: 'connector@tdsgeo.ai',
+        email: 'connector@kozmocore.ai',
       };
       next();
       return;

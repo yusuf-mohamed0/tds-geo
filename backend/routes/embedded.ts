@@ -11,6 +11,7 @@ import vectorMemoryService from '../services/vectorMemory';
 import costTracker from '../services/costTracker';
 import { convert } from '../utils/markdownToHtml';
 import shopifyService from '../services/shopify';
+import { sitesService } from '../services/sitesService';
 
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 
@@ -151,6 +152,10 @@ export function createEmbeddedRoutes(pool: Pool): Router {
           `UPDATE articles SET status = 'approved' WHERE client_id = $1 AND status = 'published' AND title != ALL($2)`,
           [clientId, shopifyTitles]
         );
+      }
+
+      if (config.shop) {
+        await sitesService.recordSync(config.shop, 'shopify').catch(() => {});
       }
     } catch (err) {
       logger.warn('Auto-sync from Shopify failed', { error: (err as Error).message });
@@ -317,6 +322,10 @@ export function createEmbeddedRoutes(pool: Pool): Router {
             metaDescription: article.meta_description,
             tags: article.tags || [],
           });
+          const shopDomain = client.shopify_shop || '';
+          if (shopDomain) {
+            await sitesService.recordPublish(shopDomain, 'shopify').catch(() => {});
+          }
           results.push({ id: article.id, title: article.title, success: true });
         } catch (err) {
           results.push({ id: article.id, title: article.title, success: false, error: (err as Error).message });
@@ -366,6 +375,11 @@ export function createEmbeddedRoutes(pool: Pool): Router {
           );
           synced++;
         }
+      }
+
+      const shopDomain = config?.shop || '';
+      if (shopDomain) {
+        await sitesService.recordSync(shopDomain, 'shopify').catch(() => {});
       }
 
       logger.info('Embedded sync completed', { clientId: auth.clientId, synced });

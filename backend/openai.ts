@@ -42,7 +42,7 @@ class OpenAIService {
   /**
    * Get the active AI client.
    */
-  private getClient(): OpenAI | null {
+  public getClient(): OpenAI | null {
     return this.openaiClient;
   }
 

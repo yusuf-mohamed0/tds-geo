@@ -106,6 +106,8 @@ import { initializeEngines, analyticsEngine } from './engines';
 import { eventBus } from './event-bus';
 import { connectorManager } from './connector-manager';
 import { registerBuiltinConnectors } from './connectors';
+import { sitesService } from './services/sitesService';
+import { heartbeatService } from './services/heartbeatService';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -421,6 +423,14 @@ app.use('/api/scraper', createClientScraperRoutes(pool));
 import { createMemoryRoutes } from './routes/memory';
 app.use('/api/memory', createMemoryRoutes(pool));
 
+// ═══════ Connector Management Routes (WordPress, etc.) ═══════
+import { createConnectorRoutes } from './routes/connectors';
+app.use('/api/connector', createConnectorRoutes(pool));
+
+// ═══════ Heartbeat Monitor Routes ════════════════════════
+import { createHeartbeatRoutes } from './routes/heartbeat';
+app.use('/api/heartbeat', createHeartbeatRoutes());
+
 // ═══════ Worker Performance Scoring Routes ═══════
 app.use('/api/worker-scoring', createWorkerScoringRoutes(pool));
 
@@ -694,6 +704,13 @@ async function start(): Promise<void> {
 
     // ═══ Odoo ERP Integration ═══════════════════
     odooConnector.initialize(pool);
+
+    // ═══════ Connected Sites Registry ═══════════════
+    sitesService.initialize(pool);
+
+    // ═══════ Heartbeat Monitor ═══════════════════════
+    heartbeatService.initialize(pool);
+    heartbeatService.start();
 
     // ════════════════════════════════════════════
     // TDS GEO CORE ENGINE INITIALIZATION

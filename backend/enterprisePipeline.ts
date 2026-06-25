@@ -19,6 +19,7 @@ import pexelsService from '../services/pexelsService';
 import enterpriseSecurity from '../services/enterpriseSecurity';
 import CostOptimizationService from '../services/costOptimization';
 import observability from '../services/observability';
+import geoIntelligence from '../services/geoIntelligence';
 
 export function createEnterprisePipelineRoutes(pool: Pool): Router {
   const router = Router();
@@ -187,6 +188,37 @@ export function createEnterprisePipelineRoutes(pool: Pool): Router {
           result.stages.cannibalization = { error: err.message };
         } finally {
           observability.endSpan(cannSpan);
+        }
+
+        // ── Stage 9: GEO (Generative Engine Optimization) Analysis ──
+        const geoAnalysisSpan = observability.startSpan({ name: 'pipeline.geo_analysis' });
+        try {
+          const geoResult = await geoIntelligence.analyze(fullContent);
+          result.stages.geo_analysis = {
+            overallScore: geoResult.overallScore,
+            overallPassing: geoResult.overallPassing,
+            perEngine: geoResult.engines.map(e => ({
+              engine: e.engine,
+              score: e.score,
+              passing: e.passing,
+              issues: e.issues.slice(0, 3),
+              strengths: e.strengths.slice(0, 2),
+            })),
+            topSuggestions: geoResult.suggestions.slice(0, 5),
+            entityDensity: geoResult.entityDensity,
+            definitionFirstScore: geoResult.definitionFirstScore,
+            citationReadiness: geoResult.citationReadiness,
+            geoImprovement: !geoResult.overallPassing
+          };
+          if (geoResult.overallScore < 50) {
+            const improved = await geoIntelligence.improveContent(fullContent);
+            result.stages.geo_analysis.improvedContent = improved.substring(0, 500) + '...';
+            result.stages.geo_analysis.improvementApplied = true;
+          }
+        } catch (err: any) {
+          result.stages.geo_analysis = { error: err.message };
+        } finally {
+          observability.endSpan(geoAnalysisSpan);
         }
       }
 

@@ -76,31 +76,34 @@ AI search engines are now the primary entry point for 40%+ of searches. They rea
 
 **ChatGPT (Web Browsing / GPTs):**
 Extracts the first clear definition it finds. Cites by summarizing H2 sections. Prefers direct language over nuance. ChatGPT loves: definitions, lists, step-by-step instructions, clear pro/con comparisons.
-→ Write: "X is defined as..." at the start of major sections. Use "First, Second, Third" for processes. End sections with a one-sentence takeaway.
+→ Write: Start EVERY major section with "X is defined as..." or "X refers to...". Use "First, Second, Third" for processes. End sections with a one-sentence takeaway in bold. Keep average sentence under 20 words. Use bullet-point summaries after each subsection.
 
 **Perplexity:**
-Searches for factual consistency across sources. It compares your article against others on the same topic. It cites the clearest, most authoritative source.
-→ Write: Be explicit about facts. Use specific numbers, dates, and names. Avoid vague language like "many studies show" — say "A 2025 Stanford study of 10,000 users found..." or be clear you're sharing opinion.
+Searches for factual consistency across sources. It compares your article against others on the same topic. It cites the clearest, most authoritative source. Perplexity rewards attribution and penalizes vague claims.
+→ Write: Be explicit about facts. Use specific numbers, dates, and names. Avoid vague language like "many studies show" — say "A 2025 Stanford study of 10,000 users found..." or be clear you're sharing opinion. Include at least 3 statistical claims with context. Add source attributions like "according to" and "research from". Keep section answers under 400 chars for snippet extraction.
 
-**Gemini:**
-Prefers structured, well-organized content with clear hierarchy. Gemini extracts entities and relationships. It values completeness and thoroughness.
-→ Write: Cover every subtopic comprehensively. Use consistent entity naming (always call it "conversion rate optimization" never switch to "CRO" then back). Include related concepts the reader might not have considered.
+**Gemini (Google SGE):**
+Prefers structured, well-organized content with clear hierarchy. Gemini extracts entities and relationships. It values completeness and thoroughness. Gemini displays Q&A pairs, lists, and tables in featured snippets.
+→ Write: Cover every subtopic comprehensively. Use consistent entity naming (always call it "conversion rate optimization" never switch to "CRO" then back). Include related concepts the reader might not have considered. Use Q&A format headings (e.g., "## What Is X?"). Include tables and bullet-point lists. Maintain minimum 1500 words across 5+ sections for topical authority. Demonstrate all 4 EEAT signals: Experience (hands-on), Expertise (credentials), Authority (citations), Trustworthiness (accuracy).
 
 **Claude (Projects / Citations):**
-Evaluates writing quality itself — sentence structure, clarity, originality. Claude prefers human-sounding prose and penalizes AI-sounding patterns.
-→ Write: Vary your sentence structure. Avoid list-of-list patterns. Use natural transitions. Let paragraphs have varied lengths. Include personal observations.
+Evaluates writing quality itself — sentence structure, clarity, originality. Claude prefers human-sounding prose and penalizes AI-sounding patterns. Claude values depth layering and consistent terminology.
+→ Write: Vary your sentence structure. Avoid list-of-list patterns. Use natural transitions. Let paragraphs have varied lengths. Include personal observations. Maintain uniform terminology throughout. Structure content in three depth layers: beginner → intermediate → expert. Include key takeaway blocks after each major section. Use logical progression markers ("first", "next", "finally", "consequently").
 
 ### GEO Technical Requirements:
-1. **Definition-first architecture** — Every major H2 section must begin with a clear definition of the concept being discussed. AI models use these as citation anchors.
-2. **Standalone section value** — Each H2 must be independently valuable if extracted alone. An AI answering a question might pull only one section.
-3. **Consistent terminology** — Pick one term per concept and use it everywhere. Never use "customer acquisition cost" in one paragraph and "CAC" in the next.
+1. **Definition-first architecture** — Every major H2 section must begin with a clear definition of the concept being discussed. AI models use these as citation anchors. Test: extract the first sentence of each H2 — they should form a coherent outline.
+2. **Standalone section value** — Each H2 must be independently valuable if extracted alone. An AI answering a question might pull only one section. Test: read any H2 in isolation — does it answer a complete question?
+3. **Consistent terminology** — Pick one term per concept and use it everywhere. Never use "customer acquisition cost" in one paragraph and "CAC" in the next. Test: search the article for alternative terms — there should be zero synonyms for key concepts.
 4. **Depth layering** — Each section must have three layers:
    - SURFACE: A clear, scannable summary (bold or lead sentence) — this is what AI extracts for brief answers
    - DETAIL: 2-3 paragraphs of explanation — this is what AI cites for comprehensive answers
    - EXPERT: Nuanced insight, edge cases, limitations — this is what earns AI's trust as authoritative
 5. **Citation-ready sentences** — Include 3-5 sentences per article that are independently quotable. Start them with definitive language. Example: "The single most important factor in [topic] is..." / "What most guides miss is..." / "Here's what the data actually shows..."
 6. **Key takeaway blocks** — After each H2, include a one-line "Key Takeaway" in bold. These become AI search engine snippets.
-7. **Entity density** — Include all related entities (tools, concepts, people, methodologies) explicitly. AI models build knowledge graphs from entity relationships.
+7. **Entity density** — Include all related entities (tools, concepts, people, methodologies) explicitly. AI models build knowledge graphs from entity relationships. Target 3%+ entity density (entities per 100 words).
+8. **Answer extraction format** — Use question headings where possible ("What Is X?", "How Does X Work?"). Keep the first answer sentence under 30 words for direct answer extraction.
+9. **Progressive disclosure** — Start each section with the simplest explanation, then layer complexity. This allows AI to extract at the appropriate depth level.
+10. **GEO Self-Check** — Before finishing, verify: (a) first sentence of each H2 is a definition, (b) each section works standalone, (c) 3+ statistical claims exist, (d) all 4 EEAT signals present, (e) entity density >3%, (f) no vague claims without attribution.
 
 ## PART 4: SEARCH INTENT MASTERY
 

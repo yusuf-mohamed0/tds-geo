@@ -6,6 +6,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import { authenticate, authorize } from '../middleware/auth';
 import { logger } from '../utils/logger';
+import { sitesService } from '../services/sitesService';
 
 export function createAdminRoutes(pool: Pool): Router {
   const router = Router();
@@ -212,6 +213,78 @@ export function createAdminRoutes(pool: Pool): Router {
       );
 
       res.json(result.rows);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ═══════ Connected Sites Registry ══════════════
+
+  router.get('/sites', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { platform, status, health, search } = req.query;
+      const sites = await sitesService.list({
+        platform: platform as any,
+        status: status as any,
+        health: health as any,
+        search: search as string,
+      });
+      const stats = await sitesService.getStats();
+      res.json({ success: true, data: sites, stats });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/sites/export', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { platform, status } = req.query;
+      const sites = await sitesService.list({
+        platform: platform as any,
+        status: status as any,
+      });
+
+      const ExcelJS = require('exceljs');
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'TDS Geo';
+      workbook.created = new Date();
+
+      const sheet = workbook.addWorksheet('Connected Sites');
+
+      sheet.columns = [
+        { header: 'Platform', key: 'platform', width: 14 },
+        { header: 'Site Name', key: 'site_name', width: 30 },
+        { header: 'Domain', key: 'domain', width: 40 },
+        { header: 'Status', key: 'connection_status', width: 16 },
+        { header: 'Health', key: 'health_status', width: 14 },
+        { header: 'Connected At', key: 'connected_at', width: 22 },
+        { header: 'Last Sync', key: 'last_sync_at', width: 22 },
+        { header: 'Last Publish', key: 'last_publish_at', width: 22 },
+        { header: 'Total Articles', key: 'total_articles_published', width: 16 },
+      ];
+
+      sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' } };
+      sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '171414' } };
+
+      for (const site of sites) {
+        sheet.addRow({
+          platform: site.platform,
+          site_name: site.site_name,
+          domain: site.domain,
+          connection_status: site.connection_status,
+          health_status: site.health_status,
+          connected_at: site.connected_at ? new Date(site.connected_at).toISOString().replace('T', ' ').slice(0, 19) : '-',
+          last_sync_at: site.last_sync_at ? new Date(site.last_sync_at).toISOString().replace('T', ' ').slice(0, 19) : '-',
+          last_publish_at: site.last_publish_at ? new Date(site.last_publish_at).toISOString().replace('T', ' ').slice(0, 19) : '-',
+          total_articles_published: site.total_articles_published || 0,
+        });
+      }
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=connected-sites-${new Date().toISOString().slice(0, 10)}.xlsx`);
+
+      await workbook.xlsx.write(res);
+      res.end();
     } catch (err) {
       next(err);
     }

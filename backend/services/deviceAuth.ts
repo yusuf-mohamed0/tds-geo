@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../utils/logger';
 import { DeviceFingerprint, DeviceRegistration, EmployeeSession } from '../types';
 
-const DEVICE_SALT = process.env.DEVICE_FINGERPRINT_SALT || 'tds-geo-device-fingerprint-salt-change-in-production';
+const DEVICE_SALT = process.env.DEVICE_FINGERPRINT_SALT || 'kozmo-core-device-fingerprint-salt-change-in-production';
 
 export class DeviceAuthService {
   private pool: Pool | null = null;

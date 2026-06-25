@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { randomBytes } from 'crypto';
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { sitesService } from '../services/sitesService';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
@@ -144,6 +145,16 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
       } catch (shopErr) {
         logger.warn('Failed to fetch shop info (non-fatal)', { shop, error: (shopErr as Error).message });
       }
+
+      await sitesService.register({
+        platform: 'shopify',
+        site_name: storeName,
+        domain: shop,
+        owner_name: storeName,
+        connector_id: clientId,
+        encrypted_credentials: accessToken,
+        connection_status: 'connected',
+      });
 
       logger.info('Shopify store installed successfully', { shop, storeName });
       res.redirect(`${SHOPIFY_APP_URL}/shopify/success?shop=${encodeURIComponent(shop)}&name=${encodeURIComponent(storeName)}`);
