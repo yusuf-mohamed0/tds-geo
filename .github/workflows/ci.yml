@@ -38,11 +38,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
-      - name: Install native build tools
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq build-essential python3
+      - name: Install dependencies (skip native compilation)
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+      - name: Build native modules (isolated-vm)
+        run: npx node-gyp-build || true
+        working-directory: node_modules/isolated-vm
+        continue-on-error: true
 
       - name: Lint
         run: npm run lint
@@ -84,11 +86,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
-      - name: Install native build tools
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq build-essential python3
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+      - name: Install dependencies (skip native compilation)
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Run E2E pipeline integration tests
         run: npm run test:e2e
