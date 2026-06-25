@@ -317,7 +317,7 @@ const AI_ENGINES: Array<{ name: string; criteria: GeoCriterion[] }> = [
             const matches = content.match(pattern);
             if (matches && matches.length > 1) {
               totalTerms += matches.length;
-              const preferredMatches = content.match(new RegExp(preferred.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'));
+              const preferredMatches = content.match(new RegExp(String(preferred).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'));
               if (preferredMatches) dominantTermCount += preferredMatches.length;
             }
           }
@@ -504,17 +504,10 @@ export class GeoIntelligenceService {
       const contextWindow = content.length / CHARS_PER_TOKEN + improvementPrompt.length / CHARS_PER_TOKEN;
       const maxNewTokens = Math.min(4096, Math.max(1024, Math.round(content.length / CHARS_PER_TOKEN * 0.5)));
 
-      const response = await openaiService.getClient()!.chat.completions.create({
-        model: openaiService.defaultModel,
-        messages: [
-          { role: 'system', content: 'You are a GEO content optimization specialist. Improve content for AI search engine visibility. Return only the improved content, no explanations.' },
-          { role: 'user', content: improvementPrompt },
-        ],
-        max_tokens: maxNewTokens,
-        temperature: 0.4,
-      });
-
-      const improved = response.choices[0]?.message?.content;
+      const improved = await openaiService.chat([
+        { role: 'system', content: 'You are a GEO content optimization specialist. Improve content for AI search engine visibility. Return only the improved content, no explanations.' },
+        { role: 'user', content: improvementPrompt },
+      ], { temperature: 0.4, maxTokens: maxNewTokens });
       if (improved && improved.length > content.length * 0.5) {
         return improved;
       }

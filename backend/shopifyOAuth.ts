@@ -5,8 +5,8 @@
 
 import crypto from 'crypto';
 import { Pool } from 'pg';
-import { logger } from '../utils/logger';
-import { generateSlug } from '../utils/stringUtils';
+import { logger } from './utils/logger';
+import { generateSlug } from './utils/stringUtils';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';

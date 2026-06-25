@@ -12,7 +12,7 @@ const PLANS: Record<string, { name: string; amount: number; interval: 'EVERY_30_
   enterprise: { name: 'Enterprise', amount: 19900, interval: 'EVERY_30_DAYS' },
 };
 
-async function shopifyGraphQL(shop: string, accessToken: string, query: string, variables?: Record<string, any>) {
+async function shopifyGraphQL(shop: string, accessToken: string, query: string, variables?: Record<string, any>): Promise<any> {
   const res = await fetch(`https://${shop}/admin/api/2024-07/graphql.json`, {
     method: 'POST',
     headers: {
@@ -151,7 +151,7 @@ export function createBillingRoutes(pool: Pool): Router {
             }
           }
         `;
-        const result = await shopifyGraphQL(shop, accessToken, query);
+        const result = await shopifyGraphQL(shop as string, accessToken, query);
 
         const status = result.data?.node?.status || 'ACTIVE';
         if (status === 'ACTIVE') {

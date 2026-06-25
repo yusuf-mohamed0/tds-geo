@@ -3,10 +3,10 @@
 // ──────────────────────────────────────────────
 
 import OpenAI from 'openai';
-import { logger } from '../utils/logger';
-import { countKeywordOccurrences } from '../utils/stringUtils';
-import { GeneratedArticle, GenerateBlogParams } from '../types';
-import { writingSystemPrompt } from '../prompts';
+import { logger } from './utils/logger';
+import { countKeywordOccurrences } from './utils/stringUtils';
+import { GeneratedArticle, GenerateBlogParams } from './types';
+import { writingSystemPrompt } from './prompts';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || '';
@@ -1048,7 +1048,7 @@ FORMATTING:
 // module is the OllamaService instead of OpenAIService.
 // This makes ALL consumers work without import changes.
 import ollamaService from './ollama';
-import type { AIService } from '../types';
+import type { AIService } from './types';
 
 const openaiSingleton = new OpenAIService();
 const aiProvider = (process.env.AI_PROVIDER || 'openai').toLowerCase();

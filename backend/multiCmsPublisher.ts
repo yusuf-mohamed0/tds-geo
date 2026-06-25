@@ -8,6 +8,7 @@ import { Pool } from 'pg';
 import { logger } from './utils/logger';
 import { Article, PublishResult, CmsProvider, CmsConnection, PublisherAdapter, PublisherCapabilities } from './types';
 import { generateSlug } from './utils/stringUtils';
+import { ConnectorInterface } from './sdk/connector-interface';
 import { wordpressConnector } from './connectors/wordpress';
 import { webflowConnector } from './connectors/webflow';
 import { ghostConnector } from './connectors/ghost';
@@ -28,17 +29,10 @@ class MultiCmsPublisherService {
   }
 
   private registerBuiltInAdapters(): void {
-    // Shopify adapter — standalone connector from backend/connectors/
-    this.adapters.set('shopify', shopifyConnector);
-
-    // WordPress adapter — standalone connector from backend/connectors/
-    this.adapters.set('wordpress', wordpressConnector);
-
-    // Webflow adapter — standalone connector from backend/connectors/
-    this.adapters.set('webflow', webflowConnector);
-
-    // Ghost adapter — standalone connector from backend/connectors/
-    this.adapters.set('ghost', ghostConnector);
+    this.adapters.set('shopify', this.wrapConnector(shopifyConnector, 'shopify'));
+    this.adapters.set('wordpress', this.wrapConnector(wordpressConnector, 'wordpress'));
+    this.adapters.set('webflow', this.wrapConnector(webflowConnector, 'webflow'));
+    this.adapters.set('ghost', this.wrapConnector(ghostConnector, 'ghost'));
 
     // ── Custom REST (Next.js TDS Geo Plugin) adapter ──
     // Publishes articles to any site running @tds-geo/nextjs-integration
@@ -72,6 +66,38 @@ class MultiCmsPublisherService {
         return [{ id: 1, title: 'Blog', handle: 'blog' }];
       }
     });
+  }
+
+  private wrapConnector(connector: ConnectorInterface, provider: CmsProvider): PublisherAdapter {
+    return {
+      provider,
+      name: connector.name,
+      capabilities: this.getDefaultCapabilities(provider),
+      testConnection: async () => {
+        const health = await connector.health();
+        return health.status === 'healthy';
+      },
+      publish: async (article, config) => {
+        const result = await connector.publish(article as any, config as any);
+        return {
+          id: result.externalId ? Number(result.externalId) : 0,
+          blogId: 0,
+          url: result.url || '',
+          handle: '',
+        };
+      },
+      update: async (id, article) => {
+        const result = await connector.update(id, article as any);
+        return {
+          id: Number(id),
+          blogId: 0,
+          url: result.url || '',
+          handle: '',
+        };
+      },
+      delete: async (id) => connector.delete(id),
+      getBlogs: async () => [{ id: 1, title: 'Blog', handle: 'blog' }],
+    };
   }
 
   private getDefaultCapabilities(provider: string): PublisherCapabilities {
@@ -140,7 +166,8 @@ class MultiCmsPublisherService {
 
     // Fall back to Shopify (default provider)
     logger.info('No target provider specified, publishing to Shopify (default)');
-    return shopifyConnector.publish(article, { publishImmediately: true });
+    const defaultAdapter = this.adapters.get('shopify')!;
+    return defaultAdapter.publish(article, { publishImmediately: true });
   }
 
   /**
