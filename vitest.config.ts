@@ -16,6 +16,7 @@ export default defineConfig({
       'backend/tests/integration/pipeline-e2e.test.ts',
       '**/node_modules/**',
       '**/dist/**',
+      'understand-anything-plugin/**',
     ],
   },
 });
