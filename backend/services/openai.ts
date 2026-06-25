@@ -7,12 +7,14 @@ import { logger } from '../utils/logger';
 import { countKeywordOccurrences } from '../utils/stringUtils';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
 import { writingSystemPrompt } from '../prompts';
+import resilience from '../services/circuitBreaker';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || '';
 
 class OpenAIService {
   private openaiClient: OpenAI | null = null;
+  private fallbackClient: OpenAI | null = null;
   public defaultModel: string = process.env.OPENAI_MODEL || 'gpt-4o';
   public maxTokens: number = parseInt(process.env.OPENAI_MAX_TOKENS || '4096', 10);
   public temperature: number = parseFloat(process.env.OPENAI_TEMPERATURE || '0.7');
@@ -26,7 +28,15 @@ class OpenAIService {
   }
 
   initialize(): void {
+    const fallbackKey = process.env.OPENAI_FALLBACK_KEY;
+
     if (!OPENAI_API_KEY) {
+      if (fallbackKey) {
+        this.openaiClient = new OpenAI({ apiKey: fallbackKey });
+        this.fallbackClient = null;
+        logger.info('OpenAI client initialized with fallback key (no primary)', { model: this.defaultModel });
+        return;
+      }
       logger.warn('No OpenAI API key set — operating in DEV MOCK mode with generated content');
       this.openaiClient = null;
       return;
@@ -36,14 +46,64 @@ class OpenAIService {
       apiKey: OPENAI_API_KEY,
       ...(OPENAI_BASE_URL ? { baseURL: OPENAI_BASE_URL } : {}),
     });
-    logger.info('OpenAI client initialized', { model: this.defaultModel });
+
+    if (fallbackKey) {
+      this.fallbackClient = new OpenAI({ apiKey: fallbackKey });
+      logger.info('OpenAI fallback client initialized');
+    }
+
+    logger.info('OpenAI client initialized', { model: this.defaultModel, hasFallback: !!fallbackKey });
   }
 
   /**
    * Get the active AI client.
+   * When a fallback client is configured, returns a wrapper that
+   * transparently routes chat.completions.create through the fallback
+   * if the primary client's call fails.
    */
+  private fallbackWrapper: OpenAI | null = null;
+
   private getClient(): OpenAI | null {
-    return this.openaiClient;
+    if (this.fallbackWrapper) return this.fallbackWrapper;
+    if (!this.openaiClient) return null;
+    if (!this.fallbackClient) return this.openaiClient;
+
+    const primary = this.openaiClient;
+    const fallback = this.fallbackClient;
+
+    this.fallbackWrapper = new Proxy(primary, {
+      get(target, prop, receiver) {
+        if (prop === 'chat') {
+          const chat = Reflect.get(target, prop, receiver);
+          return new Proxy(chat, {
+            get(chatTarget, chatProp, chatReceiver) {
+              if (chatProp === 'completions') {
+                const completions = Reflect.get(chatTarget, chatProp, chatReceiver);
+                return new Proxy(completions, {
+                  get(compTarget, compProp, compReceiver) {
+                    if (compProp === 'create') {
+                      return async (...args: any[]) => {
+                        try {
+                          return await (compTarget as any)(...args);
+                        } catch (err) {
+                          logger.warn('Primary OpenAI failed, retrying with fallback');
+                          return await (fallback.chat.completions.create as any)(...args);
+                        }
+                      };
+                    }
+                    return Reflect.get(compTarget, compProp, compReceiver);
+                  }
+                });
+              }
+              return Reflect.get(chatTarget, chatProp, chatReceiver);
+            }
+          });
+        }
+        return Reflect.get(target, prop, receiver);
+      }
+    });
+
+    return this.fallbackWrapper;
   }
 
   private ensureInitialized(): void {
@@ -125,21 +185,30 @@ class OpenAIService {
     try {
       logger.info('Generating blog post via OpenAI', { keyword, model: this.defaultModel });
 
-      const response = await this.getClient()!.chat.completions.create({
-        model: this.defaultModel,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: enrichedPrompt }
-        ],
-        max_tokens: this.maxTokens,
-        temperature: this.temperature,
-        response_format: { type: 'json_object' }
-      });
+      const response = await resilience.getCircuitBreaker().call(
+        'openai-generate-blog',
+        async () => {
+          return this.getClient()!.chat.completions.create({
+            model: this.defaultModel,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: enrichedPrompt }
+            ],
+            max_tokens: this.maxTokens,
+            temperature: this.temperature,
+            response_format: { type: 'json_object' }
+          });
+        },
+        async () => {
+          logger.error('OpenAI generate-blog circuit open');
+          throw new Error('OpenAI circuit breaker open — unable to generate blog post');
+        }
+      );
 
       const tokensIn = response.usage?.prompt_tokens || 0;
       const tokensOut = response.usage?.completion_tokens || 0;
 
-      const result = JSON.parse(response.choices[0].message.content || '{}');
+      const result = JSON.parse(response?.choices?.[0]?.message?.content || '{}');
 
       if (!result.title || !result.content) {
         throw new Error('OpenAI response missing required fields (title, content)');
@@ -188,26 +257,35 @@ class OpenAIService {
     }
     this.ensureInitialized();
 
-    const response = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an SEO expert. Analyze the given content for the target keyword "${keyword}".
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-seo-analyze',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an SEO expert. Analyze the given content for the target keyword "${keyword}".
 Score the content from 0-100 and provide actionable improvements.
 Respond in JSON format with keys: score, keywordDensity, suggestions[], headingStructure[], readabilityScore.`
-        },
-        {
-          role: 'user',
-          content: `Content:\n\n${content.slice(0, 8000)}`
-        }
-      ],
-      max_tokens: 1500,
-      temperature: 0.3,
-      response_format: { type: 'json_object' }
-    });
+            },
+            {
+              role: 'user',
+              content: `Content:\n\n${content.slice(0, 8000)}`
+            }
+          ],
+          max_tokens: 1500,
+          temperature: 0.3,
+          response_format: { type: 'json_object' }
+        });
+      },
+      async () => {
+        logger.warn('OpenAI SEO analysis circuit open — returning empty result');
+        return null;
+      }
+    );
 
-    return JSON.parse(response.choices[0].message.content || '{}');
+    return JSON.parse(response?.choices[0]?.message?.content || '{}');
   }
 
   async generateKeywordVariations(seedKeyword: string, count: number = 10): Promise<string[]> {
@@ -216,26 +294,35 @@ Respond in JSON format with keys: score, keywordDensity, suggestions[], headingS
     }
     this.ensureInitialized();
 
-    const response = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an SEO keyword researcher. Generate ${count} related long-tail keyword variations for the given seed keyword.
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-keyword-variations',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an SEO keyword researcher. Generate ${count} related long-tail keyword variations for the given seed keyword.
 Focus on: informational intent, question-based queries, and "near me" variations for local SEO.
 Respond with a JSON array of strings only.`
-        },
-        {
-          role: 'user',
-          content: `Seed keyword: "${seedKeyword}"`
-        }
-      ],
-      max_tokens: 1000,
-      temperature: 0.5,
-      response_format: { type: 'json_object' }
-    });
+            },
+            {
+              role: 'user',
+              content: `Seed keyword: "${seedKeyword}"`
+            }
+          ],
+          max_tokens: 1000,
+          temperature: 0.5,
+          response_format: { type: 'json_object' }
+        });
+      },
+      async () => {
+        logger.warn('OpenAI keyword variations circuit open — returning empty array');
+        return null;
+      }
+    );
 
-    const result = JSON.parse(response.choices[0].message.content || '{}');
+    const result = JSON.parse(response?.choices?.[0]?.message?.content || '{}');
     const keywords = Array.isArray(result) ? result : ((result as any).keywords || (result as any).variations || []);
     return keywords.slice(0, count);
   }
@@ -259,12 +346,15 @@ Respond with a JSON array of strings only.`
     this.ensureInitialized();
 
     // First, generate an optimized image prompt
-    const promptResponse = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an expert image prompt engineer for a maintenance/property care company.
+    const promptResponse = await resilience.getCircuitBreaker().call(
+      'openai-image-prompt',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an expert image prompt engineer for a maintenance/property care company.
 Create a detailed DALL-E prompt for a blog article image that is:
 - Professional and realistic
 - Safe and appropriate for all audiences
@@ -273,27 +363,42 @@ Create a detailed DALL-E prompt for a blog article image that is:
 - Style: clean, well-lit, professional photography
 
 Respond ONLY with the prompt text, max 400 characters.`
-        },
-        {
-          role: 'user',
-          content: `Create an image prompt for a blog article titled: "${articleTitle}" about "${keyword}". Tone: ${tone}.`
-        }
-      ],
-      max_tokens: 200,
-      temperature: 0.7
-    });
+            },
+            {
+              role: 'user',
+              content: `Create an image prompt for a blog article titled: "${articleTitle}" about "${keyword}". Tone: ${tone}.`
+            }
+          ],
+          max_tokens: 200,
+          temperature: 0.7
+        });
+      },
+      async () => {
+        logger.warn('OpenAI image prompt circuit open — using fallback');
+        return null;
+      }
+    );
 
-    const imagePrompt = promptResponse.choices[0].message.content?.trim() || `Professional maintenance service for ${keyword}`;
+    const imagePrompt = promptResponse?.choices?.[0]?.message?.content?.trim() || `Professional maintenance service for ${keyword}`;
 
     // Generate the image (only supported via OpenAI's DALL-E)
-    const imageResponse = await this.openaiClient!.images.generate({
-      model: 'dall-e-3',
-      prompt: imagePrompt,
-      n: 1,
-      size: '1792x1024',
-      quality: 'standard',
-      style: 'vivid'
-    });
+    const imageResponse = await resilience.getCircuitBreaker().call(
+      'openai-image-generate',
+      async () => {
+        return this.openaiClient!.images.generate({
+          model: 'dall-e-3',
+          prompt: imagePrompt,
+          n: 1,
+          size: '1792x1024',
+          quality: 'standard',
+          style: 'vivid'
+        });
+      },
+      async () => {
+        logger.error('OpenAI image generation circuit open');
+        throw new Error('Image generation circuit breaker open');
+      }
+    );
 
     const imageData0 = imageResponse.data?.[0];
     const imageUrl = imageData0?.url;
@@ -302,23 +407,32 @@ Respond ONLY with the prompt text, max 400 characters.`
     }
 
     // Generate SEO alt text
-    const altResponse = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: 'You generate concise, SEO-optimized image alt text (max 125 characters). Respond with only the alt text.'
-        },
-        {
-          role: 'user',
-          content: `Generate alt text for a blog image about: ${articleTitle}. Keyword: ${keyword}`
-        }
-      ],
-      max_tokens: 100,
-      temperature: 0.3
-    });
+    const altResponse = await resilience.getCircuitBreaker().call(
+      'openai-image-alt',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: 'You generate concise, SEO-optimized image alt text (max 125 characters). Respond with only the alt text.'
+            },
+            {
+              role: 'user',
+              content: `Generate alt text for a blog image about: ${articleTitle}. Keyword: ${keyword}`
+            }
+          ],
+          max_tokens: 100,
+          temperature: 0.3
+        });
+      },
+      async () => {
+        logger.warn('OpenAI alt text circuit open — using fallback');
+        return null;
+      }
+    );
 
-    const altText = altResponse.choices[0].message.content?.trim().slice(0, 125) || `${keyword} professional maintenance service`;
+    const altText = altResponse?.choices?.[0]?.message?.content?.trim().slice(0, 125) || `${keyword} professional maintenance service`;
 
     return { imageUrl, altText, prompt: imagePrompt };
   }
@@ -336,12 +450,15 @@ Respond ONLY with the prompt text, max 400 characters.`
     }
     this.ensureInitialized();
 
-    const response = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an SEO title expert for a maintenance company.
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-generate-title',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an SEO title expert for a maintenance company.
 Generate a single compelling, click-worthy blog title for the given keyword.
 Rules:
 - Max 60 characters
@@ -350,17 +467,23 @@ Rules:
 - Sound professional and trustworthy
 - NEVER make dangerous DIY promises
 - Respond with ONLY the title text, no quotes or formatting`
-        },
-        {
-          role: 'user',
-          content: `Keyword: "${keyword}"${brandVoice ? `\nBrand voice: ${brandVoice}` : ''}`
-        }
-      ],
-      max_tokens: 100,
-      temperature: 0.7
-    });
+            },
+            {
+              role: 'user',
+              content: `Keyword: "${keyword}"${brandVoice ? `\nBrand voice: ${brandVoice}` : ''}`
+            }
+          ],
+          max_tokens: 100,
+          temperature: 0.7
+        });
+      },
+      async () => {
+        logger.warn('OpenAI title generation circuit open — using fallback title');
+        return null;
+      }
+    );
 
-    return (response.choices[0].message.content || '').replace(/^["']|["']$/g, '').trim();
+    return (response?.choices?.[0]?.message?.content || keyword).replace(/^["']|["']$/g, '').trim();
   }
 
   /**
@@ -376,30 +499,39 @@ Rules:
       ? `\nAVOID these topics: ${blacklistKeywords.join(', ')}`
       : '';
 
-    const response = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are a content strategist. Generate a detailed article outline with H2 headings.
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-generate-outline',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are a content strategist. Generate a detailed article outline with H2 headings.
 Rules:
 - Include 4-6 H2 sections
 - Each H2 should be a distinct subtopic
 - Prioritize educational content, warning signs, and preventative maintenance
 - Avoid dangerous DIY instructions${blacklistStr}
 - Respond with a JSON array of strings, e.g. ["Section 1", "Section 2"]`
-        },
-        {
-          role: 'user',
-          content: `Title: "${title}"\nKeyword: "${keyword}"`
-        }
-      ],
-      max_tokens: 500,
-      temperature: 0.5,
-      response_format: { type: 'json_object' }
-    });
+            },
+            {
+              role: 'user',
+              content: `Title: "${title}"\nKeyword: "${keyword}"`
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.5,
+          response_format: { type: 'json_object' }
+        });
+      },
+      async () => {
+        logger.warn('OpenAI outline generation circuit open — returning empty array');
+        return null;
+      }
+    );
 
-    const result = JSON.parse(response.choices[0].message.content || '[]');
+    const result = JSON.parse(response?.choices?.[0]?.message?.content || '[]');
     return Array.isArray(result) ? result : (result.sections || result.outline || []);
   }
 
@@ -413,12 +545,15 @@ Rules:
     }
     this.ensureInitialized();
 
-    const response = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an SEO content optimizer. Improve the given article for the target keyword "${keyword}".
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-seo-enhance',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an SEO content optimizer. Improve the given article for the target keyword "${keyword}".
 Guidelines:
 - Ensure the keyword appears naturally in H2 headings and first 100 words
 - Improve heading structure (H2 for main sections, H3 for subsections)
@@ -427,17 +562,23 @@ Guidelines:
 - Keep the same tone and voice
 - Do NOT add or remove factual claims
 - Return the full improved article in markdown ONLY, no explanation`
-        },
-        {
-          role: 'user',
-          content: `Keyword: "${keyword}"\n\nContent:\n${content.slice(0, 10000)}`
-        }
-      ],
-      max_tokens: this.maxTokens,
-      temperature: 0.3
-    });
+            },
+            {
+              role: 'user',
+              content: `Keyword: "${keyword}"\n\nContent:\n${content.slice(0, 10000)}`
+            }
+          ],
+          max_tokens: this.maxTokens,
+          temperature: 0.3
+        });
+      },
+      async () => {
+        logger.warn('OpenAI SEO enhance circuit open — returning original content');
+        return null;
+      }
+    );
 
-    return response.choices[0].message.content || content;
+    return response?.choices?.[0]?.message?.content || content;
   }
 
   /**
@@ -449,12 +590,15 @@ Guidelines:
     }
     this.ensureInitialized();
 
-    const response = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an FAQ content creator for a maintenance company.
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-generate-faq',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an FAQ content creator for a maintenance company.
 Generate ${count} frequently asked questions and answers about the given topic.
 Rules:
 - Questions should be what customers actually search for
@@ -467,17 +611,23 @@ Rules:
 
 ### Question 1?
 Answer...`
-        },
-        {
-          role: 'user',
-          content: `Generate FAQs about: "${keyword}"`
-        }
-      ],
-      max_tokens: 800,
-      temperature: 0.5
-    });
+            },
+            {
+              role: 'user',
+              content: `Generate FAQs about: "${keyword}"`
+            }
+          ],
+          max_tokens: 800,
+          temperature: 0.5
+        });
+      },
+      async () => {
+        logger.warn('OpenAI FAQ generation circuit open — returning empty string');
+        return null;
+      }
+    );
 
-    return response.choices[0].message.content || '';
+    return response?.choices?.[0]?.message?.content || '';
   }
 
   /**
@@ -492,26 +642,35 @@ Answer...`
     }
     this.ensureInitialized();
 
-    const response = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are an SEO metadata specialist.
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-generate-metadata',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an SEO metadata specialist.
 Generate meta title (max 60 chars) and meta description (max 160 chars) for the given article.
 Respond ONLY with JSON: {"metaTitle": "...", "metaDescription": "..."}`
-        },
-        {
-          role: 'user',
-          content: `Title: "${title}"\nKeyword: "${keyword}"\nContent excerpt: ${content.slice(0, 500)}`
-        }
-      ],
-      max_tokens: 200,
-      temperature: 0.3,
-      response_format: { type: 'json_object' }
-    });
+            },
+            {
+              role: 'user',
+              content: `Title: "${title}"\nKeyword: "${keyword}"\nContent excerpt: ${content.slice(0, 500)}`
+            }
+          ],
+          max_tokens: 200,
+          temperature: 0.3,
+          response_format: { type: 'json_object' }
+        });
+      },
+      async () => {
+        logger.warn('OpenAI metadata generation circuit open — returning fallback');
+        return null;
+      }
+    );
 
-    const result = JSON.parse(response.choices[0].message.content || '{}');
+    const result = JSON.parse(response?.choices?.[0]?.message?.content || '{}');
     return {
       metaTitle: result.metaTitle || title,
       metaDescription: result.metaDescription || ''
@@ -533,12 +692,15 @@ Respond ONLY with JSON: {"metaTitle": "...", "metaDescription": "..."}`
     }
     this.ensureInitialized();
 
-    const response = await this.getClient()!.chat.completions.create({
-      model: this.defaultModel,
-      messages: [
-        {
-          role: 'system',
-          content: `You are a content safety moderator for a home maintenance company.
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-moderate-content',
+      async () => {
+        return this.getClient()!.chat.completions.create({
+          model: this.defaultModel,
+          messages: [
+            {
+              role: 'system',
+              content: `You are a content safety moderator for a home maintenance company.
 Review the content and flag any:
 - Dangerous DIY repair instructions (electrical, gas, plumbing, structural)
 - Medical or health claims
@@ -552,18 +714,28 @@ Respond with JSON:
   "flags": [{"category": "string", "severity": "low|medium|high|critical", "text": "offending text"}],
   "summary": "brief summary of findings"
 }`
-        },
-        {
-          role: 'user',
-          content: content.slice(0, 8000)
-        }
-      ],
-      max_tokens: 500,
-      temperature: 0.2,
-      response_format: { type: 'json_object' }
-    });
+            },
+            {
+              role: 'user',
+              content: content.slice(0, 8000)
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.2,
+          response_format: { type: 'json_object' }
+        });
+      },
+      async () => {
+        logger.warn('OpenAI moderate content circuit open — returning safe fallback');
+        return null;
+      }
+    );
 
-    return JSON.parse(response.choices[0].message.content || '{}');
+    const moderateResult = response?.choices?.[0]?.message?.content;
+    if (!moderateResult) {
+      return { safe: true, flags: [], summary: 'Circuit breaker fallback: content not moderated' };
+    }
+    return JSON.parse(moderateResult);
   }
 
   /**
@@ -581,13 +753,23 @@ Respond with JSON:
     this.ensureInitialized();
 
     try {
-      const response = await this.getClient()!.chat.completions.create({
-        model: this.defaultModel,
-        messages: messages as any[],
-        max_tokens: options?.maxTokens || 1000,
-        temperature: options?.temperature ?? 0.7,
-      });
-      return response.choices[0].message.content || '';
+      const result = await resilience.getCircuitBreaker().call(
+        'openai-chat',
+        async () => {
+          const response = await this.getClient()!.chat.completions.create({
+            model: this.defaultModel,
+            messages: messages as any[],
+            max_tokens: options?.maxTokens || 1000,
+            temperature: options?.temperature ?? 0.7,
+          });
+          return response.choices[0].message.content || '';
+        },
+        async () => {
+          logger.warn('OpenAI chat circuit open — returning null');
+          return '' as string;
+        }
+      );
+      return result || null;
     } catch (err) {
       logger.error('AI chat completion failed', { error: (err as Error).message });
       return null;

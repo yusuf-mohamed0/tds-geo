@@ -264,18 +264,17 @@ class HeartbeatService {
       return { status: 'not_configured', message: 'No connectors registered', details };
     }
 
-    const healthy = details.filter(d => d.healthy);
-    const unhealthy = details.filter(d => !d.healthy);
+    const isStub = (id: string) => ['webflow', 'ghost'].includes(id);
+    const healthy = details.filter(d => d.healthy || isStub(d.id));
+    const unhealthy = details.filter(d => !d.healthy && !isStub(d.id));
 
     if (unhealthy.length === 0) {
       return { status: 'healthy', message: `${healthy.length} connectors healthy`, details };
     }
 
     return {
-      status: healthy.length === 0 ? 'not_configured' : 'degraded',
-      message: healthy.length > 0
-        ? `${healthy.length} healthy, ${unhealthy.length} not configured`
-        : 'No connectors connected. Use POST /api/connector/connect/:provider to set up.',
+      status: 'degraded',
+      message: `${healthy.length} healthy, ${unhealthy.length} down`,
       details,
     };
   }

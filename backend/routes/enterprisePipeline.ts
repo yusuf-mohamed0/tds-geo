@@ -6,6 +6,7 @@
 import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { authenticate, authorize } from '../middleware/auth';
+import { clientRateLimit } from '../middleware/rateLimiter';
 import { logger } from '../utils/logger';
 import openaiService from '../services/openai';
 import seoService from '../services/seo';
@@ -39,7 +40,7 @@ export function createEnterprisePipelineRoutes(pool: Pool): Router {
   // FULL ENTERPRISE PIPELINE
   // ════════════════════════════════════════════════════
 
-  router.post('/run', authenticate, authorize('editor', 'admin'), async (req: Request, res: Response) => {
+  router.post('/run', clientRateLimit({ windowMs: 60_000, max: 5, name: 'enterprise-run', message: 'Pipeline run limit reached. Max 5 per minute.' }), authenticate, authorize('editor', 'admin'), async (req: Request, res: Response) => {
     const traceId = observability.startSpan({ name: 'enterprise_pipeline' });
 
     try {
@@ -256,7 +257,7 @@ export function createEnterprisePipelineRoutes(pool: Pool): Router {
   // OPTIMIZED CHEAP-TO-PREMIUM GENERATION
   // ════════════════════════════════════════════════════
 
-  router.post('/optimized-generate', authenticate, authorize('editor', 'admin'), async (req: Request, res: Response) => {
+  router.post('/optimized-generate', clientRateLimit({ windowMs: 60_000, max: 10, name: 'optimized-generate', message: 'Optimized generate limit reached. Max 10 per minute.' }), authenticate, authorize('editor', 'admin'), async (req: Request, res: Response) => {
     try {
       const { client_id, keyword, task_type } = req.body;
       const costOpt = CostOptimizationService.getInstance();

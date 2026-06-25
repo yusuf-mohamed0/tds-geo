@@ -2,19 +2,12 @@ import { logger } from '../../utils/logger';
 import { eventBus } from '../../event-bus';
 import { Events } from '../../event-bus/events';
 import shopifyService from '../../services/shopify';
-import multiCmsPublisher from '../../services/multiCmsPublisher';
+import { connectorManager } from '../../connector-manager';
+import { PublishResult, ContentPayload } from '../../sdk/connector-interface';
 
 export interface PublishTarget {
   provider: 'shopify' | 'wordpress' | 'webflow' | 'ghost' | 'custom';
-  config: any;
-}
-
-export interface PublishResult {
-  success: boolean;
-  provider: string;
-  externalId?: string;
-  url?: string;
-  error?: string;
+  config?: any;
 }
 
 export class PublisherEngine {
@@ -64,7 +57,44 @@ export class PublisherEngine {
   }
 
   private async publishToTarget(article: any, target: PublishTarget): Promise<PublishResult> {
-    return { success: false, provider: target.provider, error: 'Not implemented for this provider' };
+    const connector = connectorManager.get(target.provider);
+    if (!connector) {
+      return { success: false, provider: target.provider, error: `No connector registered for provider "${target.provider}"` };
+    }
+
+    const payload: ContentPayload = {
+      title: article.title || article.name || '',
+      content: article.content_html || article.content || '',
+      excerpt: article.excerpt || article.meta_description || '',
+      slug: article.slug || '',
+      status: article.status === 'draft' ? 'draft' : 'published',
+      categories: article.categories || [],
+      tags: article.tags || [],
+      metaTitle: article.meta_title || article.metaTitle || '',
+      metaDescription: article.meta_description || article.metaDescription || '',
+      imageUrl: article.image_url || article.imageUrl || '',
+    };
+
+    try {
+      const result = await connector.publish(payload);
+      await eventBus.emit(Events.PUBLISH_SUCCEEDED, {
+        articleId: article.id || payload.slug,
+        provider: target.provider,
+        url: result.url,
+      });
+      return result;
+    } catch (err) {
+      await eventBus.emit(Events.PUBLISH_FAILED, {
+        articleId: article.id || payload.slug,
+        provider: target.provider,
+        error: (err as Error).message,
+      });
+      return { success: false, provider: target.provider, error: (err as Error).message };
+    }
+  }
+
+  getConnector(provider: string) {
+    return connectorManager.get(provider);
   }
 
   async sync(provider: string, config: any): Promise<number> {

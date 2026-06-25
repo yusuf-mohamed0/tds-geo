@@ -6,6 +6,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import { authenticate, authorize } from '../middleware/auth';
 import { logger } from '../utils/logger';
+import { checkRedisHealth } from '../utils/redisHealth';
+import { validate, adminNotifySchema } from '../validators/index';
 import { sitesService } from '../services/sitesService';
 
 export function createAdminRoutes(pool: Pool): Router {
@@ -114,19 +116,8 @@ export function createAdminRoutes(pool: Pool): Router {
       // Check database
       await pool.query('SELECT 1');
 
-      // Check Redis (if configured)
-      let redisStatus = 'not_configured';
-      try {
-        if (process.env.REDIS_URL) {
-          const Redis = require('ioredis');
-          const redis = new Redis(process.env.REDIS_URL, { connectTimeout: 3000, maxRetriesPerRequest: 1 });
-          await redis.ping();
-          await redis.quit();
-          redisStatus = 'healthy';
-        }
-      } catch {
-        redisStatus = 'unhealthy';
-      }
+      // Check Redis (shared client)
+      const redisStatus = await checkRedisHealth();
 
       const dbDuration = Date.now() - start;
 
@@ -291,14 +282,9 @@ export function createAdminRoutes(pool: Pool): Router {
   });
 
   // ─── Broadcast Notification ────────────────
-  router.post('/notify', async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/notify', validate(adminNotifySchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { message, level = 'info', clientIds } = req.body;
-
-      if (!message) {
-        res.status(400).json({ error: 'Message is required' });
-        return;
-      }
 
       if (clientIds && Array.isArray(clientIds)) {
         for (const clientId of clientIds) {

@@ -6,6 +6,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import { authenticate } from '../middleware/auth';
+import { validate, createSessionSchema, sendMessageSchema, executeCommandSchema } from '../validators/index';
 import { logger, logActivity } from '../utils/logger';
 import chatEngine from '../services/chatEngine';
 
@@ -30,7 +31,7 @@ export function createChatRoutes(pool: Pool): Router {
   });
 
   // ─── Create session ────────────────────────
-  router.post('/sessions', async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/sessions', validate(createSessionSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as any).user;
       const { title } = req.body;
@@ -63,15 +64,10 @@ export function createChatRoutes(pool: Pool): Router {
   });
 
   // ─── Send message to session ────────────────
-  router.post('/sessions/:id/messages', async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/sessions/:id/messages', validate(sendMessageSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as any).user;
-      const { content } = req.body;
-
-      if (!content || !content.trim()) {
-        res.status(400).json({ error: 'Message content is required' });
-        return;
-      }
+      const { message: content } = req.body;
 
       // Verify session belongs to user
       const session = await pool.query(
@@ -147,15 +143,10 @@ export function createChatRoutes(pool: Pool): Router {
   });
 
   // ─── Quick command (no session needed) ──────
-  router.post('/command', async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/command', validate(executeCommandSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as any).user;
       const { command } = req.body;
-
-      if (!command || !command.trim()) {
-        res.status(400).json({ error: 'Command is required' });
-        return;
-      }
 
       const result = await chatEngine.generateResponse(command, [], user);
 

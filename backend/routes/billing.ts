@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { validate, createBillingSchema } from '../validators/index';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
@@ -39,12 +40,8 @@ export function createBillingRoutes(pool: Pool): Router {
     });
   });
 
-  router.post('/create', async (req: Request, res: Response) => {
+  router.post('/create', validate(createBillingSchema), async (req: Request, res: Response) => {
     const { shop, plan: planId, returnUrl } = req.body;
-    if (!shop || !planId) {
-      res.status(400).json({ error: 'shop and plan required' });
-      return;
-    }
 
     const plan = PLANS[planId];
     if (!plan) {

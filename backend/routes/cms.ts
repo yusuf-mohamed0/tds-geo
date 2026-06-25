@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { Pool } from "pg";
 import { authenticate, authorize } from "../middleware/auth";
+import { clientRateLimit } from "../middleware/rateLimiter";
 import multiCmsPublisher from "../services/multiCmsPublisher";
 
 export function createCmsRoutes(pool: Pool): Router {
@@ -34,7 +35,7 @@ export function createCmsRoutes(pool: Pool): Router {
     }
   });
 
-  router.post("/publish", authenticate, authorize("admin", "editor"), async (req: Request, res: Response) => {
+  router.post("/publish", clientRateLimit({ windowMs: 60_000, max: 20, name: 'cms-publish', message: 'Publish limit reached.' }), authenticate, authorize("admin", "editor"), async (req: Request, res: Response) => {
     try {
       const { article_id, connection_id } = req.body;
       const connections = await multiCmsPublisher.getConnections(req.body.client_id || (req as any).user.clientId);
@@ -51,7 +52,7 @@ export function createCmsRoutes(pool: Pool): Router {
     }
   });
 
-  router.post("/publish-all", authenticate, authorize("admin", "editor"), async (req: Request, res: Response) => {
+  router.post("/publish-all", clientRateLimit({ windowMs: 60_000, max: 10, name: 'cms-publish-all', message: 'Publish-all limit reached. Max 10 per minute.' }), authenticate, authorize("admin", "editor"), async (req: Request, res: Response) => {
     try {
       const { article_id, client_id } = req.body;
       const article = await pool.query("SELECT * FROM articles WHERE id = $1", [article_id]);

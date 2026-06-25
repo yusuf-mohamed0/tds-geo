@@ -2,6 +2,7 @@
 // JWT Authentication & Authorization Middleware
 // ──────────────────────────────────────────────
 
+import crypto from 'crypto';
 import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
@@ -11,7 +12,13 @@ import { JwtPayload, UserRole, DeviceFingerprint } from '../types';
 import { logger } from '../utils/logger';
 import deviceAuthService from '../services/deviceAuth';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'change-this-in-production-secret-key';
+const JWT_SECRET = (() => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production');
+  }
+  return secret || 'change-this-in-production-secret-key';
+})();
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 const SESSION_TTL_HOURS = parseInt(process.env.SESSION_TTL_HOURS || '24', 10);
 
@@ -46,15 +53,22 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
   // Allow API key auth for connector integrations (WordPress, etc.)
   if (apiKey) {
     const allowedKey = process.env.KOZMO_AI_WORDPRESS_API_KEY || process.env.API_KEY;
-    if (allowedKey && apiKey === allowedKey) {
-      (req as any).user = {
-        id: 'connector',
-        clientId: null,
-        role: 'connector',
-        email: 'connector@kozmocore.ai',
-      };
-      next();
-      return;
+    if (allowedKey) {
+      const keyBuf = Buffer.from(apiKey);
+      const allowedBuf = Buffer.from(allowedKey);
+      const match = keyBuf.length === allowedBuf.length
+        ? crypto.timingSafeEqual(keyBuf, allowedBuf)
+        : (crypto.timingSafeEqual(keyBuf, keyBuf), false);
+      if (match) {
+        (req as any).user = {
+          id: 'connector',
+          clientId: null,
+          role: 'connector',
+          email: 'connector@kozmocore.ai',
+        };
+        next();
+        return;
+      }
     }
     res.status(401).json({ error: 'Invalid API key' });
     return;

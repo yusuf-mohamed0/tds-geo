@@ -17,6 +17,8 @@ services:
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-ai_seo_automation}
       - REDIS_URL=redis://redis:6379
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+      - OPENAI_FALLBACK_KEY=${OPENAI_FALLBACK_KEY:-}
       - SHOPIFY_DEFAULT_SHOP=${SHOPIFY_DEFAULT_SHOP}
       - SHOPIFY_DEFAULT_ACCESS_TOKEN=${SHOPIFY_DEFAULT_ACCESS_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
@@ -45,6 +47,8 @@ services:
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-ai_seo_automation}
       - REDIS_URL=redis://redis:6379
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+      - OPENAI_FALLBACK_KEY=${OPENAI_FALLBACK_KEY:-}
       - SHOPIFY_DEFAULT_SHOP=${SHOPIFY_DEFAULT_SHOP}
       - SHOPIFY_DEFAULT_ACCESS_TOKEN=${SHOPIFY_DEFAULT_ACCESS_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
@@ -56,6 +60,28 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    networks:
+      - ai-seo-network
+
+  # ─── FreeLLMAPI (Free LLM Proxy) ────────────
+  freellmapi:
+    image: ghcr.io/tashfeenahmed/freellmapi:latest
+    container_name: ai-seo-freellmapi
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      ENCRYPTION_KEY: ${FREELMAPI_ENCRYPTION_KEY:-}
+    ports:
+      - "${HOST_BIND:-127.0.0.1}:3001:3001"
+    volumes:
+      - freellmapi-data:/app/server/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/ping').then((r) => { if (!r.ok) process.exit(1); }).catch(() => process.exit(1));"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
     networks:
       - ai-seo-network
 
@@ -119,10 +145,39 @@ services:
     networks:
       - ai-seo-network
 
+  # ─── Database Backups ────────────────────────
+  db-backup:
+    image: postgres:16-alpine
+    container_name: ai-seo-db-backup
+    restart: unless-stopped
+    environment:
+      - DB_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-ai_seo_automation}
+      - BACKUP_DIR=/backups
+      - RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-7}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - S3_BUCKET=${S3_BUCKET:-}
+    volumes:
+      - db-backups:/backups
+      - ./scripts/backup-db.sh:/usr/local/bin/backup-db.sh:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "
+        chmod +x /usr/local/bin/backup-db.sh &&
+        echo '0 3 * * * /usr/local/bin/backup-db.sh' | crontab - &&
+        crond -f -l 2
+      "
+    networks:
+      - ai-seo-network
+
 volumes:
   postgres-data:
   redis-data:
+  freellmapi-data:
   nginx-logs:
+  db-backups:
 
 networks:
   ai-seo-network:

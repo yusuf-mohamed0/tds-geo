@@ -132,7 +132,9 @@ async function handleContentGeneration(job: Job): Promise<Record<string, unknown
     content: article.content,
     metaTitle: article.metaTitle,
     metaDescription: article.metaDescription,
-    tags: article.tags
+    tags: article.tags,
+    faqSection: article.faqSection || '',
+    metadata: article.metadata || undefined,
   };
 }
 

@@ -120,6 +120,16 @@ export const createScheduleSchema = Joi.object({
   config: Joi.object().default({})
 });
 
+// ─── GEO Intelligence ─────────────────────────
+
+export const geoAnalyzeSchema = Joi.object({
+  content: Joi.string().min(100).required()
+});
+
+export const geoImproveSchema = Joi.object({
+  content: Joi.string().min(100).required()
+});
+
 // ─── SEO Analysis ─────────────────────────────
 
 export const seoAnalyzeSchema = Joi.object({
@@ -133,6 +143,99 @@ export const generateImageSchema = Joi.object({
   articleTitle: Joi.string().required(),
   keyword: Joi.string().required(),
   tone: Joi.string().default('professional')
+});
+
+// ─── Billing ──────────────────────────────────
+
+export const createBillingSchema = Joi.object({
+  shop: Joi.string().required(),
+  plan: Joi.string().valid('starter', 'professional', 'enterprise').required(),
+  returnUrl: Joi.string().uri().optional()
+});
+
+// ─── Embedded (Shopify App) ───────────────────
+
+export const embeddedGenerateSchema = Joi.object({
+  keyword: Joi.string().min(2).max(500).required(),
+  blogId: Joi.alternatives().try(Joi.number(), Joi.string()).optional()
+});
+
+export const embeddedPublishAllSchema = Joi.object({
+  articleId: Joi.alternatives().try(Joi.number(), Joi.string()).required(),
+  blogId: Joi.alternatives().try(Joi.number(), Joi.string()).optional()
+});
+
+export const embeddedSyncSchema = Joi.object({
+  blogId: Joi.alternatives().try(Joi.number(), Joi.string()).optional()
+});
+
+export const embeddedGeoAnalyzeSchema = Joi.object({
+  content: Joi.string().min(100).required()
+});
+
+export const embeddedGeoImproveSchema = Joi.object({
+  content: Joi.string().min(100).required()
+});
+
+// ─── Chat ─────────────────────────────────────
+
+export const createSessionSchema = Joi.object({
+  clientId: Joi.string().uuid().optional(),
+  title: Joi.string().max(255).optional()
+});
+
+export const sendMessageSchema = Joi.object({
+  content: Joi.string().min(1).max(10000).required()
+});
+
+export const executeCommandSchema = Joi.object({
+  command: Joi.string().min(1).max(1000).required()
+});
+
+// ─── Admin ────────────────────────────────────
+
+export const adminNotifySchema = Joi.object({
+  title: Joi.string().max(255).required(),
+  message: Joi.string().max(5000).required(),
+  level: Joi.string().valid('info', 'warn', 'error').default('info'),
+  channels: Joi.array().items(Joi.string()).optional()
+});
+
+// ─── Security ─────────────────────────────────
+
+export const setPermissionSchema = Joi.object({
+  userId: Joi.string().required(),
+  role: Joi.string().valid('super_admin', 'admin', 'editor', 'client', 'connector').required()
+});
+
+export const checkPermissionSchema = Joi.object({
+  userId: Joi.string().required(),
+  permission: Joi.string().required()
+});
+
+// ─── Plugin ───────────────────────────────────
+
+export const registerPluginSchema = Joi.object({
+  name: Joi.string().min(2).max(255).required(),
+  version: Joi.string().max(50).required(),
+  endpointUrl: Joi.string().uri().required(),
+  apiKey: Joi.string().required(),
+  capabilities: Joi.array().items(Joi.string()).default([])
+});
+
+// ─── System Config ────────────────────────────
+
+export const createSystemConfigSchema = Joi.object({
+  key: Joi.string().min(2).max(255).required(),
+  value: Joi.any().required(),
+  description: Joi.string().max(500).optional(),
+  isEncrypted: Joi.boolean().default(false)
+});
+
+export const updateSystemConfigSchema = Joi.object({
+  value: Joi.any().required(),
+  description: Joi.string().max(500).optional(),
+  isEncrypted: Joi.boolean().optional()
 });
 
 // ─── Pagination ───────────────────────────────

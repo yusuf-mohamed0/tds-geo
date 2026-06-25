@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 import { logger } from '../utils/logger';
+import { generateContent } from '../services/pipelineService';
 import geoIntelligence from '../services/geoIntelligence';
 import openaiService from '../services/openai';
 import seoService from '../services/seo';
@@ -10,8 +11,10 @@ import keywordService from '../services/keywords';
 import vectorMemoryService from '../services/vectorMemory';
 import costTracker from '../services/costTracker';
 import { convert } from '../utils/markdownToHtml';
+import { validate, embeddedGenerateSchema, embeddedPublishAllSchema, embeddedSyncSchema, embeddedGeoAnalyzeSchema, embeddedGeoImproveSchema } from '../validators/index';
 import shopifyService from '../services/shopify';
 import { sitesService } from '../services/sitesService';
+import { publisherEngine } from '../engines/publisher';
 
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 
@@ -182,16 +185,12 @@ export function createEmbeddedRoutes(pool: Pool): Router {
     }
   });
 
-  router.post('/articles/generate', async (req: Request, res: Response) => {
+  router.post('/articles/generate', validate(embeddedGenerateSchema), async (req: Request, res: Response) => {
     const auth = await authenticateEmbedded(req, res, pool);
     if (!auth) return;
 
     try {
       const { keyword } = req.body;
-      if (!keyword || typeof keyword !== 'string' || keyword.trim().length < 2) {
-        res.status(400).json({ error: 'Keyword must be at least 2 characters' });
-        return;
-      }
 
       const budgetExceeded = await costTracker.isBudgetExceeded(auth.clientId);
       if (budgetExceeded) {
@@ -220,25 +219,19 @@ export function createEmbeddedRoutes(pool: Pool): Router {
       );
       const keywordId = keywordResult.rows[0].id;
 
-      const startTime = Date.now();
-      const article = await openaiService.generateBlogPost({
-        keyword,
+      const generateResult = await generateContent(auth.clientId, keyword, {
         tone: client.brand_voice || 'educational',
         minWords: 1200,
         maxWords: 2500,
         clientSettings: client.settings || {}
       });
 
-      if (article.metadata) {
-        const { tokensIn = 0, tokensOut = 0, model = 'deepseek/deepseek-v4-flash' } = article.metadata as any;
-        const cost = costTracker.calculateOpenAICost(model, tokensIn, tokensOut);
-        await costTracker.recordCost({
-          client_id: auth.clientId,
-          provider: 'openai', model,
-          tokens_in: tokensIn, tokens_out: tokensOut,
-          cost_usd: cost, duration_ms: Date.now() - startTime
-        });
+      if (generateResult.queued) {
+        res.status(202).json({ queued: true, jobId: generateResult.jobId });
+        return;
       }
+
+      const article = generateResult.article!;
 
       const seoAnalysis = await seoService.analyzeContent(article.content, keyword);
       const linkOpportunities = await internalLinksService.findLinkOpportunities(
@@ -315,18 +308,12 @@ export function createEmbeddedRoutes(pool: Pool): Router {
       const results: { id: string; title: string; success: boolean; error?: string }[] = [];
       for (const article of articles.rows) {
         try {
-          await shopifyService.publishArticleWithTracking(pool, client, blogId, article.id, {
-            title: article.title,
-            contentHtml: article.content_html,
-            metaTitle: article.meta_title,
-            metaDescription: article.meta_description,
-            tags: article.tags || [],
-          });
+          const result = await publisherEngine.publish(article, client, blogId);
           const shopDomain = client.shopify_shop || '';
           if (shopDomain) {
             await sitesService.recordPublish(shopDomain, 'shopify').catch(() => {});
           }
-          results.push({ id: article.id, title: article.title, success: true });
+          results.push({ id: article.id, title: article.title, success: result.success });
         } catch (err) {
           results.push({ id: article.id, title: article.title, success: false, error: (err as Error).message });
         }
@@ -390,16 +377,12 @@ export function createEmbeddedRoutes(pool: Pool): Router {
     }
   });
 
-  router.post('/geo/analyze', async (req: Request, res: Response) => {
+  router.post('/geo/analyze', validate(embeddedGeoAnalyzeSchema), async (req: Request, res: Response) => {
     const auth = await authenticateEmbedded(req, res, pool);
     if (!auth) return;
 
     try {
       const { content } = req.body;
-      if (!content || content.length < 50) {
-        res.status(400).json({ error: 'Content must be at least 50 characters' });
-        return;
-      }
       const analysis = await geoIntelligence.analyze(content);
       res.json(analysis);
     } catch (err) {
@@ -408,16 +391,12 @@ export function createEmbeddedRoutes(pool: Pool): Router {
     }
   });
 
-  router.post('/geo/improve', async (req: Request, res: Response) => {
+  router.post('/geo/improve', validate(embeddedGeoImproveSchema), async (req: Request, res: Response) => {
     const auth = await authenticateEmbedded(req, res, pool);
     if (!auth) return;
 
     try {
       const { content } = req.body;
-      if (!content || content.length < 50) {
-        res.status(400).json({ error: 'Content must be at least 50 characters' });
-        return;
-      }
       const result = await geoIntelligence.improveContent(content);
       res.json(result);
     } catch (err) {

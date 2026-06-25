@@ -134,10 +134,15 @@ export interface ArticleImage {
 
 // ─── Publishing ──────────────────────────────
 export interface PublishResult {
-  id: number;
-  blogId: number;
-  url: string;
-  handle: string;
+  success: boolean;
+  provider: string;
+  externalId?: string;
+  url?: string;
+  error?: string;
+  // Legacy fields (used by multiCmsPublisher)
+  id?: number;
+  blogId?: number;
+  handle?: string;
 }
 
 // ─── Schedule ────────────────────────────────

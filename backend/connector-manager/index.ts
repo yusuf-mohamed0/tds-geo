@@ -55,6 +55,16 @@ export class ConnectorManager {
     return this.connectors.get(id)?.config;
   }
 
+  getCapabilities(id: string): ConnectorCapability[] {
+    return this.connectors.get(id)?.config?.capabilities || [];
+  }
+
+  hasCapability(id: string, capability: string): boolean {
+    return this.connectors.get(id)?.config?.capabilities?.some(
+      c => c.name === capability && c.supported
+    ) || false;
+  }
+
   list(): { id: string; provider: string; healthy: boolean; registeredAt: Date }[] {
     return Array.from(this.connectors.entries()).map(([id, c]) => ({
       id,

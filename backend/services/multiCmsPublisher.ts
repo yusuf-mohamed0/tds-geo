@@ -346,8 +346,8 @@ class MultiCmsPublisherService {
       }
 
       return {
-        id: 0, // localId is a UUID, can't fit in PublishResult's number type
-        blogId: 1,
+        success: true,
+        provider: 'custom',
         url,
         handle: slug,
       };
@@ -418,14 +418,14 @@ class MultiCmsPublisherService {
 
     if (data.data) {
       return {
-        id: 0,
-        blogId: 1,
+        success: true,
+        provider: 'custom',
         url: data.data.url || '',
         handle: data.data.slug || '',
       };
     }
 
-    return { id: 0, blogId: 1, url: '', handle: '' };
+    return { success: false, provider: 'custom', error: 'No data in response' };
   }
 
   /**
@@ -497,7 +497,7 @@ class MultiCmsPublisherService {
         `INSERT INTO publishing_history (article_id, client_id, cms_connection_id, provider, external_id, external_url, status)
          VALUES ($1, $2, $3, $4, $5, $6, 'published')
          ON CONFLICT DO NOTHING`,
-        [article.id, article.client_id, connection.id, connection.provider, String(result.id), result.url]
+        [article.id, article.client_id, connection.id, connection.provider, result.externalId || String((result as any).id || ''), result.url]
       );
     } catch (err) {
       logger.warn('Failed to record publish history', { error: (err as Error).message });

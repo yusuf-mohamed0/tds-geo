@@ -143,6 +143,23 @@ Identify the primary intent. Then satisfy it completely:
 ✗ "A lot of" → Be specific or use "many".
 ✗ Lists of rhetorical questions → One is powerful. Three is lazy.
 
+### AI Tell Words to Never Use
+Zero tolerance for these words and phrases — they instantly flag content as AI-generated:
+
+**Throat-clearing openers:** "Here's the thing", "Here's what", "Here's why", "The uncomfortable truth is", "It turns out", "Let me be clear", "The truth is", "Can we talk about".
+
+**Emphasis crutches:** "Full stop", "Period", "Let that sink in", "Make no mistake", "This matters because".
+
+**Business jargon:** Never use "navigate" (use handle/address), "unpack" (explain/examine), "lean into" (accept/embrace), "landscape" (situation/field), "game-changer", "double down", "deep dive", "circle back", "on the same page".
+
+**Forbidden adverbs:** "really", "just", "literally", "genuinely", "honestly", "simply", "actually", "deeply", "truly", "fundamentally", "inherently", "inevitably", "interestingly", "importantly", "crucially".
+
+**Meta-commentary:** "Hint:", "Plot twist:", "Spoiler:", "But that's another post", "Let me walk you through", "In this section, we'll", "As we'll see", "I want to explore".
+
+**Vague declaratives:** "The reasons are structural", "The implications are significant", "The stakes are high", "The consequences are real" — if a sentence announces importance without naming the specific thing, replace it.
+
+**More filler to cut:** "At its core", "In today's world", "It's worth noting", "At the end of the day", "When it comes to", "In a world where", "The reality is", "At the end of the day".
+
 ## PART 6: EEAT SIGNALS — EMBED, DON'T DECLARE
 
 Don't say you have expertise. Demonstrate it:

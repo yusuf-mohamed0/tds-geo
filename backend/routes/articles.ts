@@ -6,12 +6,14 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import { authenticate, authorize, authorizeClientAccess, scopeQueryByClient, requireResourceOwnership } from '../middleware/auth';
+import { clientRateLimit } from '../middleware/rateLimiter';
 import { validate } from '../validators/index';
 import {
   generateArticleSchema, updateArticleSchema,
   publishArticleSchema, generateImageSchema
 } from '../validators/index';
 import { logger, logActivity } from '../utils/logger';
+import { generateContent, getJobResult } from '../services/pipelineService';
 import openaiService from '../services/openai';
 import shopifyService from '../services/shopify';
 import seoService from '../services/seo';
@@ -27,7 +29,7 @@ export function createArticleRoutes(pool: Pool): Router {
   router.use(authenticate);
 
   // ─── Generate Article ────────────────────────
-  router.post('/generate', validate(generateArticleSchema), async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/generate', clientRateLimit({ windowMs: 60_000, max: 10, name: 'generate', message: 'Generate limit reached. Max 10 requests per minute per client.' }), validate(generateArticleSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as any).user;
       const { keyword, publish, blogId, tone, minWords, maxWords } = (req as any).validated;
@@ -79,15 +81,25 @@ export function createArticleRoutes(pool: Pool): Router {
         blogId
       );
 
-      // Generate content
-      const startTime = Date.now();
-      const article = await openaiService.generateBlogPost({
-        keyword,
+      // Generate content via pipeline (BullMQ if available, direct otherwise)
+      const generateResult = await generateContent(clientId, keyword, {
         tone: tone || client.brand_voice || 'educational',
         minWords: minWords || parseInt(process.env.CONTENT_MIN_WORDS || '1200'),
         maxWords: maxWords || parseInt(process.env.CONTENT_MAX_WORDS || '2500'),
         clientSettings: client.settings || {}
       });
+
+      // If queued async, return job ID and status endpoint
+      if (generateResult.queued) {
+        res.status(202).json({
+          queued: true,
+          jobId: generateResult.jobId,
+          message: 'Content generation queued. Poll /articles/job/:jobId for status.',
+        });
+        return;
+      }
+
+      const article = generateResult.article!;
 
       // Track OpenAI cost
       if (article.metadata) {
@@ -100,7 +112,6 @@ export function createArticleRoutes(pool: Pool): Router {
           tokens_in: tokensIn,
           tokens_out: tokensOut,
           cost_usd: cost,
-          duration_ms: Date.now() - startTime
         });
       }
 
@@ -183,6 +194,16 @@ export function createArticleRoutes(pool: Pool): Router {
         publishResult,
         approvalRequired: client.approval_mode === 'manual'
       });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ─── Job Status (async generation) ──────────
+  router.get('/job/:jobId', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await getJobResult(req.params.jobId);
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -458,7 +479,7 @@ export function createArticleRoutes(pool: Pool): Router {
   });
 
   // ─── Regenerate Article ──────────────────────
-  router.post('/:id/regenerate', requireResourceOwnership(pool, 'articles'), async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/:id/regenerate', clientRateLimit({ windowMs: 60_000, max: 10, name: 'regenerate', message: 'Regenerate limit reached. Max 10 requests per minute per client.' }), requireResourceOwnership(pool, 'articles'), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const articleResult = await pool.query(
         'SELECT a.*, k.keyword FROM articles a LEFT JOIN keywords k ON k.id = a.keyword_id WHERE a.id = $1',
@@ -507,7 +528,7 @@ export function createArticleRoutes(pool: Pool): Router {
   });
 
   // ─── Publish Article to Shopify ──────────────
-  router.post('/:id/publish', requireResourceOwnership(pool, 'articles'), validate(publishArticleSchema), async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/:id/publish', clientRateLimit({ windowMs: 60_000, max: 20, name: 'publish', message: 'Publish limit reached. Max 20 requests per minute per client.' }), requireResourceOwnership(pool, 'articles'), validate(publishArticleSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { blogId } = (req as any).validated;
       const articleResult = await pool.query('SELECT * FROM articles WHERE id = $1', [req.params.id]);

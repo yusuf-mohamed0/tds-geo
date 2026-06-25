@@ -11,6 +11,7 @@ import { Pool } from 'pg';
 import path from 'path';
 
 import { logger, initLogBuffer, closeLogBuffer } from './utils/logger';
+import { checkRedisHealth, closeRedis } from './utils/redisHealth';
 import { authenticate, authorize, authorizeClientAccess, requireDeviceAuth } from './middleware/auth';
 import { requireVpnAccess, ipWhitelist } from './middleware/network';
 import { validate, seoAnalyzeSchema } from './validators/index';
@@ -65,6 +66,7 @@ import enterpriseSecurity from './services/enterpriseSecurity';
 import contentIntelligence from './services/contentIntelligence';
 import aiEvaluation from './services/aiEvaluation';
 import resilience from './services/circuitBreaker';
+import metricsService from './services/metricsService';
 
 // ═══ Device Auth Route Factory ═══════════════
 import { createDeviceRoutes } from './routes/devices';
@@ -200,11 +202,12 @@ app.use('/api/webhooks/compliance', createComplianceWebhookRoutes(pool));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ─── Request Logging ─────────────────────────
+// ─── Request Logging & Metrics ──────────────
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
+    metricsService.recordRequest(req.method, req.originalUrl, res.statusCode, duration);
     const level = res.statusCode >= 400 ? 'warn' : res.statusCode >= 500 ? 'error' : 'info';
     logger.log(level, `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`, {
       method: req.method,
@@ -266,21 +269,8 @@ app.get('/health', async (_req: Request, res: Response) => {
       }
     })();
 
-    // Redis check
-    const redisPromise = (async () => {
-      try {
-        if (process.env.REDIS_URL) {
-          const Redis = require('ioredis');
-          const redis = new Redis(process.env.REDIS_URL, { connectTimeout: 3000, maxRetriesPerRequest: 1 });
-          const ping = await redis.ping();
-          await redis.quit();
-          return ping === 'PONG' ? 'healthy' : 'unhealthy';
-        }
-        return 'not_configured';
-      } catch {
-        return 'unhealthy';
-      }
-    })();
+    // Redis check (shared client)
+    const redisPromise = checkRedisHealth();
 
     // Live pings to Python microservices (skip if not configured)
     const turbovecPromise = process.env.TVEC_URL
@@ -340,6 +330,18 @@ app.get('/health', async (_req: Request, res: Response) => {
       error: (err as Error).message,
       timestamp: new Date().toISOString()
     });
+  }
+});
+
+// ─── Prometheus Metrics ─────────────────────
+app.get('/metrics', async (_req: Request, res: Response) => {
+  try {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    const metrics = await metricsService.generateMetrics();
+    res.send(metrics);
+  } catch (err) {
+    logger.error('Metrics generation failed', { error: (err as Error).message });
+    res.status(500).send('# Error generating metrics\n');
   }
 });
 
@@ -707,6 +709,7 @@ async function start(): Promise<void> {
     CostOptimizationService.getInstance().initialize(pool);
     editorialWorkflow.initialize(pool);
     observability.initialize(pool);
+    metricsService.initialize(pool);
     enterpriseSecurity.initialize(pool);
     contentIntelligence.initialize(pool);
     aiEvaluation.initialize(pool);
@@ -722,6 +725,11 @@ async function start(): Promise<void> {
     // ═══════ Connected Sites Registry ═══════════════
     sitesService.initialize(pool);
 
+    // ═══════ Connectors ═════════════════════════════
+    connectorManager.initialize(pool);
+    registerBuiltinConnectors(pool);
+    connectorManager.startPeriodicHealthChecks();
+
     // ═══════ Heartbeat Monitor ═══════════════════════
     heartbeatService.initialize(pool);
     heartbeatService.start();
@@ -730,9 +738,6 @@ async function start(): Promise<void> {
     // TDS GEO CORE ENGINE INITIALIZATION
     // ════════════════════════════════════════════
     await initializeEngines(pool);
-    connectorManager.initialize(pool);
-    registerBuiltinConnectors(pool);
-    connectorManager.startPeriodicHealthChecks();
 
     logger.info('All enterprise services initialized successfully');
 
@@ -766,6 +771,7 @@ async function shutdown(signal: string): Promise<void> {
   await observability.close().catch(() => {});
   await enterpriseSecurity.close().catch(() => {});
   await resilience.close().catch(() => {});
+  await closeRedis().catch(() => {});
   await workerScoringEngine.close().catch(() => {});
   await odooConnector.close().catch(() => {});
   await ceoOrchestrator.close().catch(() => {});
