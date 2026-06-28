@@ -9,6 +9,7 @@ import { GeneratedArticle, GenerateBlogParams } from '../types';
 import { writingSystemPrompt } from '../prompts';
 import resilience from '../services/circuitBreaker';
 import { crawlCompetitors } from './contentResearch';
+import dataforseo from './dataforseo';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || '';
@@ -203,6 +204,45 @@ class OpenAIService {
         enrichedPrompt += `---\nURL: ${comp.url}\nTitle: ${comp.title}\n${comp.markdown.slice(0, 1500)}\n\n`;
       }
       enrichedPrompt += `\n`;
+    }
+
+    // Inject DataForSEO keyword research data
+    try {
+      if (dataforseo.isEnabled()) {
+        const [volumeData, keywordIdeas] = await Promise.all([
+          dataforseo.getKeywordVolume([keyword]).catch(() => null),
+          dataforseo.discoverContentKeywords(keyword).catch(() => null),
+        ]);
+
+        if (volumeData?.[0]) {
+          const v = volumeData[0];
+          enrichedPrompt += `## KEYWORD RESEARCH DATA\n`;
+          enrichedPrompt += `- Primary keyword: "${keyword}"\n`;
+          enrichedPrompt += `- Monthly search volume: ${v.searchVolume.toLocaleString()}\n`;
+          enrichedPrompt += `- CPC: $${v.cpc.toFixed(2)}\n`;
+          enrichedPrompt += `- Competition level: ${v.competition < 0.3 ? 'Low' : v.competition < 0.7 ? 'Medium' : 'High'}\n`;
+          if (v.monthlySearches.length > 0) {
+            enrichedPrompt += `- Monthly trend: ${v.monthlySearches.map(m => `${m.month}/${m.year}: ${m.volume}`).join(', ')}\n`;
+          }
+          enrichedPrompt += `\n`;
+        }
+
+        if (keywordIdeas) {
+          enrichedPrompt += `## RELATED KEYWORDS TO INCORPORATE\n`;
+          if (keywordIdeas.primary.length > 0) {
+            enrichedPrompt += `- Primary related: ${keywordIdeas.primary.slice(0, 8).join(', ')}\n`;
+          }
+          if (keywordIdeas.longTail.length > 0) {
+            enrichedPrompt += `- Long-tail opportunities: ${keywordIdeas.longTail.slice(0, 8).join(', ')}\n`;
+          }
+          if (keywordIdeas.questions.length > 0) {
+            enrichedPrompt += `- People also ask: ${keywordIdeas.questions.slice(0, 5).join(', ')}\n`;
+          }
+          enrichedPrompt += `- Use these naturally as H2/H3 subheadings\n\n`;
+        }
+      }
+    } catch {
+      // DataForSEO is best-effort; skip on failure
     }
 
     // Inject website-scraped intelligence if available
