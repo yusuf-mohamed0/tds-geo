@@ -280,8 +280,18 @@ app.get('/health', async (_req: Request, res: Response) => {
       ? localLLMClient.healthCheck().then(s => s.healthy ? 'healthy' : 'unreachable').catch(() => 'unreachable')
       : Promise.resolve('not_configured');
 
-    const [stats, redisStatus, turbovecStatus, airllmStatus] = await Promise.all([
-      statsPromise, redisPromise, turbovecPromise, airllmPromise
+    // Live pings to Docker sidecars (skip if not configured)
+    const headroomPromise = process.env.HEADROOM_BASE_URL
+      ? fetch(`${process.env.HEADROOM_BASE_URL}/health`, { signal: AbortSignal.timeout(3000) })
+          .then(r => r.ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
+      : Promise.resolve('not_configured');
+    const openseoPromise = process.env.OPENSEO_URL
+      ? fetch(`${process.env.OPENSEO_URL}/health`, { signal: AbortSignal.timeout(5000) })
+          .then(r => r.ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
+      : Promise.resolve('not_configured');
+
+    const [stats, redisStatus, turbovecStatus, airllmStatus, headroomStatus, openseoStatus] = await Promise.all([
+      statsPromise, redisPromise, turbovecPromise, airllmPromise, headroomPromise, openseoPromise
     ]);
 
     res.json({
@@ -320,6 +330,16 @@ app.get('/health', async (_req: Request, res: Response) => {
           status: airllmStatus,
           mode: 'python_service',
           url: process.env.AIRLLM_URL || 'http://127.0.0.1:8531'
+        },
+        headroom: {
+          status: headroomStatus,
+          mode: 'docker_sidecar',
+          url: process.env.HEADROOM_BASE_URL || ''
+        },
+        openseo: {
+          status: openseoStatus,
+          mode: 'docker_sidecar',
+          url: process.env.OPENSEO_URL || ''
         }
       },
       stats
@@ -427,6 +447,10 @@ app.use('/api/devices', authenticate, createDeviceRoutes(pool));
 
 // ═══════ Meta Routes (Prompt Hardening) ═══════
 app.use('/api/meta', createMetaRoutes(pool));
+
+// ═══ API Documentation (Swagger/OpenAPI) ══════
+import { createSwaggerRoutes } from './routes/swagger';
+app.use('/docs', createSwaggerRoutes());
 
 // ═══════ Client Website Scanner Routes ═══════
 app.use('/api/scraper', createClientScraperRoutes(pool));

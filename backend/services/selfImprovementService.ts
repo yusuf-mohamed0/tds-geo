@@ -239,7 +239,7 @@ export class SelfImprovementService {
     const suggestions: ImprovementSuggestion[] = [];
 
     const prompts = await this.pool.query(`
-      SELECT id, name, slug, performance->>'avgScore' as avg_score,
+      SELECT id, name, name as slug, performance->>'avgScore' as avg_score,
              performance->>'totalRuns' as total_runs
       FROM prompt_templates WHERE is_active = true
     `);

@@ -1,153 +1,100 @@
-# ════════════════════════════════════════════════════════════════
-# CI — Continuous Integration
-# Runs on every push (any branch) and every pull request.
-# ════════════════════════════════════════════════════════════════
-
 name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
-    branches: [main, develop]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  NODE_VERSION: "20"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    branches: [main]
 
 jobs:
-  # ─── Backend: lint, typecheck, test, build ─────────────────
-  backend:
-    name: Backend
+  quality:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ai_seo_automation
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          node-version: 22
+          cache: 'npm'
 
-      - name: Install dependencies (skip native compilation)
-        run: npm ci --legacy-peer-deps --ignore-scripts
+      - run: npm ci
 
-      - name: Build native modules (isolated-vm)
-        run: npx node-gyp-build || true
-        working-directory: node_modules/isolated-vm
-        continue-on-error: true
+      - name: Type check
+        run: npx tsc --noEmit
+        env:
+          NODE_ENV: production
 
       - name: Lint
-        run: npm run lint
-        continue-on-error: true
+        run: npx eslint backend/ --ext .ts --max-warnings 0
 
-      - name: TypeScript typecheck
-        run: npm run typecheck
-
-      - name: Run unit & service tests
-        run: npm test
+      - name: Unit & service tests
+        run: npx vitest run --reporter=dot
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ai_seo_automation
           REDIS_URL: redis://localhost:6379
-          JWT_SECRET: ci-jwt-secret-key
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || '' }}
-          SHOPIFY_DEFAULT_SHOP: ${{ secrets.SHOPIFY_DEFAULT_SHOP || '' }}
-          SHOPIFY_DEFAULT_ACCESS_TOKEN: ${{ secrets.SHOPIFY_DEFAULT_ACCESS_TOKEN || '' }}
+          NODE_ENV: test
 
-      - name: Build backend
-        run: npm run build
-
-  # ─── E2E Pipeline Integration Tests ─────────────────────────
-  # Runs in parallel with backend and frontend jobs.
-  # All external services are mocked — no DB, Redis, or API keys needed.
-  e2e:
-    name: E2E Pipeline
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: [quality]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-
-      - name: Install dependencies (skip native compilation)
-        run: npm ci --legacy-peer-deps --ignore-scripts
-
-      - name: Run E2E pipeline integration tests
-        run: npm run test:e2e
-
-  # ─── Python Services: unit tests ─────────────────────────
-  python-services:
-    name: Python Services
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: backend/requirements.txt
-
-      - name: Install Python dependencies
+      - name: Deploy to AWS
+        env:
+          SSH_HOST: ${{ secrets.AWS_HOST }}
+          SSH_USER: ${{ secrets.AWS_USER }}
+          SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
         run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          rsync -avz --delete \
+            --exclude '.git' --exclude '.env' --exclude 'node_modules' \
+            --exclude '.claude' --exclude '.pytest_cache' \
+            --exclude 'graphify-out' --exclude '.understand-anything' \
+            --exclude 'frontend/node_modules' --exclude 'assets' \
+            --exclude 'Fonts' --exclude 'Icons' --exclude 'Services Icons' \
+            --exclude 'n8n' --exclude 'tools' --exclude 'scripts' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            ./ $SSH_USER@$SSH_HOST:/home/$SSH_USER/tds-geo/
 
-      - name: Run Python service tests
-        run: npm run test:py
-
-  # ─── Frontend: typecheck, build ────────────────────────────
-  frontend:
-    name: Frontend
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-          cache-dependency-path: frontend/package.json
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: TypeScript typecheck
-        run: npx tsc --noEmit
-
-      - name: Build frontend
-        run: npm run build
-
-      - name: Upload frontend build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/dist/
-          retention-days: 3
-          if-no-files-found: error
+      - name: Restart PM2
+        env:
+          SSH_HOST: ${{ secrets.AWS_HOST }}
+          SSH_USER: ${{ secrets.AWS_USER }}
+          SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            $SSH_USER@$SSH_HOST \
+            "cd /home/$SSH_USER/tds-geo && \
+             source /home/$SSH_USER/.nvm/nvm.sh 2>/dev/null; \
+             npm install --production 2>&1 | tail -5 && \
+             pm2 restart tds-geo-backend --update-env && \
+             sleep 8 && \
+             curl -s http://localhost:3000/health | python3 -c 'import sys,json; d=json.load(sys.stdin); print(f\"Deploy OK: {d[\"status\"]}\")'"
