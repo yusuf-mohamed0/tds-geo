@@ -527,7 +527,7 @@ ${uniqueFailures.map(f => `<div style="background:#FCF6F2;border-radius:10px;pad
 
     <hr>
     <div style="text-align:center;font-size:11px;color:#838081">
-      <span style="background:#FCF6F2;padding:4px 12px;border-radius:20px">Every ${HEARTBEAT_INTERVAL / 60000} min &middot; <a href="http://13.48.59.201:3000/api/heartbeat/status" style="color:#769ACC;text-decoration:none">Live Status</a></span>
+      <span style="background:#FCF6F2;padding:4px 12px;border-radius:20px">Every ${HEARTBEAT_INTERVAL / 60000} min &middot; <a href="http://16.170.218.59:3000/api/heartbeat/status" style="color:#769ACC;text-decoration:none">Live Status</a></span>
     </div>
   </div>
   <div class="footnote">
