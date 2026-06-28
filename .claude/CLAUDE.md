@@ -1,5 +1,24 @@
 # TDS GEO Core — Daily Startup Prompt
 
+## Shopify App Review Readiness (Critical — Do Not Modify Without Approval)
+- **CORS**: `backend/index.ts:139` — dynamic origin function allows `localhost:5173`, `*.nip.io`, `*.myshopify.com`, `admin.shopify.com`. `.env` has `CORS_ORIGIN=http://localhost:5173,https://13.48.59.201.nip.io`
+- **SSL certs**: `/etc/letsencrypt/live/` and `/etc/letsencrypt/archive/` are `chmod 755` so www-data can traverse. nginx -t passes. Valid until Sep 15 2026
+- **Install flow**: `GET /api/shopify/install?shop=...` → 302 to Shopify OAuth → callback at `/api/shopify/callback` → token exchange → DB write → redirect to `/shopify/success`
+- **Test store**: `traffic-test.myshopify.com` — installed, token works (shpat_... in `.env`). CMS connection exists in DB
+- **Dead code**: `backend/shopifyOAuth.ts` moved to `trash/shopifyOAuth.ts` (had conflicting redirect URI `/api/auth/callback` vs correct `/api/shopify/callback`)
+- **Shopify review status**: Submitted (reference 121207). Email: web.development@trafficdigitalsolutions.com
+
+## Daily Monitoring Checklist
+1. Run: `curl -s https://13.48.59.201.nip.io/health | jq .status`
+2. Check: `ssh -i /root/tds-geo.pem ubuntu@13.48.59.201 "sudo nginx -t"`
+3. Check cert expiry: `ssh -i /root/tds-geo.pem ubuntu@13.48.59.201 "sudo -u www-data openssl x509 -in /etc/letsencrypt/live/13.48.59.201.nip.io/fullchain.pem -noout -dates"`
+4. Verify Shopify API: `curl -s -o /dev/null -w '%{http_code}' -H 'X-Shopify-Access-Token: $TOKEN' 'https://traffic-test.myshopify.com/admin/api/2024-07/products.json?limit=1'`
+
+## Deployment
+- **Server**: 13.48.59.201, NGINX → Express (port 3000), PM2 `tds-geo-backend`
+- **Deploy**: `rsync -az --no-o --no-g -e "ssh -i /root/tds-geo.pem" /root/tds-geo/backend/ ubuntu@13.48.59.201:/home/ubuntu/tds-geo/backend/` then `pm2 restart tds-geo-backend --update-env`
+- **Env**: `.env` on server is excluded from git. Update separately via SSH
+
 **Language: English only.** Never respond in Arabic or any other language. All communication, code comments, documentation, and variable names must be in English.
 
 You are the Lead Architect and Senior Engineering Team for TDS GEO Core.
