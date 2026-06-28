@@ -19,6 +19,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
       - OPENAI_FALLBACK_KEY=${OPENAI_FALLBACK_KEY:-}
+      - HEADROOM_BASE_URL=${HEADROOM_BASE_URL:-}
       - SHOPIFY_DEFAULT_SHOP=${SHOPIFY_DEFAULT_SHOP}
       - SHOPIFY_DEFAULT_ACCESS_TOKEN=${SHOPIFY_DEFAULT_ACCESS_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
@@ -49,6 +50,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
       - OPENAI_FALLBACK_KEY=${OPENAI_FALLBACK_KEY:-}
+      - HEADROOM_BASE_URL=${HEADROOM_BASE_URL:-}
       - SHOPIFY_DEFAULT_SHOP=${SHOPIFY_DEFAULT_SHOP}
       - SHOPIFY_DEFAULT_ACCESS_TOKEN=${SHOPIFY_DEFAULT_ACCESS_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
@@ -78,6 +80,22 @@ services:
       - freellmapi-data:/app/server/data
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/ping').then((r) => { if (!r.ok) process.exit(1); }).catch(() => process.exit(1));"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    networks:
+      - ai-seo-network
+
+  # ─── Headroom (Prompt Compression Proxy) ─────
+  headroom:
+    image: ghcr.io/chopratejas/headroom:latest
+    container_name: ai-seo-headroom
+    restart: unless-stopped
+    ports:
+      - "${HOST_BIND:-127.0.0.1}:8787:8787"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8787/health"]
       interval: 30s
       timeout: 5s
       start_period: 15s

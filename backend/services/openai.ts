@@ -11,6 +11,34 @@ import resilience from '../services/circuitBreaker';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || '';
+const HEADROOM_BASE_URL = process.env.HEADROOM_BASE_URL || '';
+
+async function compressWithHeadroom(
+  messages: any[],
+  model: string
+): Promise<{ messages: any[]; compressed: boolean }> {
+  if (!HEADROOM_BASE_URL) return { messages, compressed: false };
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+
+    const res = await fetch(`${HEADROOM_BASE_URL}/v1/compress`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages, model }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) return { messages, compressed: false };
+
+    const data = await res.json();
+    return { messages: data.messages || messages, compressed: true };
+  } catch {
+    return { messages, compressed: false };
+  }
+}
 
 class OpenAIService {
   private openaiClient: OpenAI | null = null;
@@ -60,18 +88,15 @@ class OpenAIService {
    * When a fallback client is configured, returns a wrapper that
    * transparently routes chat.completions.create through the fallback
    * if the primary client's call fails.
+   * When HEADROOM_BASE_URL is set, messages are compressed before sending.
    */
-  private fallbackWrapper: OpenAI | null = null;
+  private clientWrapper: OpenAI | null = null;
 
-  private getClient(): OpenAI | null {
-    if (this.fallbackWrapper) return this.fallbackWrapper;
-    if (!this.openaiClient) return null;
-    if (!this.fallbackClient) return this.openaiClient;
-
-    const primary = this.openaiClient;
+  private createClientWrapper(clientToWrap: OpenAI): OpenAI {
+    const primary = clientToWrap;
     const fallback = this.fallbackClient;
 
-    this.fallbackWrapper = new Proxy(primary, {
+    return new Proxy(primary, {
       get(target, prop, receiver) {
         if (prop === 'chat') {
           const chat = Reflect.get(target, prop, receiver);
@@ -83,11 +108,24 @@ class OpenAIService {
                   get(compTarget, compProp, compReceiver) {
                     if (compProp === 'create') {
                       return async (...args: any[]) => {
+                        const params = args[0] || {};
+                        const { messages: compressedMessages } = await compressWithHeadroom(
+                          params.messages || [],
+                          params.model || ''
+                        );
+                        const compressedArgs = compressedMessages !== params.messages
+                          ? [{ ...params, messages: compressedMessages }]
+                          : args;
+
                         try {
-                          return await (compTarget as any)(...args);
+                          return await (compTarget as any)(...compressedArgs);
                         } catch (err) {
-                          logger.warn('Primary OpenAI failed, retrying with fallback');
-                          return await (fallback.chat.completions.create as any)(...args);
+                          if (fallback) {
+                            logger.warn('Primary OpenAI failed, retrying with fallback');
+                            const fbArgs = compressedArgs;
+                            return await (fallback.chat.completions.create as any)(...fbArgs);
+                          }
+                          throw err;
                         }
                       };
                     }
@@ -102,8 +140,14 @@ class OpenAIService {
         return Reflect.get(target, prop, receiver);
       }
     });
+  }
 
-    return this.fallbackWrapper;
+  private getClient(): OpenAI | null {
+    if (this.clientWrapper) return this.clientWrapper;
+    if (!this.openaiClient) return null;
+
+    this.clientWrapper = this.createClientWrapper(this.openaiClient);
+    return this.clientWrapper;
   }
 
   private ensureInitialized(): void {
