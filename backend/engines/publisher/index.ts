@@ -52,6 +52,74 @@ export class PublisherEngine {
     }
   }
 
+  async publishWithTracking(
+    pool: any,
+    article: any,
+    client: any,
+    blogId?: number | string
+  ): Promise<PublishResult> {
+    try {
+      let useConnector = false;
+      let connection: any = null;
+
+      try {
+        const cmsResult = await pool.query(
+          `SELECT * FROM cms_connections WHERE client_id = $1 AND is_active = true ORDER BY is_primary DESC LIMIT 1`,
+          [client.id]
+        );
+        if (cmsResult.rows.length > 0) {
+          useConnector = true;
+          connection = cmsResult.rows[0];
+        }
+      } catch {
+        // cms_connections table may not exist — fall back to Shopify
+      }
+
+      if (useConnector && connection) {
+        const target: PublishTarget = {
+          provider: connection.provider,
+          config: connection.config,
+        };
+        const result = await this.publishToTarget(article, target);
+
+        if (result.success) {
+          await pool.query(
+            `UPDATE articles SET status = 'published', updated_at = NOW() WHERE id = $1`,
+            [article.id]
+          );
+          await pool.query(
+            `INSERT INTO publishing_history (article_id, client_id, provider, external_id, url, status)
+             VALUES ($1, $2, $3, $4, $5, 'success')`,
+            [article.id, client.id, connection.provider, result.externalId, result.url]
+          );
+        }
+        return result;
+      }
+
+      const result = await shopifyService.publishArticleWithTracking(
+        pool, client, blogId || null, article.id,
+        {
+          title: article.title,
+          contentHtml: article.content_html || '',
+          metaTitle: article.meta_title,
+          metaDescription: article.meta_description,
+          tags: article.tags || [],
+        }
+      );
+
+      await eventBus.emit(Events.PUBLISH_SUCCEEDED, {
+        articleId: article.id, clientId: client.id, url: result.url,
+      });
+
+      return { success: true, provider: 'shopify', externalId: String(result.id), url: result.url };
+    } catch (err) {
+      await eventBus.emit(Events.PUBLISH_FAILED, {
+        articleId: article.id, clientId: client.id, error: (err as Error).message,
+      });
+      return { success: false, provider: 'shopify', error: (err as Error).message };
+    }
+  }
+
   async publishMulti(article: any, targets: PublishTarget[]): Promise<PublishResult[]> {
     return Promise.all(targets.map(t => this.publishToTarget(article, t)));
   }

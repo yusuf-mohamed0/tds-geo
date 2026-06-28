@@ -16,6 +16,7 @@ import { logger, logActivity } from '../utils/logger';
 import { generateContent, getJobResult } from '../services/pipelineService';
 import openaiService from '../services/openai';
 import shopifyService from '../services/shopify';
+import { publisherEngine } from '../engines/publisher';
 import seoService from '../services/seo';
 import internalLinksService from '../services/internalLinks';
 import keywordService from '../services/keywords';
@@ -160,13 +161,7 @@ export function createArticleRoutes(pool: Pool): Router {
       let publishResult = null;
       if (publish && status === 'approved') {
         try {
-          publishResult = await shopifyService.publishArticleWithTracking(pool, client, blogId, savedArticle.id, {
-            title: article.title,
-            contentHtml,
-            metaTitle: article.metaTitle,
-            metaDescription: article.metaDescription,
-            tags: article.tags
-          });
+          publishResult = await publisherEngine.publishWithTracking(pool, savedArticle, client, blogId);
         } catch (publishErr) {
           logger.warn('Auto-publish failed, article saved as draft', {
             articleId: savedArticle.id,
@@ -551,20 +546,14 @@ export function createArticleRoutes(pool: Pool): Router {
       }
 
       const client = clientResult.rows[0];
-      const publishResult = await shopifyService.publishArticleWithTracking(pool, client, blogId, article.id, {
-        title: article.title,
-        contentHtml: article.content_html,
-        metaTitle: article.meta_title,
-        metaDescription: article.meta_description,
-        tags: article.tags
-      });
+      const publishResult = await publisherEngine.publishWithTracking(pool, article, client, blogId);
 
       // Generate and upload image
       try {
         const imageData = await openaiService.generateArticleImage(article.title, article.tags?.[0] || '');
         const shopifyImage = await shopifyService.uploadImage(
           { shop: client.shopify_shop, accessToken: client.shopify_token },
-          publishResult.shopifyArticle.id,
+          publishResult.externalId || article.id,
           imageData.imageUrl,
           imageData.altText
         );

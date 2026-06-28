@@ -8,6 +8,7 @@ import { countKeywordOccurrences } from '../utils/stringUtils';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
 import { writingSystemPrompt } from '../prompts';
 import resilience from '../services/circuitBreaker';
+import { crawlCompetitors } from './contentResearch';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || '';
@@ -191,6 +192,18 @@ class OpenAIService {
 
     // Build an enriched user prompt with website intelligence
     let enrichedPrompt = `Generate a complete SEO-optimized blog post about: "${keyword}"\n\n`;
+
+    // Inject competitor research for differentiation
+    const competitors = await crawlCompetitors(keyword);
+    if (competitors.length > 0) {
+      enrichedPrompt += `## COMPETITOR CONTENT (for differentiation)\n`;
+      enrichedPrompt += `Review these competitor articles. Identify gaps, missing angles, and opportunities they miss.\n`;
+      enrichedPrompt += `DO NOT copy or paraphrase. Write something BETTER and DIFFERENT.\n\n`;
+      for (const comp of competitors) {
+        enrichedPrompt += `---\nURL: ${comp.url}\nTitle: ${comp.title}\n${comp.markdown.slice(0, 1500)}\n\n`;
+      }
+      enrichedPrompt += `\n`;
+    }
 
     // Inject website-scraped intelligence if available
     if (websiteIntelligence) {

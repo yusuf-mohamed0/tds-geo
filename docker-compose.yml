@@ -20,6 +20,7 @@ services:
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
       - OPENAI_FALLBACK_KEY=${OPENAI_FALLBACK_KEY:-}
       - HEADROOM_BASE_URL=${HEADROOM_BASE_URL:-}
+      - CRAWL4AI_URL=${CRAWL4AI_URL:-}
       - SHOPIFY_DEFAULT_SHOP=${SHOPIFY_DEFAULT_SHOP}
       - SHOPIFY_DEFAULT_ACCESS_TOKEN=${SHOPIFY_DEFAULT_ACCESS_TOKEN}
       - JWT_SECRET=${JWT_SECRET}
@@ -84,6 +85,23 @@ services:
       timeout: 5s
       start_period: 15s
       retries: 3
+    networks:
+      - ai-seo-network
+
+  # ─── Crawl4AI (Web Crawling for AI) ──────────
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    container_name: ai-seo-crawl4ai
+    restart: unless-stopped
+    ports:
+      - "${HOST_BIND:-127.0.0.1}:11235:11235"
+    shm_size: 1g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:11235/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
     networks:
       - ai-seo-network
 
