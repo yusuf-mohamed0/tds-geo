@@ -115,7 +115,7 @@ You'll need these installed on your computer:
 |---------|-----------|---------------|---------------|
 | **OpenRouter** | ✅ Yes | AI content generation (DeepSeek V4 Flash) | [openrouter.ai/keys](https://openrouter.ai/keys) |
 | **Shopify** | ✅ Yes | Publishing articles & OAuth install | Shopify Partner Dashboard → Apps |
-| **DataForSEO** | ❌ No | Keyword research, SERP, domain data | [dataforseo.com](https://dataforseo.com/) |
+| **DataForSEO** | ✅ Yes | Keyword research, SERP, domain data | [dataforseo.com](https://dataforseo.com/) |
 | **Pexels** | ❌ No | Free stock photos for articles | [pexels.com/api](https://www.pexels.com/api/) |
 
 > **Tip:** If you don't have an OpenRouter key yet, you can still try the app! Leave `OPENAI_API_KEY` empty and the system runs in **mock mode** — all AI features return realistic sample data.
@@ -161,10 +161,8 @@ Fill in these values:
 - `SHOPIFY_DEFAULT_SHOP` — Your shop's `.myshopify.com` URL
 - `SHOPIFY_DEFAULT_ACCESS_TOKEN` — Your Shopify Admin API token
 
-Optional keys:
-- `DATAFORSEO_API_KEY` — For real SEO data (keyword volume, competitors, etc.)
-- `OPENAI_API_KEY` — OpenRouter API key for AI generation
-- `PEXELS_API_KEY` — For stock photo integration
+- `DATAFORSEO_API_KEY` — SEO data (keyword volume, competitors, SERP, etc.)
+- `PEXELS_API_KEY` — Optional, for stock photo integration
 
 ### Step 4: Set Up the Database
 
