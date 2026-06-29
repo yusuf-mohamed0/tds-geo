@@ -6,7 +6,7 @@ import { sitesService } from '../services/sitesService';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
-const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.170.218.59.nip.io';
+const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://13.51.207.126.nip.io';
 const SCOPES = 'read_content,read_products,write_content,write_products';
 const WEBHOOK_API_VERSION = '2024-07';
 

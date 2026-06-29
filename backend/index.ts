@@ -133,7 +133,7 @@ app.use(helmet({
 }));
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
-  : ['http://localhost:5173', 'https://16.170.218.59.nip.io'];
+  : ['http://localhost:5173', 'https://13.51.207.126.nip.io'];
 
 app.use(cors({
   origin: (origin, cb) => {
@@ -296,7 +296,7 @@ app.get('/health', async (_req: Request, res: Response) => {
           .then(r => r.ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
       : Promise.resolve('not_configured');
     const openseoPromise = process.env.OPENSEO_URL
-      ? fetch(`${process.env.OPENSEO_URL}/health`, { signal: AbortSignal.timeout(5000) })
+      ? fetch(`${process.env.OPENSEO_URL}/`, { signal: AbortSignal.timeout(5000) })
           .then(r => r.ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
       : Promise.resolve('not_configured');
 

@@ -10,7 +10,7 @@
     }
   },
   "servers": [
-    { "url": "https://16.170.218.59.nip.io", "description": "Production" },
+    { "url": "https://13.51.207.126.nip.io", "description": "Production" },
     { "url": "http://localhost:3000", "description": "Development" }
   ],
   "security": [
