@@ -570,7 +570,7 @@ export function createArticleRoutes(pool: Pool): Router {
         });
       }
 
-      res.json({ success: true, ...publishResult });
+      res.json({ ...publishResult, success: true });
     } catch (err) {
       next(err);
     }

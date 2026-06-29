@@ -35,7 +35,7 @@ async function compressWithHeadroom(
 
     if (!res.ok) return { messages, compressed: false };
 
-    const data = await res.json();
+    const data: any = await res.json();
     return { messages: data.messages || messages, compressed: true };
   } catch {
     return { messages, compressed: false };

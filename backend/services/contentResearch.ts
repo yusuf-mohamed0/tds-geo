@@ -29,7 +29,7 @@ async function callCrawl4AI(url: string): Promise<CompetitorContent | null> {
 
     if (!res.ok) return null;
 
-    const data = await res.json();
+    const data: any = await res.json();
     const result = data.results?.[0];
     if (!result) return null;
 

@@ -83,7 +83,7 @@ describe('OpenAIService (mock mode)', () => {
       expect(result.content).toBeTruthy();
       expect(result.content.length).toBeGreaterThan(200);
       expect(result.metadata).toBeDefined();
-      expect(result.metadata.wordCount).toBeGreaterThan(0);
+      expect(result.metadata!.wordCount).toBeGreaterThan(0);
     });
 
     it('should include keyword in mock output', async () => {
