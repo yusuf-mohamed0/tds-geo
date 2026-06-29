@@ -5,7 +5,7 @@ import { validate, createBillingSchema } from '../validators/index';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
-const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://13.51.207.126.nip.io';
+const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
 
 const PLANS: Record<string, { name: string; amount: number; interval: 'EVERY_30_DAYS' | 'ANNUAL' }> = {
   starter: { name: 'Starter', amount: 2900, interval: 'EVERY_30_DAYS' },

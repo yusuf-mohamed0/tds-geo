@@ -4,7 +4,7 @@ import axios from 'axios';
 import crypto from 'crypto';
 import { logger } from '../utils/logger';
 
-const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://13.51.207.126.nip.io';
+const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
 const WEBHOOK_API_VERSION = '2024-07';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 

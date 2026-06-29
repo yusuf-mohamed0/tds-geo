@@ -133,7 +133,7 @@ app.use(helmet({
 }));
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
-  : ['http://localhost:5173', 'https://13.51.207.126.nip.io'];
+  : ['http://localhost:5173', 'https://16.192.29.174.nip.io'];
 
 app.use(cors({
   origin: (origin, cb) => {
