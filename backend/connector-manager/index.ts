@@ -1,7 +1,7 @@
 import { logger } from '../utils/logger';
 import { eventBus } from '../event-bus';
 import { Events } from '../event-bus/events';
-import { ConnectorConfig, ConnectorRegistration, HealthStatus, ConnectorInterface } from '../sdk/connector-interface';
+import { ConnectorConfig, ConnectorCapability, HealthStatus, ConnectorInterface } from '../sdk/connector-interface';
 import { sitesService } from '../services/sitesService';
 import { heartbeatService } from '../services/heartbeatService';
 

@@ -1,22 +1,16 @@
 # ════════════════════════════════════════════════════════════════
-# Docker: Build & Deploy
+# Docker: Build & Push
 # On pushes to main: build multi-arch Docker image, push to
-# GitHub Container Registry, and optionally deploy via SSH.
+# GitHub Container Registry.
 # ════════════════════════════════════════════════════════════════
 
-name: Docker Build & Deploy
+name: Docker Build
 
 on:
   push:
     branches: [main]
     tags: ["v*.*.*"]
   workflow_dispatch:
-    inputs:
-      deploy:
-        description: "Deploy to production after build?"
-        required: true
-        default: true
-        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -29,7 +23,6 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  # ─── Build & push Docker image ─────────────────────────────
   build:
     name: Build Docker Image
     runs-on: ubuntu-latest
@@ -73,65 +66,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  # ─── Deploy via SSH (optional) ─────────────────────────────
-  deploy:
-    name: Deploy to Production
-    needs: build
-    if: |
-      github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          port: ${{ secrets.DEPLOY_PORT || '22' }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            set -e
-
-            cd ${{ secrets.DEPLOY_PATH || '/opt/ai-seo' }}
-
-            # Write .env from GitHub secrets
-            cat > .env <<- 'EOF'
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            SHOPIFY_DEFAULT_SHOP=${{ secrets.SHOPIFY_DEFAULT_SHOP || '' }}
-            SHOPIFY_DEFAULT_ACCESS_TOKEN=${{ secrets.SHOPIFY_DEFAULT_ACCESS_TOKEN || '' }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            SERPAPI_API_KEY=${{ secrets.SERPAPI_API_KEY || '' }}
-            DB_USER=postgres
-            DB_PASSWORD=${{ secrets.DB_PASSWORD || 'postgres' }}
-            DB_NAME=ai_seo_automation
-            EOF
-
-            # Pull the updated image
-            docker compose pull api worker
-
-            # Recreate services (use existing image, no local build)
-            docker compose up -d --no-deps api worker nginx
-
-            # Wait for health check
-            echo "Waiting for API to become healthy..."
-            for i in {1..30}; do
-              if curl -sf http://localhost:3000/health > /dev/null 2>&1; then
-                echo "API is healthy!"
-                break
-              fi
-              echo "Attempt $i/30 — API not ready yet..."
-              sleep 2
-            done
-
-            # Run database migrations on existing databases
-            if [ -f backend/database/migration_v2.sql ]; then
-              echo "Running database migrations..."
-              docker compose exec -T postgres psql -U postgres -d ai_seo_automation -f /docker-entrypoint-initdb.d/02-migration.sql 2>/dev/null || true
-            fi
-
-            # Clean up old images
-            docker image prune -f
-
-            echo "Deployment complete!"

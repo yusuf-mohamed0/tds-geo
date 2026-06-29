@@ -7,10 +7,10 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package.json ./
 
 # Install all dependencies (including devDependencies for build)
-RUN npm ci --legacy-peer-deps --ignore-scripts
+RUN npm install --legacy-peer-deps --ignore-scripts
 
 # Copy source files
 COPY tsconfig.json ./
@@ -25,8 +25,8 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
 # Copy frontend package files and install dependencies
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci --legacy-peer-deps
+COPY frontend/package.json ./
+RUN npm install --legacy-peer-deps
 
 # Copy frontend source files
 COPY frontend/ ./
@@ -44,8 +44,8 @@ RUN addgroup -g 1001 -S appgroup && \
     adduser -S appuser -u 1001 -G appgroup
 
 # Install only production dependencies
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev --legacy-peer-deps --ignore-scripts && \
+COPY package.json ./
+RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts && \
     npm cache clean --force
 
 # Copy compiled output from backend builder
