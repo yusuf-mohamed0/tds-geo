@@ -5,7 +5,7 @@ config({ path: resolve(__dirname, '../../.env') });
 
 const SHOP = 'traffic-test.myshopify.com';
 const TOKEN = process.env.SHOPIFY_DEFAULT_ACCESS_TOKEN;
-const NEW_URL = 'https://16.170.218.59.nip.io/api/webhooks/compliance';
+const NEW_URL = 'https://13.51.207.126.nip.io/api/webhooks/compliance';
 const API_VERSION = '2024-07';
 const COMPLIANCE_TOPICS = ['customers/redact', 'customers/data_request', 'shop/redact'];
 
