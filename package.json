@@ -34,7 +34,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0",
+    "@anthropic-ai/sdk": "^0.107.0",
     "@rollup/rollup-linux-x64-gnu": "^4.60.4",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
