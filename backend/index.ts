@@ -441,7 +441,9 @@ app.use('/api/content-intel', createContentIntelRoutes(pool));
 
 // GEO (Generative Engine Optimization) routes
 import { createGeoRoutes } from './routes/geo';
+import { createAeoRoutes } from './routes/aeo';
 app.use('/api/geo', createGeoRoutes());
+app.use('/api/aeo', createAeoRoutes());
 
 // AI evaluation routes
 app.use('/api/evaluation', createEvaluationRoutes(pool));
