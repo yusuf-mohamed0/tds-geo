@@ -71,7 +71,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 CMD ["node", "dist/backend/index.js"]
 
 # ─── Frontend (Nginx) Stage ────────────────────
-FROM nginx:1.26-alpine AS frontend
+FROM nginx:1.31-alpine AS frontend
 
 # Copy custom nginx configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
