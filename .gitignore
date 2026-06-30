@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.backup
+.env.local
+.env.*.local
+
+# Understand Anything - generated knowledge graph artifacts
+.understand-anything/intermediate/
+.understand-anything/diff-overlay.json
+
+# Logs
+*.log
+logs/
+
+# Pipeline artifacts
+outputs/
+
+# Temp files
+/tmp/
+dump.rdb
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Build artifacts
+*.zip
+# Dead files (root-level standalone scripts)
+/billing.ts
+/complianceWebhooks.ts
+/heartbeatService.ts
+/shopifyInstall.ts
+/index.ts
+
+# Project assets
+*.png
+Fonts/
+Icons/
+*.odt
+n8n/
+assets/
+frontend/
+docker/
+*.sidcars.yml
+graphify-out/
+.graphifyignore
+*.bak
+*.orig
+trash/
+project-blueprint.md

@@ -1,0 +1,248 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "TDS GEO — AI SEO Automation API",
+    "version": "2.0.0",
+    "description": "Multi-CMS content generation and SEO optimization platform for Shopify and WordPress stores.",
+    "contact": {
+      "name": "Traffic Digital Solutions",
+      "email": "web.development@trafficdigitalsolutions.com"
+    }
+  },
+  "servers": [
+    { "url": "https://16.192.29.174.nip.io", "description": "Production" },
+    { "url": "http://localhost:3000", "description": "Development" }
+  ],
+  "security": [
+    { "bearerAuth": [] }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "System health check",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "System is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "healthy" },
+                    "checks": {
+                      "type": "object",
+                      "properties": {
+                        "database": { "$ref": "#/components/schemas/HealthCheck" },
+                        "redis": { "$ref": "#/components/schemas/HealthCheck" },
+                        "openai": { "$ref": "#/components/schemas/HealthCheck" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Authenticate user",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Authentication successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/api/articles": {
+      "post": {
+        "summary": "Create and publish an article",
+        "tags": ["Articles"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["clientId", "keyword"],
+                "properties": {
+                  "clientId": { "type": "string", "description": "Client/store ID" },
+                  "keyword": { "type": "string", "description": "Target keyword" },
+                  "title": { "type": "string" },
+                  "content": { "type": "string" },
+                  "autoPublish": { "type": "boolean", "default": false }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Article created" },
+          "400": { "description": "Validation error" }
+        }
+      },
+      "get": {
+        "summary": "List articles",
+        "tags": ["Articles"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "clientId", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["draft", "generated", "published", "failed"] } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": {
+          "200": { "description": "Articles list" }
+        }
+      }
+    },
+    "/api/clients": {
+      "get": {
+        "summary": "List clients",
+        "tags": ["Clients"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Clients list" }
+        }
+      },
+      "post": {
+        "summary": "Create a client",
+        "tags": ["Clients"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "201": { "description": "Client created" }
+        }
+      }
+    },
+    "/api/analytics/{clientId}/overview": {
+      "get": {
+        "summary": "Client analytics dashboard",
+        "tags": ["Analytics"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "clientId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Analytics overview" }
+        }
+      }
+    },
+    "/api/cms": {
+      "get": {
+        "summary": "List CMS connections",
+        "tags": ["CMS"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "CMS connections list" }
+        }
+      },
+      "post": {
+        "summary": "Connect a CMS",
+        "tags": ["CMS"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["type", "name"],
+                "properties": {
+                  "type": { "type": "string", "enum": ["wordpress", "shopify"] },
+                  "name": { "type": "string" },
+                  "apiUrl": { "type": "string", "format": "uri" },
+                  "apiKey": { "type": "string" },
+                  "apiSecret": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "CMS connected" }
+        }
+      }
+    },
+    "/api/heartbeat": {
+      "get": {
+        "summary": "Heartbeat status",
+        "tags": ["Monitoring"],
+        "responses": {
+          "200": { "description": "Heartbeat status" }
+        }
+      }
+    },
+    "/api/billing": {
+      "get": {
+        "summary": "Billing information",
+        "tags": ["Billing"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Billing info" }
+        }
+      }
+    },
+    "/api/shopify/install": {
+      "get": {
+        "summary": "Initiate Shopify OAuth install",
+        "tags": ["Shopify"],
+        "parameters": [
+          { "name": "shop", "in": "query", "required": true, "schema": { "type": "string", "example": "mystore.myshopify.com" } }
+        ],
+        "responses": {
+          "302": { "description": "Redirect to Shopify OAuth" }
+        }
+      }
+    },
+    "/api/connector": {
+      "get": {
+        "summary": "List connectors",
+        "tags": ["Connectors"],
+        "responses": {
+          "200": { "description": "Connectors list" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "HealthCheck": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["healthy", "degraded", "unreachable", "not_configured"] }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" }
+        }
+      }
+    }
+  }
+}

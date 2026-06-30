@@ -1,0 +1,1 @@
+export { ConnectorConfig, ConnectorCapability, HealthStatus, SyncResult, ContentPayload, MediaPayload, PublishResult, Taxonomy, ConnectorRegistration, ConnectorInterface } from './connector-interface';

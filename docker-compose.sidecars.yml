@@ -1,0 +1,75 @@
+# Sidecar services for TDS GEO on AWS (runs alongside PM2)
+# Start: docker compose -f docker-compose.sidecars.yml up -d
+# Stop:  docker compose -f docker-compose.sidecars.yml down
+
+services:
+  freellmapi:
+    image: ghcr.io/tashfeenahmed/freellmapi:latest
+    container_name: tds-freellmapi
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      ENCRYPTION_KEY: ${FREELMAPI_ENCRYPTION_KEY:-}
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - freellmapi-data:/app/server/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/ping').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  headroom:
+    image: ghcr.io/chopratejas/headroom:latest
+    container_name: tds-headroom
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8787:8787"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8787/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    container_name: tds-crawl4ai
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11235:11235"
+    shm_size: 1g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:11235/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
+
+  openseo:
+    image: ghcr.io/every-app/open-seo:latest
+    container_name: tds-openseo
+    restart: no
+    environment:
+      CLOUDFLARE_INCLUDE_PROCESS_ENV: "true"
+      PORT: 3001
+      AUTH_MODE: local_noauth
+      DATAFORSEO_API_KEY: ${DATAFORSEO_API_KEY:-}
+      VITE_SHOW_DEVTOOLS: "false"
+    ports:
+      - "127.0.0.1:3005:3001"
+    volumes:
+      - openseo_data:/app/.wrangler
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:3001/"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+volumes:
+  freellmapi-data:
+  openseo_data:

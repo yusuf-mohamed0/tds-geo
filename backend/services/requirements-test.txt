@@ -1,0 +1,12 @@
+# ──────────────────────────────────────────────
+# Test dependencies for Python microservices
+# ──────────────────────────────────────────────
+# Install with:
+#   pip install -r backend/requirements.txt
+# Or with system package protection bypass:
+#   pip install -r backend/requirements.txt --break-system-packages
+#
+# This file is kept for backwards compatibility.
+# The canonical dependency file is: backend/requirements.txt
+
+-r ../requirements.txt
