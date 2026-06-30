@@ -11,7 +11,7 @@
  * Plugin Name:       Traffic Digital Solutions GEO — WordPress Connector
  * Plugin URI:        https://trafficdigitalsolutions.com/wordpress
  * Description:       Thin connector for TDS Geo. Exposes REST API for post CRUD, media, taxonomies, and settings — all AI intelligence runs on the Core backend.
- * Version:           3.0.0
+ * Version:           3.1.3
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Traffic Digital Solutions GEO
@@ -90,7 +90,7 @@ if (!function_exists('mb_strtoupper')) {
 }
 
 // ─── Constants ───────────────────────────────────────
-define('TDS_GEO_WP_VERSION', '3.0.0');
+define('TDS_GEO_WP_VERSION', '3.1.3');
 define('TDS_GEO_CONNECTOR_VERSION', '1.0.0');
 define('TDS_GEO_WP_FILE', __FILE__);
 define('TDS_GEO_WP_DIR', plugin_dir_path(__FILE__));

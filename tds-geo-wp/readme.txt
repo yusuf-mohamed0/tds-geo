@@ -3,7 +3,7 @@ Contributors: tdsgeo
 Tags: AI, SEO, content, connector, rest-api, shopify, automation
 Requires at least: 5.8
 Tested up to: 6.4
-Stable tag: 3.0.0
+Stable tag: 3.1.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -72,6 +72,28 @@ Go to TDS GEO Connector → API Keys, generate a new API key, then enter the TDS
 * SEO plugin integration (Yoast, Rank Math, AIOSEO, SEOPress)
 * Multi-key authentication with permissions and rate limiting
 * Webhook support with HMAC signature verification
+
+= 3.1.3 =
+* Fixed WordPress admin AJAX nonce handling for dashboard actions
+* Fixed `Test Connection` requests being rejected before reaching the plugin handler
+* Fixed API key reveal AJAX nonce handling
+
+= 3.1.2 =
+* Added a dedicated admin body class for TDS plugin pages to make the branded styling deterministic
+* Hardened dark theme selectors against WordPress admin/theme/plugin overrides
+* Improved page-level background, wrapper, and notice styling consistency across Dashboard, Settings, API Keys, and Logs
+
+= 3.1.1 =
+* Fixed admin asset loading across all plugin pages
+* Fixed dashboard JS initialization and test connection interaction
+* Fixed API key generate/revoke redirects to stay on the API Keys page
+* Fixed connection testing for encrypted-only API keys
+* Hardened admin page styling selectors for consistent branded layout
+
+= 3.1.0 =
+* Added richer status metadata for backend discovery (`api_base_url`, `webhook_url`, `connector_version`)
+* Added payload normalization for newer TDS Geo backend field names (`contentHtml`, `metaTitle`, `metaDescription`, `imageUrl`, `publishedAt`, and related camelCase keys)
+* Keeps WordPress connector compatible with current backend article publishing payloads
 
 = 2.0.0 =
 * Initial autonomous agent architecture

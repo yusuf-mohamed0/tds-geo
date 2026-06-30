@@ -11,8 +11,7 @@ class Admin {
         add_action('admin_menu', [self::class, 'add_admin_menu']);
         add_action('admin_enqueue_scripts', [self::class, 'enqueue_assets']);
         add_action('admin_head', [self::class, 'inject_sidebar_logo']);
-        add_action('admin_post_tds_geo_generate_key', ['TdsGeo_WP\\Auth', 'handle_generate_key']);
-        add_action('admin_post_tds_geo_revoke_key', ['TdsGeo_WP\\Auth', 'handle_revoke_key']);
+        add_filter('admin_body_class', [self::class, 'admin_body_class']);
         add_action('admin_post_tds_geo_save_settings', [self::class, 'handle_save_settings']);
         add_action('admin_post_tds_geo_clear_logs', [self::class, 'handle_clear_logs']);
         add_action('wp_ajax_tds_geo_test_connection', [self::class, 'ajax_test_connection']);
@@ -35,14 +34,30 @@ class Admin {
     }
 
     public static function enqueue_assets(string $hook): void {
-        if (str_starts_with($hook, 'toplevel_page_tds-geo-wp') || str_contains($hook, 'tds-geo-wp-')) {
-            wp_enqueue_style('tds-geo-admin', TDS_GEO_WP_URL . 'assets/admin.css', [], TDS_GEO_WP_VERSION);
-            wp_enqueue_script('tds-geo-admin', TDS_GEO_WP_URL . 'assets/admin.js', ['jquery'], TDS_GEO_WP_VERSION, true);
-            wp_localize_script('tds-geo-admin', 'tdsGeo', [
-                'ajax_url' => admin_url('admin-ajax.php'),
-                'nonce'    => wp_create_nonce('tds_geo_wp_ajax'),
-            ]);
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        $is_plugin_page = str_starts_with($hook, 'toplevel_page_tds-geo-wp')
+            || str_contains($hook, 'tds-geo-wp-')
+            || str_starts_with($page, 'tds-geo-wp');
+
+        if (!$is_plugin_page) {
+            return;
         }
+
+        wp_enqueue_style('tds-geo-admin', TDS_GEO_WP_URL . 'assets/admin.css', [], TDS_GEO_WP_VERSION);
+        wp_enqueue_script('tds-geo-admin', TDS_GEO_WP_URL . 'assets/admin.js', ['jquery'], TDS_GEO_WP_VERSION, true);
+        wp_localize_script('tds-geo-admin', 'tdsGeo', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce'    => wp_create_nonce('tds_geo_wp_ajax'),
+        ]);
+    }
+
+    public static function admin_body_class(string $classes): string {
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        if (!str_starts_with($page, 'tds-geo-wp')) {
+            return $classes;
+        }
+
+        return trim($classes . ' tds-geo-wp-admin');
     }
 
     public static function inject_sidebar_logo(): void {
@@ -88,6 +103,13 @@ class Admin {
         $log_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tds_geo_logs WHERE level IN ('error','critical')");
         $seo_plugins = Api::detect_seo_plugins();
         $api_enabled = ($settings['api_enabled'] ?? 'yes') === 'yes';
+        $api_ready = $api_enabled && $key_count > 0;
+        $api_state = !$api_enabled ? 'warning' : ($api_ready ? 'healthy' : 'warning');
+        $api_message = !$api_enabled
+            ? 'API Disabled — enable in Settings to receive content.'
+            : ($api_ready
+                ? 'API Ready — authenticated and ready to receive content from TDS Geo.'
+                : 'API Enabled, but no active API key exists yet. Generate one to connect TDS Geo.');
         ?>
         <div class="tds-shell tds-admin-dashboard">
             <div class="tds-nav">
@@ -99,12 +121,12 @@ class Admin {
                     <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp-keys')); ?>" class="tds-nav-item">API Keys</a>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=tds-geo-wp-logs')); ?>" class="tds-nav-item">Logs</a>
                 </div>
-                <div class="tds-nav-status">v<?php echo esc_html(TDS_GEO_WP_VERSION); ?> <span class="tds-nav-dot <?php echo $api_enabled ? 'healthy' : 'warning'; ?>"></span></div>
+                <div class="tds-nav-status">v<?php echo esc_html(TDS_GEO_WP_VERSION); ?> <span class="tds-nav-dot <?php echo esc_attr($api_state); ?>"></span></div>
             </div>
 
-            <div class="tds-banner <?php echo $api_enabled ? 'healthy' : 'warning'; ?>">
-                <span class="tds-banner-icon"><?php echo $api_enabled ? '✓' : '⚠'; ?></span>
-                <span class="tds-banner-text"><?php echo $api_enabled ? 'API Active — ready to receive content from TDS Geo.' : 'API Disabled — enable in Settings to receive content.'; ?></span>
+            <div class="tds-banner <?php echo esc_attr($api_state); ?>">
+                <span class="tds-banner-icon"><?php echo $api_ready ? '✓' : '⚠'; ?></span>
+                <span class="tds-banner-text"><?php echo esc_html($api_message); ?></span>
             </div>
 
             <div class="tds-grid">
@@ -116,7 +138,7 @@ class Admin {
 
             <div class="tds-gen">
                 <div class="tds-gen-info">
-                    <div class="tds-gen-item"><span class="tds-gen-label">Status</span><span class="tds-gen-badge tds-tag <?php echo $api_enabled ? 'tds-tag-active' : 'tds-tag-yellow'; ?>"><?php echo $api_enabled ? 'Active' : 'Paused'; ?></span></div>
+                    <div class="tds-gen-item"><span class="tds-gen-label">Status</span><span class="tds-gen-badge tds-tag <?php echo $api_ready ? 'tds-tag-active' : 'tds-tag-yellow'; ?>"><?php echo $api_ready ? 'Ready' : ($api_enabled ? 'Needs Key' : 'Paused'); ?></span></div>
                     <div class="tds-gen-item"><span class="tds-gen-label">Default Status</span><span class="tds-gen-value"><?php echo esc_html($settings['default_status'] ?? 'draft'); ?></span></div>
                 </div>
                 <div class="tds-gen-actions">
@@ -160,6 +182,12 @@ class Admin {
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <?php wp_nonce_field('tds_geo_save_settings', 'tds_geo_nonce'); ?>
                 <input type="hidden" name="action" value="tds_geo_save_settings">
+
+                <?php if (isset($_GET['updated'])): ?>
+                <div class="tds-notice tds-notice-success" style="margin-bottom:16px;">
+                    Settings saved successfully.
+                </div>
+                <?php endif; ?>
 
                 <div class="tds-settings">
                     <div class="tds-section">
@@ -242,6 +270,14 @@ class Admin {
 
     public static function render_api_keys(): void {
         $keys = Auth::list_keys();
+        $new_key = get_transient('tds_geo_wp_new_key_' . get_current_user_id());
+        $key_error = get_transient('tds_geo_wp_key_error_' . get_current_user_id());
+        if ($new_key) {
+            delete_transient('tds_geo_wp_new_key_' . get_current_user_id());
+        }
+        if ($key_error) {
+            delete_transient('tds_geo_wp_key_error_' . get_current_user_id());
+        }
         ?>
         <div class="tds-shell">
             <div class="tds-nav">
@@ -257,6 +293,19 @@ class Admin {
 
             <div class="tds-card">
                 <div class="tds-card-header"><h2>Generate New API Key</h2></div>
+
+                <?php if (isset($_GET['updated'])): ?>
+                <div class="tds-notice tds-notice-success" style="margin-bottom:16px;">
+                    API key updated successfully.
+                </div>
+                <?php endif; ?>
+
+                <?php if ($key_error): ?>
+                <div class="tds-notice tds-notice-error" style="margin-bottom:16px;">
+                    <?php echo esc_html($key_error); ?>
+                </div>
+                <?php endif; ?>
+
                 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="tds-key-form">
                     <?php wp_nonce_field('tds_geo_generate_key', 'tds_geo_generate_nonce'); ?>
                     <input type="hidden" name="action" value="tds_geo_generate_key">
@@ -285,11 +334,11 @@ class Admin {
                     <button type="submit" class="tds-btn tds-btn-primary">Generate Key</button>
                 </form>
 
-                <?php if (isset($_GET['new_key'])): ?>
+                <?php if ($new_key): ?>
                 <div class="tds-notice tds-notice-success" style="margin-top:16px;">
                     <strong>New API Key Generated!</strong> Copy it now — it will not be shown again.
                     <div class="tds-key-display tds-key-new" style="margin-top:8px;">
-                        <code><?php echo esc_html(sanitize_text_field(wp_unslash($_GET['new_key']))); ?></code>
+                        <code><?php echo esc_html($new_key); ?></code>
                         <button type="button" class="tds-btn tds-btn-sm tds-btn-secondary" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent.trim());this.textContent='Copied!';">Copy</button>
                     </div>
                 </div>
@@ -425,7 +474,7 @@ class Admin {
     }
 
     public static function ajax_dashboard_data(): void {
-        check_ajax_referer('tds_geo_wp_ajax');
+        check_ajax_referer('tds_geo_wp_ajax', 'nonce');
         if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized.']);
 
         global $wpdb;
@@ -507,15 +556,18 @@ class Admin {
     }
 
     public static function ajax_test_connection(): void {
-        check_ajax_referer('tds_geo_wp_ajax');
+        check_ajax_referer('tds_geo_wp_ajax', 'nonce');
         if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized.']);
 
         global $wpdb;
         $api_key = get_option('tds_geo_wp_initial_key', '');
         if (empty($api_key)) {
-            $api_key = $wpdb->get_var(
-                "SELECT api_key FROM {$wpdb->prefix}tds_geo_api_keys WHERE is_active = 1 AND api_key IS NOT NULL AND api_key <> '' AND (expires_at IS NULL OR expires_at > NOW()) LIMIT 1"
+            $active_key_id = (int) $wpdb->get_var(
+                "SELECT id FROM {$wpdb->prefix}tds_geo_api_keys WHERE is_active = 1 AND (expires_at IS NULL OR expires_at > NOW()) ORDER BY created_at DESC LIMIT 1"
             );
+            if ($active_key_id > 0) {
+                $api_key = Auth::reveal_key($active_key_id) ?: '';
+            }
         }
 
         if (empty($api_key)) {
@@ -523,18 +575,18 @@ class Admin {
             return;
         }
 
-        $response = wp_remote_get(rest_url(TDS_GEO_WP_API_NAMESPACE . '/status'), [
-            'timeout' => 10,
-            'headers' => ['X-TDS-GEO-Key' => $api_key],
-        ]);
+        $request = new \WP_REST_Request('GET', '/' . TDS_GEO_WP_API_NAMESPACE . '/status');
+        $request->set_header('X-TDS-GEO-Key', $api_key);
+        $response = rest_do_request($request);
 
-        if (is_wp_error($response)) {
-            wp_send_json_error(['message' => $response->get_error_message()]);
+        if ($response->is_error()) {
+            $error = $response->as_error();
+            wp_send_json_error(['message' => $error ? $error->get_error_message() : 'Connection test failed.']);
             return;
         }
 
-        $status_code = wp_remote_retrieve_response_code($response);
-        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $status_code = $response->get_status();
+        $body = $response->get_data();
 
         if ($status_code === 200 && ($body['success'] ?? false)) {
             wp_send_json_success([

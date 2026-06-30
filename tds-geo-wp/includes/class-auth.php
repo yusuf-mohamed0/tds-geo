@@ -71,6 +71,7 @@ class Auth {
 
     public static function generate_key(string $label = '', string $permissions = 'read,write', int $created_by = 0, int $expires_in = 0): array {
         global $wpdb;
+        self::ensure_schema();
         $api_key = 'kai_' . bin2hex(random_bytes(24));
         $expires_at = $expires_in > 0 ? gmdate('Y-m-d H:i:s', time() + ($expires_in * DAY_IN_SECONDS)) : null;
 
@@ -89,7 +90,11 @@ class Auth {
             ['%s', '%s', '%s', '%s', '%s', '%d', '%s', '%d']
         );
 
-        if (!$inserted) return ['success' => false, 'message' => __('Failed to generate API key.', 'tds-geo-wp')];
+        if (!$inserted) {
+            $db_error = $wpdb->last_error ?: __('Unknown database error.', 'tds-geo-wp');
+            Logger::error('API key generation failed', ['service' => 'auth', 'db_error' => $db_error]);
+            return ['success' => false, 'message' => sprintf(__('Failed to generate API key: %s', 'tds-geo-wp'), $db_error)];
+        }
 
         Logger::info('API key generated', ['label' => $label, 'permissions' => $permissions]);
         return ['success' => true, 'api_key' => $api_key, 'message' => __('API key generated.', 'tds-geo-wp')];
@@ -188,7 +193,7 @@ class Auth {
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Unauthorized.']);
         }
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'tds_geo_wp_ajax')) {
+        if (!wp_verify_nonce($_POST['nonce'] ?? ($_POST['_ajax_nonce'] ?? ''), 'tds_geo_wp_ajax')) {
             wp_send_json_error(['message' => 'Security check failed. Refresh the page.']);
         }
         $key_id = absint($_POST['key_id'] ?? 0);
@@ -265,8 +270,14 @@ class Auth {
         $expires_in  = absint(wp_unslash($_POST['expires_in'] ?? 0));
         $result = self::generate_key($label, $permissions, get_current_user_id(), $expires_in);
 
-        $redirect = admin_url('admin.php?page=tds-geo-wp-settings');
-        if ($result['success']) $redirect = add_query_arg('new_key', $result['api_key'], $redirect);
+        $redirect = admin_url('admin.php?page=tds-geo-wp-keys');
+        if ($result['success']) {
+            set_transient('tds_geo_wp_new_key_' . get_current_user_id(), $result['api_key'], MINUTE_IN_SECONDS * 10);
+            $redirect = add_query_arg('generated', '1', $redirect);
+        } else {
+            set_transient('tds_geo_wp_key_error_' . get_current_user_id(), $result['message'] ?? __('Failed to generate API key.', 'tds-geo-wp'), MINUTE_IN_SECONDS * 10);
+            $redirect = add_query_arg('error', '1', $redirect);
+        }
 
         wp_safe_redirect($redirect);
         exit;
@@ -279,7 +290,7 @@ class Auth {
         $key_id = absint(wp_unslash($_POST['key_id'] ?? 0));
         if ($key_id > 0) self::revoke_key_by_id($key_id);
 
-        wp_safe_redirect(admin_url('admin.php?page=tds-geo-wp-settings&updated=1'));
+        wp_safe_redirect(admin_url('admin.php?page=tds-geo-wp-keys&updated=1'));
         exit;
     }
 }

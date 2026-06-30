@@ -19,6 +19,7 @@ class Sync {
     }
 
     public static function create_post(array $article): array {
+        $article = self::normalize_article_payload($article);
         $post_data = self::build_post_data($article);
         $settings  = get_option('tds_geo_wp_settings', []);
 
@@ -53,6 +54,7 @@ class Sync {
     }
 
     public static function update_post(int $post_id, array $article): array {
+        $article = self::normalize_article_payload($article);
         $existing = get_post($post_id);
         if (!$existing) return ['success' => false, 'message' => 'Post not found.'];
 
@@ -139,6 +141,34 @@ class Sync {
         }
 
         return $data;
+    }
+
+    private static function normalize_article_payload(array $article): array {
+        $map = [
+            'contentHtml' => 'content_html',
+            'metaTitle' => 'meta_title',
+            'metaDescription' => 'meta_description',
+            'focusKeyword' => 'focus_keyword',
+            'featuredImageUrl' => 'featured_image_url',
+            'imageUrl' => 'featured_image_url',
+            'publishedAt' => 'publish_date',
+            'authorEmail' => 'author_email',
+            'authorId' => 'author_id',
+            'postType' => 'post_type',
+            'commentStatus' => 'comment_status',
+            'pingStatus' => 'ping_status',
+            'statusOverride' => 'status_override',
+            'agentArticleId' => 'agent_article_id',
+            'customFields' => 'custom_fields',
+        ];
+
+        foreach ($map as $from => $to) {
+            if (!array_key_exists($to, $article) && array_key_exists($from, $article)) {
+                $article[$to] = $article[$from];
+            }
+        }
+
+        return $article;
     }
 
     private static function handle_taxonomies(int $post_id, array $article): void {
