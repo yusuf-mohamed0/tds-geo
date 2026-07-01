@@ -14,8 +14,16 @@ class Auth {
         add_action('wp_ajax_tds_geo_reveal_key', [self::class, 'handle_reveal_key']);
     }
 
+    private static function table_exists(): bool {
+        global $wpdb;
+        $table = $wpdb->prefix . 'tds_geo_api_keys';
+        $result = $wpdb->get_var("SHOW TABLES LIKE '{$table}'");
+        return $result === $table;
+    }
+
     private static function ensure_schema(): void {
         global $wpdb;
+        if (!self::table_exists()) return;
 
         $table = $wpdb->prefix . 'tds_geo_api_keys';
         $has_hash = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM {$table} LIKE %s", 'api_key_hash'));
@@ -71,6 +79,10 @@ class Auth {
 
     public static function generate_key(string $label = '', string $permissions = 'read,write', int $created_by = 0, int $expires_in = 0): array {
         global $wpdb;
+        Database::init();
+        if (!self::table_exists()) {
+            return ['success' => false, 'message' => __('Database tables are missing. Please deactivate and reactivate the plugin.', 'tds-geo-wp')];
+        }
         self::ensure_schema();
         $api_key = 'kai_' . bin2hex(random_bytes(24));
         $expires_at = $expires_in > 0 ? gmdate('Y-m-d H:i:s', time() + ($expires_in * DAY_IN_SECONDS)) : null;

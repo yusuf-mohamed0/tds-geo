@@ -5,7 +5,7 @@ defined('ABSPATH') || exit;
 class Database {
     private static ?self $instance = null;
     private const DB_VERSION_OPTION = 'tds_geo_db_version';
-    private const DB_VERSION = 1;
+    private const DB_VERSION = 2;
 
     public static function init(): void {
         if (null === self::$instance) self::$instance = new self();
@@ -44,8 +44,8 @@ class Database {
                 message TEXT NOT NULL,
                 context LONGTEXT DEFAULT NULL,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                INDEX idx_level (level),
-                INDEX idx_created (created_at)
+                KEY idx_level (level),
+                KEY idx_created (created_at)
             ) $charset;";
 
             $tables[] = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}tds_geo_api_keys (
@@ -60,8 +60,8 @@ class Database {
                 expires_at DATETIME DEFAULT NULL,
                 created_by BIGINT UNSIGNED DEFAULT NULL,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                INDEX idx_key (api_key),
-                INDEX idx_active (is_active)
+                KEY idx_key (api_key),
+                KEY idx_active (is_active)
             ) $charset;";
 
             $tables[] = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}tds_geo_articles (
@@ -70,13 +70,49 @@ class Database {
                 agent_article_id VARCHAR(64) DEFAULT NULL,
                 quality_score DECIMAL(5,2) DEFAULT 0.00,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                INDEX idx_post_id (post_id),
-                INDEX idx_agent_id (agent_article_id)
+                KEY idx_post_id (post_id),
+                KEY idx_agent_id (agent_article_id)
             ) $charset;";
         }
 
-        // Future migrations go here:
-        // if ($current < 2) { ... }
+        if ($current < 2) {
+            $tables[] = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}tds_geo_logs (
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                level VARCHAR(20) NOT NULL DEFAULT 'info',
+                service VARCHAR(50) DEFAULT NULL,
+                message TEXT NOT NULL,
+                context LONGTEXT DEFAULT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                KEY idx_level (level),
+                KEY idx_created (created_at)
+            ) $charset;";
+
+            $tables[] = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}tds_geo_api_keys (
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                api_key VARCHAR(64) DEFAULT NULL UNIQUE,
+                api_key_hash VARCHAR(255) DEFAULT NULL,
+                api_key_encrypted TEXT DEFAULT NULL,
+                label VARCHAR(100) DEFAULT NULL,
+                permissions VARCHAR(255) NOT NULL DEFAULT 'read,write',
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
+                last_used_at DATETIME DEFAULT NULL,
+                expires_at DATETIME DEFAULT NULL,
+                created_by BIGINT UNSIGNED DEFAULT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                KEY idx_key (api_key),
+                KEY idx_active (is_active)
+            ) $charset;";
+
+            $tables[] = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}tds_geo_articles (
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                post_id BIGINT UNSIGNED NOT NULL,
+                agent_article_id VARCHAR(64) DEFAULT NULL,
+                quality_score DECIMAL(5,2) DEFAULT 0.00,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                KEY idx_post_id (post_id),
+                KEY idx_agent_id (agent_article_id)
+            ) $charset;";
+        }
 
         foreach ($tables as $sql) {
             dbDelta($sql);
