@@ -7,6 +7,21 @@ import { sitesService } from '../services/sitesService';
 export function createConnectorRoutes(pool: Pool): Router {
   const router = Router();
 
+  const normalizeConnectorInput = (provider: string, body: Record<string, any>) => {
+    const endpointUrl = body.endpointUrl || body.siteUrl || body.url || '';
+    const apiKey = body.apiKey || body.tdsGeoApiKey || body.tds_geo_api_key || body.accessToken || '';
+
+    return {
+      provider,
+      endpointUrl,
+      apiKey,
+      config: {
+        endpointUrl,
+        apiKey,
+      },
+    };
+  };
+
   router.get('/', async (_req: Request, res: Response) => {
     const connectors = connectorManager.list();
     res.json({ success: true, data: connectors });
@@ -15,7 +30,9 @@ export function createConnectorRoutes(pool: Pool): Router {
   router.post('/connect/:provider', async (req: Request, res: Response) => {
     try {
       const { provider } = req.params;
-      const { endpointUrl, apiKey, clientId } = req.body;
+      const { clientId } = req.body;
+      const normalized = normalizeConnectorInput(provider, req.body);
+      const { endpointUrl, apiKey } = normalized;
 
       if (!endpointUrl || !apiKey) {
         res.status(400).json({ success: false, error: 'endpointUrl and apiKey are required' });
@@ -45,7 +62,7 @@ export function createConnectorRoutes(pool: Pool): Router {
            VALUES ($1, $2, $3, $4, true, NOW())
            ON CONFLICT (client_id, provider) WHERE is_active = true
            DO UPDATE SET endpoint_url = $3, config = $4, updated_at = NOW()`,
-          [clientId, provider, endpointUrl, JSON.stringify({ endpointUrl, apiKey })]
+          [clientId, provider, endpointUrl, JSON.stringify(normalized.config)]
         );
       }
 
@@ -71,10 +88,24 @@ export function createConnectorRoutes(pool: Pool): Router {
     try {
       const { provider } = req.params;
       const connector = connectorManager.get(provider);
+      const normalized = normalizeConnectorInput(provider, req.body || {});
 
       if (!connector) {
         res.status(404).json({ success: false, error: `Connector '${provider}' not registered` });
         return;
+      }
+
+      if (normalized.endpointUrl && normalized.apiKey) {
+        const connected = await connector.connect({
+          provider,
+          endpointUrl: normalized.endpointUrl,
+          apiKey: normalized.apiKey,
+        });
+
+        if (!connected) {
+          res.status(502).json({ success: false, error: `Failed to connect to ${provider}` });
+          return;
+        }
       }
 
       const health = await connector.health();

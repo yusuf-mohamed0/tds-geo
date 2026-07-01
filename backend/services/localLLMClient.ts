@@ -15,6 +15,13 @@ export interface GenerateResponse {
   model: string;
 }
 
+export interface LocalLLMHealth {
+  healthy: boolean;
+  modelLoaded: boolean;
+  model: string;
+  libraryAvailable?: boolean;
+}
+
 class LocalLLMClient {
   private baseUrl: string;
   private healthy = false;
@@ -23,23 +30,30 @@ class LocalLLMClient {
     this.baseUrl = baseUrl || AIRLLM_BASE_URL;
   }
 
-  async healthCheck(): Promise<{ healthy: boolean; modelLoaded: boolean; model: string }> {
+  async healthCheck(): Promise<LocalLLMHealth> {
     try {
       const res = await fetch(`${this.baseUrl}/health`, { signal: AbortSignal.timeout(5000) });
       if (res.ok) {
         this.healthy = true;
-        const data = await res.json() as { status?: string; model?: string; model_loaded?: boolean };
+        const data = await res.json() as {
+          status?: string;
+          service_status?: string;
+          model?: string;
+          model_loaded?: boolean;
+          library_available?: boolean;
+        };
         return {
-          healthy: data.status?.startsWith('healthy') ?? false,
+          healthy: (data.service_status || data.status)?.startsWith('healthy') ?? false,
           modelLoaded: data.model_loaded ?? false,
           model: data.model ?? 'not_set',
+          libraryAvailable: data.library_available,
         };
       }
       this.healthy = false;
-      return { healthy: false, modelLoaded: false, model: 'unreachable' };
+      return { healthy: false, modelLoaded: false, model: 'unreachable', libraryAvailable: false };
     } catch {
       this.healthy = false;
-      return { healthy: false, modelLoaded: false, model: 'unreachable' };
+      return { healthy: false, modelLoaded: false, model: 'unreachable', libraryAvailable: false };
     }
   }
 

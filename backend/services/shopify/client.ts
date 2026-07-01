@@ -4,7 +4,7 @@ import { ShopifyConfig } from '../../types';
 export function buildClient(shopConfig: ShopifyConfig): { client: AxiosInstance; shopName: string } {
   const shop = shopConfig.shop || process.env.SHOPIFY_DEFAULT_SHOP || '';
   const accessToken = shopConfig.accessToken || process.env.SHOPIFY_DEFAULT_ACCESS_TOKEN || '';
-  const apiVersion = shopConfig.apiVersion || process.env.SHOPIFY_DEFAULT_API_VERSION || '2024-07';
+  const apiVersion = shopConfig.apiVersion || process.env.SHOPIFY_DEFAULT_API_VERSION || '2025-07';
 
   if (!shop || !accessToken) {
     throw new Error('Shopify shop URL and access token are required');

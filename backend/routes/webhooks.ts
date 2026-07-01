@@ -9,11 +9,18 @@ import { validate } from '../validators/index';
 import { createWebhookSchema, updateWebhookSchema } from '../validators/index';
 import { logger } from '../utils/logger';
 import crypto from 'crypto';
+import { normalizeWebhookBody, verifyShopifyWebhookHmac } from '../utils/shopifyWebhook';
 
 export function createWebhookRoutes(pool: Pool): Router {
   const router = Router();
 
-  router.use(authenticate);
+  router.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.path === '/events/receive') {
+      next();
+      return;
+    }
+    authenticate(req, res, next);
+  });
 
   // ─── List Webhooks for Client ───────────────
   router.get('/:clientId/webhooks', authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
@@ -196,23 +203,17 @@ export function createWebhookRoutes(pool: Pool): Router {
   // ─── Event Receiver (for Shopify/webhook callbacks) ──
   router.post('/events/receive', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const event = req.body;
+      const rawBody = normalizeWebhookBody(req.body, (req as any).rawBody);
+      const event = rawBody ? JSON.parse(rawBody) : {};
       // Log incoming webhook events
       logger.info('Webhook event received', { event: event.event || 'unknown' });
 
       // Verify Shopify webhook HMAC if present
-      const hmac = req.headers['x-shopify-hmac-sha256'];
-      if (hmac) {
-        const generatedHmac = crypto
-          .createHmac('sha256', process.env.SHOPIFY_DEFAULT_ACCESS_TOKEN || '')
-          .update(JSON.stringify(req.body))
-          .digest('base64');
-
-        if (hmac !== generatedHmac) {
-          logger.warn('Invalid Shopify webhook HMAC');
-          res.status(401).json({ error: 'Invalid signature' });
-          return;
-        }
+      const hmac = req.headers['x-shopify-hmac-sha256'] as string | string[] | undefined;
+      if (!verifyShopifyWebhookHmac(rawBody, hmac)) {
+        logger.warn('Invalid Shopify webhook HMAC');
+        res.status(401).json({ error: 'Invalid signature' });
+        return;
       }
 
       // Store the webhook event

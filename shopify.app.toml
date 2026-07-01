@@ -7,19 +7,14 @@ embedded = true
 scopes = "write_products,read_products,write_content,read_content,write_script_tags,read_script_tags,write_themes,read_themes"
 
 [webhooks]
-api_version = "2024-07"
+api_version = "2025-07"
 
-[[webhooks.privacy]]
-topic = "customers/redact"
-address = "https://16.192.29.174.nip.io/api/webhooks/compliance"
+[[webhooks.subscriptions]]
+compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+uri = "https://16.192.29.174.nip.io/api/webhooks/compliance"
 
-[[webhooks.privacy]]
-topic = "customers/data_request"
-address = "https://16.192.29.174.nip.io/api/webhooks/compliance"
-
-[[webhooks.privacy]]
-topic = "shop/redact"
-address = "https://16.192.29.174.nip.io/api/webhooks/compliance"
+[build]
+automatically_update_urls_on_dev = true
 
 [auth]
-redirect_urls = ["https://16.192.29.174.nip.io/api/auth/shopify/callback"]
+redirect_urls = ["https://16.192.29.174.nip.io/api/shopify/callback"]

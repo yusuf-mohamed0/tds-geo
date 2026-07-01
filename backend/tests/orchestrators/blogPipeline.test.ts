@@ -258,7 +258,7 @@ function createMockPool(clientOverrides: Record<string, any> = {}) {
       slug: 'test-client',
       shopify_shop: 'test-shop.myshopify.com',
       shopify_token: 'test-token',
-      shopify_api_version: '2024-07',
+      shopify_api_version: '2025-07',
       brand_voice: 'professional',
       service_area: 'New York',
       timezone: 'America/New_York',

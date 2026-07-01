@@ -1,6 +1,6 @@
 {
   "name": "ai-seo-automation",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "AI-powered SEO automation SaaS platform for Shopify blogs",
   "main": "dist/backend/index.js",
   "scripts": {

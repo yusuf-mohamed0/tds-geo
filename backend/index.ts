@@ -73,6 +73,7 @@ import { createDeviceRoutes } from './routes/devices';
 
 // ═══ Shopify Install Route Factory ═══════════
 import { createShopifyInstallRoutes } from './routes/shopifyInstall';
+import { normalizeWebhookBody, verifyShopifyWebhookHmac } from './utils/shopifyWebhook';
 
 // ═══ Enterprise Route Factories ═══════════════
 import { createEditorialRoutes } from './routes/editorial';
@@ -215,6 +216,10 @@ app.use('/api/webhooks/compliance', (req, res, next) => {
 });
 app.use('/api/webhooks/compliance', createComplianceWebhookRoutes(pool));
 
+// Preserve raw bodies for the client webhook event receiver so HMAC checks
+// can validate the exact payload Shopify or external senders posted.
+app.use('/api/clients/:clientId/webhooks/events/receive', express.raw({ type: 'application/json' }));
+
 // ─── Body Parsing ─────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -311,9 +316,9 @@ app.get('/health', async (_req: Request, res: Response) => {
     const turbovecPromise = process.env.TVEC_URL
       ? vectorStore.healthCheck().then(ok => ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
       : Promise.resolve('not_configured');
-    const airllmPromise = process.env.AIRLLM_URL
-      ? localLLMClient.healthCheck().then(s => s.healthy ? 'healthy' : 'unreachable').catch(() => 'unreachable')
-      : Promise.resolve('not_configured');
+    const airllmPromise = localLLMClient.healthCheck()
+      .then(s => s.healthy ? 'healthy' : 'unreachable')
+      .catch(() => 'unreachable');
 
     // Live pings to Docker sidecars (skip if not configured)
     const headroomPromise = process.env.HEADROOM_BASE_URL
@@ -563,30 +568,19 @@ app.use('/api/webhooks/events/receive', express.raw({ type: 'application/json' }
 
 app.post('/api/webhooks/events/receive', async (req: Request, res: Response) => {
   try {
-    // Get the raw body (set by express.raw()) or fall back to parsed JSON
-    const rawBody = (req as any).rawBody !== undefined
-      ? (req as any).rawBody.toString('utf8')
-      : JSON.stringify(req.body);
+    const rawBody = normalizeWebhookBody(req.body, (req as any).rawBody);
+
+    // Verify Shopify webhook HMAC before trusting the payload.
+    const hmac = req.headers['x-shopify-hmac-sha256'] as string | string[] | undefined;
+    if (!verifyShopifyWebhookHmac(rawBody, hmac)) {
+      logger.warn('Invalid Shopify webhook HMAC');
+      res.status(401).json({ error: 'Invalid signature' });
+      return;
+    }
 
     // Parse the raw body to get the event object
     const event = JSON.parse(rawBody);
     logger.info('Webhook event received via /api/webhooks', { event: event?.event || 'unknown' });
-
-    // Verify Shopify webhook HMAC if present
-    const hmac = req.headers['x-shopify-hmac-sha256'];
-    if (hmac && process.env.SHOPIFY_DEFAULT_ACCESS_TOKEN) {
-      const crypto = require('crypto');
-      const generatedHmac = crypto
-        .createHmac('sha256', process.env.SHOPIFY_DEFAULT_ACCESS_TOKEN)
-        .update(rawBody)
-        .digest('base64');
-
-      if (hmac !== generatedHmac) {
-        logger.warn('Invalid Shopify webhook HMAC');
-        res.status(401).json({ error: 'Invalid signature' });
-        return;
-      }
-    }
 
     // Store the webhook event in activity logs
     await pool.query(
@@ -673,13 +667,21 @@ app.use('/api/assets', express.static(assetsDir));
 app.get('/shopify/success', (_req: Request, res: Response) => {
   const shop = String(_req.query.shop || '');
   const name = String(_req.query.name || shop.replace('.myshopify.com', ''));
-  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connected - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#171414;color:#FCF6F2;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#FCB900;font-size:24px;margin:0 0 8px}p{color:#838081;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#FCB900;color:#171414;border-radius:8px;text-decoration:none;font-weight:600;margin:0 6px}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✓</div><h1>Connected!</h1><p><strong>${name}</strong><br>${shop} — ready to generate and publish articles.</p><a class="btn" href="https://${shop}/admin">Return to Admin</a></div></body></html>`);
+  const host = String(_req.query.host || '');
+  const appUrl = new URL(SHOPIFY_APP_URL);
+  if (shop) appUrl.searchParams.set('shop', shop);
+  if (host) appUrl.searchParams.set('host', host);
+  appUrl.searchParams.set('connected', '1');
+  appUrl.searchParams.set('name', name);
+
+  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connected - TDS Geo</title><meta http-equiv="refresh" content="1;url=${appUrl.toString()}"><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#171414;color:#FCF6F2;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#FCB900;font-size:24px;margin:0 0 8px}p{color:#838081;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#FCB900;color:#171414;border-radius:8px;text-decoration:none;font-weight:600;margin:0 6px}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✓</div><h1>Connected!</h1><p><strong>${name}</strong><br>${shop} — opening the app.</p><a class="btn" href="${appUrl.toString()}">Open App</a><a class="btn" href="https://${shop}/admin">Return to Admin</a><script>setTimeout(function(){window.location.replace(${JSON.stringify(appUrl.toString())});},500);</script></div></body></html>`);
 });
 
 app.get('/shopify/error', (_req: Request, res: Response) => {
   const errors: Record<string, string> = {
     invalid_shop: 'Invalid Shopify store URL. Use store.myshopify.com format.',
     missing_params: 'Missing OAuth parameters. Please try installing again.',
+    invalid_hmac: 'Invalid Shopify signature. The OAuth callback did not verify.',
     invalid_state: 'Session expired. Please try installing again.',
     state_error: 'Verification failed. Please try again.',
     token_exchange_failed: 'Could not get access token. The app may not be properly configured.',
@@ -804,8 +806,16 @@ async function start(): Promise<void> {
       for (const row of cmsResult.rows) {
         try {
           const cfg = typeof row.config === 'string' ? JSON.parse(row.config) : row.config;
-          const endpointUrl = row.endpoint_url || (cfg.shop ? `https://${cfg.shop}` : cfg.endpointUrl);
-          const apiKey = cfg.accessToken || cfg.apiKey;
+          const endpointUrl = row.endpoint_url
+            || (cfg.shop ? `https://${cfg.shop}` : undefined)
+            || cfg.endpointUrl
+            || cfg.endpoint_url
+            || cfg.siteUrl;
+          const apiKey = cfg.accessToken
+            || cfg.apiKey
+            || cfg.tdsGeoApiKey
+            || cfg.tds_geo_api_key
+            || cfg.wpAppPassword;
           const connector = connectorManager.get(row.provider);
           if (connector && endpointUrl && apiKey) {
             await connector.connect({ provider: row.provider, endpointUrl, apiKey });
@@ -894,7 +904,7 @@ async function shutdown(signal: string): Promise<void> {
 
   // TDS GEO Core engine cleanup
   connectorManager.stopPeriodicHealthChecks();
-  eventBus.clear();
+  eventBus.clear(false);
 
   logger.info('Server shut down');
   process.exit(0);

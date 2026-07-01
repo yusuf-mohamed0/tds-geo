@@ -57,7 +57,7 @@ export function createClientRoutes(pool: Pool): Router {
                    timezone, publish_frequency, approval_mode, is_active, created_at`,
         [
           data.name, data.slug, data.shopifyShop, data.shopifyToken,
-          data.shopifyApiVersion || '2024-07', data.brandVoice || null,
+          data.shopifyApiVersion || '2025-07', data.brandVoice || null,
           data.serviceArea || null, data.timezone || 'UTC',
           data.publishFrequency || 'daily', data.preferredPublishHour || 10,
           data.approvalMode || 'auto', data.monthlyTokenLimit || 1000000,

@@ -101,7 +101,7 @@ export function createEmbeddedRoutes(pool: Pool): Router {
         return;
       }
       const { shop, accessToken, apiVersion } = conn.rows[0].config;
-      const shopifyRes = await fetch(`https://${shop}/admin/api/${apiVersion || '2024-07'}/blogs.json`, {
+      const shopifyRes = await fetch(`https://${shop}/admin/api/${apiVersion || '2025-07'}/blogs.json`, {
         headers: { 'X-Shopify-Access-Token': accessToken },
       });
       const data: any = await shopifyRes.json();
@@ -122,7 +122,7 @@ export function createEmbeddedRoutes(pool: Pool): Router {
       const config = conn.rows[0].config;
 
       const shopifyRes = await fetch(
-        `https://${config.shop}/admin/api/${config.apiVersion || '2024-07'}/articles.json?limit=250&fields=id,title,body_html,summary_html,handle,published_at,updated_at,tags,author`,
+        `https://${config.shop}/admin/api/${config.apiVersion || '2025-07'}/articles.json?limit=250&fields=id,title,body_html,summary_html,handle,published_at,updated_at,tags,author`,
         { headers: { 'X-Shopify-Access-Token': config.accessToken } }
       );
       if (!shopifyRes.ok) return;

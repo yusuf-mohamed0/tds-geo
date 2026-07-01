@@ -26,14 +26,23 @@ if pgrep -f "localLLM.*server.py" > /dev/null 2>&1; then
   sleep 1
 fi
 
-# Make sure deps are installed
-python -c "from airllm import AutoModel; print('airllm ready')" 2>/dev/null || {
-  echo "   Installing airllm..."
-  pip3 install airllm --quiet 2>&1 || pip3 install airllm --quiet --break-system-packages 2>&1 | tail -2
+# Make sure API deps are installed. The airllm package itself is optional until a model is loaded.
+python3 -c "import fastapi, uvicorn, pydantic; print('api deps ready')" 2>/dev/null || {
+  echo "   Installing Python API deps..."
+  python3 -m pip install -r "$PROJECT_DIR/backend/requirements.txt" --break-system-packages 2>&1 | tail -5
 }
 
+if ! python3 -c "from airllm import AutoModel; print('airllm ready')" 2>/dev/null; then
+  if [ -n "${AIRLLM_MODEL:-}" ]; then
+    echo "   Installing airllm for configured model..."
+    python3 -m pip install airllm --break-system-packages 2>&1 | tail -5
+  else
+    echo "   airllm package not installed yet; service will start in standby mode"
+  fi
+fi
+
 # Start the Python server
-nohup python "$PROJECT_DIR/backend/services/localLLM/server.py" \
+nohup python3 "$PROJECT_DIR/backend/services/localLLM/server.py" \
   > "$AIRLLM_LOG" 2>&1 &
 
 LLM_PID=$!

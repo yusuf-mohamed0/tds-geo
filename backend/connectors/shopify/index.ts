@@ -21,7 +21,7 @@ export class ShopifyConnector implements ConnectorInterface {
     this.shopConfig = {
       shop: config.endpointUrl?.replace('https://', '').replace('/admin', '') || '',
       accessToken: config.apiKey || '',
-      apiVersion: '2024-07',
+      apiVersion: '2025-07',
     };
 
     if (!this.shopConfig.shop || !this.shopConfig.accessToken) {
@@ -155,7 +155,7 @@ export class ShopifyConnector implements ConnectorInterface {
       return {
         shop: cfg?.endpointUrl?.replace('https://', '').replace('/admin', '') || '',
         accessToken: cfg?.apiKey || '',
-        apiVersion: '2024-07',
+        apiVersion: '2025-07',
       };
     }
     return this.shopConfig;

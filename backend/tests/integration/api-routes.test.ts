@@ -153,7 +153,7 @@ function createMockPoolWithData(overrides: Record<string, any> = {}): any {
         slug: 'test-client',
         shopify_shop: 'test-shop.myshopify.com',
         shopify_token: 'test-token',
-        shopify_api_version: '2024-07',
+        shopify_api_version: '2025-07',
         brand_voice: 'educational',
         service_area: 'California',
         timezone: 'US/Pacific',

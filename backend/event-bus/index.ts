@@ -1,4 +1,6 @@
 import { logger } from '../utils/logger';
+import fs from 'node:fs';
+import path from 'node:path';
 
 export type EventHandler = (payload: any) => Promise<void>;
 
@@ -11,6 +13,11 @@ class EventBus {
   private handlers = new Map<string, EventHandler[]>();
   private history: { event: string; payload: any; timestamp: Date }[] = [];
   private maxHistory = 1000;
+  private historyFile = process.env.EVENT_BUS_HISTORY_FILE || path.resolve(process.cwd(), 'outputs', 'event-bus-history.json');
+
+  constructor() {
+    this.loadHistory();
+  }
 
   on(event: string, handler: EventHandler): void {
     if (!this.handlers.has(event)) {
@@ -31,6 +38,7 @@ class EventBus {
   async emit(event: string, payload: any): Promise<void> {
     this.history.push({ event, payload, timestamp: new Date() });
     if (this.history.length > this.maxHistory) this.history.shift();
+    this.persistHistory();
 
     const handlers = this.handlers.get(event);
     if (!handlers || handlers.length === 0) return;
@@ -59,9 +67,34 @@ class EventBus {
     return [...this.history];
   }
 
-  clear(): void {
+  clear(clearHistory = true): void {
     this.handlers.clear();
-    this.history = [];
+    if (clearHistory) {
+      this.history = [];
+      this.persistHistory();
+    }
+  }
+
+  private loadHistory(): void {
+    try {
+      if (!fs.existsSync(this.historyFile)) return;
+      const raw = fs.readFileSync(this.historyFile, 'utf8');
+      const parsed = JSON.parse(raw) as { event: string; payload: any; timestamp: string }[];
+      this.history = parsed
+        .slice(-this.maxHistory)
+        .map(item => ({ ...item, timestamp: new Date(item.timestamp) }));
+    } catch (error) {
+      logger.warn('EventBus: failed to load persisted history', { error: (error as Error).message });
+    }
+  }
+
+  private persistHistory(): void {
+    try {
+      fs.mkdirSync(path.dirname(this.historyFile), { recursive: true });
+      fs.writeFileSync(this.historyFile, JSON.stringify(this.history), 'utf8');
+    } catch (error) {
+      logger.warn('EventBus: failed to persist history', { error: (error as Error).message });
+    }
   }
 }
 

@@ -7,6 +7,7 @@
 import os
 import json
 import time
+import importlib.util
 from typing import Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -64,11 +65,14 @@ def _load_model(model_name: str, compression: str | None = None):
 
 @app.get("/health")
 def health():
+    library_available = importlib.util.find_spec("airllm") is not None
     return {
         "status": "healthy" if model_loaded else "no_model_loaded",
+        "service_status": "healthy",
         "model": MODEL_NAME or "not_set",
         "model_loaded": model_loaded,
         "library": "airllm",
+        "library_available": library_available,
     }
 
 

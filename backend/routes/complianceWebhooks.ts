@@ -1,21 +1,15 @@
 import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
 import axios from 'axios';
-import crypto from 'crypto';
 import { logger } from '../utils/logger';
+import { SHOPIFY_COMPLIANCE_WEBHOOKS, verifyShopifyWebhookHmac } from '../utils/shopifyWebhook';
 
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
-const WEBHOOK_API_VERSION = '2024-07';
+const WEBHOOK_API_VERSION = '2025-07';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 
 function verifyHmac(rawBody: string, hmacHeader: string | undefined): boolean {
-  if (!hmacHeader || !SHOPIFY_API_SECRET) return false;
-  const calculated = crypto.createHmac('sha256', SHOPIFY_API_SECRET).update(rawBody).digest('base64');
-  try {
-    return crypto.timingSafeEqual(Buffer.from(calculated, 'base64'), Buffer.from(hmacHeader, 'base64'));
-  } catch {
-    return false;
-  }
+  return verifyShopifyWebhookHmac(rawBody, hmacHeader, SHOPIFY_API_SECRET);
 }
 
 function rawBodyCapture(req: Request, _res: Response, next: () => void) {
@@ -168,16 +162,9 @@ export function createComplianceWebhookRoutes(pool: Pool): Router {
     }
 
     const baseUrl = `https://${shop}/admin/api/${WEBHOOK_API_VERSION}`;
-    const complianceTopics = [
-      { topic: 'customers/data_request', path: '/api/webhooks/compliance/customers-data-request' },
-      { topic: 'customers/redact', path: '/api/webhooks/compliance/customers-redact' },
-      { topic: 'shop/redact', path: '/api/webhooks/compliance/shop-redact' },
-      { topic: 'app/uninstalled', path: '/api/webhooks/compliance/app-uninstalled' },
-    ];
-
     const results: { topic: string; created: boolean; error?: string }[] = [];
 
-    for (const { topic, path } of complianceTopics) {
+    for (const { topic, path } of SHOPIFY_COMPLIANCE_WEBHOOKS) {
       try {
         const webhookRes = await axios.post(`${baseUrl}/webhooks.json`, {
           webhook: {

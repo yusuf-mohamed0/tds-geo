@@ -14,7 +14,7 @@ const PLANS: Record<string, { name: string; amount: number; interval: 'EVERY_30_
 };
 
 async function shopifyGraphQL(shop: string, accessToken: string, query: string, variables?: Record<string, any>): Promise<any> {
-  const res = await fetch(`https://${shop}/admin/api/2024-07/graphql.json`, {
+  const res = await fetch(`https://${shop}/admin/api/2025-07/graphql.json`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

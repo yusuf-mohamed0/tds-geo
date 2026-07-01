@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS clients (
   slug                VARCHAR(255) UNIQUE NOT NULL,
   shopify_shop        VARCHAR(255) NOT NULL,
   shopify_token       VARCHAR(255) NOT NULL,
-  shopify_api_version VARCHAR(50) NOT NULL DEFAULT '2024-07',
+  shopify_api_version VARCHAR(50) NOT NULL DEFAULT '2025-07',
 
   -- Brand & Content config
   brand_voice         TEXT DEFAULT 'professional and educational',

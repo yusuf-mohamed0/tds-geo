@@ -64,7 +64,7 @@ export function createClientRepo(pool: Pool) {
        RETURNING *`,
       [
         data.name, data.slug, data.shopify_shop, data.shopify_token,
-        data.shopify_api_version || '2024-07', data.brand_voice || null,
+        data.shopify_api_version || '2025-07', data.brand_voice || null,
         data.service_area || null, data.timezone || 'UTC',
         data.publish_frequency || 'daily', data.preferred_publish_hour || 10,
         data.approval_mode || 'auto', data.monthly_token_limit || 1000000,

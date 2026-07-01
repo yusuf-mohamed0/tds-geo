@@ -71,6 +71,9 @@ ALTER TABLE schedules
 ALTER TABLE schedules
   ADD COLUMN IF NOT EXISTS articles_generated INTEGER DEFAULT 0;
 
+ALTER TABLE schedules
+  ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ;
+
 CREATE TABLE IF NOT EXISTS schedule_logs (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   schedule_id     UUID REFERENCES schedules(id) ON DELETE CASCADE,

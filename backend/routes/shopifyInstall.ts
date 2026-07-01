@@ -3,12 +3,13 @@ import { randomBytes } from 'crypto';
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import { sitesService } from '../services/sitesService';
+import { SHOPIFY_COMPLIANCE_WEBHOOKS, verifyShopifyOAuthHmac } from '../utils/shopifyWebhook';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
 const SCOPES = 'read_content,read_products,write_content,write_products';
-const WEBHOOK_API_VERSION = '2024-07';
+const WEBHOOK_API_VERSION = '2025-07';
 
 function isValidShop(shop: string): boolean {
   return /^[a-zA-Z0-9][a-zA-Z0-9-]*\.myshopify\.com$/.test(shop);
@@ -55,9 +56,15 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
     const code = String(req.query.code || '');
     const state = String(req.query.state || '');
     const hmac = String(req.query.hmac || '');
+    const host = String(req.query.host || '');
 
     if (!shop || !code || !hmac) {
       res.redirect(`${SHOPIFY_APP_URL}/shopify/error?msg=missing_params`);
+      return;
+    }
+
+    if (!verifyShopifyOAuthHmac(req.query as Record<string, string | string[] | undefined>, hmac, SHOPIFY_API_SECRET)) {
+      res.redirect(`${SHOPIFY_APP_URL}/shopify/error?msg=invalid_hmac`);
       return;
     }
 
@@ -126,7 +133,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
           [clientId]
         );
         const storeName = shop.replace('.myshopify.com', '').replace(/^[a-z0-9]-/, match => match.toUpperCase());
-        const connConfig = JSON.stringify({ shop, accessToken, apiVersion: '2024-07' });
+        const connConfig = JSON.stringify({ shop, accessToken, apiVersion: '2025-07' });
         const fullUrl = `https://${shop}`;
         if (existingConn.rows.length > 0) {
           await pool.query(
@@ -156,7 +163,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
       // Step 4: Try fetching shop info (non-fatal if fails)
       let storeName = shop.replace('.myshopify.com', '');
       try {
-        const shopResp = await fetch(`https://${shop}/admin/api/2024-07/shop.json`, {
+        const shopResp = await fetch(`https://${shop}/admin/api/2025-07/shop.json`, {
           headers: { 'X-Shopify-Access-Token': accessToken }
         });
         if (shopResp.ok) {
@@ -180,13 +187,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
 
       // Step 5: Subscribe GDPR compliance webhooks (non-fatal)
       try {
-        const complianceTopics = [
-          { topic: 'customers/data_request', path: '/api/webhooks/compliance/customers-data-request' },
-          { topic: 'customers/redact', path: '/api/webhooks/compliance/customers-redact' },
-          { topic: 'shop/redact', path: '/api/webhooks/compliance/shop-redact' },
-          { topic: 'app/uninstalled', path: '/api/webhooks/compliance/app-uninstalled' },
-        ];
-        for (const { topic, path } of complianceTopics) {
+        for (const { topic, path } of SHOPIFY_COMPLIANCE_WEBHOOKS) {
           const webhookUrl = `${SHOPIFY_APP_URL}${path}`;
           const existingRes = await fetch(`https://${shop}/admin/api/${WEBHOOK_API_VERSION}/webhooks.json?topic=${encodeURIComponent(topic)}&address=${encodeURIComponent(webhookUrl)}`, {
             headers: { 'X-Shopify-Access-Token': accessToken },
@@ -207,7 +208,12 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
       }
 
       logger.info('Shopify store installed successfully', { shop, storeName });
-      res.redirect(`${SHOPIFY_APP_URL}/shopify/success?shop=${encodeURIComponent(shop)}&name=${encodeURIComponent(storeName)}`);
+      const appUrl = new URL(SHOPIFY_APP_URL);
+      appUrl.searchParams.set('shop', shop);
+      appUrl.searchParams.set('connected', '1');
+      if (host) appUrl.searchParams.set('host', host);
+      appUrl.searchParams.set('name', storeName);
+      res.redirect(appUrl.toString());
 
     } catch (err: any) {
       logger.error('Shopify OAuth callback failed', {

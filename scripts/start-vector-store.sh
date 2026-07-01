@@ -28,15 +28,15 @@ if pgrep -f "turbovec.*server.py" > /dev/null 2>&1 || pgrep -f "vectorStore.*ser
 fi
 
 # Make sure deps are installed
-python -c "from turbovec import TurboQuantIndex; print('turbovec ready')" 2>/dev/null || {
+python3 -c "from turbovec import TurboQuantIndex; print('turbovec ready')" 2>/dev/null || {
   echo "   Installing turbovec..."
-  pip3 install turbovec --quiet 2>&1 || pip3 install turbovec --quiet --break-system-packages 2>&1 | tail -2
+  python3 -m pip install turbovec --quiet 2>&1 || python3 -m pip install turbovec --quiet --break-system-packages 2>&1 | tail -2
 }
 
 mkdir -p "$TVEC_DATA_DIR"
 
 # Start the Python server
-nohup python "$PROJECT_DIR/backend/services/vectorStore/server.py" \
+nohup python3 "$PROJECT_DIR/backend/services/vectorStore/server.py" \
   > "$TVEC_LOG" 2>&1 &
 
 VEC_PID=$!

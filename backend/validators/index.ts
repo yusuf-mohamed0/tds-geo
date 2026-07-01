@@ -26,7 +26,7 @@ export const createClientSchema = Joi.object({
   slug: Joi.string().min(2).max(255).pattern(/^[a-z0-9-]+$/).required(),
   shopifyShop: Joi.string().required(),
   shopifyToken: Joi.string().required(),
-  shopifyApiVersion: Joi.string().default('2024-07'),
+  shopifyApiVersion: Joi.string().default('2025-07'),
   brandVoice: Joi.string().optional(),
   serviceArea: Joi.string().optional(),
   timezone: Joi.string().optional(),
