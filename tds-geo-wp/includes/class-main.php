@@ -34,6 +34,7 @@ class Main {
         Api::init();
         Sync::init();
         Admin::init();
+        AdminRemote::init();
 
         $this->services = [
             'database'    => Database::class,

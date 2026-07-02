@@ -78,12 +78,16 @@ class Api {
     }
 
     public static function check_read_permission() {
-        if (!self::is_api_enabled() || !Auth::check_read_permission()) return false;
+        if (!self::is_api_enabled()) return false;
+        if (is_user_logged_in() && current_user_can('manage_options')) return true;
+        if (!Auth::check_read_permission()) return false;
         return self::rate_limit_response('read', 120, 60);
     }
 
     public static function check_write_permission() {
-        if (!self::is_api_enabled() || !Auth::check_write_permission()) return false;
+        if (!self::is_api_enabled()) return false;
+        if (is_user_logged_in() && current_user_can('manage_options')) return true;
+        if (!Auth::check_write_permission()) return false;
         return self::rate_limit_response('write', 30, 60);
     }
 

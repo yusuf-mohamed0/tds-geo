@@ -474,7 +474,7 @@ class Admin {
     }
 
     public static function ajax_dashboard_data(): void {
-        check_ajax_referer('tds_geo_wp_ajax', 'nonce');
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'tds_geo_wp_ajax')) { wp_send_json_error(['message' => 'Security check failed. Refresh the page.']); return; }
         if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized.']);
 
         global $wpdb;
@@ -556,19 +556,17 @@ class Admin {
     }
 
     public static function ajax_test_connection(): void {
-        check_ajax_referer('tds_geo_wp_ajax', 'nonce');
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'tds_geo_wp_ajax')) { wp_send_json_error(['message' => 'Security check failed. Refresh the page.']); return; }
         if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Unauthorized.']);
 
         global $wpdb;
-        $api_key = get_option('tds_geo_wp_initial_key', '');
-        if (empty($api_key)) {
-            $active_key_id = (int) $wpdb->get_var(
-                "SELECT id FROM {$wpdb->prefix}tds_geo_api_keys WHERE is_active = 1 AND (expires_at IS NULL OR expires_at > NOW()) ORDER BY created_at DESC LIMIT 1"
-            );
-            if ($active_key_id > 0) {
-                $api_key = Auth::reveal_key($active_key_id) ?: '';
-            }
-        }
+        $stored_key = get_option('tds_geo_wp_initial_key', '');
+        $active_key_id = (int) $wpdb->get_var(
+            "SELECT id FROM {$wpdb->prefix}tds_geo_api_keys WHERE is_active = 1 AND (expires_at IS NULL OR expires_at > NOW()) ORDER BY created_at DESC LIMIT 1"
+        );
+        $db_key = $active_key_id > 0 ? (Auth::reveal_key($active_key_id) ?: '') : '';
+
+        $api_key = $db_key ?: $stored_key;
 
         if (empty($api_key)) {
             wp_send_json_error(['message' => 'No active API key found. Generate one first.']);
