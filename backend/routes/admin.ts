@@ -9,6 +9,7 @@ import { logger } from '../utils/logger';
 import { checkRedisHealth } from '../utils/redisHealth';
 import { validate, adminNotifySchema } from '../validators/index';
 import { sitesService } from '../services/sitesService';
+import { encrypt, mask } from '../services/credentialEncryption';
 
 export function createAdminRoutes(pool: Pool): Router {
   const router = Router();
@@ -311,6 +312,58 @@ export function createAdminRoutes(pool: Pool): Router {
     } catch (err) {
       next(err);
     }
+  });
+
+  // ─── Vault Sync (WordPress plugin pushes credential updates) ──
+  router.post('/vault/sync', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { siteUrl, username, password, wpUsername, wpPassword, dbName, dbUser, dbPassword, dbHost } = req.body;
+      if (!siteUrl) {
+        res.status(400).json({ error: 'siteUrl is required' });
+        return;
+      }
+
+      const user = (req as any).user;
+      const service = new URL(siteUrl).hostname.replace(/^www\./, '');
+
+      const upsert = async (category: string, label: string, u: string, p: string, url: string, notes: string) => {
+        const encUser = u ? encrypt(u) : '';
+        const encPass = p ? encrypt(p) : '';
+        const maskedU = u ? mask(u) : '';
+        const maskedP = p ? mask(p) : '';
+
+        const existing = await pool.query(
+          `SELECT id FROM credential_vault WHERE service = $1 AND category = $2 AND label = $3 AND deleted_at IS NULL`,
+          [service, category, label]
+        );
+
+        if (existing.rows.length > 0) {
+          await pool.query(
+            `UPDATE credential_vault SET username = $1, password = $2, masked_username = $3, masked_password = $4,
+             url = $5, notes = $6, updated_at = NOW() WHERE id = $7`,
+            [encUser || null, encPass || null, maskedU || null, maskedP || null, url, notes, existing.rows[0].id]
+          );
+        } else {
+          await pool.query(
+            `INSERT INTO credential_vault (category, service, label, url, username, password, notes, masked_username, masked_password)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+            [category, service, label, url, encUser || null, encPass || null, notes || null, maskedU || null, maskedP || null]
+          );
+        }
+      };
+
+      if (username && password) {
+        await upsert('wordpress', 'WordPress Admin', username, password, siteUrl, '');
+      }
+      if (wpUsername && wpPassword) {
+        await upsert('wordpress', 'WP Application Password', wpUsername, wpPassword, siteUrl, 'For REST API / plugin updates');
+      }
+      if (dbUser && dbPassword) {
+        await upsert('database', 'Database', dbUser, dbPassword, dbHost || siteUrl, dbName ? `Database: ${dbName}` : '');
+      }
+
+      res.json({ message: 'Vault synced', service });
+    } catch (err) { next(err); }
   });
 
   return router;

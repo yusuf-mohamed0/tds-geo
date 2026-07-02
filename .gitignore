@@ -61,3 +61,7 @@ graphify-out/
 *.orig
 trash/
 project-blueprint.md
+
+# Vault UI
+backend/vault-ui/node_modules/
+backend/vault-ui/package-lock.json

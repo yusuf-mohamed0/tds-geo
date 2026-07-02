@@ -104,6 +104,9 @@ import odooConnector from './services/odooConnector';
 // ═══ Prompt Hardening Routes ═════════════════
 import { createMetaRoutes } from './routes/meta';
 
+// ═══ Credential Vault ═══════════════════════════
+import { createCredentialVaultRoutes } from './routes/credentialVault';
+
 // ═══ TDS GEO Core Engine Imports ════════════════
 import { initializeEngines, analyticsEngine } from './engines';
 import { eventBus } from './event-bus';
@@ -518,6 +521,9 @@ app.use('/api/heartbeat', createHeartbeatRoutes());
 // ═══════ Billing Routes (Shopify AppStore requirement) ═══
 import { createBillingRoutes } from './routes/billing';
 app.use('/api/billing', createBillingRoutes(pool));
+
+// ═══════ Credential Vault Route ════════════════
+app.use('/api/vault', createCredentialVaultRoutes(pool));
 
 // ═══════ Worker Performance Scoring Routes ═══════
 app.use('/api/worker-scoring', createWorkerScoringRoutes(pool));
