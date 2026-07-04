@@ -103,7 +103,111 @@ Evaluates writing quality itself — sentence structure, clarity, originality. C
 7. **Entity density** — Include all related entities (tools, concepts, people, methodologies) explicitly. AI models build knowledge graphs from entity relationships. Target 3%+ entity density (entities per 100 words).
 8. **Answer extraction format** — Use question headings where possible ("What Is X?", "How Does X Work?"). Keep the first answer sentence under 30 words for direct answer extraction.
 9. **Progressive disclosure** — Start each section with the simplest explanation, then layer complexity. This allows AI to extract at the appropriate depth level.
-10. **GEO Self-Check** — Before finishing, verify: (a) first sentence of each H2 is a definition, (b) each section works standalone, (c) 3+ statistical claims exist, (d) all 4 EEAT signals present, (e) entity density >3%, (f) no vague claims without attribution.
+10. **Content density — Per 1,000 words include:**
+    - **2+ named expert quotes** with credentials (name, title, institution) → +40.9% citation lift
+    - **5+ sourced statistics** with named source and date → +30.6% citation lift
+    - **1+ comparison table** → +34% Gemini citations
+    - **3+ independently quotable sentences** starting with definitive language
+11. **GEO Self-Check** — Before finishing, verify: (a) first sentence of each H2 is a definition, (b) each section works standalone, (c) 5+ sourced statistics exist, (d) all 4 EEAT signals present, (e) entity density >3%, (f) no vague claims without attribution.
+
+### Quotable Sentence Templates
+- "The single most important factor in [topic] is..."
+- "What most guides miss is..."
+- "Here's what the data actually shows..."
+- "[Number]% of [group] report that..."
+- "According to [authoritative source]..."
+- "The key distinction between X and Y is..."
+- "After [number] years of [experience], the most important lesson is..."
+
+---
+
+## PART 3.5: AEO — ANSWER ENGINE OPTIMIZATION
+
+AI answer engines (AI Overviews, ChatGPT, Perplexity, Gemini, voice assistants) extract, cite, and quote content as direct answers. Structure every section for extraction.
+
+### Required Section Format
+```
+## [Question-based H2 heading]
+
+[40-60 word direct answer. First sentence must be independently liftable.
+Next 2-3 sentences add qualifying detail. This block is what AI extracts.]
+
+[Supporting paragraphs — context, examples, nuance for human readers]
+
+**Key takeaway:** [One-line summary — becomes AI snippet.]
+```
+
+### AEO Rules
+1. **Question-led headings** — Every H2 starts with who/what/why/how/where/when. "What is X" not "X explained".
+2. **40-60 word answer blocks** — Immediate, direct answer under every H2. First sentence is the quote.
+3. **Declarative language** — State facts clearly. No hedging, no "might", "could", "perhaps".
+4. **Entity-clear** — Link every named entity to its canonical reference on first mention.
+5. **FAQPage-ready** — Include 3-5 natural-language Q&A pairs. Real questions users ask, not keyword-stuffed.
+6. **Standalone sections** — Each H2 section is independently valuable if extracted alone.
+7. **Surface-specific:**
+   - AI Overviews: 97% of citations from organic top 20. FAQPage schema gives 2-3x lift.
+   - ChatGPT: 44.2% of citations from first 30% of page. Front-load the answer.
+   - Perplexity: Cross-references sources. Attribute every statistic to a named source with date.
+   - Gemini: Structured hierarchy, complete coverage, consistent entity naming.
+   - Claude: Human-sounding prose. Varied sentence structure. Penalizes AI-sounding patterns.
+   - Featured snippets: 40-60 word paragraphs, numbered lists, short tables.
+
+### Anti-Patterns
+- Burying the answer under preamble
+- Clever or brand-name headings that don't match real queries
+- Generic paragraphs any competitor could have written
+- Missing entity links on first mention
+
+---
+
+## PART 3.6: LLMO — LARGE LANGUAGE MODEL OPTIMIZATION
+
+LLMs build an internal representation of your brand from your content. Optimize for both training data (Common Crawl) and live retrieval (RAG).
+
+### The 6 Highest-Impact LLMO Tactics
+
+**1. Answer Capsules (Foundation)**
+After every H2 heading, write a 40-60 word direct answer that is self-contained and quotable.
+
+**2. Named Expert Quotes (+40.9% Citation Lift)**
+```
+"[Direct quote with specific claim]" — [Full Name], [Title/Role] at [Institution/Company]
+```
+Include 2+ per 1,000 words. "John Smith, professor of computational linguistics at MIT" is citable. "Experts say" is not.
+
+**3. Sourced Statistics (+30.6% Citation Lift)**
+```
+[Number]% of [population] [action/result], according to a [year] [institution] study of [sample size].
+```
+Include 1 per 150-200 words. Always name the source, year, and sample size.
+
+**4. Comparison Tables (+34% Gemini Citations)**
+Use `<table>` for product comparisons, before/after scenarios, methodology comparisons, cost/benefit analyses.
+
+**5. FAQ Sections with FAQPage JSON-LD**
+Use real user search queries as question text. Phrase conversationally.
+
+**6. Entity Consistency (Foundational)**
+Your company, product, people, partners must be written IDENTICALLY across every page. Pick one term per concept and never vary.
+
+### Entity Notes
+After each H2 section, optionally list the key entities mentioned (products, people, concepts, organizations). This reinforces the model's entity map.
+
+### Definitive Language
+Cited text is nearly twice as likely to contain definitive phrasing (36.2% vs 20.3%).
+- DO: "The most important factor in X is Y."
+- DON'T: "One factor that may be important is Y."
+- DO: "Three studies confirm that..."
+- DON'T: "Research suggests that..."
+- DO: "X is defined as..."
+- DON'T: "X can be thought of as..."
+
+### Section Architecture for LLM Retrieval
+- **Within first 100 words:** Answer the primary question (44.2% of ChatGPT citations come here).
+- **H2 headings:** Match real user prompt language, not keyword variants.
+- **Paragraphs:** Each makes exactly one point. Max 5 sentences.
+- **Definitions:** Every named concept has an explicit definition somewhere in the page.
+- **Internal links:** Descriptive anchor text. Link to related cluster content.
 
 ## PART 4: SEARCH INTENT MASTERY
 

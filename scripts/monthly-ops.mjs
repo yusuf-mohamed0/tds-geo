@@ -527,7 +527,6 @@ async function runDailyOps() {
       const staleDrafts = await getOldUnpublishedDrafts(client.id, 14);
       for (const draft of staleDrafts) {
         log('info', 'Clearing stale draft', { id: draft.id, title: draft.title?.substring(0, 50) });
-        // Approve and queue it
         await pool.query(
           `UPDATE articles SET status = 'approved', editorial_status = 'approved', updated_at = NOW() WHERE id = $1`,
           [draft.id]
@@ -537,6 +536,35 @@ async function runDailyOps() {
         pubDate.setUTCHours(9, 0, 0, 0);
         await queueArticleForPublishing(draft.id, client.id, pubDate.toISOString());
       }
+    }
+  }
+
+  // Step 7: Freshness calendar audit (once per week, Wednesday)
+  if (DAY_OF_WEEK === 3 && HOUR === 5) {
+    log('info', '── Step 7: Freshness calendar audit ──');
+    const flaggedCount = await checkFreshnessCalendar();
+    if (flaggedCount > 0) {
+      // Regenerate the oldest stale articles (up to 3 per week)
+      const oldest = await pool.query(
+        `SELECT fa.article_id, fa.age_days
+         FROM freshness_audits fa
+         WHERE fa.needs_update = true
+           AND (fa.updated_at IS NULL OR fa.updated_at < NOW() - INTERVAL '7 days')
+         ORDER BY fa.age_days DESC
+         LIMIT 3`
+      );
+      for (const article of oldest.rows) {
+        await regenerateFreshArticle(article.article_id);
+      }
+    }
+  }
+
+  // Step 8: Entity consistency check (once per month, 1st day)
+  if (DAY === 1 && HOUR === 6) {
+    log('info', '── Step 8: Entity consistency check ──');
+    const clients = await pool.query('SELECT id, name FROM clients');
+    for (const client of clients.rows) {
+      await checkEntityConsistency(client.id, client.name);
     }
   }
 
@@ -624,8 +652,20 @@ async function main() {
       case 'init-schedules':
         await initializeSchedules();
         break;
+      case 'freshness':
+        await checkFreshnessCalendar();
+        break;
+      case 'entity-check':
+        const allClients = await pool.query('SELECT id, name FROM clients');
+        for (const c of allClients.rows) {
+          await checkEntityConsistency(c.id, c.name);
+        }
+        break;
+      case 'enhanced-report':
+        await generateEnhancedMonthlyReport();
+        break;
       default:
-        console.log('Usage: node monthly-ops.mjs [daily|report|publish-queue|health|improve|init-schedules]');
+        console.log('Usage: node monthly-ops.mjs [daily|report|publish-queue|health|improve|init-schedules|freshness|entity-check|enhanced-report]');
     }
   } catch (err) {
     log('error', 'Monthly ops failed', { error: err.message, stack: err.stack?.split('\n')[1] });
@@ -633,6 +673,216 @@ async function main() {
   } finally {
     await pool.end();
   }
+}
+
+// ─── Freshness Calendar ──────────────────────────────────────────
+
+async function checkFreshnessCalendar() {
+  log('info', '═══ Running Freshness Calendar Audit ═══');
+
+  const staleArticles = await pool.query(
+    `SELECT a.id, a.title, a.client_id, c.name as client_name, a.created_at, a.updated_at
+     FROM articles a
+     JOIN clients c ON c.id = a.client_id
+     WHERE a.status = 'published'
+       AND (a.updated_at IS NULL OR a.updated_at < NOW() - INTERVAL '10 months')
+       AND a.created_at < NOW() - INTERVAL '10 months'
+     ORDER BY a.updated_at ASC NULLS FIRST
+     LIMIT 50`
+  );
+
+  log('info', 'Freshness audit results', {
+    staleCount: staleArticles.rows.length,
+    thresholdMonths: 10,
+  });
+
+  for (const article of staleArticles.rows) {
+    const ageDays = Math.floor(
+      (Date.now() - new Date(article.updated_at || article.created_at).getTime()) / 86400000
+    );
+
+    await pool.query(
+      `INSERT INTO freshness_audits (article_id, client_id, age_days, needs_update, last_checked_at)
+       VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT DO NOTHING`,
+      [article.id, article.client_id, ageDays, ageDays > 365]
+    );
+
+    log('info', 'Stale article flagged', {
+      id: article.id,
+      title: article.title?.substring(0, 50),
+      client: article.client_name,
+      ageDays,
+      needsUpdate: ageDays > 365,
+    });
+  }
+
+  // Update freshness audit records for recent articles (marked as up-to-date)
+  await pool.query(
+    `INSERT INTO freshness_audits (article_id, client_id, age_days, needs_update, last_checked_at)
+     SELECT a.id, a.client_id, 0, false, NOW()
+     FROM articles a
+     WHERE a.status = 'published'
+       AND a.updated_at > NOW() - INTERVAL '6 months'
+     ON CONFLICT DO NOTHING`
+  );
+
+  log('info', 'Freshness calendar audit complete', {
+    flagged: staleArticles.rows.length,
+  });
+
+  return staleArticles.rows.length;
+}
+
+async function regenerateFreshArticle(articleId) {
+  log('info', 'Regenerating stale article for freshness', { articleId });
+  const token = generateToken();
+  try {
+    const res = await fetch(`${BASE_URL}/api/articles/${articleId}/regenerate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (res.ok) {
+      const body = await res.json();
+      log('info', 'Article regenerated for freshness', { articleId });
+      await pool.query(
+        `UPDATE freshness_audits SET updated_at = NOW() WHERE article_id = $1`,
+        [articleId]
+      );
+      return body;
+    }
+    log('warn', 'Freshness regeneration failed', { articleId, status: res.status });
+    return null;
+  } catch (err) {
+    log('error', 'Freshness regeneration error', { articleId, error: err.message });
+    return null;
+  }
+}
+
+// ─── Entity Consistency Check ────────────────────────────────────
+
+async function checkEntityConsistency(clientId, clientName) {
+  log('info', 'Checking entity consistency', { client: clientName });
+
+  // Define canonical entities per client
+  const canonicalEntities = {
+    'boston-pharma': [
+      { name: 'Boston Pharmaceutical Industries', variants: ['boston pharma', 'boston pharmaceuticals', 'boston-pharma'] },
+      { name: 'GMP', variants: ['good manufacturing practice', 'gmp certification', 'gmp certified'] },
+      { name: 'Egyptian Drug Authority', variants: ['EDA', 'egyptian drug authority (EDA)', 'eda'] },
+    ],
+    'traffic-test': [
+      { name: 'Traffic Test', variants: ['traffic-test', 'traffic test store'] },
+      { name: 'TDS Geo', variants: ['tds-geo', 'tds geo plugin', 'tds geo app'] },
+    ],
+    'boston-vet': [
+      { name: 'Boston Veterinary Pharmaceutical', variants: ['boston vet', 'boston veterinary', 'boston-vet'] },
+      { name: 'GMP', variants: ['good manufacturing practice', 'gmp certification'] },
+    ],
+  };
+
+  const slug = Object.keys(canonicalEntities).find(s => clientName.toLowerCase().includes(s.replace('-', ' '))) || 'boston-pharma';
+  const entities = canonicalEntities[slug] || canonicalEntities['boston-pharma'];
+
+  let totalInconsistencies = 0;
+
+  for (const entity of entities) {
+    const articles = await pool.query(
+      `SELECT id, title, content_md
+       FROM articles
+       WHERE client_id = $1 AND status = 'published'
+         AND content_md ILIKE $2
+       LIMIT 20`,
+      [clientId, `%${entity.name}%`]
+    );
+
+    for (const article of articles.rows) {
+      const contentLower = (article.content_md || '').toLowerCase();
+      for (const variant of entity.variants) {
+        if (contentLower.includes(variant.toLowerCase())) {
+          // Check if the variant is used where canonical should be
+          const regex = new RegExp(`\\b${variant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+          const matches = contentLower.match(regex);
+          if (matches) {
+            totalInconsistencies++;
+            log('warn', 'Entity inconsistency detected', {
+              article: article.title?.substring(0, 50),
+              entity: entity.name,
+              variantFound: variant,
+              occurrences: matches.length,
+            });
+
+            await pool.query(
+              `INSERT INTO entity_consistency_records
+               (client_id, entity_name, canonical_form, variant_found, source_type, source_id)
+               VALUES ($1, $2, $3, $4, 'article', $5)
+               ON CONFLICT DO NOTHING`,
+              [clientId, entity.name, entity.name, variant, article.id]
+            );
+          }
+        }
+      }
+    }
+  }
+
+  log('info', 'Entity consistency check complete', {
+    client: clientName,
+    inconsistenciesFound: totalInconsistencies,
+  });
+
+  return totalInconsistencies;
+}
+
+// ─── Monthly Report Extension ────────────────────────────────────
+
+async function generateEnhancedMonthlyReport() {
+  log('info', '═══ Generating Enhanced Monthly Report ═══');
+
+  await generateMonthlyReport();
+
+  // Add citation and freshness data
+  const clients = await pool.query('SELECT id, name FROM clients');
+
+  for (const client of clients.rows) {
+    // Citation stats
+    const citationStats = await pool.query(
+      `SELECT engine, COUNT(*) FILTER (WHERE cited = true) as cited_count,
+              COUNT(*) as total_checks
+       FROM citation_records
+       WHERE client_id = $1 AND checked_at > NOW() - INTERVAL '30 days'
+       GROUP BY engine`,
+      [client.id]
+    );
+
+    // Freshness stats
+    const freshnessStats = await pool.query(
+      `SELECT COUNT(*) FILTER (WHERE needs_update = true) as needs_update,
+              COUNT(*) as total_audited
+       FROM freshness_audits
+       WHERE client_id = $1`,
+      [client.id]
+    );
+
+    // Entity consistency stats
+    const entityStats = await pool.query(
+      `SELECT entity_name, COUNT(*) as inconsistencies
+       FROM entity_consistency_records
+       WHERE client_id = $1 AND detected_at > NOW() - INTERVAL '30 days'
+       GROUP BY entity_name`,
+      [client.id]
+    );
+
+    log('report', `Enhanced stats: ${client.name}`, {
+      citations: citationStats.rows,
+      freshness: freshnessStats.rows[0],
+      entityInconsistencies: entityStats.rows,
+    });
+  }
+
+  log('info', 'Enhanced monthly report complete');
 }
 
 // ─── Initialize DB Schedules ────────────────────────────────────

@@ -126,6 +126,9 @@ import crawlerTrackerService, { identifyCrawler } from './services/crawlerTracke
 import { createKnowledgeBaseRoutes } from './routes/knowledgeBase';
 import { createCrawlerAnalyticsRoutes } from './routes/crawlerAnalytics';
 
+// ═══ AI SEO Services ═══════════════════════
+import citationTracker from './services/citationTracker';
+
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
@@ -480,8 +483,10 @@ app.use('/api/content-intel', createContentIntelRoutes(pool));
 // GEO (Generative Engine Optimization) routes
 import { createGeoRoutes } from './routes/geo';
 import { createAeoRoutes } from './routes/aeo';
+import { createAiSeoRoutes } from './routes/aiSeo';
 app.use('/api/geo', createGeoRoutes());
 app.use('/api/aeo', createAeoRoutes());
+app.use('/api/ai-seo', createAiSeoRoutes());
 
 // Knowledge Base / RAG routes
 app.use('/api/knowledge-bases', createKnowledgeBaseRoutes());
@@ -642,6 +647,25 @@ app.post('/api/seo/analyze', authenticate, validate(seoAnalyzeSchema), async (re
   } catch (err) {
     next(err);
   }
+});
+
+// ─── Serve robots.txt ─────────────────────
+app.get('/robots.txt', (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'robots.txt'));
+});
+
+// ─── IndexNow Key File ────────────────────
+// Required by IndexNow protocol: host/.well-known/{key}.txt
+app.get('/.well-known/:keyFile', (req: Request, res: Response) => {
+  const keyFile = req.params.keyFile;
+  if (keyFile.endsWith('.txt')) {
+    const key = process.env.INDEXNOW_KEY || '';
+    if (key && keyFile === `${key}.txt`) {
+      res.type('text/plain').send(key);
+      return;
+    }
+  }
+  res.status(404).send('Not found');
 });
 
 // ─── Privacy Policy ────────────────────────
@@ -869,6 +893,13 @@ async function start(): Promise<void> {
       schedulerService.start(scheduleInterval);
     } catch (e) {
       logger.warn('Scheduler service init failed', { error: (e as Error).message });
+    }
+
+    // ═══ Citation Tracker Initialization ═══════
+    try {
+      citationTracker.initialize(pool);
+    } catch (e) {
+      logger.warn('CitationTracker init failed', { error: (e as Error).message });
     }
 
     // ════════════════════════════════════════════

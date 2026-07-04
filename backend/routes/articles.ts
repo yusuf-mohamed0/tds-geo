@@ -27,6 +27,8 @@ import keywordService from '../services/keywords';
 import vectorMemoryService from '../services/vectorMemory';
 import costTracker from '../services/costTracker';
 import { convert } from '../utils/markdownToHtml';
+import schemaGenerator from '../services/schemaGenerator';
+import indexNowService from '../services/indexNowService';
 
 export function createArticleRoutes(pool: Pool): Router {
   const router = Router();
@@ -165,7 +167,40 @@ export function createArticleRoutes(pool: Pool): Router {
       let publishResult = null;
       if (publish && status === 'approved') {
         try {
-          publishResult = await publisherEngine.publishWithTracking(pool, savedArticle, client, blogId);
+          // Inject JSON-LD schema before publishing
+          let publishHtml = contentHtml;
+          try {
+            const faqPairs = schemaGenerator.extractFaqPairsFromContent(finalContent);
+            const schemas = schemaGenerator.generateAllSchemas({
+              siteName: client.name || process.env.SITE_NAME || '',
+              siteUrl: client.shopify_shop ? `https://${client.shopify_shop}` : '',
+              articleTitle: article.title,
+              articleDescription: article.metaDescription || '',
+              articleBody: finalContent,
+              datePublished: new Date().toISOString(),
+              dateModified: new Date().toISOString(),
+              authorName: process.env.AUTHOR_NAME || 'AI SEO Agent',
+              faqPairs: faqPairs.length > 0 ? faqPairs : undefined,
+            });
+            publishHtml = schemaGenerator.injectSchemaIntoHtml(contentHtml, schemas);
+          } catch (schemaErr) {
+            logger.warn('Schema injection failed for auto-publish', {
+              articleId: savedArticle.id,
+              error: (schemaErr as Error).message,
+            });
+          }
+
+          publishResult = await publisherEngine.publishWithTracking(pool, { ...savedArticle, content_html: publishHtml }, client, blogId);
+
+          // Ping IndexNow
+          if (publishResult?.url) {
+            indexNowService.pingArticlePublished(publishResult.url).catch(err => {
+              logger.warn('IndexNow ping failed after auto-publish', {
+                articleId: savedArticle.id,
+                error: (err as Error).message,
+              });
+            });
+          }
         } catch (publishErr) {
           logger.warn('Auto-publish failed, article saved as draft', {
             articleId: savedArticle.id,
@@ -550,7 +585,42 @@ export function createArticleRoutes(pool: Pool): Router {
       }
 
       const client = clientResult.rows[0];
+
+      // Inject JSON-LD schema into content before publishing
+      let contentHtml = article.content_html || convert(article.content_md || '');
+      try {
+        const faqPairs = schemaGenerator.extractFaqPairsFromContent(article.content_md || '');
+        const schemas = schemaGenerator.generateAllSchemas({
+          siteName: client.name || process.env.SITE_NAME || '',
+          siteUrl: client.shopify_shop ? `https://${client.shopify_shop}` : '',
+          articleTitle: article.title,
+          articleDescription: article.meta_description || '',
+          articleBody: article.content_md || '',
+          datePublished: article.created_at?.toISOString?.() || new Date().toISOString(),
+          dateModified: new Date().toISOString(),
+          authorName: process.env.AUTHOR_NAME || 'AI SEO Agent',
+          faqPairs: faqPairs.length > 0 ? faqPairs : undefined,
+        });
+        contentHtml = schemaGenerator.injectSchemaIntoHtml(contentHtml, schemas);
+        article.content_html = contentHtml;
+      } catch (schemaErr) {
+        logger.warn('Schema injection failed, publishing without schema', {
+          articleId: article.id,
+          error: (schemaErr as Error).message,
+        });
+      }
+
       const publishResult = await publisherEngine.publishWithTracking(pool, article, client, blogId);
+
+      // Ping IndexNow with the published article URL
+      if (publishResult?.url) {
+        indexNowService.pingArticlePublished(publishResult.url).catch(err => {
+          logger.warn('IndexNow ping failed after publish', {
+            articleId: article.id,
+            error: (err as Error).message,
+          });
+        });
+      }
 
       // Generate and upload image
       try {

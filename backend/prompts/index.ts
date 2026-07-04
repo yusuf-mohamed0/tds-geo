@@ -45,3 +45,42 @@ export interface ResearchPromptVars {
 export function researchPrompt(vars: ResearchPromptVars): string {
   return loadPrompt('research-prompt.md', vars as unknown as Record<string, string>);
 }
+
+export function aeoSystemPrompt(vars: Record<string, any>): string {
+  return loadPrompt('aeo-answer-engine-prompt.md', vars);
+}
+
+export function geoSystemPrompt(vars: Record<string, any>): string {
+  return loadPrompt('geo-generative-engine-prompt.md', vars);
+}
+
+export function llmoSystemPrompt(vars: Record<string, any>): string {
+  return loadPrompt('llmo-large-language-model-prompt.md', vars);
+}
+
+export function aiSeoConsultingPrompt(vars: Record<string, any>): string {
+  return loadPrompt('ai-seo-consulting-framework-prompt.md', vars);
+}
+
+export function combinedAiSeoPrompt(vars: WritingPromptVars & { FOCUS?: string }): string {
+  const master = writingSystemPrompt(vars);
+  const aeo = aeoSystemPrompt({ TOPIC: vars.TOPIC });
+  const geo = geoSystemPrompt({ TOPIC: vars.TOPIC });
+  const llmo = llmoSystemPrompt({ TOPIC: vars.TOPIC });
+
+  return [
+    master,
+    '',
+    '---',
+    '## AI SEARCH OPTIMIZATION — SUPPLEMENTAL DIRECTIVES',
+    `Focus: ${vars.FOCUS || 'All AI search surfaces (AEO + GEO + LLMO)'}`,
+    '',
+    aeo,
+    '',
+    '---',
+    geo,
+    '',
+    '---',
+    llmo,
+  ].join('\n');
+}

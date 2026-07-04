@@ -1,0 +1,78 @@
+# robots.txt — TDS Geo AI SEO Automation
+# Generated: 2026-07-04
+#
+# AI crawler access control — allow all AI bots to index content
+# for AI Overviews, ChatGPT, Perplexity, Gemini, Claude, Copilot
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /assets/
+Disallow: /health
+Disallow: /metrics
+Disallow: /privacy
+
+# ─── AI Search Engines ────────────────────────
+# Allow full crawl for AI training and retrieval
+
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 2
+
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: ChatGPT-User
+Allow: /
+Crawl-delay: 2
+
+User-agent: OAI-SearchBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Claude-Web
+Allow: /
+Crawl-delay: 2
+
+User-agent: Amazonbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Applebot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Bytespider
+Allow: /
+Crawl-delay: 2
+
+User-agent: CCBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# ─── Traditional Search ───────────────────────
+
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# ─── Sitemap ──────────────────────────────────
+
+Sitemap: https://16.192.29.174.nip.io/sitemap.xml
