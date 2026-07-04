@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import { EnterprisePipelineOrchestrator } from '../orchestrators/blogPipeline';

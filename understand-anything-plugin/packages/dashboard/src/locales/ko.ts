@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 export const ko = {
   common: {
     loading: "프로젝트 로딩 중...",

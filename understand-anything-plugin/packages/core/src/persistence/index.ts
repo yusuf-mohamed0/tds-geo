@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, isAbsolute, relative, basename } from "node:path";
 import type { KnowledgeGraph, AnalysisMeta, ProjectConfig } from "../types.js";

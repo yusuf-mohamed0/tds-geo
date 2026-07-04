@@ -1,3 +1,7 @@
+-- <YKS />  YUSUF KO STA  Code. Build. Ship.™
+-- © 2026 Yusuf Mohamed. All rights reserved.
+-- Licensed under the ISC License.
+
 -- ══════════════════════════════════════════════
 -- AI SEO Automation System - Complete Schema v3
 -- Merges schema.sql + migration_v2.sql + migration_platform_v1.sql

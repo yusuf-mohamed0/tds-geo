@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 """
 merge-batch-graphs.py — Merge and normalize batch analysis results.
 

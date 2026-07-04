@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // ══════════════════════════════════════════════════════════════════
 // TDS Geo — Monthly Operations System
 // Automated content generation, publishing, improvement, maintenance

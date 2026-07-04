@@ -1,3 +1,7 @@
+-- <YKS />  YUSUF KO STA  Code. Build. Ship.™
+-- © 2026 Yusuf Mohamed. All rights reserved.
+-- Licensed under the ISC License.
+
 -- ══════════════════════════════════════════════
 -- Content Briefs — Migration
 -- Copywriters submit briefs/prompts for AI article generation

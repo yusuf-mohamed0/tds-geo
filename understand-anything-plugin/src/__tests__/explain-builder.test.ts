@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { describe, it, expect } from "vitest";
 import { buildExplainContext, formatExplainPrompt } from "../explain-builder.js";
 import type { KnowledgeGraph } from "@understand-anything/core";

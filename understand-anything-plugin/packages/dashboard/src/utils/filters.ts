@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import type { GraphNode, GraphEdge } from "@understand-anything/core/types";
 import type { FilterState, NodeType, Complexity, EdgeCategory } from "../store";
 import { EDGE_CATEGORY_MAP } from "../store";

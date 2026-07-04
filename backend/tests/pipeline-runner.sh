@@ -1,4 +1,7 @@
 #!/bin/bash
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 # ═══════════════════════════════════════════════════════════════
 # AI SEO Pipeline - Full Production Simulation Runner v2
 # Uses Python for DB operations to avoid shell escaping hell

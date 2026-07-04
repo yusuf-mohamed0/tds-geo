@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { connectorManager } from '../connector-manager';
 import { shopifyConnector } from './shopify';
 import { wordpressConnector } from './wordpress';

@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import 'dotenv/config';
 
 const WP_KEY = 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';

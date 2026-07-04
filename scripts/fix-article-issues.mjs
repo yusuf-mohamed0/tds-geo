@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import pg from 'pg';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';

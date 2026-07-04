@@ -1,4 +1,7 @@
 #!/bin/bash
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 # tds — main CLI entry for TDS ecosystem
 TDS_ROOT="/root/tds-geo"
 cd "$TDS_ROOT" || { echo "Error: TDS root not found at $TDS_ROOT"; exit 1; }

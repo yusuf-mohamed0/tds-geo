@@ -1,3 +1,7 @@
+-- <YKS />  YUSUF KO STA  Code. Build. Ship.™
+-- © 2026 Yusuf Mohamed. All rights reserved.
+-- Licensed under the ISC License.
+
 -- ══════════════════════════════════════════════════════════════════
 -- AI SEO Automation System — Website Intelligence Migration
 -- Adds storage for scraped client website data to power

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 # ──────────────────────────────────────────────
 # start-all.sh — Launch the full AI stack
 # Starts Python microservices (turbovec, AirLLM)

@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 export const Events = {
   ARTICLE_CREATED: 'article:created',
   ARTICLE_UPDATED: 'article:updated',

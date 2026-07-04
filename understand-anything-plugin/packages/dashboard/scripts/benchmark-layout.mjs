@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // Stage 1 ELK layout perf benchmark.
 //
 // Mirrors `applyElkLayout` from `src/utils/elk-layout.ts` using `elkjs`

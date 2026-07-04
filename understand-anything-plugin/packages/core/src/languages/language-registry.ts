@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { LanguageConfigSchema } from "./types.js";
 import type { LanguageConfig } from "./types.js";
 import { builtinLanguageConfigs } from "./configs/index.js";

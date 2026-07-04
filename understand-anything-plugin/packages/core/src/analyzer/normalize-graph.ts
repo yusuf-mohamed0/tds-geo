@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 const VALID_PREFIXES = new Set([
   "file", "func", "class", "module", "concept",
   "config", "document", "service", "table", "endpoint",

@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // ──────────────────────────────────────────────
 // Plugin System Service
 // Manages plugin lifecycle, hook execution, and

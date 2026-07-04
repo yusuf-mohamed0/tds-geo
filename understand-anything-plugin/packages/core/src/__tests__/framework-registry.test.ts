@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { describe, it, expect } from "vitest";
 import { FrameworkRegistry } from "../languages/framework-registry.js";
 import { djangoConfig } from "../languages/frameworks/django.js";

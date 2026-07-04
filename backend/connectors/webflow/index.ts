@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { ConnectorInterface, ConnectorConfig, HealthStatus, SyncResult, ContentPayload, MediaPayload, PublishResult, Taxonomy } from '../../sdk/connector-interface';
 import { logger } from '../../utils/logger';
 

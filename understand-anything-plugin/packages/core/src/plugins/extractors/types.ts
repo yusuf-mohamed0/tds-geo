@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import type { StructuralAnalysis, CallGraphEntry } from "../../types.js";
 
 // Re-export the tree-sitter Node type for use by extractors

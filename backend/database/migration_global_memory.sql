@@ -1,3 +1,7 @@
+-- <YKS />  YUSUF KO STA  Code. Build. Ship.™
+-- © 2026 Yusuf Mohamed. All rights reserved.
+-- Licensed under the ISC License.
+
 -- ═══════════════════════════════════════════════════════════════
 -- Global Memory Store — Article Memory
 -- Tracks article history, performance, and entity associations

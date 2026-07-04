@@ -1,3 +1,7 @@
+-- <YKS />  YUSUF KO STA  Code. Build. Ship.™
+-- © 2026 Yusuf Mohamed. All rights reserved.
+-- Licensed under the ISC License.
+
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS shopify_subscription_id VARCHAR(255);
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS shopify_charge_id BIGINT;
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS billing_plan VARCHAR(50) DEFAULT 'starter';

@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import type { AnalyzerPlugin, StructuralAnalysis, SectionInfo } from "../../types.js";
 import { parse as parseYAML } from "yaml";
 

@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // ══════════════════════════════════════════════════════════════════
 // Department Manager — Base Class
 // Shared logic for all 8 department managers:

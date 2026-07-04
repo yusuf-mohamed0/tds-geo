@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // ══════════════════════════════════════════════
 // End-to-End Pipeline Integration Test
 // Exercises BlogPipelineOrchestrator with mocked

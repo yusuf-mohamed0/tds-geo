@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { describe, it, expect } from "vitest";
 import { LanguageRegistry } from "../languages/language-registry.js";
 import { StrictLanguageConfigSchema } from "../languages/types.js";

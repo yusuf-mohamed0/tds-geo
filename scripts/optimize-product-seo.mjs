@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // ══════════════════════════════════════════════════════════════════
 // TDS Geo — Product SEO Optimizer
 // Generates SEO-optimized meta titles and descriptions for products

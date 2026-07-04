@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 """
 browser-use Agent Bridge
 Runs a browser-use agent task and outputs JSON results to stdout.

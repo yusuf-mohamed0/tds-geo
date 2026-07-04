@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { defineConfig } from 'vitest/config';
 
 // The plugin package no longer ships any test files — they were relocated

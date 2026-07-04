@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 export const config = {
   nodeEnv: env('NODE_ENV', 'development'),
   port: parseInt(env('PORT', '3000'), 10),

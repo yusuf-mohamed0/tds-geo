@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // ──────────────────────────────────────────────
 // n8n Server Launcher
 // Starts n8n programmatically via its internal APIs

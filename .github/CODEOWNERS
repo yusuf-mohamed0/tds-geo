@@ -1,0 +1,20 @@
+# YUSUF KO STA < /> — Code. Build. Ship.™
+# Each line is a file pattern followed by one or more owners.
+
+# Default owner for everything
+* @yusuf-mohamed0
+
+# Security-sensitive files
+SECURITY.md @yusuf-mohamed0
+.github/ @yusuf-mohamed0
+
+# Backend core
+backend/index.ts @yusuf-mohamed0
+backend/utils/config.ts @yusuf-mohamed0
+
+# WordPress plugin
+tds-geo-wp/ @yusuf-mohamed0
+
+# Documentation
+doc/ @yusuf-mohamed0
+*.md @yusuf-mohamed0

@@ -1,3 +1,7 @@
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
+
 # Sidecar services for TDS GEO on AWS (runs alongside PM2)
 # Start: docker compose -f docker-compose.sidecars.yml up -d
 # Stop:  docker compose -f docker-compose.sidecars.yml down

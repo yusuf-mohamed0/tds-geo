@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { chromium } from 'playwright';
 
 const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyODQ2Yzk0Zi1mYjYyLTQ3NzUtYjhkMy1jMWM1MWY3ZWViZWYiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6ImFkbWluIiwiY2xpZW50SWQiOm51bGwsImlhdCI6MTc3OTg1ODUyMSwiZXhwIjoxNzc5OTQ0OTIxfQ.3rZZTKhoIhONoA_iM77VA7HnRcYKVBZTyzbotNEFkZw';

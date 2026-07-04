@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme, PRESETS } from "../themes/index.ts";
 import type { HeadingFont } from "../themes/index.ts";

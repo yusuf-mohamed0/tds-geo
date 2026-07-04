@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 """
 crawl4ai Scraper Bridge
 Uses crawl4ai to scrape web pages and output clean, LLM-ready content as JSON.

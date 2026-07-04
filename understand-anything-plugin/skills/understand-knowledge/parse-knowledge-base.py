@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 """
 Deterministic parser for Karpathy-pattern LLM wikis.
 

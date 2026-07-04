@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import type { LanguageConfig } from "../types.js";
 
 // TODO: JSON Schema files have no unique extension — *.schema.json files will match

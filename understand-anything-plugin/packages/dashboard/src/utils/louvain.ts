@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import Graph from "graphology";
 import louvain from "graphology-communities-louvain";
 import type { GraphEdge } from "@understand-anything/core/types";

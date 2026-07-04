@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { describe, it, expect } from "vitest";
 import { MarkdownParser } from "../plugins/parsers/markdown-parser.js";
 import { YAMLConfigParser } from "../plugins/parsers/yaml-parser.js";

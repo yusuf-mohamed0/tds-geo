@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { DepartmentManager } from './DepartmentManager';
 import { DepartmentName, DepartmentTask, DecomposedTask, Subtask } from './types';
 import { QueueNames } from '../../utils/queue';

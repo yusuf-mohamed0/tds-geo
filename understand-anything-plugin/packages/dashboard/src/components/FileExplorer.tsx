@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { useMemo, useState } from "react";
 import type { GraphNode } from "@understand-anything/core/types";
 import { useDashboardStore } from "../store";

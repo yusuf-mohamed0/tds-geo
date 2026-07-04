@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // Per-layer aggregation perf benchmark.
 //
 // Mirrors the BEFORE shape (graph.nodes.filter(n => layer.nodeIds.includes(n.id))

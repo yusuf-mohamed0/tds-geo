@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { describe, it, expect, beforeAll } from "vitest";
 import { createRequire } from "node:module";
 import { RubyExtractor } from "../ruby-extractor.js";

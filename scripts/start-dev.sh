@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 # ──────────────────────────────────────────────
 # start-dev.sh — Dev server with auto ngrok tunnel
 # Starts ngrok, waits for it to be ready, then

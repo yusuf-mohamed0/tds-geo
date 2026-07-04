@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // ──────────────────────────────────────────────
 // Ollama Service — Local & Cloud AI Inference
 // Mirrors OpenAIService interface for drop-in

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 # ──────────────────────────────────────────────
 # start-vector-store.sh — turbovec Vector Store
 # Starts the Python FastAPI microservice that

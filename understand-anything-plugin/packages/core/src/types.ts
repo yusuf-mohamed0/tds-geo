@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // Node types (21 total: 5 code + 8 non-code + 3 domain + 5 knowledge)
 export type NodeType =
   | "file" | "function" | "class" | "module" | "concept"

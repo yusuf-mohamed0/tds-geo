@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { init, refreshIfExpired } from './auth';
 import { fetchArticles, publishArticle, publishArticleWithTracking, uploadImage, fetchBlogs } from './content';
 import { getRateLimitStatus } from './rate-limit';

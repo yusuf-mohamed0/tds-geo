@@ -1,4 +1,7 @@
 #!/bin/bash
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 # Start the Vault UI server
 TDS_ROOT="/root/tds-geo"
 cd "$TDS_ROOT/backend/vault-ui" || exit 1

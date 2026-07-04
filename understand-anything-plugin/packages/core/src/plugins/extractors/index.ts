@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 export type { LanguageExtractor, TreeSitterNode } from "./types.js";
 export { traverse, getStringValue, findChild, findChildren, hasChildOfType } from "./base-extractor.js";
 export { TypeScriptExtractor } from "./typescript-extractor.js";

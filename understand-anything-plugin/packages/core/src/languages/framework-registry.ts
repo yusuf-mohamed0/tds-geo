@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { FrameworkConfigSchema } from "./types.js";
 import type { FrameworkConfig } from "./types.js";
 import { builtinFrameworkConfigs } from "./frameworks/index.js";

@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 // Validates the worktree-redirect bash snippet embedded in
 // `skills/understand/SKILL.md` Phase 0 step 1 and
 // `skills/understand-domain/SKILL.md` Phase 0.

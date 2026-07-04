@@ -1,4 +1,7 @@
 #!/bin/bash
+# <YKS />  YUSUF KO STA  Code. Build. Ship.™
+# © 2026 Yusuf Mohamed. All rights reserved.
+# Licensed under the ISC License.
 # Script to update the n8n workflow with all fixes
 # Uses the credentials and client IDs obtained from fix-n8n-workflow.sh
 

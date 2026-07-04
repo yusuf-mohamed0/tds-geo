@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import type { TreeSitterNode } from "./types.js";
 
 /** Recursively traverse an AST tree, calling the visitor for each node. */

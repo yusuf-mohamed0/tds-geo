@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { config } from 'dotenv';
 import { resolve } from 'path';
 import { SHOPIFY_COMPLIANCE_WEBHOOKS } from '../utils/shopifyWebhook';

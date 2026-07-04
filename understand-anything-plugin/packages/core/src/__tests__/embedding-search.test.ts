@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { describe, it, expect } from "vitest";
 import { SemanticSearchEngine, cosineSimilarity } from "../embedding-search.js";
 import type { GraphNode } from "../types.js";

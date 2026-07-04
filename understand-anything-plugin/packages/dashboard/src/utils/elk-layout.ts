@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import ELK from "elkjs/lib/elk.bundled.js";
 import type { GraphIssue } from "@understand-anything/core/schema";
 import { NODE_WIDTH, NODE_HEIGHT } from "./layout";

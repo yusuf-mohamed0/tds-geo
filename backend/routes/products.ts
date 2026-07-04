@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { Router, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import { authenticate } from '../middleware/auth';

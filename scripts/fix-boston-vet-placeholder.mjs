@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
 // ══════════════════════════════════════════════════════════════════
 // Boston Vet — Lorem Ipsum Fixer
 // Replaces placeholder content with proper brand copy via TDS Geo API

@@ -1,3 +1,7 @@
+// <YKS />  YUSUF KO STA  Code. Build. Ship.™
+// © 2026 Yusuf Mohamed. All rights reserved.
+// Licensed under the ISC License.
+
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { getLocale, resolveLocaleKey, type Locale, type LocaleKey } from "../locales";
 

@@ -1,3 +1,7 @@
+-- <YKS />  YUSUF KO STA  Code. Build. Ship.™
+-- © 2026 Yusuf Mohamed. All rights reserved.
+-- Licensed under the ISC License.
+
 -- ══════════════════════════════════════════════
 -- AI SaaS Platform - Phase 1: Platform Expansion
 -- Adds tables for full multi-tenant SaaS platform
