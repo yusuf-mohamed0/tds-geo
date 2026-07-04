@@ -4,8 +4,8 @@
 
 # ════════════════════════════════════════════════════════════════
 # Dependabot Configuration
-# Keeps npm packages and Docker base images up to date
-# automatically via weekly pull requests.
+# All updates grouped into a single weekly PR per ecosystem
+# to keep the inbox clean. Rebase manually if a PR conflicts.
 # ════════════════════════════════════════════════════════════════
 
 version: 2
@@ -19,28 +19,22 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: "America/Los_Angeles"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 2
     versioning-strategy: increase
+    assignees:
+      - "yusuf-mohamed0"
     labels:
       - "dependencies"
-      - "backend"
     groups:
-      production-deps:
-        dependency-type: "production"
+      all-deps:
+        patterns:
+          - "*"
         update-types:
-          - "patch"
+          - "major"
           - "minor"
-      dev-deps:
-        dependency-type: "development"
-        update-types:
           - "patch"
-          - "minor"
     ignore:
-      # TypeScript major bumps require manual migration
       - dependency-name: "typescript"
-        update-types: ["version-update:semver-major"]
-      # Playwright major bumps need browser binary updates
-      - dependency-name: "playwright"
         update-types: ["version-update:semver-major"]
 
   # ─── Frontend npm dependencies ─────────────────────────────
@@ -51,22 +45,20 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: "America/Los_Angeles"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 2
     versioning-strategy: increase
+    assignees:
+      - "yusuf-mohamed0"
     labels:
       - "dependencies"
-      - "frontend"
     groups:
-      production-deps:
-        dependency-type: "production"
+      all-deps:
+        patterns:
+          - "*"
         update-types:
-          - "patch"
+          - "major"
           - "minor"
-      dev-deps:
-        dependency-type: "development"
-        update-types:
           - "patch"
-          - "minor"
     ignore:
       - dependency-name: "react"
         update-types: ["version-update:semver-major"]
@@ -83,10 +75,11 @@ updates:
       day: "monday"
       time: "10:00"
       timezone: "America/Los_Angeles"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
+    assignees:
+      - "yusuf-mohamed0"
     labels:
       - "dependencies"
-      - "docker"
     ignore:
       - dependency-name: "node"
         update-types: ["version-update:semver-major"]
@@ -99,7 +92,8 @@ updates:
       day: "monday"
       time: "08:00"
       timezone: "America/Los_Angeles"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
+    assignees:
+      - "yusuf-mohamed0"
     labels:
       - "dependencies"
-      - "ci"
