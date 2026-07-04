@@ -1,7 +1,15 @@
 {
   "name": "ai-seo-automation",
   "version": "2.0.1",
-  "description": "AI-powered SEO automation SaaS platform for Shopify blogs",
+  "description": "AI SEO automation — multi-tenant content pipeline, Shopify publishing, and product engine. <YKS /> Code. Build. Ship.™",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yusuf-mohamed0/tds-geo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yusuf-mohamed0/tds-geo/issues"
+  },
+  "homepage": "https://github.com/yusuf-mohamed0/tds-geo#readme",
   "main": "dist/backend/index.js",
   "scripts": {
     "build": "tsc",
@@ -32,9 +40,11 @@
     "ai",
     "automation",
     "content-generation",
-    "saas"
+    "saas",
+    "yusuf-ko-sta",
+    "yks"
   ],
-  "author": "",
+  "author": "Yusuf Mohamed — YUSUF KO STA < />",
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.0",
