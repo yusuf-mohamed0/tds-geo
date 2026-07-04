@@ -36,15 +36,33 @@ class Auth {
         }
     }
 
+    private static function get_encryption_key(): string {
+        if (defined('NONCE_KEY') && NONCE_KEY) {
+            return NONCE_KEY;
+        }
+        if (defined('SECURE_AUTH_KEY') && SECURE_AUTH_KEY) {
+            return SECURE_AUTH_KEY;
+        }
+        if (defined('AUTH_KEY') && AUTH_KEY) {
+            return AUTH_KEY;
+        }
+        $salt = function_exists('wp_salt') ? wp_salt('auth') : '';
+        if ($salt) {
+            return $salt;
+        }
+        _doing_it_wrong(__FUNCTION__, 'TDS Geo: No WordPress secret key found. Set NONCE_KEY in wp-config.php for secure API key encryption.', '2.0.0');
+        return wp_hash('tds-geo-encryption-key-' . DB_NAME);
+    }
+
     private static function encrypt_key(string $plaintext): string {
-        $key = defined('NONCE_KEY') ? NONCE_KEY : 'tds-geo-fallback';
+        $key = self::get_encryption_key();
         $iv = openssl_random_pseudo_bytes(16);
         $encrypted = openssl_encrypt($plaintext, 'aes-256-cbc', $key, 0, $iv);
         return base64_encode($iv . $encrypted);
     }
 
     private static function decrypt_key(string $encoded): ?string {
-        $key = defined('NONCE_KEY') ? NONCE_KEY : 'tds-geo-fallback';
+        $key = self::get_encryption_key();
         $data = base64_decode($encoded, true);
         if (false === $data || strlen($data) < 17) return null;
         $iv = substr($data, 0, 16);
