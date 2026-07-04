@@ -23,8 +23,6 @@ updates:
     versioning-strategy: increase
     assignees:
       - "yusuf-mohamed0"
-    labels:
-      - "dependencies"
     groups:
       all-deps:
         patterns:
@@ -49,8 +47,6 @@ updates:
     versioning-strategy: increase
     assignees:
       - "yusuf-mohamed0"
-    labels:
-      - "dependencies"
     groups:
       all-deps:
         patterns:
@@ -78,8 +74,6 @@ updates:
     open-pull-requests-limit: 1
     assignees:
       - "yusuf-mohamed0"
-    labels:
-      - "dependencies"
     ignore:
       - dependency-name: "node"
         update-types: ["version-update:semver-major"]
@@ -95,5 +89,3 @@ updates:
     open-pull-requests-limit: 1
     assignees:
       - "yusuf-mohamed0"
-    labels:
-      - "dependencies"
