@@ -124,6 +124,7 @@ import { createCrawlerAnalyticsRoutes } from './routes/crawlerAnalytics';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
+const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
 
 // ─── Security Middleware ──────────────────────
 app.use(helmet({
@@ -503,6 +504,10 @@ app.use('/api/meta', createMetaRoutes(pool));
 import { createSwaggerRoutes } from './routes/swagger';
 app.use('/docs', createSwaggerRoutes());
 
+// ═══════ Product Content Routes ═══════════════
+import { createProductRoutes } from './routes/products';
+app.use('/api/products', createProductRoutes(pool));
+
 // ═══════ Client Website Scanner Routes ═══════
 app.use('/api/scraper', createClientScraperRoutes(pool));
 
@@ -699,10 +704,10 @@ app.get('/shopify/error', (_req: Request, res: Response) => {
 
 // ─── Serve Frontend (production) ────────────
 if (process.env.NODE_ENV === 'production') {
-  const frontendDist = path.resolve(__dirname, '../frontend/dist');
-  app.use(express.static(frontendDist));
+  const distPath = path.join(process.cwd(), 'frontend/dist');
+  app.use(express.static(distPath));
   app.get('*', (_req: Request, res: Response) => {
-    res.sendFile(path.join(frontendDist, 'index.html'));
+    res.sendFile(path.join(distPath, 'index.html'));
   });
 }
 
