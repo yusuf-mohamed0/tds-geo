@@ -120,6 +120,9 @@ import { createAuditRoutes } from './routes/clientAudit';
 // ═══ CSRF Protection ═════════════════════════════
 import { csrfTokenHandler, csrfProtection } from './middleware/csrf';
 
+// ═══ Kali Security Tools Routes ══════════════════
+import { createSecurityScanRoutes } from './routes/securityScan';
+
 // ═══ TDS GEO Core Engine Imports ════════════════
 import { initializeEngines, analyticsEngine } from './engines';
 import { eventBus } from './event-bus';
@@ -488,6 +491,9 @@ app.use('/api/security', createSecurityRoutes(pool));
 
 // ─── CSRF Token Endpoint ───────────────────
 app.get('/api/csrf/token', authenticate, csrfTokenHandler);
+
+// ─── Security Scan Routes (Kali tools) ────
+app.use('/api/security-scan', createSecurityScanRoutes(pool));
 
 // Content intelligence routes
 app.use('/api/content-intel', createContentIntelRoutes(pool));
