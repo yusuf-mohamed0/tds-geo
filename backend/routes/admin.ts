@@ -18,11 +18,10 @@ import { encrypt, mask } from '../services/credentialEncryption';
 export function createAdminRoutes(pool: Pool): Router {
   const router = Router();
 
-  // All admin routes require admin role
+  // Authentication required for all admin routes
   router.use(authenticate);
-  router.use(authorize('admin'));
 
-  // ─── System Overview ─────────────────────────
+  // ─── System Overview (accessible to admins + editors) ───
   router.get('/dashboard', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const [clientStats, articleStats, keywordStats, publishStats, costStats, userStats, recentArticles] = await Promise.all([
@@ -93,6 +92,9 @@ export function createAdminRoutes(pool: Pool): Router {
       next(err);
     }
   });
+
+  // Remaining admin routes require admin role
+  router.use(authorize('admin'));
 
   // ─── List all errors (system-wide) ──────────
   router.get('/errors', async (req: Request, res: Response, next: NextFunction) => {

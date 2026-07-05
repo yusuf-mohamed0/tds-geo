@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, FileText, BarChart3, Target, Shield,
-  DollarSign, CheckSquare, Settings, Search, ScrollText, Webhook,
+  LayoutDashboard, Users, FileText,
+  DollarSign, CheckSquare, Search, ScrollText,
 } from 'lucide-react';
 
 const navItems = [
@@ -12,11 +12,6 @@ const navItems = [
   { to: '/citations', icon: ScrollText, label: 'Citations' },
   { to: '/costs', icon: DollarSign, label: 'Costs' },
   { to: '/quality', icon: CheckSquare, label: 'Quality' },
-  { to: '/editorial', icon: BarChart3, label: 'Editorial' },
-  { to: '/security', icon: Shield, label: 'Security' },
-  { to: '/webhooks', icon: Webhook, label: 'Webhooks' },
-  { to: '/prompts', icon: Target, label: 'Prompts' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function Sidebar() {
