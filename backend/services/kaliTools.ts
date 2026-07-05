@@ -18,6 +18,15 @@ interface ScanResult {
   error?: string;
 }
 
+function execAsync(cmd: string, timeout: number, maxBuffer?: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    exec(cmd, { timeout, maxBuffer: maxBuffer || 1024 * 1024, shell: '/bin/bash' }, (err, stdout) => {
+      if (err) reject(err);
+      else resolve(stdout);
+    });
+  });
+}
+
 class KaliToolService {
   private tools: Map<string, boolean> = new Map();
 
@@ -64,7 +73,7 @@ class KaliToolService {
       const enumerate = options?.enumerate || 'vp,vt';
       const start = Date.now();
       const cmd = `wpscan --url "${url}" --enumerate ${enumerate} --no-banner --format json 2>/dev/null`;
-      const output = execSync(cmd, { timeout: 120_000, maxBuffer: 10 * 1024 * 1024, shell: '/bin/bash' }).toString();
+      const output = await execAsync(cmd, 120_000, 10 * 1024 * 1024);
       const data = JSON.parse(output);
 
       return {
@@ -80,22 +89,13 @@ class KaliToolService {
     return this.runWithCircuitBreaker('whatweb', url, async () => {
       const start = Date.now();
       const cmd = `whatweb "${url}" --colour=never --no-errors -a 3 2>/dev/null`;
-      const output = execSync(cmd, { timeout: 30_000, shell: '/bin/bash' }).toString().trim();
-
-      const plugins: Record<string, unknown> = {};
-      const match = output.match(/\{[^}]+\}/);
-      if (match) {
-        try { Object.assign(plugins, JSON.parse(match[0])); } catch {}
-      }
+      const output = await execAsync(cmd, 30_000);
+      const trimmed = output.toString().trim();
 
       return {
         tool: 'whatweb', target: url, success: true,
-        data: {
-          summary: output.slice(0, 1000),
-          plugins,
-          techStack: Object.keys(plugins),
-        },
-        rawOutput: output.slice(0, 5000),
+        data: { summary: trimmed.slice(0, 1000) },
+        rawOutput: trimmed.slice(0, 5000),
         durationMs: Date.now() - start,
       };
     });
@@ -105,7 +105,7 @@ class KaliToolService {
     return this.runWithCircuitBreaker('nikto', url, async () => {
       const start = Date.now();
       const cmd = `nikto -h "${url}" -nointeractive -Format json 2>/dev/null`;
-      const output = execSync(cmd, { timeout: 180_000, maxBuffer: 5 * 1024 * 1024, shell: '/bin/bash' }).toString();
+      const output = await execAsync(cmd, 180_000, 5 * 1024 * 1024);
 
       let findings: Record<string, unknown>[] = [];
       try { findings = JSON.parse(output); } catch {}
@@ -124,7 +124,7 @@ class KaliToolService {
       const ports = portRange || '80,443,8080,8443,3000,5000,5432,6379';
       const start = Date.now();
       const cmd = `nmap -sV -p ${ports} --open -T4 "${target}" -oX - 2>/dev/null`;
-      const output = execSync(cmd, { timeout: 120_000, maxBuffer: 2 * 1024 * 1024, shell: '/bin/bash' }).toString();
+      const output = await execAsync(cmd, 120_000, 2 * 1024 * 1024);
 
       return {
         tool: 'nmap', target, success: true,
@@ -139,14 +139,12 @@ class KaliToolService {
     const results: ScanResult[] = [];
     const domain = target.replace(/^https?:\/\//, '').split('/')[0];
 
-    // Run all available tools in parallel
-    const checks: Promise<ScanResult | null>[] = [];
+    const fastChecks: Promise<ScanResult | null>[] = [];
 
-    if (this.isAvailable('whatweb')) checks.push(this.runWhatweb(target));
-    if (this.isAvailable('nmap')) checks.push(this.runNmap(domain));
+    if (this.isAvailable('whatweb')) fastChecks.push(this.runWhatweb(target));
+    if (this.isAvailable('nmap')) fastChecks.push(this.runNmap(domain));
 
-    // wpscan and nikto are sequential (longer running)
-    const parallelResults = await Promise.allSettled(checks);
+    const parallelResults = await Promise.allSettled(fastChecks);
     for (const r of parallelResults) {
       if (r.status === 'fulfilled' && r.value) results.push(r.value);
     }
