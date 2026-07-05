@@ -56,25 +56,25 @@ export default function AdminDashboard() {
           icon={<Users size={20} />}
           label="Total Clients"
           value={dashboard.clients.total}
-          subtitle={`${dashboard.clients.activeThisMonth} active this month`}
+          subtitle={`${dashboard.clients.active} active · ${dashboard.clients.new_30d} new (30d)`}
         />
         <MetricCard
           icon={<FileText size={20} />}
           label="Articles"
           value={dashboard.articles.total}
-          subtitle={`${dashboard.articles.published} published · ${dashboard.articles.pending} pending`}
+          subtitle={`${dashboard.articles.published} published · ${dashboard.articles.pending_review} pending`}
         />
         <MetricCard
           icon={<Target size={20} />}
-          label="Keywords Tracked"
-          value={dashboard.keywords.tracked}
-          subtitle={`${dashboard.keywords.total} total`}
+          label="Avg Keyword Relevance"
+          value={`${dashboard.keywords.avg_relevance}%`}
+          subtitle={`${dashboard.keywords.total} keywords`}
         />
         <MetricCard
           icon={<DollarSign size={20} />}
           label="MTD Costs"
-          value={`$${dashboard.costs.total.toFixed(2)}`}
-          subtitle={`${dashboard.publishing.thisMonth} published this month`}
+          value={`$${parseFloat(dashboard.costs.total_cost_mtd || '0').toFixed(2)}`}
+          subtitle={`${dashboard.publishing.this_week} published this week`}
         />
       </div>
 

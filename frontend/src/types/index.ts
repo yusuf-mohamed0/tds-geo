@@ -14,12 +14,12 @@ export interface HealthStatus {
 }
 
 export interface AdminDashboard {
-  clients: { total: number; activeThisMonth: number };
-  articles: { total: number; published: number; pending: number; weeklyPublished: number };
-  keywords: { total: number; tracked: number };
-  publishing: { total: number; thisMonth: number };
-  costs: { total: number };
-  users: { total: number; active: number };
+  clients: { total: number; active: number; new_30d: number };
+  articles: { total: number; published: number; pending_review: number; this_week: number };
+  keywords: { total: number; avg_relevance: string };
+  publishing: { total: number; this_week: number };
+  costs: { total_cost_mtd: string; total_tokens_mtd: number };
+  users: { total: number; admins: number; editors: number; clients: number };
   activity: { date: string; count: number }[];
   recentArticles: ArticleSummary[];
 }
