@@ -13,6 +13,7 @@ import { validate } from '../validators/index';
 import { createWebhookSchema, updateWebhookSchema } from '../validators/index';
 import { logger } from '../utils/logger';
 import crypto from 'crypto';
+import { encrypt as encryptSecret, decrypt as decryptSecret } from '../services/credentialEncryption';
 import { normalizeWebhookBody, verifyShopifyWebhookHmac } from '../utils/shopifyWebhook';
 
 export function createWebhookRoutes(pool: Pool): Router {
@@ -44,7 +45,8 @@ export function createWebhookRoutes(pool: Pool): Router {
   router.post('/:clientId/webhooks', authorize('admin', 'editor'), validate(createWebhookSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = (req as any).validated;
-      const secret = data.secret || crypto.randomBytes(32).toString('hex');
+      const rawSecret = data.secret || crypto.randomBytes(32).toString('hex');
+      const secret = encryptSecret(rawSecret);
 
       const result = await pool.query(
         `INSERT INTO webhooks (client_id, name, url, events, secret, retry_count, timeout_ms)
@@ -91,7 +93,7 @@ export function createWebhookRoutes(pool: Pool): Router {
       if (data.name) { fields.push(`name = $${paramIndex++}`); values.push(data.name); }
       if (data.url) { fields.push(`url = $${paramIndex++}`); values.push(data.url); }
       if (data.events) { fields.push(`events = $${paramIndex++}`); values.push(data.events); }
-      if (data.secret) { fields.push(`secret = $${paramIndex++}`); values.push(data.secret); }
+      if (data.secret) { fields.push(`secret = $${paramIndex++}`); values.push(encryptSecret(data.secret)); }
       if (data.retryCount !== undefined) { fields.push(`retry_count = $${paramIndex++}`); values.push(data.retryCount); }
       if (data.timeoutMs !== undefined) { fields.push(`timeout_ms = $${paramIndex++}`); values.push(data.timeoutMs); }
       if (data.isActive !== undefined) { fields.push(`is_active = $${paramIndex++}`); values.push(data.isActive); }

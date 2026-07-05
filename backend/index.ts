@@ -117,6 +117,9 @@ import { createQualityRoutes } from './routes/quality';
 // ═══ Client Audit Routes (AI SEO Phase 1) ════════
 import { createAuditRoutes } from './routes/clientAudit';
 
+// ═══ CSRF Protection ═════════════════════════════
+import { csrfTokenHandler, csrfProtection } from './middleware/csrf';
+
 // ═══ TDS GEO Core Engine Imports ════════════════
 import { initializeEngines, analyticsEngine } from './engines';
 import { eventBus } from './event-bus';
@@ -482,6 +485,9 @@ app.use('/api/observability', createObservabilityRoutes(pool));
 
 // Security routes (audit, permissions, rate limiting)
 app.use('/api/security', createSecurityRoutes(pool));
+
+// ─── CSRF Token Endpoint ───────────────────
+app.get('/api/csrf/token', authenticate, csrfTokenHandler);
 
 // Content intelligence routes
 app.use('/api/content-intel', createContentIntelRoutes(pool));

@@ -70,10 +70,20 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
           role: 'connector',
           email: 'connector@kozmocore.ai',
         };
+        logger.info('API key authenticated', {
+          source: req.ip,
+          path: req.originalUrl,
+          method: req.method,
+        });
         next();
         return;
       }
     }
+    logger.warn('Invalid API key attempt', {
+      source: req.ip,
+      path: req.originalUrl,
+      keyPrefix: apiKey.slice(0, 8),
+    });
     res.status(401).json({ error: 'Invalid API key' });
     return;
   }

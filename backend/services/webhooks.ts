@@ -11,6 +11,7 @@ import axios from 'axios';
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import { Webhook } from '../types';
+import { decrypt } from './credentialEncryption';
 
 class WebhookService {
   private pool: Pool | null = null;
@@ -47,10 +48,20 @@ class WebhookService {
   private async deliver(webhook: Webhook, event: string, payload: Record<string, unknown>): Promise<void> {
     const deliveryId = await this.recordDelivery(webhook.id, event, payload);
 
+    // Decrypt the stored webhook secret
+    let signingSecret: string | undefined;
+    if (webhook.secret) {
+      try {
+        signingSecret = decrypt(webhook.secret);
+      } catch {
+        logger.error('Failed to decrypt webhook secret', { webhookId: webhook.id });
+      }
+    }
+
     for (let attempt = 1; attempt <= webhook.retry_count; attempt++) {
       try {
-        const signature = webhook.secret
-          ? require('crypto').createHmac('sha256', webhook.secret).update(JSON.stringify(payload)).digest('hex')
+        const signature = signingSecret
+          ? require('crypto').createHmac('sha256', signingSecret).update(JSON.stringify(payload)).digest('hex')
           : undefined;
 
         const response = await axios.post(webhook.url, {
