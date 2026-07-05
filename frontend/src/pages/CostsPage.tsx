@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { DollarSign, TrendingUp } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { apiFetch } from '../api/client';
 
 interface CostReport {
@@ -20,39 +22,51 @@ export default function CostsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-brand-accent border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (!report) {
-    return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold">Cost Tracking</h2>
-        <p className="text-sm text-brand-muted">Cost report endpoint requires a client ID. Navigate to a client dashboard for cost details.</p>
+        <PageHeader title="Cost Tracking" description="Monitor your AI service spending" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="card animate-pulse">
+              <div className="h-8 w-20 bg-brand-border rounded" />
+              <div className="h-4 w-32 bg-brand-border rounded mt-2" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold">Cost Tracking</h2>
-      <div className="card">
-        <p className="text-3xl font-bold">${report.total.toFixed(2)}</p>
-        <p className="text-sm text-brand-muted mt-1">Total costs (30 days)</p>
-      </div>
-      {report.byProvider && (
-        <div className="card">
-          <h3 className="text-sm font-semibold mb-3">By Provider</h3>
-          <div className="space-y-2">
-            {report.byProvider.map((p) => (
-              <div key={p.provider} className="flex justify-between text-sm">
-                <span className="text-brand-muted">{p.provider}</span>
-                <span>${p.cost.toFixed(2)}</span>
+      <PageHeader title="Cost Tracking" description="Monitor your AI service spending" />
+
+      {report ? (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="card relative overflow-hidden">
+              <svg className="absolute top-0 right-0 w-24 h-20 opacity-[0.04]" viewBox="0 0 200 120" fill="none">
+                <path d="M0 80C40 40 60 100 100 60C140 20 160 80 200 40V120H0V80Z" fill="currentColor" />
+              </svg>
+              <DollarSign size={20} className="text-green-400" />
+              <p className="text-3xl font-bold mt-3">${report.total.toFixed(2)}</p>
+              <p className="text-sm text-brand-muted mt-0.5">Total (30 days)</p>
+            </div>
+            {report.byProvider?.map((p) => (
+              <div key={p.provider} className="card relative overflow-hidden">
+                <svg className="absolute top-0 right-0 w-24 h-20 opacity-[0.04]" viewBox="0 0 200 120" fill="none">
+                  <path d="M0 80C40 40 60 100 100 60C140 20 160 80 200 40V120H0V80Z" fill="currentColor" />
+                </svg>
+                <TrendingUp size={20} className="text-brand-accent" />
+                <p className="text-3xl font-bold mt-3">${p.cost.toFixed(2)}</p>
+                <p className="text-sm text-brand-muted mt-0.5 capitalize">{p.provider}</p>
               </div>
             ))}
           </div>
+        </>
+      ) : (
+        <div className="card text-center py-16">
+          <DollarSign size={40} className="mx-auto text-brand-muted/40" />
+          <p className="text-brand-muted mt-4">Cost report requires a client ID. Navigate to a client dashboard for details.</p>
         </div>
       )}
     </div>

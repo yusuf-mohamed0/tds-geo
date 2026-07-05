@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Users, FileText,
   DollarSign, CheckSquare, Search, ScrollText,
 } from 'lucide-react';
+import Logo from './Logo';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', end: true },
@@ -18,8 +19,7 @@ export default function Sidebar() {
   return (
     <aside className="w-60 h-screen bg-brand-surface border-r border-brand-border flex flex-col overflow-y-auto">
       <div className="p-5 border-b border-brand-border">
-        <h1 className="text-lg font-bold text-brand-accent tracking-tight">TDS Geo</h1>
-        <p className="text-xs text-brand-muted mt-0.5">Dashboard</p>
+        <Logo />
       </div>
       <nav className="flex-1 p-3 space-y-0.5">
         {navItems.map((item) => (
