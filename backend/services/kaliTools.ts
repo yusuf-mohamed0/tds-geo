@@ -23,14 +23,14 @@ class KaliToolService {
 
   async detectTools(): Promise<ToolInfo[]> {
     const toolList = [
-      { name: 'wpscan', checkCmd: 'wpscan --version 2>/dev/null | head -1' },
-      { name: 'whatweb', checkCmd: 'whatweb --version 2>&1 | head -1' },
-      { name: 'nikto', checkCmd: 'nikto -Version 2>&1 | head -1' },
-      { name: 'nmap', checkCmd: 'nmap --version 2>&1 | head -1' },
-      { name: 'sqlmap', checkCmd: 'sqlmap --version 2>&1 | head -1' },
-      { name: 'wapiti', checkCmd: 'wapiti --version 2>&1 | head -1' },
-      { name: 'grype', checkCmd: 'grype version 2>&1 | head -1' },
-      { name: 'trivy', checkCmd: 'trivy --version 2>&1 | head -2 | tail -1' },
+      { name: 'wpscan', checkCmd: 'command -v wpscan && wpscan --version 2>/dev/null | head -1' },
+      { name: 'whatweb', checkCmd: 'command -v whatweb && whatweb --version 2>&1 | head -1' },
+      { name: 'nikto', checkCmd: 'command -v nikto && nikto -Version 2>&1 | head -1' },
+      { name: 'nmap', checkCmd: 'command -v nmap && nmap --version 2>&1 | head -1' },
+      { name: 'sqlmap', checkCmd: 'command -v sqlmap && sqlmap --version 2>&1 | head -1' },
+      { name: 'wapiti', checkCmd: 'command -v wapiti && wapiti --version 2>&1 | head -1' },
+      { name: 'grype', checkCmd: 'command -v grype && grype version 2>&1 | head -1' },
+      { name: 'trivy', checkCmd: 'command -v trivy && trivy --version 2>&1 | head -2 | tail -1' },
     ];
 
     const results: ToolInfo[] = [];
