@@ -484,20 +484,9 @@ app.use('/api/content-intel', createContentIntelRoutes(pool));
 import { createGeoRoutes } from './routes/geo';
 import { createAeoRoutes } from './routes/aeo';
 import { createAiSeoRoutes } from './routes/aiSeo';
-console.log('[index] About to register geo/aeo/ai-seo routes');
-try {
-  console.log('[index] createGeoRoutes type:', typeof createGeoRoutes);
-  app.use('/api/geo', createGeoRoutes());
-} catch(e) { console.error('[index] geo error:', e); }
-try {
-  console.log('[index] createAeoRoutes type:', typeof createAeoRoutes);
-  app.use('/api/aeo', createAeoRoutes());
-} catch(e) { console.error('[index] aeo error:', e); }
-try {
-  console.log('[index] createAiSeoRoutes type:', typeof createAiSeoRoutes);
-  app.use('/api/ai-seo', createAiSeoRoutes());
-} catch(e) { console.error('[index] aiSeo error:', e); }
-console.log('[index] After route registration');
+app.use('/api/geo', createGeoRoutes());
+app.use('/api/aeo', createAeoRoutes());
+app.use('/api/ai-seo', createAiSeoRoutes());
 
 // Knowledge Base / RAG routes
 app.use('/api/knowledge-bases', createKnowledgeBaseRoutes());

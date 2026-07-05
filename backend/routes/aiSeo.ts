@@ -8,10 +8,7 @@ import schemaGenerator from '../services/schemaGenerator';
 import indexNowService from '../services/indexNowService';
 import citationTracker from '../services/citationTracker';
 
-console.log('[aiSeo] Module loaded at', new Date().toISOString());
-
 export function createAiSeoRoutes(): Router {
-  console.log('[aiSeo] createAiSeoRoutes() called');
   const router = Router();
 
   // Debug endpoint — remove after verification
