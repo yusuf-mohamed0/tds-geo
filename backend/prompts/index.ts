@@ -62,6 +62,10 @@ export function aiSeoConsultingPrompt(vars: Record<string, any>): string {
   return loadPrompt('ai-seo-consulting-framework-prompt.md', vars);
 }
 
+export function writingOutlinePrompt(vars: WritingPromptVars): string {
+  return loadPrompt('writing-outline-prompt.md', vars as unknown as Record<string, string>);
+}
+
 export function combinedAiSeoPrompt(vars: WritingPromptVars & { FOCUS?: string }): string {
   const master = writingSystemPrompt(vars);
   const aeo = aeoSystemPrompt({ TOPIC: vars.TOPIC });

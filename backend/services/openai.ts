@@ -10,7 +10,7 @@ import OpenAI from 'openai';
 import { logger } from '../utils/logger';
 import { countKeywordOccurrences } from '../utils/stringUtils';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
-import { writingSystemPrompt } from '../prompts';
+import { writingSystemPrompt, writingOutlinePrompt } from '../prompts';
 import resilience from '../services/circuitBreaker';
 import { crawlCompetitors } from './contentResearch';
 import dataforseo from './dataforseo';
@@ -163,6 +163,68 @@ class OpenAIService {
     }
   }
 
+  async generateOutlinePhase(params: GenerateBlogParams): Promise<string> {
+    this.ensureInitialized();
+    const {
+      keyword,
+      clientSettings = {}
+    } = params;
+
+    const systemPrompt = writingOutlinePrompt({
+      TOPIC: keyword,
+      SITE_NAME: (clientSettings as any).siteName || process.env.SITE_NAME || 'Website',
+      SITE_DESCRIPTION: (clientSettings as any).siteDescription || process.env.SITE_DESCRIPTION || '',
+      CATEGORIES: (clientSettings as any).categories || '',
+      DATE: new Date().toISOString().split('T')[0],
+      YEAR: String(new Date().getFullYear()),
+    });
+
+    try {
+      const response = await resilience.getCircuitBreaker().call(
+        'openai-generate-outline',
+        async () => {
+          return this.getClient()!.chat.completions.create({
+            model: this.defaultModel,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: `Develop a strategic outline and creative plan for the definitive article about: "${keyword}"` }
+            ],
+            max_tokens: 1500,
+            temperature: 0.6,
+            response_format: { type: 'json_object' }
+          });
+        },
+        async () => {
+          logger.warn('OpenAI outline generation circuit open — proceeding without outline');
+          return null;
+        }
+      );
+
+      const content = response?.choices?.[0]?.message?.content;
+      if (!content) {
+        logger.info('Outline phase returned no content, proceeding without outline');
+        return '';
+      }
+
+      const parsed = JSON.parse(content);
+      logger.info('Outline phase complete', {
+        keyword,
+        creativeDna: parsed.creativeDna?.slice(0, 100),
+        sections: parsed.outline?.length || 0,
+        techniques: parsed.creativeTechniques?.length || 0,
+        faq: parsed.faqQuestions?.length || 0,
+      });
+
+      return content;
+    } catch (err) {
+      logger.warn('Outline phase failed, proceeding without outline', {
+        keyword,
+        error: (err as Error).message,
+      });
+      return '';
+    }
+  }
+
   async generateBlogPost(params: GenerateBlogParams): Promise<GeneratedArticle> {
     if (this.isMockMode) {
       return this.mockGenerateBlogPost(params);
@@ -196,8 +258,18 @@ class OpenAIService {
       GRAPHIFY_CONTEXT: (clientSettings as any).graphifyContext || '',
     });
 
-    // Build an enriched user prompt with website intelligence
+    // Run the two-pass pipeline: strategic outline phase first
+    const outlineJson = await this.generateOutlinePhase(params);
     let enrichedPrompt = `Generate a complete SEO-optimized blog post about: "${keyword}"\n\n`;
+
+    // Inject strategic outline from phase one (guides structure, creative DNA, evidence)
+    if (outlineJson) {
+      enrichedPrompt += `## STRATEGIC OUTLINE (from planning phase — follow this plan)\n`;
+      enrichedPrompt += `The following outline was developed during the strategic planning phase.\n`;
+      enrichedPrompt += `Adhere to its creative DNA, structural outline, sourced statistics, and expert quotes.\n`;
+      enrichedPrompt += `DO NOT deviate from the planned H2 structure or creative direction.\n\n`;
+      enrichedPrompt += `${outlineJson}\n\n`;
+    }
 
     // Inject competitor research for differentiation
     const competitors = await crawlCompetitors(keyword);
@@ -282,7 +354,7 @@ class OpenAIService {
 
     enrichedPrompt += `- Use E-E-A-T principles: demonstrate Experience, Expertise, Authoritativeness, Trustworthiness\n\n`;
 
-    enrichedPrompt += `Format your response as JSON with the following keys:\n{\n  "title": "The article title",\n  "metaTitle": "SEO meta title (max 60 chars)",\n  "metaDescription": "SEO meta description (max 160 chars)",\n  "tags": ["tag1", "tag2", "tag3"],\n  "faqSection": "## Frequently Asked Questions\\n\\n### Question 1?\\nAnswer 1...",\n  "content": "The full article content in markdown"\n}`;
+    enrichedPrompt += `Format your response as JSON per the schema defined in the system prompt. The output must include: title, metaTitle (max 60), metaDescription (max 150), tags, categories, secondaryKeywords, entities, searchIntent, slug, content (full HTML), and a faqSection appended to content. Follow the system prompt's output format exactly.`;
 
     try {
       logger.info('Generating blog post via OpenAI', { keyword, model: this.defaultModel });
