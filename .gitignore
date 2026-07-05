@@ -52,7 +52,6 @@ Icons/
 *.odt
 n8n/
 assets/
-frontend/
 docker/
 *.sidcars.yml
 graphify-out/
