@@ -651,7 +651,16 @@ app.post('/api/seo/analyze', authenticate, validate(seoAnalyzeSchema), async (re
 
 // ─── Serve robots.txt ─────────────────────
 app.get('/robots.txt', (_req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, 'public', 'robots.txt'));
+  const robotsPath = path.join(__dirname, 'public', 'robots.txt');
+  res.sendFile(robotsPath, (err) => {
+    if (err) {
+      res.type('text/plain').send(`User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+`);
+    }
+  });
 });
 
 // ─── IndexNow Key File ────────────────────

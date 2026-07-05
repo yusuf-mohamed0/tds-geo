@@ -11,6 +11,11 @@ import citationTracker from '../services/citationTracker';
 export function createAiSeoRoutes(): Router {
   const router = Router();
 
+  // Debug endpoint — remove after verification
+  router.get('/ping', (_req: Request, res: Response) => {
+    res.json({ ok: true, routes: router.stack.length });
+  });
+
   router.use(authenticate);
 
   // ─── Schema Generator ──────────────────────
