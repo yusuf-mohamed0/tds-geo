@@ -1,6 +1,6 @@
-# TDS Geo — AI SEO Automation System
+# TDS Geo — AI Search Optimization Platform (AEO, GEO, LLMO)
 
-Multi-tenant SaaS platform that automates SEO content generation and publishing for Shopify stores. Uses AI (OpenAI GPT-4o) to research keywords, generate high-quality blog posts, optimize for SEO, and publish directly to Shopify — all with per-client rate limiting, cost tracking, and a full admin dashboard.
+Multi-tenant SaaS platform that automates SEO content generation, publishing, and **AI search optimization** (AEO, GEO, LLMO) for Shopify stores. Uses AI (OpenAI GPT-4o + Ollama) to research keywords, generate high-quality blog posts, optimize for traditional and generative search engines, inject structured schema, track AI engine citations, and ping IndexNow — all with per-client rate limiting, cost tracking, and a full admin dashboard.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-22-green?style=flat-square&logo=node.js)](https://nodejs.org/)
@@ -17,9 +17,16 @@ Multi-tenant SaaS platform that automates SEO content generation and publishing 
 |---------|-------------|
 | **24-Stage Pipeline** | End-to-end orchestration: validation → keyword discovery → title gen → outline → article → SEO → CTA → FAQ → metadata → images → approval → publish → logging |
 | **Keyword Discovery** | AI-powered research with SerpAPI data, clustering, scoring, dedup, and 90-day reuse prevention |
-| **Content Generation** | Long-form SEO blog posts via OpenAI GPT-4o with brand voice, E-E-A-T guidelines |
-| **SEO Analysis** | Content scoring, keyword density, readability, quality scoring, internal linking optimization |
+| **Content Generation** | Long-form SEO blog posts via OpenAI GPT-4o / Ollama with brand voice, E-E-A-T guidelines |
+| **SEO / AEO / GEO / LLMO** | Optimize for traditional search, answer engines (AEO), generative AI (GEO), and LLM retrieval (LLMO) |
+| **Structured Schema (JSON-LD)** | Auto-generate 7 schema types (Organization, Article, FAQPage, Product, BreadcrumbList, HowTo, WebPage) at publish time |
+| **AI Crawler Control** | robots.txt allowing Google-Extended, GPTBot, PerplexityBot, Claude-Web, and 8 other AI crawlers |
+| **IndexNow Pinging** | Dual-ping IndexNow + Bing API on every publish for instant search engine notification |
+| **Citation Tracking** | Monthly audit of article citations across 7 AI engines (ChatGPT, Gemini, Perplexity, Claude, Copilot, Google AI Overviews, Bing AI) |
+| **Content Freshness** | Automated freshness calendar — flags articles >10 months old, regenerates 3/week |
+| **Entity Consistency** | Validates canonical entity names vs variants in generated content |
 | **Shopify Publishing** | Direct publish with image upload, tags, metadata, retry with backoff, rate-limit protection |
+| **WooCommerce Publishing** | Product content generation via TDS Geo plugin API with SEO metafields |
 | **Multi-Tenant** | Per-client Shopify stores, keyword pools, generation settings, publishing queues, budgets |
 | **JWT Authentication** | Role-based auth (admin, editor, client), login/logout, protected routes |
 | **Webhook System** | Event-driven webhooks with retry delivery, delivery history, per-webhook config |
@@ -43,8 +50,8 @@ Multi-tenant SaaS platform that automates SEO content generation and publishing 
 | **Frontend** | React 18.3, Vite 5.2, React Router 6.23, Recharts 2.12, Lucide icons |
 | **Database** | PostgreSQL 16 + pgvector extension (optional) |
 | **Queue** | BullMQ 5.8 (Redis-backed, graceful degradation without Redis) |
-| **AI** | OpenAI API (GPT-4o, text-embedding-3-small, DALL-E 3) |
-| **SEO** | SerpAPI (Google keyword data), custom SEO scoring engine |
+| **AI** | OpenAI API (GPT-4o, text-embedding-3-small, DALL-E 3), Ollama (Ministral 3:14B) |
+| **SEO / AEO / GEO / LLMO** | SerpAPI (keyword data), structured JSON-LD schema, IndexNow pinging, citation auditor |
 | **Images** | Pexels API for article featured images |
 | **Auth** | JWT (jsonwebtoken + bcryptjs), 7-day expiry, role-based |
 | **Container** | Docker + docker-compose (Node, PostgreSQL, Redis, Nginx) |
@@ -147,6 +154,11 @@ Fill in these values:
 - `SHOPIFY_DEFAULT_ACCESS_TOKEN` — Your Shopify Admin API token
 - `DATABASE_URL` — Your PostgreSQL connection string
 - `JWT_SECRET` — A random string for security (generate one with `openssl rand -hex 32`)
+- `INDEXNOW_KEY` — Your IndexNow API key for instant search notification
+- `INDEXNOW_HOST` — Your site domain registered with IndexNow
+- `INDEXNOW_KEY_LOCATION` — Public URL to the key verification file
+- `SITE_NAME` — Your site name (used in JSON-LD schema)
+- `AUTHOR_NAME` — Default author name (used in JSON-LD schema)
 
 ### Step 4: Set Up the Database
 
@@ -213,14 +225,14 @@ Nginx serves the app at `http://localhost:80`.
 ### Manual (without Docker)
 
 ```bash
-# 1. Build backend TypeScript
-npm run build
-
-# 2. Build frontend
+# 1. Build frontend (backend runs via tsx, no build needed)
 cd frontend && npm run build && cd ..
 
-# 3. Start with PM2
+# 2. Start with PM2 (runs from TypeScript source via tsx)
 npx pm2 start ecosystem.config.cjs
+
+# 3. Verify the server started correctly
+pm2 logs tds-geo-backend --lines 10
 
 # 4. (Optional) Save PM2 config to restart on reboot
 npx pm2 save
@@ -254,7 +266,7 @@ For production, make sure to:
 │   │   └── blogPipeline.ts          # 24-stage pipeline orchestrator
 │   ├── workers/
 │   │   └── index.ts                 # BullMQ worker processors
-│   ├── services/                    # 26+ service modules
+│   ├── services/                    # 30+ service modules
 │   │   ├── openai.ts                # OpenAI (GPT, embeddings, images)
 │   │   ├── shopify.ts               # Shopify Admin API
 │   │   ├── seo.ts                   # SEO analysis & validation
@@ -267,8 +279,15 @@ For production, make sure to:
 │   │   ├── multiCmsPublisher.ts     # Multi-CMS publishing
 │   │   ├── costTracker.ts           # Cost tracking & budgets
 │   │   ├── costOptimization.ts      # AI model routing
-│   │   └── selfImprovementService.ts # Prompt optimization
-│   ├── routes/                      # 24 route modules
+│   │   ├── selfImprovementService.ts # Prompt optimization
+│   │   ├── schemaGenerator.ts       # JSON-LD schema generation (7 types)
+│   │   ├── indexNowService.ts       # IndexNow + Bing URL pinging
+│   │   ├── citationTracker.ts       # AI engine citation auditor
+│   │   └── geoIntelligence.ts       # GEO content analysis engine
+│   ├── prompts/                     # AI prompt loaders
+│   │   └── index.ts                 # AEO, GEO, LLMO, consulting prompt loaders
+│   ├── writing-system-prompt.md     # Master writing prompt (AEO + LLMO sections)
+│   ├── routes/                      # 27+ route modules
 │   ├── repositories/                # Data access layers
 │   ├── middleware/auth.ts           # JWT auth + RBAC
 │   ├── database/                    # Migrations & seed data
@@ -285,6 +304,16 @@ For production, make sure to:
 │   │   └── pages/                   # 24 route pages
 │   └── index.html
 ├── scripts/                      # Utility & pipeline scripts
+│   ├── monthly-ops.mjs           # Monthly freshness + citation + entity audit
+│   └── run-monthly-ops.sh        # Shell wrapper for monthly ops
+├── doc/                          # Knowledge base & documentation
+│   ├── AI-SEO-MASTER-KNOWLEDGE-BASE.md  # 531-line AI SEO reference
+│   ├── aeo-answer-engine-prompt.md      # AEO discipline prompt
+│   ├── geo-generative-engine-prompt.md  # GEO discipline prompt
+│   ├── llmo-large-language-model-prompt.md # LLMO discipline prompt
+│   ├── ai-seo-consulting-framework-prompt.md # Consulting framework prompt
+│   ├── 18-WP-SHOPIFY-MIGRATION.md       # WordPress → Shopify migration plan
+│   └── EEAT-content-framework.md        # E-E-A-T content quality framework
 ├── docker/nginx.conf
 ├── n8n/workflows/
 ├── .github/workflows/
@@ -328,6 +357,38 @@ All other endpoints require: `Authorization: Bearer <token>`
 | `POST` | `/api/chat/sessions/:id/messages` | Send chat message |
 | `GET` | `/api/admin/summary` | Platform-wide stats |
 | `GET` | `/api/admin/errors` | Recent errors |
+| `GET` | `/api/ai-seo/ping` | AI SEO router health check |
+| `POST` | `/api/ai-seo/schema/generate` | Generate JSON-LD schemas for an article |
+| `POST` | `/api/ai-seo/schema/inject` | Inject JSON-LD into HTML |
+| `POST` | `/api/ai-seo/schema/extract-faq` | Extract FAQ pairs from content |
+| `POST` | `/api/ai-seo/indexnow/ping` | Ping IndexNow for a single URL |
+| `POST` | `/api/ai-seo/indexnow/ping-batch` | Batch-ping IndexNow for multiple URLs |
+| `POST` | `/api/ai-seo/citations/check` | Check article citations across AI engines |
+| `GET` | `/api/ai-seo/citations/history` | Citation history for an article |
+| `POST` | `/api/ai-seo/citations/audit` | Run a full citation audit |
+
+## Monthly Operations
+
+Automated monthly pipeline for content freshness and AI search optimization:
+
+```bash
+# Run monthly ops (freshness + citation audit + entity check + full report)
+node scripts/monthly-ops.mjs monthly
+
+# Check content freshness calendar (flags articles >10 months old)
+node scripts/monthly-ops.mjs freshness
+
+# Check entity consistency across all articles
+node scripts/monthly-ops.mjs entity-check
+
+# Generate enhanced monthly report with all metrics
+node scripts/monthly-ops.mjs enhanced-report
+```
+
+Or use the shell wrapper:
+```bash
+bash scripts/run-monthly-ops.sh
+```
 
 ## Testing
 
@@ -357,6 +418,22 @@ GitHub Actions workflows:
 6. **Natural language CLI** — Regex-based pattern matching for fast command parsing
 7. **Cost-first routing** — Routes tasks to optimal AI model based on complexity
 8. **TypeScript strict mode** — Zero type errors across frontend and backend
+9. **Schema injection at publish time** — JSON-LD is generated and injected when an article is published, not at generation time
+10. **IndexNow fires async** — After successful publish, IndexNow ping is fire-and-forget (doesn't block the response)
+11. **Master prompt in Markdown** — The actual writing prompt is `writing-system-prompt.md` loaded by `prompts/index.ts`, not embedded in code
+12. **TDS Geo plugin for WooCommerce** — WooCommerce product reads/writes use the TDS Geo plugin API (`/tds-geo/v1/posts/{id}`), not WP native REST
+
+## WordPress → Shopify Migration
+
+A full migration engine design is available at `doc/18-WP-SHOPIFY-MIGRATION.md`. The migration plan covers:
+
+- **Content migration** — Articles, products, categories, tags, images, SEO metadata
+- **URL preservation** — 301 redirects for all existing WordPress URLs
+- **SEO continuity** — Title tags, meta descriptions, Open Graph, Twitter Cards
+- **Plugin replacement** — Shopify equivalents for Yoast SEO, WooCommerce, Contact Form 7
+- **Estimated effort** — 22–29 hours for a complete migration
+
+The migration engine has not yet been built — the document is a detailed implementation blueprint.
 
 ## License
 
