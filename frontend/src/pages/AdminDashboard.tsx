@@ -39,12 +39,12 @@ export default function AdminDashboard() {
       <h2 className="text-xl font-bold">Dashboard</h2>
 
       {/* System Health */}
-      {health && (
-        <div className="flex gap-4 text-sm">
-          {Object.entries(health).map(([key, val]) => (
+      {health?.checks && (
+        <div className="flex gap-4 text-sm flex-wrap">
+          {Object.entries(health.checks).map(([key, val]) => (
             <div key={key} className="flex items-center gap-2 card py-2 px-3">
               <span className="capitalize text-brand-muted">{key}:</span>
-              <StatusBadge status={typeof val === 'object' && 'status' in val ? (val as { status: string }).status : 'unknown'} />
+              <StatusBadge status={(val as { status: string })?.status || 'unknown'} />
             </div>
           ))}
         </div>
