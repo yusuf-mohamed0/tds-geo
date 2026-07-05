@@ -24,8 +24,19 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-brand-accent border-t-transparent rounded-full" />
+      <div className="space-y-6">
+        <h2 className="text-xl font-bold">Dashboard</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="card animate-pulse">
+              <div className="w-10 h-10 rounded-xl bg-brand-border" />
+              <div className="mt-4 space-y-2">
+                <div className="h-8 w-24 bg-brand-border rounded" />
+                <div className="h-4 w-32 bg-brand-border rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -36,52 +47,80 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold">Dashboard</h2>
+      <div>
+        <h2 className="text-xl font-bold">Dashboard</h2>
+        <p className="text-sm text-brand-muted mt-0.5">Overview of your platform performance and activity</p>
+      </div>
 
       {/* System Health */}
       {health?.checks && (
-        <div className="flex gap-4 text-sm flex-wrap">
-          {Object.entries(health.checks).map(([key, val]) => (
-            <div key={key} className="flex items-center gap-2 card py-2 px-3">
-              <span className="capitalize text-brand-muted">{key}:</span>
-              <StatusBadge status={(val as { status: string })?.status || 'unknown'} />
-            </div>
-          ))}
+        <div className="card py-3 px-5">
+          <div className="flex items-center gap-1 text-xs text-brand-muted mb-2.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5" />
+            System Status
+          </div>
+          <div className="flex gap-3 flex-wrap">
+            {Object.entries(health.checks).map(([key, val]) => {
+              const status = (val as { status: string })?.status || 'unknown';
+              return (
+                <div key={key} className="flex items-center gap-2 py-1 px-2.5 rounded-lg bg-brand-bg/50">
+                  <div className={`w-1.5 h-1.5 rounded-full ${
+                    status === 'healthy' ? 'bg-green-400' :
+                    status === 'configured' ? 'bg-blue-400' :
+                    status.includes('unreachable') || status.includes('not') ? 'bg-red-400' :
+                    'bg-yellow-400'
+                  }`} />
+                  <span className="capitalize text-xs text-brand-text">{key}</span>
+                  <span className="text-[10px] text-brand-muted/60">{status}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <MetricCard
           icon={<Users size={20} />}
           label="Total Clients"
           value={dashboard.clients.total}
-          subtitle={`${dashboard.clients.active} active · ${dashboard.clients.new_30d} new (30d)`}
+          subtitle={`${dashboard.clients.active} active · ${dashboard.clients.new_30d} new`}
+          color="#818CF8"
         />
         <MetricCard
           icon={<FileText size={20} />}
           label="Articles"
           value={dashboard.articles.total}
           subtitle={`${dashboard.articles.published} published · ${dashboard.articles.pending_review} pending`}
+          color="#34D399"
         />
         <MetricCard
           icon={<Target size={20} />}
           label="Avg Keyword Relevance"
           value={`${dashboard.keywords.avg_relevance}%`}
-          subtitle={`${dashboard.keywords.total} keywords`}
+          subtitle={`${dashboard.keywords.total} keywords tracked`}
+          color="#F472B6"
         />
         <MetricCard
           icon={<DollarSign size={20} />}
           label="MTD Costs"
           value={`$${parseFloat(dashboard.costs.total_cost_mtd || '0').toFixed(2)}`}
           subtitle={`${dashboard.publishing.this_week} published this week`}
+          color="#FBBF24"
         />
       </div>
 
       {/* Activity Chart + Recent Articles */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2 card">
-          <h3 className="text-sm font-semibold mb-4">30-Day Activity</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold">30-Day Activity</h3>
+            <div className="flex items-center gap-1.5 text-xs text-brand-muted">
+              <div className="w-2 h-2 rounded-full bg-brand-accent" />
+              <span>Events</span>
+            </div>
+          </div>
           {dashboard.activity.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={dashboard.activity}>
@@ -100,29 +139,37 @@ export default function AdminDashboard() {
         </div>
 
         <div className="card">
-          <h3 className="text-sm font-semibold mb-4">Recent Articles</h3>
-          <div className="space-y-2">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold">Recent Articles</h3>
+            <span className="text-xs text-brand-muted">{dashboard.recentArticles.length}</span>
+          </div>
+          <div className="space-y-1">
             {dashboard.recentArticles.slice(0, 8).map((article) => (
               <button
                 key={article.id}
                 onClick={() => navigate(`/articles/${article.id}`)}
-                className="w-full text-left p-2.5 rounded-lg hover:bg-brand-border transition-colors"
+                className="w-full text-left p-3 rounded-xl hover:bg-brand-border/60 transition-all duration-150 group"
               >
-                <p className="text-sm truncate">{article.title}</p>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm truncate flex-1 group-hover:text-brand-accent transition-colors">{article.title}</p>
+                  <ChevronRight size={14} className="text-brand-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" />
+                </div>
+                <div className="flex items-center gap-2 mt-1.5">
                   <StatusBadge status={article.status} />
-                  {article.seoScore && (
-                    <span className="text-xs text-brand-muted">SEO: {article.seoScore}</span>
+                  {article.seo_score && (
+                    <span className="text-[11px] text-brand-muted/60">SEO: {article.seo_score}</span>
                   )}
                 </div>
               </button>
             ))}
-            <button
-              onClick={() => navigate('/articles')}
-              className="flex items-center gap-1 text-sm text-brand-accent hover:underline mt-2"
-            >
-              View all <ChevronRight size={14} />
-            </button>
+            {dashboard.recentArticles.length > 0 && (
+              <button
+                onClick={() => navigate('/articles')}
+                className="w-full text-left p-2.5 mt-1 text-sm text-brand-accent/80 hover:text-brand-accent transition-colors rounded-lg hover:bg-brand-border/30"
+              >
+                View all articles →
+              </button>
+            )}
           </div>
         </div>
       </div>

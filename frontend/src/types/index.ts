@@ -28,9 +28,13 @@ export interface ArticleSummary {
   id: string;
   title: string;
   status: string;
-  clientName?: string;
+  client_id?: string;
+  keyword?: string;
+  created_at?: string;
   createdAt: string;
+  word_count?: number;
   wordCount?: number;
+  seo_score?: string | number;
   seoScore?: number;
 }
 
