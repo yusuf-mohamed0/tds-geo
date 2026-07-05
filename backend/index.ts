@@ -111,6 +111,12 @@ import { createMetaRoutes } from './routes/meta';
 // ═══ Credential Vault ═══════════════════════════
 import { createCredentialVaultRoutes } from './routes/credentialVault';
 
+// ═══ Quality Evaluation Routes (Prompt Phase 2) ═══
+import { createQualityRoutes } from './routes/quality';
+
+// ═══ Client Audit Routes (AI SEO Phase 1) ════════
+import { createAuditRoutes } from './routes/clientAudit';
+
 // ═══ TDS GEO Core Engine Imports ════════════════
 import { initializeEngines, analyticsEngine } from './engines';
 import { eventBus } from './event-bus';
@@ -496,6 +502,12 @@ app.use('/api/crawler-analytics', createCrawlerAnalyticsRoutes());
 
 // AI evaluation routes
 app.use('/api/evaluation', createEvaluationRoutes(pool));
+
+// Quality evaluation + GEPA reflection (Prompt Phase 2)
+app.use('/api/quality', createQualityRoutes(pool));
+
+// Client AI SEO audit (AI SEO Phase 1)
+app.use('/api/audit', createAuditRoutes(pool));
 
 // Pexels image routes
 app.use('/api/pexels', createPexelsRoutes(pool));
