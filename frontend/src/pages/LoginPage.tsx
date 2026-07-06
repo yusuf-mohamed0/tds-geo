@@ -29,7 +29,7 @@ export default function LoginPage() {
     <div className="h-screen flex items-center justify-center bg-brand-bg">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8 flex flex-col items-center">
-          <img src="/assets/White Swype.png" alt="Swype" className="h-10 w-auto object-contain" />
+          <img src="/assets/White%20Swype.png" alt="Swype" className="h-10 w-auto object-contain" />
           <h1 className="text-2xl font-bold text-brand-text mt-3">TDS Geo</h1>
           <p className="text-brand-muted mt-1">Sign in to your dashboard</p>
         </div>

@@ -15,12 +15,13 @@ interface Client {
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     apiFetch<{ clients: Client[] }>('/api/clients')
       .then((res) => setClients(res.clients || []))
-      .catch(() => {})
+      .catch(() => setError('Failed to load clients'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -38,6 +39,18 @@ export default function ClientsPage() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Clients" description="Manage your connected clients and stores" />
+        <div className="card text-center py-16">
+          <Store size={40} className="mx-auto text-red-400/40" />
+          <p className="text-red-400 mt-4 font-medium">{error}</p>
         </div>
       </div>
     );

@@ -25,12 +25,13 @@ export default function ArticleDetailPage() {
   const { id } = useParams();
   const [article, setArticle] = useState<ArticleDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!id) return;
     apiFetch<ArticleDetail>(`/api/articles/${id}`)
       .then(setArticle)
-      .catch(() => {})
+      .catch(() => setError('Failed to load article'))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -42,6 +43,20 @@ export default function ArticleDetailPage() {
           <div className="h-8 w-3/4 bg-brand-border rounded" />
           <div className="h-4 w-1/2 bg-brand-border rounded" />
           <div className="h-32 bg-brand-border rounded" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <Link to="/admin/articles" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
+          ← Back to articles
+        </Link>
+        <div className="card text-center py-16">
+          <FileText size={40} className="mx-auto text-red-400/40" />
+          <p className="text-red-400 mt-4 font-medium">{error}</p>
         </div>
       </div>
     );
