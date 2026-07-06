@@ -28,6 +28,7 @@ export default function ArticlesPage() {
   const [generateError, setGenerateError] = useState('');
   const [generateResult, setGenerateResult] = useState('');
   const [queryValue, setQueryValue] = useState('');
+  const [pageError, setPageError] = useState('');
   const navigate = useNavigate();
   const limit = 20;
 
@@ -156,7 +157,6 @@ export default function ArticlesPage() {
       subtitle={data ? `${data.total} article${data.total !== 1 ? 's' : ''} total` : 'Manage your content'}
       primaryAction={{
         content: 'Generate',
-        icon: Sparkles as any,
         onAction: () => setShowGenerate(true),
       }}
     >
