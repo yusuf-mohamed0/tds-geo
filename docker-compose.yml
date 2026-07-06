@@ -174,8 +174,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: frontend
-      args:
-        VITE_SHOPIFY_API_KEY: ${SHOPIFY_API_KEY:-a178c8740049e04eec663378b6e30ad8}
     container_name: ai-seo-nginx
     restart: unless-stopped
     ports:

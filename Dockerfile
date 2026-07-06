@@ -31,9 +31,7 @@ RUN npm ci --legacy-peer-deps
 # Copy frontend source files
 COPY frontend/ ./
 
-# Build the SPA (with Shopify API key for App Bridge)
-ARG VITE_SHOPIFY_API_KEY
-ENV VITE_SHOPIFY_API_KEY=${VITE_SHOPIFY_API_KEY}
+# Build the SPA
 RUN npm run build
 
 # ─── Backend Production Stage ──────────────────
