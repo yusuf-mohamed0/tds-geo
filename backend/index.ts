@@ -135,6 +135,7 @@ import { heartbeatService } from './services/heartbeatService';
 // ═══ AEO Services ═══════════════════════════
 import knowledgeBaseService from './services/knowledgeBase';
 import { schedulerService } from './services/scheduler';
+import { autoPublishService } from './services/autoPublishService';
 import crawlerTrackerService, { identifyCrawler } from './services/crawlerTracker';
 import { createKnowledgeBaseRoutes } from './routes/knowledgeBase';
 import { createCrawlerAnalyticsRoutes } from './routes/crawlerAnalytics';
@@ -945,6 +946,15 @@ async function start(): Promise<void> {
       logger.warn('Scheduler service init failed', { error: (e as Error).message });
     }
 
+    // ═══ Auto-Publish Scheduler ═══════════════
+    try {
+      autoPublishService.initialize(pool);
+      const autoPublishInterval = parseInt(process.env.AUTO_PUBLISH_INTERVAL_MS || '30000', 10);
+      autoPublishService.start(autoPublishInterval);
+    } catch (e) {
+      logger.warn('Auto-publish service init failed', { error: (e as Error).message });
+    }
+
     // ═══ Citation Tracker Initialization ═══════
     try {
       citationTracker.initialize(pool);
@@ -997,6 +1007,7 @@ async function shutdown(signal: string): Promise<void> {
 
   // Scheduler cleanup
   schedulerService.stop();
+  autoPublishService.stop();
 
   // TDS GEO Core engine cleanup
   connectorManager.stopPeriodicHealthChecks();

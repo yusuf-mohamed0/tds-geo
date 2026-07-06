@@ -30,6 +30,7 @@ import { convert } from '../utils/markdownToHtml';
 import schemaGenerator from '../services/schemaGenerator';
 import indexNowService from '../services/indexNowService';
 import contentQualityGate from '../services/contentQualityGate';
+import serpContentScorer from '../services/serpContentScorer';
 
 export function createArticleRoutes(pool: Pool): Router {
   const router = Router();
@@ -174,6 +175,22 @@ export function createArticleRoutes(pool: Pool): Router {
         });
       }
 
+      // SERP Content Scoring — evaluate against top-ranking competitors
+      let serpScoreResult = null;
+      try {
+        serpScoreResult = await serpContentScorer.score(finalContent, article.title, keyword);
+        if (serpScoreResult.score < 40) {
+          logger.warn('SERP score low', {
+            clientId, keyword, serpScore: serpScoreResult.score,
+            improvements: serpScoreResult.improvements,
+          });
+        }
+      } catch (serpErr) {
+        logger.warn('SERP scoring failed, continuing without it', {
+          error: (serpErr as Error).message,
+        });
+      }
+
       // Convert to HTML
       const contentHtml = convert(finalContent);
 
@@ -268,6 +285,7 @@ export function createArticleRoutes(pool: Pool): Router {
         approvalRequired: client.approval_mode === 'manual',
         qualityGate: qualityGateResult,
         qualityReport,
+        serpScore: serpScoreResult,
       });
     } catch (err) {
       next(err);
@@ -749,6 +767,71 @@ export function createArticleRoutes(pool: Pool): Router {
       const { content_md, keyword } = result.rows[0];
       const analysis = await seoService.analyzeContent(content_md, keyword || result.rows[0].title);
       res.json(analysis);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ─── Schedule Article Publishing ────────────
+  router.post('/:id/schedule', requireResourceOwnership(pool, 'articles'), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { scheduledAt } = req.body;
+      if (!scheduledAt) {
+        res.status(400).json({ error: 'scheduledAt is required (ISO 8601 timestamp)' });
+        return;
+      }
+
+      const scheduledDate = new Date(scheduledAt);
+      if (isNaN(scheduledDate.getTime())) {
+        res.status(400).json({ error: 'Invalid date format. Use ISO 8601 (e.g., 2026-01-15T10:00:00Z)' });
+        return;
+      }
+
+      if (scheduledDate <= new Date()) {
+        res.status(400).json({ error: 'Scheduled time must be in the future' });
+        return;
+      }
+
+      const result = await pool.query(
+        `UPDATE articles SET scheduled_at = $1, updated_at = NOW()
+         WHERE id = $2 AND status IN ('approved', 'generated', 'draft')
+         RETURNING id, title, status, scheduled_at`,
+        [scheduledDate, req.params.id]
+      );
+
+      if (result.rows.length === 0) {
+        res.status(404).json({ error: 'Article not found or not in a schedulable state' });
+        return;
+      }
+
+      logger.info('Article scheduled for publishing', {
+        articleId: req.params.id,
+        scheduledAt: scheduledDate.toISOString(),
+      });
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ─── Cancel Schedule ────────────────────────
+  router.delete('/:id/schedule', requireResourceOwnership(pool, 'articles'), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await pool.query(
+        `UPDATE articles SET scheduled_at = NULL, updated_at = NOW()
+         WHERE id = $1 AND scheduled_at IS NOT NULL
+         RETURNING id, title, status, scheduled_at`,
+        [req.params.id]
+      );
+
+      if (result.rows.length === 0) {
+        res.status(404).json({ error: 'Article not found or no schedule to cancel' });
+        return;
+      }
+
+      logger.info('Article schedule cancelled', { articleId: req.params.id });
+      res.json(result.rows[0]);
     } catch (err) {
       next(err);
     }

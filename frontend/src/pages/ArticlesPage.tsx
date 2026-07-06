@@ -126,6 +126,15 @@ export default function ArticlesPage() {
         }>{article.status}</Badge>
       </IndexTable.Cell>
       <IndexTable.Cell>
+        {article.scheduled_at ? (
+          <Text as="span" variant="bodySm">
+            {new Date(article.scheduled_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </Text>
+        ) : (
+          <Text as="span" variant="bodySm" tone="subdued">-</Text>
+        )}
+      </IndexTable.Cell>
+      <IndexTable.Cell>
         <Text as="span" variant="bodySm" tone="subdued">{article.word_count || '-'}</Text>
       </IndexTable.Cell>
       <IndexTable.Cell>
@@ -173,6 +182,7 @@ export default function ArticlesPage() {
                 headings={[
                   { title: 'Title' },
                   { title: 'Status' },
+                  { title: 'Schedule' },
                   { title: 'Words' },
                   { title: 'SEO' },
                   { title: 'Created' },

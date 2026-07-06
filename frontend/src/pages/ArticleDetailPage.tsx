@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Page, Card, Text, Spinner, Banner, BlockStack, InlineStack, InlineGrid, Badge } from '@shopify/polaris';
+import { Page, Card, Text, Spinner, Banner, BlockStack, InlineStack, InlineGrid, Badge, Button } from '@shopify/polaris';
+import { Calendar, Clock } from 'lucide-react';
 import { apiFetch } from '../api/client';
 
 interface ArticleDetail {
@@ -15,6 +16,7 @@ interface ArticleDetail {
   status: string;
   seo_score: string | number;
   keyword: string;
+  scheduled_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -24,14 +26,58 @@ export default function ArticleDetailPage() {
   const [article, setArticle] = useState<ArticleDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
+  const [scheduling, setScheduling] = useState(false);
+  const [scheduleError, setScheduleError] = useState('');
 
   useEffect(() => {
     if (!id) return;
     apiFetch<ArticleDetail>(`/api/articles/${id}`)
-      .then(setArticle)
+      .then((data) => {
+        setArticle(data);
+        if (data.scheduled_at) {
+          const d = new Date(data.scheduled_at);
+          setScheduleDate(d.toISOString().split('T')[0]);
+          setScheduleTime(d.toTimeString().slice(0, 5));
+        }
+      })
       .catch(() => setError('Failed to load article'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  const handleSchedule = async () => {
+    if (!id || !scheduleDate || !scheduleTime) return;
+    setScheduling(true);
+    setScheduleError('');
+    try {
+      const scheduledAt = new Date(`${scheduleDate}T${scheduleTime}:00Z`).toISOString();
+      const updated = await apiFetch<ArticleDetail>(`/api/articles/${id}/schedule`, {
+        method: 'POST',
+        body: JSON.stringify({ scheduledAt }),
+      });
+      setArticle((prev) => prev ? { ...prev, scheduled_at: updated.scheduled_at } : prev);
+    } catch (err: unknown) {
+      setScheduleError(err instanceof Error ? err.message : 'Failed to schedule');
+    } finally {
+      setScheduling(false);
+    }
+  };
+
+  const handleCancelSchedule = async () => {
+    if (!id) return;
+    setScheduling(true);
+    try {
+      await apiFetch(`/api/articles/${id}/schedule`, { method: 'DELETE' });
+      setArticle((prev) => prev ? { ...prev, scheduled_at: null } : prev);
+      setScheduleDate('');
+      setScheduleTime('');
+    } catch (err: unknown) {
+      setScheduleError(err instanceof Error ? err.message : 'Failed to cancel');
+    } finally {
+      setScheduling(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -114,6 +160,9 @@ export default function ArticleDetailPage() {
                   article.status === 'generated' ? 'warning' :
                   article.status === 'rejected' ? 'critical' : 'attention'
                 }>{article.status}</Badge>
+                {article.scheduled_at && (
+                  <Badge tone="info">Scheduled</Badge>
+                )}
               </InlineStack>
               <div>
                 <Text as="p" variant="bodySm" tone="subdued">SEO Score</Text>
@@ -140,6 +189,63 @@ export default function ArticleDetailPage() {
                   <Text as="p" variant="bodySm" tone="subdued">Updated</Text>
                   <Text as="p" variant="bodyMd">{new Date(article.updated_at).toLocaleDateString()}</Text>
                 </div>
+              )}
+            </BlockStack>
+          </Card>
+
+          <Card>
+            <BlockStack gap="200">
+              <InlineStack align="start" gap="200">
+                <Calendar size={16} style={{ opacity: 0.6 }} />
+                <Text as="h3" variant="headingSm" tone="subdued">Schedule Publishing</Text>
+              </InlineStack>
+              {article.scheduled_at ? (
+                <BlockStack gap="200">
+                  <InlineStack gap="200" blockAlign="center">
+                    <Clock size={14} style={{ opacity: 0.6 }} />
+                    <Text as="p" variant="bodyMd">
+                      {new Date(article.scheduled_at).toLocaleDateString(undefined, {
+                        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit',
+                      })}
+                    </Text>
+                  </InlineStack>
+                  <Button
+                    variant="primary"
+                    tone="critical"
+                    onClick={handleCancelSchedule}
+                    loading={scheduling}
+                  >Cancel Schedule</Button>
+                </BlockStack>
+              ) : (
+                <BlockStack gap="200">
+                  <div style={{ display: 'flex', gap: 'var(--p-space-200)' }}>
+                    <input
+                      type="date"
+                      className="input"
+                      value={scheduleDate}
+                      onChange={(e) => setScheduleDate(e.target.value)}
+                      style={{ flex: 1 }}
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                    <input
+                      type="time"
+                      className="input"
+                      value={scheduleTime}
+                      onChange={(e) => setScheduleTime(e.target.value)}
+                      style={{ width: 120 }}
+                    />
+                  </div>
+                  {scheduleError && (
+                    <Text as="p" variant="bodySm" tone="critical">{scheduleError}</Text>
+                  )}
+                  <Button
+                    variant="primary"
+                    onClick={handleSchedule}
+                    loading={scheduling}
+                    disabled={!scheduleDate || !scheduleTime}
+                  >Schedule</Button>
+                </BlockStack>
               )}
             </BlockStack>
           </Card>

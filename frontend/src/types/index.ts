@@ -31,6 +31,7 @@ export interface ArticleSummary {
   status: string;
   client_id?: string;
   keyword?: string;
+  scheduled_at?: string | null;
   created_at?: string;
   createdAt: string;
   word_count?: number;
