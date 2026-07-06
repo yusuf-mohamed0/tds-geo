@@ -69,8 +69,8 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 | **Prompt Management** | ✅ Versioned + self-improvement | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Plugin System** | ✅ Hook-based | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **WooCommerce Support** | ✅ (TDS Geo plugin) | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Backlink Automation** | ❌ (planned) | ❌ | ❌ | ✅ ABC network | ❌ | ❌ |
-| **Keyword Research** | ❌ (via SerpAPI) | ✅ Built-in | ✅ Built-in | ✅ Built-in | ❌ | ❌ |
+| **Backlink Automation** | ✅ Prospect discovery + AI outreach + guest post gen + tracking + verification | ❌ | ❌ | ✅ ABC network | ❌ | ❌ |
+| **Keyword Research** | ✅ AI clustering + intent + SERP features + opportunity scoring | ✅ Built-in | ✅ Built-in | ✅ Built-in | ❌ | ❌ |
 | **GSC/GA4 Integration** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ |
 | **Image Generation** | ✅ DALL-E + Pexels | ❌ | ✅ Photosonic | ✅ HD images | ❌ | ❌ |
 | **Multi-Language** | ❌ | ❌ | ✅ | ✅ 45+ | ❌ | ❌ |
@@ -88,7 +88,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 1. ~~**No UI dashboard**~~ — ✅ **RESOLVED.** Full Polaris 13 dark-theme UI (AdminDashboard, Articles, GEO, Citations, Clients, Costs, Quality). Major adoption barrier removed.
 2. **No keyword research** — We lack built-in keyword discovery. Rely on external SerpAPI but no integration.
 3. **No analytics integration** — No Google Search Console or Google Analytics connection. Can't show traffic impact.
-4. **No backlink automation** — BlogSEO's ABC backlink network is a genuine differentiator we can't match.
+4. ~~**No backlink automation**~~ — ✅ **RESOLVED.** AI-powered prospect discovery (via DataForSEO competitor backlink analysis + AI enrichment), outreach email generation, guest post generation, link tracking, and periodic verification. BlogSEO still has the network advantage but we now have automated discovery + outreach pipeline.
 5. ~~**No image generation**~~ — ✅ **RESOLVED.** DALL-E (OpenAI) image generation + Pexels royalty-free stock with semantic matching, caching, and alt-text generation. Integrated into article pipeline.
 
 ### Important Gaps
@@ -128,6 +128,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 16. **Image Generation** — DALL-E + Pexels dual engine with semantic matching. More flexible than competitors' single-provider approach.
 17. **SERP Content Scoring** — 8-dimension scoring against top-ranking competitors during generation. Only Writesonic has comparable, but we score on more dimensions (readability alignment, question/PAA coverage, internal links).
 18. **Auto-Publish Scheduling** — Article-level scheduled_at with 30s background tick. Frontend date/time picker for precise scheduling. Most competitors lack this or require a separate scheduling UI.
+19. **Backlink Automation** — AI-powered discovery, outreach, guest post generation, and tracking. Only BlogSEO has anything comparable (ABC network), but our approach is automated discovery + AI-generated outreach and content rather than network-based.
 
 ---
 
@@ -147,6 +148,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 - **[P2] Auto-publishing scheduler** — ✅ **RESOLVED.** Scheduled_at per article + 30s background publish tick. Frontend date/time picker.
 
 ### Priority 3 — Defend (Reinforce Existing Moats)
+- **[P1] Backlink Automation** — ✅ **RESOLVED.** Competitor backlink discovery via DataForSEO + AI prospect enrichment + AI outreach email + AI guest post generation + link tracking + periodic verification. 4-tab frontend UI.
 - **[P1] WooCommerce depth** — Double down on TDS Geo plugin. No competitor does WooCommerce well.
 - **[P1] Open-source community** — Promote the ISC license. Add CONTRIBUTING.md, issue templates, discussion forum.
 - **[P2] Offline/Ollama mode** — Make truly offline operation seamless. Unique selling point.
