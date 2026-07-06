@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ChevronRight, FileText } from 'lucide-react';
+import { ChevronRight, FileText, X, Loader, Sparkles } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatusBadge from '../components/StatusBadge';
 import { apiFetch } from '../api/client';
@@ -11,10 +11,41 @@ export default function ArticlesPage() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showGenerate, setShowGenerate] = useState(false);
+  const [keyword, setKeyword] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState('');
+  const [generateResult, setGenerateResult] = useState('');
   const navigate = useNavigate();
   const limit = 20;
 
-  useEffect(() => {
+  const handleGenerate = async () => {
+    if (!keyword.trim()) return;
+    setGenerating(true);
+    setGenerateError('');
+    setGenerateResult('');
+    try {
+      const res = await apiFetch<{ success: boolean; article?: Record<string, unknown>; error?: string }>('/api/articles/generate', {
+        method: 'POST',
+        body: JSON.stringify({ keyword: keyword.trim() }),
+      });
+      if (res.success) {
+        setGenerateResult('Article generated successfully!');
+        setKeyword('');
+        setTimeout(() => { setShowGenerate(false); setGenerateResult(''); }, 1500);
+        fetchArticles();
+      } else {
+        setGenerateError(res.error || 'Generation failed');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Generation failed. Try a different topic.';
+      setGenerateError(msg);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const fetchArticles = () => {
     setLoading(true);
     const params = new URLSearchParams({ limit: String(limit), offset: String((page - 1) * limit) });
     if (statusFilter) params.set('status', statusFilter);
@@ -22,7 +53,9 @@ export default function ArticlesPage() {
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [page, statusFilter]);
+  };
+
+  useEffect(() => { fetchArticles(); }, [page, statusFilter]);
 
   const totalPages = data ? Math.ceil(data.total / limit) : 1;
 
@@ -32,11 +65,48 @@ export default function ArticlesPage() {
         title="Articles"
         description={data ? `${data.total} article${data.total !== 1 ? 's' : ''} total` : 'Manage your content'}
         action={
-          <button className="btn-primary flex items-center gap-2 opacity-60 cursor-not-allowed" title="Coming soon">
-            <Plus size={16} /> Generate
+          <button onClick={() => setShowGenerate(true)} className="btn-primary flex items-center gap-2">
+            <Sparkles size={16} /> Generate
           </button>
         }
       />
+
+      {/* Generate Modal */}
+      {showGenerate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowGenerate(false)}>
+          <div className="card w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">Generate Article</h3>
+              <button onClick={() => setShowGenerate(false)} className="p-1 rounded-lg hover:bg-brand-border transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-sm text-brand-muted mb-4">Enter a topic to generate AI-powered content optimized for your store.</p>
+            <input
+              className="input w-full mb-4"
+              placeholder="e.g. Spring HVAC maintenance tips"
+              value={keyword}
+              onChange={(e) => { setKeyword(e.target.value); setGenerateError(''); setGenerateResult(''); }}
+              onKeyDown={(e) => e.key === 'Enter' && keyword.trim() && handleGenerate()}
+              disabled={generating}
+              autoFocus
+            />
+            {generateError && <p className="text-sm text-red-400 mb-4">{generateError}</p>}
+            {generateResult && <p className="text-sm text-green-400 mb-4">{generateResult}</p>}
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setShowGenerate(false)} className="btn-ghost" disabled={generating}>Cancel</button>
+              <button
+                onClick={handleGenerate}
+                disabled={generating || !keyword.trim()}
+                className="btn-primary flex items-center gap-2"
+              >
+                {generating ? <Loader size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                {generating ? 'Generating...' : 'Generate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filter pills */}
       <div className="flex gap-2 flex-wrap">

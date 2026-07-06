@@ -38,7 +38,41 @@ export function createCostRoutes(pool: Pool): Router {
     }
   });
 
-  // Get cost report
+  // Get cost report (global — all clients)
+  router.get('/report/global', authenticate, authorize('admin'), async (req: Request, res: Response) => {
+    try {
+      const days = parseInt(req.query.days as string) || 30;
+      const result = await pool.query(`
+        SELECT COALESCE(SUM(cost_usd)::decimal(10,2), 0) as total
+        FROM cost_tracking
+        WHERE created_at >= NOW() - ($1 || ' days')::interval
+      `, [days]);
+      const dailyResult = await pool.query(`
+        SELECT DATE(created_at) as date, SUM(cost_usd)::decimal(10,2) as cost
+        FROM cost_tracking
+        WHERE created_at >= NOW() - ($1 || ' days')::interval
+        GROUP BY DATE(created_at) ORDER BY date
+      `, [days]);
+      const providerResult = await pool.query(`
+        SELECT COALESCE(model, 'unknown') as provider, SUM(cost_usd)::decimal(10,2) as cost
+        FROM cost_tracking
+        WHERE created_at >= NOW() - ($1 || ' days')::interval
+        GROUP BY model ORDER BY cost DESC
+      `, [days]);
+      res.json({
+        success: true,
+        data: {
+          total: parseFloat(result.rows[0].total),
+          daily: dailyResult.rows,
+          byProvider: providerResult.rows,
+        }
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // Get cost report (by client)
   router.get('/report/:clientId', authenticate, authorize('admin'), async (req: Request, res: Response) => {
     try {
       const days = parseInt(req.query.days as string) || 30;
