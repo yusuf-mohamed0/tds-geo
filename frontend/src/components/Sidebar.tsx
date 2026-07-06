@@ -6,13 +6,13 @@ import {
 import Logo from './Logo';
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard', end: true },
-  { to: '/clients', icon: Users, label: 'Clients' },
-  { to: '/articles', icon: FileText, label: 'Articles' },
-  { to: '/geo', icon: Search, label: 'GEO Analysis' },
-  { to: '/citations', icon: ScrollText, label: 'Citations' },
-  { to: '/costs', icon: DollarSign, label: 'Costs' },
-  { to: '/quality', icon: CheckSquare, label: 'Quality' },
+  { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
+  { to: '/admin/clients', icon: Users, label: 'Clients' },
+  { to: '/admin/articles', icon: FileText, label: 'Articles' },
+  { to: '/admin/geo', icon: Search, label: 'GEO Analysis' },
+  { to: '/admin/citations', icon: ScrollText, label: 'Citations' },
+  { to: '/admin/costs', icon: DollarSign, label: 'Costs' },
+  { to: '/admin/quality', icon: CheckSquare, label: 'Quality' },
 ];
 
 export default function Sidebar() {

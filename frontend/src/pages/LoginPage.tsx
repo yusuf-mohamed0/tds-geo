@@ -16,7 +16,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/');
+      const params = new URLSearchParams(window.location.search);
+      navigate(params.get('redirect') || '/admin');
     } catch (err) {
       setError((err as Error).message);
     } finally {

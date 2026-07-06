@@ -50,7 +50,7 @@ export default function ArticleDetailPage() {
   if (!article) {
     return (
       <div className="space-y-6">
-        <Link to="/articles" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
+        <Link to="/admin/articles" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
           ← Back to articles
         </Link>
         <div className="card text-center py-16">
@@ -63,7 +63,7 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <Link to="/articles" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
+      <Link to="/admin/articles" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
         ← Back to articles
       </Link>
 

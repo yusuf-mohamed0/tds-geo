@@ -90,7 +90,7 @@ export default function ArticlesPage() {
               {data.data.map((article) => (
                 <tr
                   key={article.id}
-                  onClick={() => navigate(`/articles/${article.id}`)}
+                  onClick={() => navigate(`/admin/articles/${article.id}`)}
                   className="border-b border-brand-border/60 hover:bg-brand-border/30 cursor-pointer transition-colors group"
                 >
                   <td className="p-4">

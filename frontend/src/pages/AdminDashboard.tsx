@@ -130,7 +130,7 @@ export default function AdminDashboard() {
             {recentArticles.slice(0, 8).map((article) => {
               const a = article as Record<string, unknown>;
               return (
-                <button key={String(a.id)} onClick={() => navigate(`/articles/${a.id}`)} className="w-full text-left p-3 rounded-xl hover:bg-brand-border/60 transition-all duration-150 group">
+                <button key={String(a.id)} onClick={() => navigate(`/admin/articles/${a.id}`)} className="w-full text-left p-3 rounded-xl hover:bg-brand-border/60 transition-all duration-150 group">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm truncate flex-1 group-hover:text-brand-accent transition-colors">{String(a.title)}</p>
                     <ChevronRight size={14} className="text-brand-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" />
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
               );
             })}
             {recentArticles.length > 0 && (
-              <button onClick={() => navigate('/articles')} className="w-full text-left p-2.5 mt-1 text-sm text-brand-accent/80 hover:text-brand-accent transition-colors rounded-lg hover:bg-brand-border/30">
+              <button onClick={() => navigate('/admin/articles')} className="w-full text-left p-2.5 mt-1 text-sm text-brand-accent/80 hover:text-brand-accent transition-colors rounded-lg hover:bg-brand-border/30">
                 View all articles →
               </button>
             )}

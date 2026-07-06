@@ -52,7 +52,7 @@ export default function ClientsPage() {
           {clients.map((client) => (
             <button
               key={client.id}
-              onClick={() => navigate(`/clients/${client.id}`)}
+              onClick={() => navigate(`/admin/clients/${client.id}`)}
               className="card text-left hover:border-brand-accent/40 transition-all duration-200 group relative overflow-hidden"
             >
               <svg className="absolute top-0 right-0 w-24 h-20 opacity-[0.03]" viewBox="0 0 200 120" fill="none">

@@ -15,7 +15,7 @@ export default function Layout() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login?redirect=/admin" replace />;
   }
 
   return (

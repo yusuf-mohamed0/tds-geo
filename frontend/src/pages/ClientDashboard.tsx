@@ -68,7 +68,7 @@ export default function ClientDashboard() {
 
   return (
     <div className="space-y-6">
-      <Link to="/clients" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
+      <Link to="/admin/clients" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
         ← Back to clients
       </Link>
 
