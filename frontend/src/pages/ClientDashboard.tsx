@@ -42,16 +42,17 @@ export default function ClientDashboard() {
   }
 
   const articleStats = (data.articleStats || data.articles || {}) as Record<string, number>;
+  const allArticles = articleStats.total || 0;
   const pipeline = {
-    total: articleStats.total || 0,
-    draft: articleStats.draft || articleStats.drafts || 0,
-    generated: articleStats.generated || 0,
+    total: allArticles,
+    draft: Math.max(0, allArticles - (articleStats.published || 0) - (articleStats.approved || 0) - (articleStats.pending || 0) - (articleStats.rejected || 0) - (articleStats.failed || 0)),
+    generated: articleStats.pending || 0,
     approved: articleStats.approved || 0,
     published: articleStats.published || 0,
   };
 
   const costs = (data.costs || {}) as Record<string, number | string>;
-  const costTotal = parseFloat(String(costs.total_cost_mtd || costs.total || costs.mtd || '0'));
+  const costTotal = parseFloat(String(costs.total_cost || costs.total_cost_mtd || costs.total || costs.mtd || '0'));
   const costOpenai = parseFloat(String(costs.openai || costs.openai_cost || '0'));
   const costSerp = parseFloat(String(costs.serp || costs.serpapi || '0'));
   const keywordStats = (data.keywordStats || data.keywords || {}) as Record<string, number>;

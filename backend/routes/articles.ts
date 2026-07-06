@@ -317,7 +317,7 @@ export function createArticleRoutes(pool: Pool): Router {
         return;
       }
 
-      let query = 'SELECT a.*, k.keyword, k.search_volume, k.competition FROM articles a LEFT JOIN keywords k ON k.id = a.keyword_id';
+      let query = `SELECT a.id, a.client_id, a.keyword_id, a.title, a.slug, a.meta_title, a.meta_description, a.tags, a.word_count, a.status, a.seo_score, a.quality_score, a.readability_score, a.source, a.scheduled_at, a.published_at, a.created_at, a.updated_at, a.editorial_status, k.keyword, k.search_volume, k.competition FROM articles a LEFT JOIN keywords k ON k.id = a.keyword_id`;
       const params: any[] = [];
       const conditions: string[] = [];
 
