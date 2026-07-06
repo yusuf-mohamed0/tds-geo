@@ -113,10 +113,22 @@ Required by Shopify. Host at: `https://traffic.16.192.29.174.nip.io/privacy`
 | Backend | Node.js/Express on port 3000 |
 | Frontend | Vite + React SPA (served by backend) |
 
+## Submission Kit
+
+A ready-to-use submission folder is at `app-store-submission/`:
+
+| File | What it does |
+|---|---|
+| `SUBMISSION_DATA.md` | All Partner Dashboard fields pre-filled — copy/paste directly |
+| `screenshots/capture.sh` | Auto-captures all screenshots (1600×900 desktop + 375×812 mobile) via Playwright |
+| `screenshots/app-icon.png` | Swype logo ready to upload as app icon |
+
+Run `bash app-store-submission/screenshots/capture.sh` to capture screenshots, then follow `SUBMISSION_DATA.md` to fill every field.
+
 ## Submission Steps
 
 1. Go to https://partners.shopify.com → Apps → TDS Geo
-2. Fill in App Store listing fields (name, description, icon, screenshots, category)
+2. Fill in App Store listing fields from `app-store-submission/SUBMISSION_DATA.md` (name, description, icon, screenshots, category)
 3. Set pricing to "Paid" with the 3 tiers, or "Free" initially
 4. Upload Privacy policy URL
 5. Click "Submit for Review"
