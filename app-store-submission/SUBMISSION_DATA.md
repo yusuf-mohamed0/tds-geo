@@ -57,12 +57,12 @@ Arabic, English
 
 ### App Introduction (98/100 chars)
 ```
-Optimize your Store content for AI-powered search engines like ChatGPT, Perplexity, and Google Gemini. Get cited by AI, not ignored.
+Optimize your Store content for AI-powered search engines like ChatGPT, Perplexity, and Google Gem
 ```
 
 ### App Details (397/500 chars)
 ```
-TDS Geo helps Shopify merchants optimize their content for Generative Engine Optimization (GEO), the practice of structuring content so AI search engines naturally cite your store as a source.
+TDS Geo helps Shopify merchants optimize their content for Generative Engine Optimization (GEO) , the practice of structuring content so AI search engines naturally cite your store as a source.
 
 AI-powered search engines are changing how customers discover products online. If your content isn't structured for how AI models extract and cite information, you're invisible to this growing audience.
 ```
@@ -71,17 +71,17 @@ AI-powered search engines are changing how customers discover products online. I
 
 **Feature 1 — AI Content Generation** (80/80)
 ```
-AI content generation — automatically creates GEO-optimized articles tailored to your store, products, and target keywords with one click
+AI content generation — automatically creates GEO-optimized articles tailored to
 ```
 
 **Feature 2 — GEO Analysis & Improvement** (80/80)
 ```
-GEO analysis & improvement — scores content across major AI engines and rewrites it to maximize citation potential
+GEO analysis & improvement — scores content across major AI engines and rewrites
 ```
 
 **Feature 3 — Smart Publishing** (80/80)
 ```
-Smart publishing — schedule and publish optimized content directly to your Shopify blog with full SEO metadata
+Smart publishing — schedule and publish optimized content directly to your Shopi
 ```
 
 ### Demo Store URL
@@ -94,7 +94,7 @@ https://admin.shopify.com/store/traffic-test
   - **Duration**: ~90 seconds (under 3 min limit ✓)
   - **Dimensions**: 1600×900 ✓
   - **Content**: Login → Dashboard → Articles → Article Detail → GEO URL Audit → Citations → Costs → Clients
-  - **YouTube URL**: `https://www.youtube.com/embed/YOUR_VIDEO_ID` (replace after upload)
+  - **YouTube URL**: `https://www.youtube.com/embed/GvqorasmfGU`
 - **Video thumbnail**: `screenshots/02-dashboard.png` (1600×900px)
 
 ### Desktop Screenshots
@@ -162,7 +162,7 @@ Get your website cited by AI search engines
 GEO
 AI content
 SEO optimization
-generative engine optimization
+generative engine op
 content marketing
 ```
 
@@ -170,7 +170,7 @@ content marketing
 
 **Title Tag** (60/60):
 ```
-TDS Geo - AI Content Generation & GEO Optimization for Shopify
+TDS Geo - AI Content Generation & GEO Optimization for Shopi
 ```
 
 **Meta Description** (158/160):
@@ -227,7 +227,7 @@ None — worldwide.
 
 ### Screencast URL
 ```
-https://vimeo.com/1203837897
+https://youtu.be/GvqorasmfGU
 ```
 
 ### Testing Instructions (900/2800 chars)
