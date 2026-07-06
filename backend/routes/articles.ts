@@ -29,6 +29,7 @@ import costTracker from '../services/costTracker';
 import { convert } from '../utils/markdownToHtml';
 import schemaGenerator from '../services/schemaGenerator';
 import indexNowService from '../services/indexNowService';
+import contentQualityGate from '../services/contentQualityGate';
 
 export function createArticleRoutes(pool: Pool): Router {
   const router = Router();
@@ -143,6 +144,36 @@ export function createArticleRoutes(pool: Pool): Router {
         finalContent = internalLinksService.injectLinks(finalContent, linkOpportunities);
       }
 
+      // Quality Gate — anti-spam, anti-fluff, anti-duplicate
+      const existingArticlesResult = await pool.query(
+        'SELECT title, content_md as content FROM articles WHERE client_id = $1 ORDER BY created_at DESC LIMIT 20',
+        [clientId]
+      );
+      const qualityGateResult = await contentQualityGate.evaluate(finalContent, keyword, {
+        minWords: 800,
+        maxWords: 3000,
+        existingArticles: existingArticlesResult.rows,
+      });
+      const qualityReport = contentQualityGate.generateClientReport(qualityGateResult);
+
+      // Hard reject if quality is critically low
+      if (qualityGateResult.score < 40 && client.approval_mode !== 'manual') {
+        res.status(422).json({
+          error: 'Content quality check failed — score too low for auto-approve',
+          qualityReport,
+          qualityGate: qualityGateResult,
+          suggestion: 'Try a different keyword angle or adjust tone settings',
+        });
+        return;
+      }
+      // Log quality warning even if approved
+      if (qualityGateResult.score < 60) {
+        logger.warn('Quality gate warning', {
+          clientId, keyword, score: qualityGateResult.score,
+          warnings: qualityGateResult.warnings,
+        });
+      }
+
       // Convert to HTML
       const contentHtml = convert(finalContent);
 
@@ -234,7 +265,9 @@ export function createArticleRoutes(pool: Pool): Router {
         linkOpportunities,
         published: !!publishResult,
         publishResult,
-        approvalRequired: client.approval_mode === 'manual'
+        approvalRequired: client.approval_mode === 'manual',
+        qualityGate: qualityGateResult,
+        qualityReport,
       });
     } catch (err) {
       next(err);
