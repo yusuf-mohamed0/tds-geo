@@ -141,7 +141,7 @@ https://trafficdigitalsolutions.com
 
 | Display name | Price | Interval |
 |---|---|---|
-| **Starter** | $29/month | Monthly (EVERY_30_DAYS) |
+| **Traffic** | $29/month | Monthly (EVERY_30_DAYS) |
 | **Professional** | $79/month | Monthly (EVERY_30_DAYS) |
 | **Enterprise** | $199/month | Monthly (EVERY_30_DAYS) |
 
