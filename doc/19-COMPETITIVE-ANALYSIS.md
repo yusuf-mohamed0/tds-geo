@@ -74,7 +74,8 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 | **GSC/GA4 Integration** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ |
 | **Image Generation** | ✅ DALL-E + Pexels | ❌ | ✅ Photosonic | ✅ HD images | ❌ | ❌ |
 | **Multi-Language** | ❌ | ❌ | ✅ | ✅ 45+ | ❌ | ❌ |
-| **SERP Analysis / Content Scoring** | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **SERP Analysis / Content Scoring** | ✅ 8-dimension scoring vs top rankings | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **Auto-Publish Scheduling** | ✅ Scheduled_at + 30s tick | ✅ Calendar-based | ❌ | ❌ | ❌ | ❌ |
 | **UI Dashboard** | ✅ Polaris 13 dark-theme | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Free Trial** | ❌ | ✅ 7 days | ❌ | ✅ 3 days | ❌ | ❌ |
 | **Whitelabel / Agency** | ❌ | ✅ Enterprise | ❌ | ❌ | ✅ Enterprise | ❌ |
@@ -91,9 +92,9 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 5. ~~**No image generation**~~ — ✅ **RESOLVED.** DALL-E (OpenAI) image generation + Pexels royalty-free stock with semantic matching, caching, and alt-text generation. Integrated into article pipeline.
 
 ### Important Gaps
-6. **No auto-publishing scheduler** — No calendar-based publishing cadence.
+6. ~~**No auto-publishing scheduler**~~ — ✅ **RESOLVED.** 30s-interval background tick publishes approved articles with scheduled_at timestamp. Frontend date/time picker in ArticleDetailPage.
 7. **No multi-language support** — 45+ languages is standard in the market.
-8. **No SERP content scoring** — Surfer/Frase-style real-time optimization scoring during writing.
+8. ~~**No SERP content scoring**~~ — ✅ **RESOLVED.** 8-dimension SERPContentScorer (title, meta, headings, length, keyword placement, question coverage, internal links, readability vs SERP). Runs on every generation.
 9. **No free trial** — Zero-risk onboarding is table stakes. (Test credentials work but no self-serve trial flow.)
 10. ~~**No Shopify App Store presence**~~ — ✅ **RESOLVED.** Submitted to Shopify App Store (Reference #121207, limited visibility). Awaiting review.
 
@@ -125,6 +126,8 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 14. **Monthly ops automation** — Freshness + citations + entity checks run on a schedule.
 15. **Content Quality Gate** — 10-point anti-spam/anti-fluff/readability/keyword/cannibalization check. No competitor validates content quality at this depth.
 16. **Image Generation** — DALL-E + Pexels dual engine with semantic matching. More flexible than competitors' single-provider approach.
+17. **SERP Content Scoring** — 8-dimension scoring against top-ranking competitors during generation. Only Writesonic has comparable, but we score on more dimensions (readability alignment, question/PAA coverage, internal links).
+18. **Auto-Publish Scheduling** — Article-level scheduled_at with 30s background tick. Frontend date/time picker for precise scheduling. Most competitors lack this or require a separate scheduling UI.
 
 ---
 
@@ -135,12 +138,13 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 - ~~**[P0] Shopify App Store listing**~~ — ✅ **RESOLVED.** Submitted (Reference #121207, limited visibility). Awaiting manual review.
 - ~~**[P1] Image generation**~~ — ✅ **RESOLVED.** DALL-E + Pexels dual engine integrated into article pipeline.
 - **[P1] Content Quality Gate** — ✅ **RESOLVED.** 10-point anti-spam/anti-fluff/readability/density/cannibalization check. Runs on every article generation.
+- **[P1] SERP Content Scoring** — ✅ **RESOLVED.** 8-dimension scoring against top-ranking competitors. Integrated into generation route.
 - **[P1] Free trial / demo mode** — Script that provisions a demo client with sample data in 30 seconds. (Test credentials exist but no self-serve flow.)
 
 ### Priority 2 — Integrate (Medium Impact)
 - **[P1] Google Search Console integration** — Pull search impression/click data. Table stakes for SEO tools.
-- **[P1] Keyword research module** — Wrap SerpAPI or similar into a proper keyword discovery service with clustering/scoring.
-- **[P2] Auto-publishing scheduler** — Calendar UI or cron-like interface for scheduling article drops.
+- **[P1] Keyword research module** — ✅ **RESOLVED.** AI-powered keyword discovery with clustering, intent classification, opportunity scoring, SERP feature analysis + 3-month content strategy.
+- **[P2] Auto-publishing scheduler** — ✅ **RESOLVED.** Scheduled_at per article + 30s background publish tick. Frontend date/time picker.
 
 ### Priority 3 — Defend (Reinforce Existing Moats)
 - **[P1] WooCommerce depth** — Double down on TDS Geo plugin. No competitor does WooCommerce well.
@@ -172,7 +176,7 @@ TDS Geo's pricing advantage is massive: $0 platform cost vs $97–$1,597/mo for 
 1. **We're uniquely positioned** — Open source, dual-CMS (Shopify+Woo), dual-AI (OpenAI+Ollama), full AEO/GEO/LLMO stack. No competitor matches this combination.
 2. ~~**The UI gap is our biggest threat**~~ — ✅ **RESOLVED.** Polaris 13 dashboard closes the gap significantly. Competitors still lead on polish, but the CLI-only barrier is gone.
 3. **We lead on technical depth** — Content freshness, entity checks, cost tracking, 24-stage pipeline, plugin system, monthly ops automation. Features no competitor has.
-4. **We lag on content-surface features** — Keyword research, backlinks, multi-language, SERP scoring. Image gen is resolved (DALL-E + Pexels).
+4. **We lag on content-surface features** — Backlinks, multi-language remaining. Keyword research (clustering + intent + opportunity scoring), SERP content scoring (8-dimension), auto-publish scheduling, and image gen (DALL-E + Pexels) all resolved.
 5. **Pricing is our superpower** — $0 vs $97–$1,597/mo. Unbeatable for cost-conscious teams.
 6. **Distribution improving** — Shopify App Store submitted (limited visibility). No free trial or landing page yet. Competitors still invest more in distribution.
 7. **Walkthrough capability** — Playwright-based auto-screenshot + video recording script (`capture.sh`). App-store-ready media pipeline in place.
