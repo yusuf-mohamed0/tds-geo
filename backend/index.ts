@@ -84,6 +84,8 @@ import { normalizeWebhookBody, verifyShopifyWebhookHmac } from './utils/shopifyW
 import { createEditorialRoutes } from './routes/editorial';
 import { createFactCheckRoutes } from './routes/factCheck';
 import { createBrandVoiceRoutes } from './routes/brandVoice';
+import { createBacklinkRoutes } from './routes/backlinks';
+import { backlinkAutomation } from './services/backlinkAutomation';
 import { createCmsRoutes } from './routes/cms';
 import { createCostRoutes } from './routes/cost';
 import { createObservabilityRoutes } from './routes/observability';
@@ -478,6 +480,10 @@ app.use('/api/factcheck', createFactCheckRoutes(pool));
 
 // Brand voice routes
 app.use('/api/brand-voice', createBrandVoiceRoutes(pool));
+
+// Backlink automation routes
+app.use('/api/clients/:clientId/backlinks', createBacklinkRoutes(pool));
+app.use('/api/backlinks', createBacklinkRoutes(pool));
 
 // Multi-CMS routes
 app.use('/api/cms', createCmsRoutes(pool));
@@ -883,6 +889,13 @@ async function start(): Promise<void> {
 
     // ═══════ Connected Sites Registry ═══════════════
     sitesService.initialize(pool);
+
+    // ═══════ Backlink Automation ════════════════════
+    try {
+      backlinkAutomation.initialize(pool);
+    } catch (e) {
+      logger.warn('Backlink automation init failed', { error: (e as Error).message });
+    }
 
     // ═══════ Connectors ═════════════════════════════
     connectorManager.initialize(pool);

@@ -15,6 +15,7 @@ import CitationsPage from './pages/CitationsPage';
 import CostsPage from './pages/CostsPage';
 import QualityPage from './pages/QualityPage';
 import KeywordResearchPage from './pages/KeywordResearchPage';
+import BacklinksPage from './pages/BacklinksPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ShopifyEmbeddedPage from './pages/ShopifyEmbeddedPage';
 
@@ -87,6 +88,7 @@ export default function App() {
               <Route path="costs" element={<CostsPage />} />
               <Route path="quality" element={<QualityPage />} />
               <Route path="keywords" element={<KeywordResearchPage />} />
+              <Route path="backlinks" element={<BacklinksPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
             <Route index element={<RootPage />} />
