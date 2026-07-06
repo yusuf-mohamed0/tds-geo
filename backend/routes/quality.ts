@@ -114,7 +114,7 @@ export function createQualityRoutes(pool: Pool): Router {
       const limit = parseInt(req.query.limit as string, 10) || 20;
 
       let query = `
-        SELECT ae.article_id, a.title, ae.overall_score, ae.summary, ae.evaluated_at
+        SELECT ae.article_id AS "id", a.title, ae.overall_score AS "score", ae.dimensions, ae.summary, ae.evaluated_at AS "evaluatedAt"
         FROM article_evaluations ae
         JOIN articles a ON a.id = ae.article_id
       `;

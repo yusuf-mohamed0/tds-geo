@@ -55,7 +55,9 @@ export function createAnalyticsRoutes(pool: Pool): Router {
         pool.query(
           `SELECT COALESCE(SUM(cost_usd)::decimal(10,2), 0) as total_cost,
                   COALESCE(SUM(tokens_in + tokens_out)::bigint, 0) as total_tokens,
-                  COUNT(*)::int as api_calls
+                  COUNT(*)::int as api_calls,
+                  COALESCE(SUM(cost_usd) FILTER (WHERE provider = 'openai')::decimal(10,2), 0) as openai,
+                  COALESCE(SUM(cost_usd) FILTER (WHERE provider = 'serpapi')::decimal(10,2), 0) as serpapi
            FROM cost_tracking
            WHERE client_id = $1 AND created_at >= DATE_TRUNC('month', NOW())`,
           [clientId]

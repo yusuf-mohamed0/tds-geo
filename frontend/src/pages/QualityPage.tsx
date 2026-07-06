@@ -5,9 +5,10 @@ import { apiFetch } from '../api/client';
 
 interface Evaluation {
   id: string;
-  articleId: string;
+  title?: string;
   score: number;
   dimensions: Record<string, number>;
+  summary?: string;
   evaluatedAt: string;
 }
 

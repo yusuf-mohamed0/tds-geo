@@ -286,6 +286,7 @@ export function createArticleRoutes(pool: Pool): Router {
         qualityGate: qualityGateResult,
         qualityReport,
         serpScore: serpScoreResult,
+        success: true,
       });
     } catch (err) {
       next(err);
