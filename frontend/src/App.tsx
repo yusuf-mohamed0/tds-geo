@@ -71,7 +71,6 @@ export default function App() {
     <BrowserRouter>
       <AppProvider
         i18n={enTranslations}
-        theme="dark-experimental"
         linkComponent={Link}
       >
         <AuthProvider>
