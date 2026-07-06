@@ -400,6 +400,27 @@ const AI_ENGINES: Array<{ name: string; criteria: GeoCriterion[] }> = [
   }
 ];
 
+export interface LlmDeepAnalysisResult {
+  summary: string;
+  engineSpecific: { engine: string; verdict: string; details: string[] }[];
+  topIssues: string[];
+  quickWins: string[];
+  strategicRecommendations: string[];
+}
+
+export interface UrlAnalysisResult {
+  success: boolean;
+  url: string;
+  title: string;
+  contentLength: number;
+  analysis: GeoAnalysis;
+  deepAnalysis: LlmDeepAnalysisResult;
+  pageTitle: string;
+  metaDescription: string;
+  headings: { level: number; text: string }[];
+  wordCount: number;
+}
+
 export class GeoIntelligenceService {
   async analyze(content: string): Promise<GeoAnalysis> {
     const engineScores: GeoEngineScore[] = [];
@@ -472,13 +493,7 @@ export class GeoIntelligenceService {
     };
   }
 
-  async llmDeepAnalysis(content: string, url?: string): Promise<{
-    summary: string;
-    engineSpecific: { engine: string; verdict: string; details: string[] }[];
-    topIssues: string[];
-    quickWins: string[];
-    strategicRecommendations: string[];
-  }> {
+  async llmDeepAnalysis(content: string, url?: string): Promise<LlmDeepAnalysisResult> {
     try {
       const textSample = content.slice(0, 8000);
       const prompt = `You are a GEO (Generative Engine Optimization) audit specialist. Analyze this content and provide a deep, specific assessment. Return ONLY valid JSON with these exact keys:
@@ -525,18 +540,7 @@ ${textSample}`;
     return { summary: '', engineSpecific: [], topIssues: [], quickWins: [], strategicRecommendations: [] };
   }
 
-  async analyzeUrl(url: string): Promise<{
-    success: boolean;
-    url: string;
-    title: string;
-    contentLength: number;
-    analysis: GeoAnalysis;
-    deepAnalysis: Awaited<ReturnType<typeof this.llmDeepAnalysis>>;
-    pageTitle: string;
-    metaDescription: string;
-    headings: { level: number; text: string }[];
-    wordCount: number;
-  }> {
+  async analyzeUrl(url: string): Promise<UrlAnalysisResult> {
     try {
       const response = await fetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TDGGeoBot/1.0; +https://tds-geo.com)' },
