@@ -90,8 +90,12 @@ https://admin.shopify.com/store/traffic-test
 ```
 
 ### Feature Media
-- **Image**: `screenshots/02-dashboard.png` (1600×900px crop)
-- **Alt text**: `TDS Geo embedded dashboard showing article generation statistics`
+- **Video** (recommended): Upload `screenshots/app-walkthrough.webm` to YouTube as **unlisted**
+  - **Duration**: ~90 seconds (under 3 min limit ✓)
+  - **Dimensions**: 1600×900 ✓
+  - **Content**: Login → Dashboard → Articles → Article Detail → GEO URL Audit → Citations → Costs → Clients
+  - **YouTube URL**: `https://www.youtube.com/embed/YOUR_VIDEO_ID` (replace after upload)
+- **Video thumbnail**: `screenshots/02-dashboard.png` (1600×900px)
 
 ### Desktop Screenshots
 
