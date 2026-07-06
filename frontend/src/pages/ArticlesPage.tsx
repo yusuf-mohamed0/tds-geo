@@ -1,10 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, FileText, X, Loader, Sparkles } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
-import StatusBadge from '../components/StatusBadge';
+import {
+  Page, Card, Text, Button, Spinner, Banner,
+  IndexTable, Filters, Badge, BlockStack, Pagination,
+} from '@shopify/polaris';
+import { Sparkles } from 'lucide-react';
 import { apiFetch } from '../api/client';
 import type { ArticleSummary, PaginatedResponse } from '../types';
+
+const statusOptions = [
+  { value: '', label: 'All' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'generated', label: 'Generated' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'published', label: 'Published' },
+  { value: 'rejected', label: 'Rejected' },
+];
 
 export default function ArticlesPage() {
   const [data, setData] = useState<PaginatedResponse<ArticleSummary> | null>(null);
@@ -16,6 +27,7 @@ export default function ArticlesPage() {
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState('');
   const [generateResult, setGenerateResult] = useState('');
+  const [queryValue, setQueryValue] = useState('');
   const navigate = useNavigate();
   const limit = 20;
 
@@ -45,7 +57,7 @@ export default function ArticlesPage() {
     }
   };
 
-  const fetchArticles = () => {
+  const fetchArticles = useCallback(() => {
     setLoading(true);
     const params = new URLSearchParams({ limit: String(limit), offset: String((page - 1) * limit) });
     if (statusFilter) params.set('status', statusFilter);
@@ -53,169 +65,175 @@ export default function ArticlesPage() {
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
-  };
+  }, [page, statusFilter]);
 
-  useEffect(() => { fetchArticles(); }, [page, statusFilter]);
+  useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   const totalPages = data ? Math.ceil(data.total / limit) : 1;
 
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Articles"
-        description={data ? `${data.total} article${data.total !== 1 ? 's' : ''} total` : 'Manage your content'}
-        action={
-          <button onClick={() => setShowGenerate(true)} className="btn-primary flex items-center gap-2">
-            <Sparkles size={16} /> Generate
-          </button>
-        }
-      />
+  const handleStatusFilter = useCallback((value: string) => {
+    setStatusFilter(value);
+    setPage(1);
+  }, []);
 
-      {/* Generate Modal */}
-      {showGenerate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowGenerate(false)}>
-          <div className="card w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">Generate Article</h3>
-              <button onClick={() => setShowGenerate(false)} className="p-1 rounded-lg hover:bg-brand-border transition-colors">
-                <X size={18} />
-              </button>
-            </div>
-            <p className="text-sm text-brand-muted mb-4">Enter a topic to generate AI-powered content optimized for your store.</p>
-            <input
-              className="input w-full mb-4"
-              placeholder="e.g. Spring HVAC maintenance tips"
-              value={keyword}
-              onChange={(e) => { setKeyword(e.target.value); setGenerateError(''); setGenerateResult(''); }}
-              onKeyDown={(e) => e.key === 'Enter' && keyword.trim() && handleGenerate()}
-              disabled={generating}
-              autoFocus
-            />
-            {generateError && <p className="text-sm text-red-400 mb-4">{generateError}</p>}
-            {generateResult && <p className="text-sm text-green-400 mb-4">{generateResult}</p>}
-            <div className="flex gap-3 justify-end">
-              <button onClick={() => setShowGenerate(false)} className="btn-ghost" disabled={generating}>Cancel</button>
-              <button
-                onClick={handleGenerate}
-                disabled={generating || !keyword.trim()}
-                className="btn-primary flex items-center gap-2"
-              >
-                {generating ? <Loader size={16} className="animate-spin" /> : <Sparkles size={16} />}
-                {generating ? 'Generating...' : 'Generate'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filter pills */}
-      <div className="flex gap-2 flex-wrap">
-        {[
-          { value: '', label: 'All' },
-          { value: 'draft', label: 'Draft' },
-          { value: 'generated', label: 'Generated' },
-          { value: 'approved', label: 'Approved' },
-          { value: 'published', label: 'Published' },
-          { value: 'rejected', label: 'Rejected' },
-        ].map((f) => (
-          <button
-            key={f.value}
-            onClick={() => { setStatusFilter(f.value); setPage(1); }}
-            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
-              statusFilter === f.value
-                ? 'bg-brand-accent text-brand-bg shadow-sm'
-                : 'bg-brand-surface text-brand-muted hover:text-brand-text hover:bg-brand-border'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Table */}
-      <div className="card overflow-hidden p-0">
-        {loading ? (
-          <div className="space-y-0">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex items-center gap-4 p-4 border-b border-brand-border animate-pulse">
-                <div className="flex-1 h-4 bg-brand-border rounded" />
-                <div className="w-16 h-4 bg-brand-border rounded" />
-                <div className="w-20 h-4 bg-brand-border rounded" />
-              </div>
-            ))}
-          </div>
-        ) : data && data.data.length > 0 ? (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-brand-border text-brand-muted text-xs uppercase tracking-wider">
-                <th className="text-left p-4 font-medium">Title</th>
-                <th className="text-left p-4 font-medium">Status</th>
-                <th className="text-left p-4 font-medium hidden md:table-cell">Words</th>
-                <th className="text-left p-4 font-medium hidden md:table-cell">SEO</th>
-                <th className="text-left p-4 font-medium hidden sm:table-cell">Created</th>
-                <th className="p-4" />
-              </tr>
-            </thead>
-            <tbody>
-              {data.data.map((article) => (
-                <tr
-                  key={article.id}
-                  onClick={() => navigate(`/admin/articles/${article.id}`)}
-                  className="border-b border-brand-border/60 hover:bg-brand-border/30 cursor-pointer transition-colors group"
-                >
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-1.5 rounded-lg bg-brand-accent/10 text-brand-accent shrink-0">
-                        <FileText size={14} />
-                      </div>
-                      <span className="font-medium truncate max-w-xs group-hover:text-brand-accent transition-colors">{article.title}</span>
-                    </div>
-                  </td>
-                  <td className="p-4"><StatusBadge status={article.status} /></td>
-                  <td className="p-4 text-brand-muted hidden md:table-cell">{article.word_count || '-'}</td>
-                  <td className="p-4 hidden md:table-cell">
-                    {article.seo_score ? (
-                      <span className={`font-medium ${Number(article.seo_score) >= 90 ? 'text-green-400' : Number(article.seo_score) >= 70 ? 'text-yellow-400' : 'text-red-400'}`}>
-                        {article.seo_score}
-                      </span>
-                    ) : '-'}
-                  </td>
-                  <td className="p-4 text-brand-muted text-xs hidden sm:table-cell">
-                    {new Date(article.created_at || article.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="p-4">
-                    <ChevronRight size={14} className="text-brand-muted opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="text-center py-16">
-            <FileText size={40} className="mx-auto text-brand-muted/40" />
-            <p className="text-brand-muted mt-4">No articles found</p>
-          </div>
-        )}
-      </div>
-
-      {/* Pagination */}
-      {data && data.total > limit && (
-        <div className="flex items-center justify-center gap-2">
-          {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
-                p === page
-                  ? 'bg-brand-accent text-brand-bg'
-                  : 'bg-brand-surface text-brand-muted hover:text-brand-text hover:bg-brand-border'
-              }`}
+  const filters = [
+    {
+      key: 'status',
+      label: 'Status',
+      filter: (
+        <div style={{ display: 'flex', gap: 'var(--p-space-100)', flexWrap: 'wrap', padding: 'var(--p-space-100)' }}>
+          {statusOptions.map((f) => (
+            <Button
+              key={f.value}
+              size="slim"
+              variant={statusFilter === f.value ? 'primary' : 'tertiary'}
+              onClick={() => handleStatusFilter(f.value)}
             >
-              {p}
-            </button>
+              {f.label}
+            </Button>
           ))}
         </div>
+      ),
+      shortcut: true,
+    },
+  ];
+
+  const appliedFilters = statusFilter
+    ? [{ key: 'status', label: `Status: ${statusFilter}`, onRemove: () => handleStatusFilter('') }]
+    : [];
+
+  const handleFiltersClearAll = useCallback(() => {
+    handleStatusFilter('');
+    setQueryValue('');
+  }, [handleStatusFilter]);
+
+  const rowMarkup = (data?.data || []).map((article, index) => (
+    <IndexTable.Row
+      id={article.id}
+      key={article.id}
+      position={index}
+      onClick={() => navigate(`/admin/articles/${article.id}`)}
+    >
+      <IndexTable.Cell>
+        <Text as="span" variant="bodyMd" fontWeight="medium">{article.title}</Text>
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        <Badge tone={
+          article.status === 'published' ? 'success' :
+          article.status === 'approved' ? 'info' :
+          article.status === 'generated' ? 'warning' :
+          article.status === 'rejected' ? 'critical' : 'attention'
+        }>{article.status}</Badge>
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        <Text as="span" variant="bodySm" tone="subdued">{article.word_count || '-'}</Text>
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        {article.seo_score ? (
+          <Text as="span" variant="bodyMd" fontWeight="medium">{article.seo_score}</Text>
+        ) : '-'}
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        <Text as="span" variant="bodySm" tone="subdued">
+          {new Date(article.created_at || article.createdAt).toLocaleDateString()}
+        </Text>
+      </IndexTable.Cell>
+    </IndexTable.Row>
+  ));
+
+  return (
+    <Page
+      title="Articles"
+      subtitle={data ? `${data.total} article${data.total !== 1 ? 's' : ''} total` : 'Manage your content'}
+      primaryAction={{
+        content: 'Generate',
+        icon: Sparkles as any,
+        onAction: () => setShowGenerate(true),
+      }}
+    >
+      <BlockStack gap="400">
+        <Card padding="0">
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
+              <Spinner accessibilityLabel="Loading articles" size="large" />
+            </div>
+          ) : data && data.data.length > 0 ? (
+            <>
+              <Filters
+                queryValue={queryValue}
+                onQueryChange={setQueryValue}
+                onQueryClear={() => setQueryValue('')}
+                filters={filters}
+                appliedFilters={appliedFilters}
+                onClearAll={handleFiltersClearAll}
+              />
+              <IndexTable
+                resourceName={{ singular: 'article', plural: 'articles' }}
+                itemCount={data.data.length}
+                headings={[
+                  { title: 'Title' },
+                  { title: 'Status' },
+                  { title: 'Words' },
+                  { title: 'SEO' },
+                  { title: 'Created' },
+                ]}
+                selectable={false}
+              >
+                {rowMarkup}
+              </IndexTable>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center', padding: 'var(--p-space-1600)' }}>
+              <Text as="p" variant="bodyMd" tone="subdued">No articles found</Text>
+            </div>
+          )}
+        </Card>
+
+        {data && data.total > limit && (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Pagination
+              label={`Page ${page} of ${totalPages}`}
+              hasPrevious={page > 1}
+              onPrevious={() => setPage(page - 1)}
+              hasNext={page < totalPages}
+              onNext={() => setPage(page + 1)}
+            />
+          </div>
+        )}
+      </BlockStack>
+
+      {showGenerate && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowGenerate(false)}>
+          <div style={{ width: '100%', maxWidth: 480, margin: '0 var(--p-space-400)' }} onClick={(e) => e.stopPropagation()}>
+            <Card>
+              <BlockStack gap="400">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text as="h2" variant="headingMd">Generate Article</Text>
+                  <Button variant="tertiary" icon={Sparkles as any} onClick={() => setShowGenerate(false)} accessibilityLabel="Close" />
+                </div>
+                <Text as="p" variant="bodyMd" tone="subdued">Enter a topic to generate AI-powered content optimized for your store.</Text>
+                <input
+                  className="input"
+                  placeholder="e.g. Spring HVAC maintenance tips"
+                  value={keyword}
+                  onChange={(e) => { setKeyword(e.target.value); setGenerateError(''); setGenerateResult(''); }}
+                  onKeyDown={(e) => e.key === 'Enter' && keyword.trim() && handleGenerate()}
+                  disabled={generating}
+                  autoFocus
+                />
+                {generateError && <Banner tone="critical">{generateError}</Banner>}
+                {generateResult && <Banner tone="success">{generateResult}</Banner>}
+                <div style={{ display: 'flex', gap: 'var(--p-space-200)', justifyContent: 'flex-end' }}>
+                  <Button variant="tertiary" onClick={() => setShowGenerate(false)} disabled={generating}>Cancel</Button>
+                  <Button variant="primary" onClick={handleGenerate} disabled={generating || !keyword.trim()} loading={generating}>
+                    Generate
+                  </Button>
+                </div>
+              </BlockStack>
+            </Card>
+          </div>
+        </div>
       )}
-    </div>
+    </Page>
   );
 }

@@ -11,6 +11,7 @@ export interface HealthStatus {
   openai: { status: string };
   ollama: { status: string };
   sidecars: { status: string; count: number };
+  checks?: Record<string, Record<string, string>>;
 }
 
 export interface AdminDashboard {

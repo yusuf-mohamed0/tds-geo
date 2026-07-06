@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link as ReactRouterLink } from 'react-router-dom';
+import { AppProvider } from '@shopify/polaris';
+import enTranslations from '@shopify/polaris/locales/en.json';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
@@ -14,6 +16,23 @@ import CostsPage from './pages/CostsPage';
 import QualityPage from './pages/QualityPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ShopifyEmbeddedPage from './pages/ShopifyEmbeddedPage';
+
+const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/;
+
+function Link({ children, url = '', external, ref: _, ...rest }: { children?: React.ReactNode; url?: string; external?: boolean; ref?: React.LegacyRef<HTMLAnchorElement> }) {
+  if (external || IS_EXTERNAL_LINK_REGEX.test(url)) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" {...rest}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <ReactRouterLink to={url} {...rest}>
+      {children}
+    </ReactRouterLink>
+  );
+}
 
 function isShopifyEmbedded(): boolean {
   try {
@@ -48,25 +67,31 @@ function RootPage() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin" element={<Layout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="clients" element={<ClientsPage />} />
-            <Route path="clients/:clientId" element={<ClientDashboard />} />
-            <Route path="articles" element={<ArticlesPage />} />
-            <Route path="articles/:id" element={<ArticleDetailPage />} />
-            <Route path="geo" element={<GeoPage />} />
-            <Route path="citations" element={<CitationsPage />} />
-            <Route path="costs" element={<CostsPage />} />
-            <Route path="quality" element={<QualityPage />} />
+      <AppProvider
+        i18n={enTranslations}
+        theme="dark-experimental"
+        linkComponent={Link}
+      >
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin" element={<Layout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="clients" element={<ClientsPage />} />
+              <Route path="clients/:clientId" element={<ClientDashboard />} />
+              <Route path="articles" element={<ArticlesPage />} />
+              <Route path="articles/:id" element={<ArticleDetailPage />} />
+              <Route path="geo" element={<GeoPage />} />
+              <Route path="citations" element={<CitationsPage />} />
+              <Route path="costs" element={<CostsPage />} />
+              <Route path="quality" element={<QualityPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+            <Route index element={<RootPage />} />
             <Route path="*" element={<NotFoundPage />} />
-          </Route>
-          <Route index element={<RootPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </AuthProvider>
+          </Routes>
+        </AuthProvider>
+      </AppProvider>
     </BrowserRouter>
   );
 }

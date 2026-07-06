@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Store, ChevronRight } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
+import { Page, Card, Text, Button, Spinner, Banner, BlockStack, InlineStack } from '@shopify/polaris';
+import { Store, ArrowRight } from 'lucide-react';
 import { apiFetch } from '../api/client';
 
 interface Client {
@@ -27,39 +27,24 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <PageHeader title="Clients" description="Manage your connected clients and stores" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="card animate-pulse">
-              <div className="w-10 h-10 rounded-xl bg-brand-border" />
-              <div className="mt-4 space-y-2">
-                <div className="h-5 w-32 bg-brand-border rounded" />
-                <div className="h-4 w-24 bg-brand-border rounded" />
-              </div>
-            </div>
-          ))}
+      <Page title="Clients" subtitle="Manage your connected clients and stores">
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
+          <Spinner accessibilityLabel="Loading clients" size="large" />
         </div>
-      </div>
+      </Page>
     );
   }
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <PageHeader title="Clients" description="Manage your connected clients and stores" />
-        <div className="card text-center py-16">
-          <Store size={40} className="mx-auto text-red-400/40" />
-          <p className="text-red-400 mt-4 font-medium">{error}</p>
-        </div>
-      </div>
+      <Page title="Clients" subtitle="Manage your connected clients and stores">
+        <Banner tone="critical">{error}</Banner>
+      </Page>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Clients" description={`${clients.length} client${clients.length !== 1 ? 's' : ''} connected`} />
-
+    <Page title="Clients" subtitle={`${clients.length} client${clients.length !== 1 ? 's' : ''} connected`}>
       {clients.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {clients.map((client) => (
@@ -67,30 +52,30 @@ export default function ClientsPage() {
               key={client.id}
               onClick={() => navigate(`/admin/clients/${client.id}`)}
               className="card text-left hover:border-brand-accent/40 transition-all duration-200 group relative overflow-hidden"
+              style={{ cursor: 'pointer', border: '1px solid var(--p-color-border)', borderRadius: 'var(--p-space-300)', background: 'var(--p-color-bg-surface)', padding: 'var(--p-space-500)', width: '100%' }}
             >
-              <svg className="absolute top-0 right-0 w-24 h-20 opacity-[0.03]" viewBox="0 0 200 120" fill="none">
-                <path d="M0 80C40 40 60 100 100 60C140 20 160 80 200 40V120H0V80Z" fill="currentColor" />
-              </svg>
-              <div className="relative z-10">
-                <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 w-fit">
-                  <Store size={20} />
-                </div>
-                <h3 className="font-semibold mt-4 group-hover:text-brand-accent transition-colors">{client.name}</h3>
-                {client.domain && <p className="text-sm text-brand-muted mt-1">{client.domain}</p>}
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-brand-border/50">
-                  <span className="text-xs text-brand-muted/60">{new Date(client.created_at).toLocaleDateString()}</span>
-                  <ChevronRight size={14} className="text-brand-muted opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
+              <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.1)', color: '#a78bfa', width: 'fit-content' }}>
+                <Store size={20} />
+              </div>
+              <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="h3" variant="headingMd" fontWeight="semibold">{client.name}</Text></div>
+              {client.domain && <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">{client.domain}</Text></div>}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--p-space-400)', paddingTop: 'var(--p-space-300)', borderTop: '1px solid var(--p-color-border-secondary)' }}>
+                <Text as="span" variant="bodyXs" tone="subdued">{new Date(client.created_at).toLocaleDateString()}</Text>
+                <ArrowRight size={14} style={{ color: 'var(--p-color-text-secondary)', opacity: 0 }} className="group-hover:opacity-100" />
               </div>
             </button>
           ))}
         </div>
       ) : (
-        <div className="card text-center py-16">
-          <Store size={40} className="mx-auto text-brand-muted/40" />
-          <p className="text-brand-muted mt-4">No clients found</p>
-        </div>
+        <Card>
+          <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+            <div style={{ opacity: 0.4, marginBottom: 'var(--p-space-400)' }}>
+              <Store size={40} style={{ margin: '0 auto' }} />
+            </div>
+            <Text as="p" variant="bodyMd" tone="subdued">No clients found</Text>
+          </div>
+        </Card>
       )}
-    </div>
+    </Page>
   );
 }

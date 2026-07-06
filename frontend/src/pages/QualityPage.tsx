@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Page, Card, Text, Spinner, Banner, DataTable, BlockStack, InlineStack } from '@shopify/polaris';
 import { CheckSquare, TrendingDown, TrendingUp } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
 import { apiFetch } from '../api/client';
 
 interface Evaluation {
@@ -26,66 +26,60 @@ export default function QualityPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  return (
-    <div className="space-y-6">
-      <PageHeader title="Quality Scores" description="Article quality evaluation and scoring" />
-
-      {loading ? (
-        <div className="card animate-pulse space-y-3 p-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-12 bg-brand-border rounded-lg" />
-          ))}
-        </div>
-      ) : lowQuality.length > 0 ? (
-        <div className="card overflow-hidden p-0">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-brand-border text-brand-muted text-xs uppercase tracking-wider">
-                <th className="text-left p-4 font-medium">Article ID</th>
-                <th className="text-left p-4 font-medium">Score</th>
-                <th className="text-left p-4 font-medium hidden md:table-cell">Dimensions</th>
-                <th className="text-left p-4 font-medium hidden sm:table-cell">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lowQuality.map((e) => (
-                <tr key={e.id} className="border-b border-brand-border/60 hover:bg-brand-border/30 transition-colors">
-                  <td className="p-4 font-mono text-xs text-brand-muted">{e.id.slice(0, 8)}...</td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      {e.score < 50 ? <TrendingDown size={14} className="text-red-400" /> : <TrendingUp size={14} className="text-yellow-400" />}
-                      <span className={e.score < 50 ? 'text-red-400 font-medium' : 'text-yellow-400 font-medium'}>{e.score}/100</span>
-                    </div>
-                  </td>
-                  <td className="p-4 text-brand-muted text-xs hidden md:table-cell">
-                    {e.dimensions ? Object.entries(e.dimensions).map(([k, v]) => `${k}: ${v}`).join(', ') : '-'}
-                  </td>
-                  <td className="p-4 text-brand-muted text-xs hidden sm:table-cell">
-                    {new Date(e.evaluatedAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+  const rows = lowQuality.map((e) => [
+    <Text as="span" variant="bodySm" tone="subdued">{e.id.slice(0, 8)}...</Text>,
+    <InlineStack gap="100" blockAlign="center">
+      {e.score < 50 ? (
+        <TrendingDown size={14} style={{ color: 'var(--p-color-icon-critical)' }} />
       ) : (
-        <div className="card text-center py-16">
-          <CheckSquare size={40} className="mx-auto text-green-400/40" />
-          <p className="text-brand-muted mt-4 font-medium">All articles are healthy</p>
-          <p className="text-sm text-brand-muted/60 mt-1">No low-quality scores detected</p>
-        </div>
+        <TrendingUp size={14} style={{ color: 'var(--p-color-text-warning)' }} />
       )}
+      <Text as="span" variant="bodyMd" fontWeight="medium" tone={e.score < 50 ? 'critical' : undefined}>{e.score}/100</Text>
+    </InlineStack>,
+    <Text as="span" variant="bodySm" tone="subdued">
+      {e.dimensions ? Object.entries(e.dimensions).map(([k, v]) => `${k}: ${v}`).join(', ') : '-'}
+    </Text>,
+    <Text as="span" variant="bodySm" tone="subdued">{new Date(e.evaluatedAt).toLocaleDateString()}</Text>,
+  ]);
 
-      <div className="card bg-brand-accent/5 border-brand-accent/20">
-        <div className="flex items-center gap-2 mb-3">
-          <CheckSquare size={16} className="text-brand-accent" />
-          <h3 className="text-sm font-semibold">Evaluate Content</h3>
-        </div>
-        <p className="text-sm text-brand-muted mb-3">Use the API to evaluate content quality programmatically:</p>
-        <code className="text-xs bg-brand-bg p-3 rounded-lg block">
-          POST /api/quality/evaluate {'{'} "articleId": "...", "content": "..." {'}'}
-        </code>
-      </div>
-    </div>
+  return (
+    <Page title="Quality Scores" subtitle="Article quality evaluation and scoring">
+      <BlockStack gap="400">
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
+            <Spinner accessibilityLabel="Loading quality scores" size="large" />
+          </div>
+        ) : lowQuality.length > 0 ? (
+          <Card padding="0">
+            <DataTable
+              columnContentTypes={['text', 'text', 'text', 'text']}
+              headings={['Article ID', 'Score', 'Dimensions', 'Date']}
+              rows={rows}
+            />
+          </Card>
+        ) : (
+          <Card>
+            <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+              <CheckSquare size={40} style={{ margin: '0 auto', color: 'var(--p-color-icon-success)', opacity: 0.4 }} />
+              <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="p" variant="headingMd" tone="success">All articles are healthy</Text></div>
+              <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">No low-quality scores detected</Text></div>
+            </div>
+          </Card>
+        )}
+
+        <Card background="bg-surface-secondary">
+          <BlockStack gap="300">
+            <InlineStack gap="200" blockAlign="center">
+              <CheckSquare size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+              <Text as="h3" variant="headingSm">Evaluate Content</Text>
+            </InlineStack>
+            <Text as="p" variant="bodyMd" tone="subdued">Use the API to evaluate content quality programmatically:</Text>
+            <div style={{ background: 'var(--p-color-bg)', padding: 'var(--p-space-300)', borderRadius: 'var(--p-space-200)', fontSize: 'var(--p-font-size-200)', fontFamily: 'monospace' }}>
+              POST /api/quality/evaluate {'{'} "articleId": "...", "content": "..." {'}'}
+            </div>
+          </BlockStack>
+        </Card>
+      </BlockStack>
+    </Page>
   );
 }

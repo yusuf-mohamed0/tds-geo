@@ -1,6 +1,6 @@
 # Competitive Analysis — AI SEO Automation (2026)
 
-Researched: July 2026
+Researched: July 2026 (Updated: July 6, 2026)
 Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing segment in martech. The field has fragmented into content generation platforms adding AI visibility features, and monitoring tools adding content generation.
 
 ---
@@ -74,7 +74,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 | **Image Generation** | ❌ | ❌ | ✅ Photosonic | ✅ HD images | ❌ | ❌ |
 | **Multi-Language** | ❌ | ❌ | ✅ | ✅ 45+ | ❌ | ❌ |
 | **SERP Analysis / Content Scoring** | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **UI Dashboard** | ❌ (API/CLI only) | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **UI Dashboard** | ✅ Polaris 13 dark-theme | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Free Trial** | ❌ | ✅ 7 days | ❌ | ✅ 3 days | ❌ | ❌ |
 | **Whitelabel / Agency** | ❌ | ✅ Enterprise | ❌ | ❌ | ✅ Enterprise | ❌ |
 
@@ -83,7 +83,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 ## Our Weak Points (Gaps to Close)
 
 ### Critical Gaps
-1. **No UI dashboard** — Everything is API/CLI. Competitors have polished SaaS dashboards. This is the #1 adoption barrier.
+1. ~~**No UI dashboard**~~ — ✅ **RESOLVED.** Full Polaris 13 dark-theme UI (AdminDashboard, Articles, GEO, Citations, Clients, Costs, Quality). Major adoption barrier removed.
 2. **No keyword research** — We lack built-in keyword discovery. Rely on external SerpAPI but no integration.
 3. **No analytics integration** — No Google Search Console or Google Analytics connection. Can't show traffic impact.
 4. **No backlink automation** — BlogSEO's ABC backlink network is a genuine differentiator we can't match.
@@ -93,8 +93,8 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 6. **No auto-publishing scheduler** — No calendar-based publishing cadence.
 7. **No multi-language support** — 45+ languages is standard in the market.
 8. **No SERP content scoring** — Surfer/Frase-style real-time optimization scoring during writing.
-9. **No free trial** — Zero-risk onboarding is table stakes.
-10. **No Shopify App Store presence** — Distribution channel we're missing entirely.
+9. **No free trial** — Zero-risk onboarding is table stakes. (Test credentials work but no self-serve trial flow.)
+10. ~~**No Shopify App Store presence**~~ — ✅ **RESOLVED.** Submitted to Shopify App Store (Reference #121207, limited visibility). Awaiting review.
 
 ### Nice-to-Have Gaps
 11. **No whitelabel/agency mode** — Enterprise / agency reseller feature.
@@ -128,10 +128,10 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 ## Strategic Recommendations
 
 ### Priority 1 — Build (High Impact, Lower Effort)
-- **[P0] Basic Web UI** — Even a minimal dashboard showing: health, recent articles, citation snapshot, trigger generation. Doesn't need to match Sight AI — just enough to reduce the CLI barrier.
-- **[P0] Shopify App Store listing** — Package as a Shopify app. This is our biggest distribution gap.
+- ~~**[P0] Basic Web UI**~~ — ✅ **RESOLVED.** Full Polaris 13 dashboard with 7 admin pages (Dashboard, Articles, GEO, Citations, Clients, Costs, Quality). Dark theme.
+- ~~**[P0] Shopify App Store listing**~~ — ✅ **RESOLVED.** Submitted (Reference #121207, limited visibility). Awaiting manual review.
 - **[P1] Image generation** — Wire DALL-E or Stable Diffusion into the pipeline. All competitors have this.
-- **[P1] Free trial / demo mode** — Script that provisions a demo client with sample data in 30 seconds.
+- **[P1] Free trial / demo mode** — Script that provisions a demo client with sample data in 30 seconds. (Test credentials exist but no self-serve flow.)
 
 ### Priority 2 — Integrate (Medium Impact)
 - **[P1] Google Search Console integration** — Pull search impression/click data. Table stakes for SEO tools.
@@ -159,15 +159,16 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 | **Jasper** | $59/mo | N/A (no GEO) | Content only |
 | **AEO Engine** | $1,597/mo | $1,597/mo (managed service) | Human-managed program |
 
-TDS Geo's pricing advantage is massive: $0 platform cost vs $97–$1,597/mo for comparable feature sets. The trade-off is the lack of a UI and managed infrastructure.
+TDS Geo's pricing advantage is massive: $0 platform cost vs $97–$1,597/mo for comparable feature sets. The trade-off is managed infrastructure (self-hosted) vs SaaS convenience.
 
 ---
 
 ## Key Takeaways
 
 1. **We're uniquely positioned** — Open source, dual-CMS (Shopify+Woo), dual-AI (OpenAI+Ollama), full AEO/GEO/LLMO stack. No competitor matches this combination.
-2. **The UI gap is our biggest threat** — Even the worst competitor dashboard is better than a CLI. This limits adoption to technical users.
-3. **We lead on technical depth** — Content freshness, entity checks, cost tracking, 24-stage pipeline, plugin system. These are features no competitor has.
+2. ~~**The UI gap is our biggest threat**~~ — ✅ **RESOLVED.** Polaris 13 dashboard closes the gap significantly. Competitors still lead on polish, but the CLI-only barrier is gone.
+3. **We lead on technical depth** — Content freshness, entity checks, cost tracking, 24-stage pipeline, plugin system, monthly ops automation. Features no competitor has.
 4. **We lag on content-surface features** — Keyword research, image gen, backlinks, multi-language, SERP scoring. These are table stakes competitors have.
-5. **Pricing is our superpower** — $0 vs $97–$1,597/mo. This is unbeatable for cost-conscious teams, but we need the UX to match.
-6. **Distribution is our blind spot** — No Shopify App Store, no free trial, no landing page. Competitors invest heavily here.
+5. **Pricing is our superpower** — $0 vs $97–$1,597/mo. Unbeatable for cost-conscious teams.
+6. **Distribution improving** — Shopify App Store submitted (limited visibility). No free trial or landing page yet. Competitors still invest more in distribution.
+7. **Walkthrough capability** — Playwright-based auto-screenshot + video recording script (`capture.sh`). App-store-ready media pipeline in place.

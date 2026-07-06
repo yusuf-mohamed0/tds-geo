@@ -1,163 +1,156 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Users, FileText, Target, DollarSign, ChevronRight,
-} from 'lucide-react';
+import { Page, Card, Text, Spinner, Badge, BlockStack, InlineStack, Banner } from '@shopify/polaris';
+import { Users, FileText, Target, DollarSign } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import MetricCard from '../components/MetricCard';
-import StatusBadge from '../components/StatusBadge';
 import { fetchDashboard, fetchHealth } from '../api/admin';
 import type { AdminDashboard, HealthStatus } from '../types';
 
-interface HealthChecks {
-  [key: string]: { status: string; [key: string]: unknown };
-}
-
-interface HealthResponse {
-  checks: HealthChecks;
-  [key: string]: unknown;
-}
-
 export default function AdminDashboard() {
   const [dashboard, setDashboard] = useState<AdminDashboard | null>(null);
-  const [health, setHealth] = useState<HealthResponse | null>(null);
+  const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     Promise.all([fetchDashboard(), fetchHealth()])
-      .then(([d, h]) => { setDashboard(d); setHealth(h as unknown as HealthResponse); })
+      .then(([d, h]) => { setDashboard(d); setHealth(h); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <h2 className="text-xl font-bold">Dashboard</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="card animate-pulse">
-              <div className="w-10 h-10 rounded-xl bg-brand-border" />
-              <div className="mt-4 space-y-2">
-                <div className="h-8 w-24 bg-brand-border rounded" />
-                <div className="h-4 w-32 bg-brand-border rounded" />
-              </div>
-            </div>
-          ))}
+      <Page title="Dashboard">
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
+          <Spinner accessibilityLabel="Loading dashboard" size="large" />
         </div>
-      </div>
+      </Page>
     );
   }
 
   if (!dashboard) {
-    return <div className="text-brand-muted">Failed to load dashboard.</div>;
+    return (
+      <Page title="Dashboard">
+        <Banner tone="critical">Failed to load dashboard.</Banner>
+      </Page>
+    );
   }
 
-  const clients = dashboard.clients || {};
-  const articles = dashboard.articles || {};
-  const keywords = dashboard.keywords || {};
-  const publishing = dashboard.publishing || {};
-  const costs = dashboard.costs || { total_cost_mtd: '0' };
-  const activity = dashboard.activity || [];
-  const recentArticles = dashboard.recentArticles || [];
-  const checks = health?.checks || {};
+  const activity = dashboard?.activity as unknown as Array<Record<string, unknown>> || [];
+  const recentArticles = dashboard?.recentArticles as unknown as Array<Record<string, unknown>> || [];
+  const clients = (dashboard?.clients || {}) as Record<string, number>;
+  const articles = (dashboard?.articles || {}) as Record<string, number>;
+  const keywords = (dashboard?.keywords || {}) as Record<string, number | string>;
+  const publishing = (dashboard?.publishing || {}) as Record<string, number>;
+  const costs = (dashboard?.costs || {}) as Record<string, number | string>;
+  const checks = (health?.checks || {}) as Record<string, Record<string, string>>;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold">Dashboard</h2>
-        <p className="text-sm text-brand-muted mt-0.5">Overview of your platform performance and activity</p>
-      </div>
+    <Page title="Dashboard" subtitle="Overview of your platform performance and activity">
+      <BlockStack gap="400">
+        {Object.keys(checks).length > 0 && (
+          <Card padding="300">
+            <BlockStack gap="200">
+              <InlineStack gap="100" blockAlign="center">
+                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--p-color-icon-success)' }} />
+                <Text as="span" variant="bodySm" tone="subdued">System Status</Text>
+              </InlineStack>
+              <div style={{ display: 'flex', gap: 'var(--p-space-300)', flexWrap: 'wrap' }}>
+                {Object.entries(checks).map(([key, val]) => {
+                  const status = val?.status || 'unknown';
+                  const isHealthy = status === 'healthy' || status === 'configured';
+                  return (
+                    <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 'var(--p-space-200)', padding: 'var(--p-space-100) var(--p-space-300)', borderRadius: 'var(--p-space-200)', background: 'var(--p-color-bg-surface-secondary)' }}>
+                      <Badge tone={isHealthy ? 'success' : 'critical'} size="small" />
+                      <Text as="span" variant="bodySm">{key}</Text>
+                      <Text as="span" variant="bodyXs" tone="subdued">{status}</Text>
+                    </div>
+                  );
+                })}
+              </div>
+            </BlockStack>
+          </Card>
+        )}
 
-      {/* System Health */}
-      {Object.keys(checks).length > 0 && (
-        <div className="card py-3 px-5">
-          <div className="flex items-center gap-1 text-xs text-brand-muted mb-2.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5" />
-            System Status
-          </div>
-          <div className="flex gap-3 flex-wrap">
-            {Object.entries(checks).map(([key, val]) => {
-              const status = val?.status || 'unknown';
-              return (
-                <div key={key} className="flex items-center gap-2 py-1 px-2.5 rounded-lg bg-brand-bg/50">
-                  <div className={`w-1.5 h-1.5 rounded-full ${
-                    status === 'healthy' ? 'bg-green-400' :
-                    status === 'configured' ? 'bg-blue-400' :
-                    status.includes('unreachable') || status.includes('not') ? 'bg-red-400' :
-                    'bg-yellow-400'
-                  }`} />
-                  <span className="capitalize text-xs text-brand-text">{key}</span>
-                  <span className="text-[10px] text-brand-muted/60">{status}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <MetricCard icon={<Users size={20} />} label="Total Clients" value={clients.total ?? 0} subtitle={`${clients.active ?? 0} active · ${clients.new_30d ?? 0} new`} color="#818CF8" />
-        <MetricCard icon={<FileText size={20} />} label="Articles" value={articles.total ?? 0} subtitle={`${articles.published ?? 0} published · ${articles.pending_review ?? 0} pending`} color="#34D399" />
-        <MetricCard icon={<Target size={20} />} label="Avg Keyword Relevance" value={`${keywords.avg_relevance ?? '0'}%`} subtitle={`${keywords.total ?? 0} keywords tracked`} color="#F472B6" />
-        <MetricCard icon={<DollarSign size={20} />} label="MTD Costs" value={`$${parseFloat(String(costs.total_cost_mtd || '0')).toFixed(2)}`} subtitle={`${publishing.this_week ?? 0} published this week`} color="#FBBF24" />
-      </div>
-
-      {/* Activity Chart + Recent Articles */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold">30-Day Activity</h3>
-            <div className="flex items-center gap-1.5 text-xs text-brand-muted">
-              <div className="w-2 h-2 rounded-full bg-brand-accent" />
-              <span>Events</span>
-            </div>
-          </div>
-          {activity.length > 0 ? (
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={activity}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2D2A2A" />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#6B7280' }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#6B7280' }} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#1F1B1B', border: '1px solid #2D2A2A', borderRadius: 8, color: '#FCF6F2', fontSize: 12 }} />
-                <Bar dataKey="count" fill="#FCB900" radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-brand-muted text-sm py-12 text-center">No activity data yet.</p>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <MetricCard icon={<Users size={20} />} label="Total Clients" value={clients.total ?? 0} subtitle={`${clients.active ?? 0} active · ${clients.new_30d ?? 0} new`} color="#818CF8" />
+          <MetricCard icon={<FileText size={20} />} label="Articles" value={articles.total ?? 0} subtitle={`${articles.published ?? 0} published · ${articles.pending_review ?? 0} pending`} color="#34D399" />
+          <MetricCard icon={<Target size={20} />} label="Avg Keyword Relevance" value={`${keywords.avg_relevance ?? '0'}%`} subtitle={`${keywords.total ?? 0} keywords tracked`} color="#F472B6" />
+          <MetricCard icon={<DollarSign size={20} />} label="MTD Costs" value={`$${parseFloat(String(costs.total_cost_mtd || '0')).toFixed(2)}`} subtitle={`${publishing.this_week ?? 0} published this week`} color="#FBBF24" />
         </div>
 
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold">Recent Articles</h3>
-            <span className="text-xs text-brand-muted">{recentArticles.length}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2">
+            <Card>
+              <BlockStack gap="400">
+                <InlineStack align="space-between" blockAlign="center">
+                  <Text as="h2" variant="headingMd">30-Day Activity</Text>
+                  <InlineStack gap="100" blockAlign="center">
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--p-color-bg-fill-brand)' }} />
+                    <Text as="span" variant="bodySm" tone="subdued">Events</Text>
+                  </InlineStack>
+                </InlineStack>
+                {activity.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={240}>
+                    <BarChart data={activity as Array<{ date: string; count: number }>}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#2D2A2A" />
+                      <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#6B7280' }} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: '#6B7280' }} tickLine={false} />
+                      <Tooltip contentStyle={{ backgroundColor: '#1F1B1B', border: '1px solid #2D2A2A', borderRadius: 8, color: '#FCF6F2', fontSize: 12 }} />
+                      <Bar dataKey="count" fill="#FCB900" radius={[3, 3, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div style={{ padding: 'var(--p-space-800)', textAlign: 'center' }}>
+                    <Text as="p" variant="bodySm" tone="subdued">No activity data yet.</Text>
+                  </div>
+                )}
+              </BlockStack>
+            </Card>
           </div>
-          <div className="space-y-1">
-            {recentArticles.slice(0, 8).map((article) => {
-              return (
-                <button key={article.id} onClick={() => navigate(`/admin/articles/${article.id}`)} className="w-full text-left p-3 rounded-xl hover:bg-brand-border/60 transition-all duration-150 group">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm truncate flex-1 group-hover:text-brand-accent transition-colors">{article.title}</p>
-                    <ChevronRight size={14} className="text-brand-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" />
-                  </div>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <StatusBadge status={article.status || 'draft'} />
-                    {article.seo_score && <span className="text-[11px] text-brand-muted/60">SEO: {article.seo_score}</span>}
-                  </div>
+
+          <Card>
+            <BlockStack gap="200">
+              <InlineStack align="space-between" blockAlign="center">
+                <Text as="h2" variant="headingMd">Recent Articles</Text>
+                <Text as="span" variant="bodySm" tone="subdued">{recentArticles.length}</Text>
+              </InlineStack>
+              {recentArticles.slice(0, 8).map((article) => {
+                const a = article as Record<string, unknown>;
+                return (
+                  <button
+                    key={String(a.id)}
+                    onClick={() => navigate(`/admin/articles/${a.id}`)}
+                    style={{ width: '100%', textAlign: 'left', padding: 'var(--p-space-300)', borderRadius: 'var(--p-space-200)', background: 'transparent', border: 'none', cursor: 'pointer', transition: 'background 0.15s' }}
+                    className="hover:bg-brand-border/60 group"
+                  >
+                    <InlineStack align="space-between" blockAlign="start" gap="200">
+                      <Text as="span" variant="bodyMd" fontWeight="medium" truncate>{String(a.title)}</Text>
+                    </InlineStack>
+                    <div style={{ marginTop: 'var(--p-space-100)' }}>
+                      <InlineStack gap="200" blockAlign="center">
+                        <Badge tone={String(a.status) === 'published' ? 'success' : String(a.status) === 'approved' ? 'info' : String(a.status) === 'generated' ? 'warning' : 'attention'}>
+                          {String(a.status || 'draft')}
+                        </Badge>
+                        {!!a.seo_score && (
+                          <Text as="span" variant="bodyXs" tone="subdued">SEO: {String(a.seo_score)}</Text>
+                        )}
+                      </InlineStack>
+                    </div>
+                  </button>
+                );
+              })}
+              {recentArticles.length > 0 && (
+                <button onClick={() => navigate('/admin/articles')} style={{ width: '100%', textAlign: 'left', padding: 'var(--p-space-200)', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--p-color-text-link)', fontSize: 'var(--p-font-size-300)' }}>
+                  View all articles →
                 </button>
-              );
-            })}
-            {recentArticles.length > 0 && (
-              <button onClick={() => navigate('/admin/articles')} className="w-full text-left p-2.5 mt-1 text-sm text-brand-accent/80 hover:text-brand-accent transition-colors rounded-lg hover:bg-brand-border/30">
-                View all articles →
-              </button>
-            )}
-          </div>
+              )}
+            </BlockStack>
+          </Card>
         </div>
-      </div>
-    </div>
+      </BlockStack>
+    </Page>
   );
 }

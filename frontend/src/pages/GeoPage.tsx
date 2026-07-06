@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { Page, Card, Text, Button, Spinner, Banner, BlockStack, InlineStack, Badge } from '@shopify/polaris';
 import { Sparkles, Globe, FileText, CheckCircle, XCircle, Lightbulb, AlertTriangle, Target, Zap, Search, TrendingUp, BookOpen } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
 import { apiFetch } from '../api/client';
 
 interface GeoEngineScore {
@@ -39,87 +39,74 @@ interface UrlResult {
   };
 }
 
-interface GeoResponse {
-  success: boolean;
-  data: GeoAnalysis;
-}
-
-interface UrlResponse {
-  success: boolean;
-  data: UrlResult;
-}
-
-const engineColors: Record<string, string> = {
-  ChatGPT: 'bg-teal-500/10 text-teal-400 border-teal-500/20',
-  Perplexity: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  'Google AI Overviews': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  Gemini: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
-  Claude: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  Copilot: 'bg-green-500/10 text-green-400 border-green-500/20',
-  Grok: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  DeepSeek: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-};
+interface GeoResponse { success: boolean; data: GeoAnalysis; }
+interface UrlResponse { success: boolean; data: UrlResult; }
 
 function scoreColor(score: number): string {
-  if (score >= 80) return 'text-green-400';
-  if (score >= 60) return 'text-yellow-400';
-  return 'text-red-400';
-}
-
-function scoreBg(score: number): string {
-  if (score >= 80) return 'bg-green-500/10 border-green-500/20';
-  if (score >= 60) return 'bg-yellow-500/10 border-yellow-500/20';
-  return 'bg-red-500/10 border-red-500/20';
+  if (score >= 80) return 'var(--p-color-text-success)';
+  if (score >= 60) return 'var(--p-color-text-warning)';
+  return 'var(--p-color-text-critical)';
 }
 
 function ScoreRing({ score, label }: { score: number; label: string }) {
   return (
-    <div className="card text-center py-6">
-      <div className="relative inline-flex items-center justify-center">
-        <svg className="w-24 h-24 -rotate-90" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" strokeWidth="8" className="text-brand-border" />
-          <circle
-            cx="60" cy="60" r="54" fill="none" stroke="currentColor" strokeWidth="8"
-            strokeDasharray={`${(score / 100) * 339.292} 339.292`}
-            strokeLinecap="round"
-            className={scoreColor(score)}
-          />
-        </svg>
-        <span className={`absolute text-2xl font-bold ${scoreColor(score)}`}>{score}</span>
+    <Card>
+      <div style={{ textAlign: 'center', padding: 'var(--p-space-400)' }}>
+        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width={96} height={96} viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="54" fill="none" stroke="var(--p-color-border)" strokeWidth="8" />
+            <circle
+              cx="60" cy="60" r="54" fill="none" stroke={scoreColor(score)} strokeWidth="8"
+              strokeDasharray={`${(score / 100) * 339.292} 339.292`}
+              strokeLinecap="round"
+            />
+          </svg>
+          <span style={{ position: 'absolute', fontSize: 'var(--p-font-size-500)', fontWeight: 'var(--p-font-weight-bold)', color: scoreColor(score) }}>{score}</span>
+        </div>
+        <div style={{ marginTop: 'var(--p-space-200)' }}><Text as="p" variant="bodySm" tone="subdued">{label}</Text></div>
       </div>
-      <p className="text-xs text-brand-muted mt-2">{label}</p>
-    </div>
+    </Card>
   );
 }
 
 function EngineCard({ engine }: { engine: GeoEngineScore }) {
+  const bg = engine.score >= 80 ? 'rgba(34,197,94,0.05)' : engine.score >= 60 ? 'rgba(234,179,8,0.05)' : 'rgba(239,68,68,0.05)';
+  const border = engine.score >= 80 ? 'rgba(34,197,94,0.2)' : engine.score >= 60 ? 'rgba(234,179,8,0.2)' : 'rgba(239,68,68,0.2)';
+  const bar = engine.score >= 80 ? 'var(--p-color-bg-fill-success)' : engine.score >= 60 ? 'var(--p-color-bg-fill-warning)' : 'var(--p-color-bg-fill-critical)';
+
   return (
-    <div className={`rounded-lg border p-4 ${scoreBg(engine.score)}`}>
-      <div className="flex items-center justify-between mb-2">
-        <span className={`text-sm font-medium ${engineColors[engine.engine]?.split(' ')[1] || 'text-brand-text'}`}>
-          {engine.engine}
-        </span>
-        <div className="flex items-center gap-1.5">
-          <span className={`text-lg font-bold ${scoreColor(engine.score)}`}>{engine.score}</span>
-          {engine.passing ? <CheckCircle size={14} className="text-green-400" /> : <XCircle size={14} className="text-red-400" />}
-        </div>
+    <div style={{ borderRadius: 'var(--p-space-200)', border: `1px solid ${border}`, background: bg, padding: 'var(--p-space-400)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--p-space-200)' }}>
+        <Text as="span" variant="bodyMd" fontWeight="medium">{engine.engine}</Text>
+        <InlineStack gap="100" blockAlign="center">
+          <span style={{ fontWeight: 'var(--p-font-weight-bold)', color: scoreColor(engine.score) }}>{engine.score}</span>
+          {engine.passing ? <CheckCircle size={14} style={{ color: 'var(--p-color-icon-success)' }} /> : <XCircle size={14} style={{ color: 'var(--p-color-icon-critical)' }} />}
+        </InlineStack>
       </div>
-      <div className="h-1.5 rounded-full bg-brand-border overflow-hidden">
-        <div className={`h-full rounded-full transition-all ${engine.score >= 80 ? 'bg-green-400' : engine.score >= 60 ? 'bg-yellow-400' : 'bg-red-400'}`}
-          style={{ width: `${engine.score}%` }}
-        />
+      <div style={{ height: 6, borderRadius: 3, background: 'var(--p-color-bg)', overflow: 'hidden' }}>
+        <div style={{ height: '100%', borderRadius: 3, background: bar, width: `${engine.score}%` }} />
       </div>
       {engine.issues.length > 0 && (
-        <div className="mt-3 space-y-1">
+        <div style={{ marginTop: 'var(--p-space-200)' }}>
           {engine.issues.map((issue, i) => (
-            <p key={i} className="text-xs text-red-400 flex items-start gap-1"><AlertTriangle size={10} className="shrink-0 mt-0.5" /> {issue}</p>
+            <div key={i} style={{ marginBottom: 'var(--p-space-050)' }}>
+              <InlineStack gap="100" blockAlign="start">
+                <AlertTriangle size={10} style={{ color: 'var(--p-color-icon-critical)', flexShrink: 0, marginTop: 2 }} />
+                <Text as="span" variant="bodyXs" tone="critical">{issue}</Text>
+              </InlineStack>
+            </div>
           ))}
         </div>
       )}
       {engine.strengths.length > 0 && (
-        <div className="mt-2 space-y-1">
+        <div style={{ marginTop: 'var(--p-space-100)' }}>
           {engine.strengths.map((s, i) => (
-            <p key={i} className="text-xs text-green-400 flex items-start gap-1"><CheckCircle size={10} className="shrink-0 mt-0.5" /> {s}</p>
+            <div key={i} style={{ marginBottom: 'var(--p-space-050)' }}>
+              <InlineStack gap="100" blockAlign="start">
+                <CheckCircle size={10} style={{ color: 'var(--p-color-icon-success)', flexShrink: 0, marginTop: 2 }} />
+                <Text as="span" variant="bodyXs" tone="success">{s}</Text>
+              </InlineStack>
+            </div>
           ))}
         </div>
       )}
@@ -129,21 +116,25 @@ function EngineCard({ engine }: { engine: GeoEngineScore }) {
 
 function AnalysisSummary({ analysis }: { analysis: GeoAnalysis }) {
   return (
-    <>
-      <div className="grid grid-cols-4 gap-4">
+    <BlockStack gap="400">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <ScoreRing score={analysis.overallScore} label="Overall GEO Score" />
         <ScoreRing score={analysis.definitionFirstScore} label="Definition-First" />
         <ScoreRing score={Math.round(analysis.entityDensity)} label="Entity Density" />
         <ScoreRing score={analysis.citationReadiness} label="Citation Readiness" />
       </div>
-
-      <div className="card">
-        <div className="flex items-center gap-2 mb-4"><Target size={16} className="text-brand-accent" /><h3 className="text-sm font-semibold">Engine Scores</h3></div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {analysis.engines.map((engine) => <EngineCard key={engine.engine} engine={engine} />)}
-        </div>
-      </div>
-    </>
+      <Card>
+        <BlockStack gap="400">
+          <InlineStack gap="200" blockAlign="center">
+            <Target size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+            <Text as="h3" variant="headingSm">Engine Scores</Text>
+          </InlineStack>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {analysis.engines.map((engine) => <EngineCard key={engine.engine} engine={engine} />)}
+          </div>
+        </BlockStack>
+      </Card>
+    </BlockStack>
   );
 }
 
@@ -151,77 +142,114 @@ function DeepAnalysisSection({ deepAnalysis }: { deepAnalysis: UrlResult['deepAn
   if (!deepAnalysis.summary && deepAnalysis.topIssues.length === 0) return null;
 
   return (
-    <>
+    <BlockStack gap="400">
       {deepAnalysis.summary && (
-        <div className="card">
-          <div className="flex items-center gap-2 mb-3"><Search size={16} className="text-brand-accent" /><h3 className="text-sm font-semibold">LLM Audit Summary</h3></div>
-          <p className="text-sm text-brand-text/80 leading-relaxed">{deepAnalysis.summary}</p>
-        </div>
+        <Card>
+          <BlockStack gap="300">
+            <InlineStack gap="200" blockAlign="center">
+              <Search size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+              <Text as="h3" variant="headingSm">LLM Audit Summary</Text>
+            </InlineStack>
+            <Text as="p" variant="bodyMd">{deepAnalysis.summary}</Text>
+          </BlockStack>
+        </Card>
       )}
 
       {deepAnalysis.engineSpecific.length > 0 && (
-        <div className="card">
-          <div className="flex items-center gap-2 mb-4"><TrendingUp size={16} className="text-brand-accent" /><h3 className="text-sm font-semibold">Per-Engine Verdict</h3></div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {deepAnalysis.engineSpecific.map((e) => (
-              <div key={e.engine} className={`rounded-lg border p-4 ${e.verdict === 'passing' ? 'bg-green-500/5 border-green-500/20' : e.verdict === 'needs-work' ? 'bg-yellow-500/5 border-yellow-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`text-sm font-medium ${engineColors[e.engine]?.split(' ')[1] || 'text-brand-text'}`}>{e.engine}</span>
-                  <span className={`text-xs px-1.5 py-0.5 rounded ${e.verdict === 'passing' ? 'bg-green-500/20 text-green-400' : e.verdict === 'needs-work' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}`}>{e.verdict}</span>
+        <Card>
+          <BlockStack gap="400">
+            <InlineStack gap="200" blockAlign="center">
+              <TrendingUp size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+              <Text as="h3" variant="headingSm">Per-Engine Verdict</Text>
+            </InlineStack>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {deepAnalysis.engineSpecific.map((e) => (
+                <div key={e.engine} style={{
+                  borderRadius: 'var(--p-space-200)', border: '1px solid',
+                  borderColor: e.verdict === 'passing' ? 'rgba(34,197,94,0.2)' : e.verdict === 'needs-work' ? 'rgba(234,179,8,0.2)' : 'rgba(239,68,68,0.2)',
+                  background: e.verdict === 'passing' ? 'rgba(34,197,94,0.05)' : e.verdict === 'needs-work' ? 'rgba(234,179,8,0.05)' : 'rgba(239,68,68,0.05)',
+                  padding: 'var(--p-space-400)',
+                }}>
+                  <div style={{ marginBottom: 'var(--p-space-200)' }}>
+                    <InlineStack gap="200" blockAlign="center">
+                      <Text as="span" variant="bodyMd" fontWeight="medium">{e.engine}</Text>
+                      <Badge tone={e.verdict === 'passing' ? 'success' : e.verdict === 'needs-work' ? 'warning' : 'critical'}>{e.verdict}</Badge>
+                    </InlineStack>
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: 'var(--p-space-300)' }}>
+                    {e.details.map((d, i) => (
+                      <li key={i} style={{ marginBottom: 'var(--p-space-050)' }}>
+                        <Text as="span" variant="bodySm" tone="subdued">{d}</Text>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-1">
-                  {e.details.map((d, i) => (
-                    <li key={i} className="text-xs text-brand-text/70 flex items-start gap-1"><span className="text-brand-muted">•</span> {d}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </BlockStack>
+        </Card>
       )}
 
       {deepAnalysis.topIssues.length > 0 && (
-        <div className="card border-red-500/20">
-          <div className="flex items-center gap-2 mb-3"><XCircle size={16} className="text-red-400" /><h3 className="text-sm font-semibold text-red-400">Critical Issues Found</h3></div>
-          <ul className="space-y-2">
-            {deepAnalysis.topIssues.map((issue, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-brand-text/80">
-                <AlertTriangle size={14} className="text-red-400 shrink-0 mt-0.5" />
-                <span>{issue}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Card>
+          <BlockStack gap="300">
+            <InlineStack gap="200" blockAlign="center">
+              <XCircle size={16} style={{ color: 'var(--p-color-icon-critical)' }} />
+              <Text as="h3" variant="headingSm" tone="critical">Critical Issues Found</Text>
+            </InlineStack>
+            <ul style={{ margin: 0, paddingLeft: 'var(--p-space-400)' }}>
+              {deepAnalysis.topIssues.map((issue, i) => (
+                <li key={i} style={{ marginBottom: 'var(--p-space-100)' }}>
+                  <InlineStack gap="200" blockAlign="start">
+                    <AlertTriangle size={14} style={{ color: 'var(--p-color-icon-critical)', flexShrink: 0, marginTop: 2 }} />
+                    <Text as="span" variant="bodyMd">{issue}</Text>
+                  </InlineStack>
+                </li>
+              ))}
+            </ul>
+          </BlockStack>
+        </Card>
       )}
 
       {deepAnalysis.quickWins.length > 0 && (
-        <div className="card border-green-500/20">
-          <div className="flex items-center gap-2 mb-3"><Zap size={16} className="text-green-400" /><h3 className="text-sm font-semibold text-green-400">Quick Wins</h3></div>
-          <ul className="space-y-2">
-            {deepAnalysis.quickWins.map((win, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-brand-text/80">
-                <Zap size={14} className="text-yellow-400 shrink-0 mt-0.5" />
-                <span>{win}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Card>
+          <BlockStack gap="300">
+            <InlineStack gap="200" blockAlign="center">
+              <Zap size={16} style={{ color: 'var(--p-color-icon-success)' }} />
+              <Text as="h3" variant="headingSm" tone="success">Quick Wins</Text>
+            </InlineStack>
+            <ul style={{ margin: 0, paddingLeft: 'var(--p-space-400)' }}>
+              {deepAnalysis.quickWins.map((win, i) => (
+                <li key={i} style={{ marginBottom: 'var(--p-space-100)' }}>
+                  <InlineStack gap="200" blockAlign="start">
+                    <Zap size={14} style={{ color: 'var(--p-color-bg-fill-warning)', flexShrink: 0, marginTop: 2 }} />
+                    <Text as="span" variant="bodyMd">{win}</Text>
+                  </InlineStack>
+                </li>
+              ))}
+            </ul>
+          </BlockStack>
+        </Card>
       )}
 
       {deepAnalysis.strategicRecommendations.length > 0 && (
-        <div className="card">
-          <div className="flex items-center gap-2 mb-3"><BookOpen size={16} className="text-brand-accent" /><h3 className="text-sm font-semibold">Strategic Recommendations</h3></div>
-          <ul className="space-y-2">
-            {deepAnalysis.strategicRecommendations.map((rec, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-brand-text/80">
-                <span className="text-brand-accent font-bold shrink-0">{i + 1}.</span>
-                <span>{rec}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Card>
+          <BlockStack gap="300">
+            <InlineStack gap="200" blockAlign="center">
+              <BookOpen size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+              <Text as="h3" variant="headingSm">Strategic Recommendations</Text>
+            </InlineStack>
+            <ul style={{ margin: 0, paddingLeft: 'var(--p-space-400)' }}>
+              {deepAnalysis.strategicRecommendations.map((rec, i) => (
+                <li key={i} style={{ marginBottom: 'var(--p-space-100)' }}>
+                  <Text as="span" variant="bodyMd">{rec}</Text>
+                </li>
+              ))}
+            </ul>
+          </BlockStack>
+        </Card>
       )}
-    </>
+    </BlockStack>
   );
 }
 
@@ -267,126 +295,134 @@ export default function GeoPage() {
   const analysis = urlResult?.data?.analysis || contentResult?.data;
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      <PageHeader title="GEO Analysis" description="Full website audit for Generative Engine Optimization readiness" />
-
-      <div className="card">
-        <div className="flex gap-1 mb-4 bg-brand-bg rounded-lg p-1 w-fit">
-          <button onClick={() => { setMode('content'); setStage('input'); }} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${mode === 'content' ? 'bg-brand-accent text-brand-bg' : 'text-brand-muted hover:text-brand-text'}`}>
-            <FileText size={14} className="inline mr-1.5" />Paste Content
-          </button>
-          <button onClick={() => { setMode('url'); setStage('input'); }} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${mode === 'url' ? 'bg-brand-accent text-brand-bg' : 'text-brand-muted hover:text-brand-text'}`}>
-            <Globe size={14} className="inline mr-1.5" />Enter URL
-          </button>
-        </div>
-
-        {mode === 'content' ? (
-          <>
-            <textarea
-              className="input h-48 resize-y font-mono text-sm"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste article content to analyze GEO readiness across ChatGPT, Perplexity, Gemini, Claude..."
-            />
-            <div className="flex items-center justify-between mt-4">
-              <span className="text-xs text-brand-muted">{content.length} characters</span>
-              <button onClick={analyze} disabled={stage === 'loading' || !content.trim()} className="btn-primary flex items-center gap-2">
-                {stage === 'loading' ? <div className="animate-spin w-4 h-4 border-2 border-brand-bg border-t-transparent rounded-full" /> : <Sparkles size={16} />}
-                {stage === 'loading' ? 'Analyzing...' : 'Analyze'}
-              </button>
+    <Page title="GEO Analysis" subtitle="Full website audit for Generative Engine Optimization readiness">
+      <div style={{ maxWidth: 1000 }}><BlockStack gap="400">
+        <Card>
+          <BlockStack gap="400">
+            <div style={{ display: 'flex', gap: 'var(--p-space-100)', background: 'var(--p-color-bg)', borderRadius: 'var(--p-space-200)', padding: 'var(--p-space-100)', width: 'fit-content' }}>
+              <Button variant={mode === 'content' ? 'primary' : 'tertiary'} onClick={() => { setMode('content'); setStage('input'); }}>
+                Paste Content
+              </Button>
+              <Button variant={mode === 'url' ? 'primary' : 'tertiary'} onClick={() => { setMode('url'); setStage('input'); }}>
+                Enter URL
+              </Button>
             </div>
-          </>
-        ) : (
-          <>
-            <label className="text-sm font-medium mb-2 block">Website URL</label>
-            <div className="flex gap-3">
-              <div className="relative flex-1 max-w-lg">
-                <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" />
-                <input
-                  className="input pl-9"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://example.com"
-                  onKeyDown={(e) => e.key === 'Enter' && analyze()}
+
+            {mode === 'content' ? (
+              <>
+                <textarea
+                  className="input"
+                  style={{ height: 192, resize: 'vertical', fontFamily: 'monospace', fontSize: 'var(--p-font-size-300)' }}
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Paste article content to analyze GEO readiness across ChatGPT, Perplexity, Gemini, Claude..."
                 />
-              </div>
-              <button onClick={analyze} disabled={stage === 'loading' || !url.trim()} className="btn-primary flex items-center gap-2">
-                {stage === 'loading' ? <div className="animate-spin w-4 h-4 border-2 border-brand-bg border-t-transparent rounded-full" /> : <Search size={16} />}
-                {stage === 'loading' ? 'Auditing...' : 'Audit Site'}
-              </button>
+                <InlineStack align="space-between" blockAlign="center">
+                  <Text as="span" variant="bodySm" tone="subdued">{content.length} characters</Text>
+                  <Button variant="primary" onClick={analyze} disabled={stage === 'loading' || !content.trim()} loading={stage === 'loading'}>
+                    Analyze
+                  </Button>
+                </InlineStack>
+              </>
+            ) : (
+              <BlockStack gap="300">
+                <Text as="span" variant="bodyMd" fontWeight="medium">Website URL</Text>
+                <div style={{ display: 'flex', gap: 'var(--p-space-300)' }}>
+                  <div style={{ position: 'relative', flex: 1, maxWidth: 500 }}>
+                    <Globe size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--p-color-text-secondary)' }} />
+                    <input
+                      className="input"
+                      style={{ paddingLeft: 36 }}
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="https://example.com"
+                      onKeyDown={(e) => e.key === 'Enter' && analyze()}
+                    />
+                  </div>
+                  <Button variant="primary" onClick={analyze} disabled={stage === 'loading' || !url.trim()} loading={stage === 'loading'}>
+                    Audit Site
+                  </Button>
+                </div>
+                <Text as="p" variant="bodyXs" tone="subdued">Fetches the page, extracts content, runs rule-based + AI-powered deep analysis</Text>
+              </BlockStack>
+            )}
+          </BlockStack>
+        </Card>
+
+        {stage === 'loading' && (
+          <Card>
+            <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+              <Spinner accessibilityLabel="Analyzing" size="large" />
+              <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="p" variant="bodyMd">{mode === 'url' ? 'Fetching page content and running deep AI analysis...' : 'Analyzing content for GEO readiness...'}</Text></div>
+              <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">Scanning across 7 AI engines</Text></div>
             </div>
-            <p className="text-xs text-brand-muted mt-2">Fetches the page, extracts content, runs rule-based + AI-powered deep analysis</p>
+          </Card>
+        )}
+
+        {error && <Banner tone="critical">{error}</Banner>}
+
+        {stage === 'result' && urlResult?.data && (
+          <>
+            <Card>
+              <BlockStack gap="300">
+                <InlineStack gap="200" blockAlign="center">
+                  <Globe size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+                  <Text as="h3" variant="headingSm">Page Audit</Text>
+                </InlineStack>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div><Text as="p" variant="bodyXs" tone="subdued">URL</Text><Text as="p" variant="bodySm" truncate>{urlResult.data.url}</Text></div>
+                  <div><Text as="p" variant="bodyXs" tone="subdued">Title</Text><Text as="p" variant="bodySm" truncate>{urlResult.data.pageTitle}</Text></div>
+                  <div><Text as="p" variant="bodyXs" tone="subdued">Word Count</Text><Text as="p" variant="bodySm">{urlResult.data.wordCount.toLocaleString()}</Text></div>
+                  <div><Text as="p" variant="bodyXs" tone="subdued">Headings</Text><Text as="p" variant="bodySm">{urlResult.data.headings.length}</Text></div>
+                </div>
+                {urlResult.data.metaDescription && (
+                  <div style={{ paddingTop: 'var(--p-space-300)', borderTop: '1px solid var(--p-color-border)' }}>
+                    <Text as="p" variant="bodyXs" tone="subdued">Meta Description</Text>
+                    <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm">{urlResult.data.metaDescription}</Text></div>
+                  </div>
+                )}
+                {urlResult.data.headings.length > 0 && (
+                  <div style={{ paddingTop: 'var(--p-space-300)', borderTop: '1px solid var(--p-color-border)' }}>
+                    <Text as="p" variant="bodyXs" tone="subdued">Page Structure</Text>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--p-space-100)', marginTop: 'var(--p-space-100)' }}>
+                      {urlResult.data.headings.slice(0, 15).map((h, i) => (
+                        <span key={i} className={`text-xs px-2 py-0.5 rounded ${h.level === 1 ? 'bg-brand-accent/20 text-brand-accent' : h.level === 2 ? 'bg-blue-500/20 text-blue-400' : 'bg-brand-border text-brand-muted'}`}>
+                          {'  '.repeat(h.level - 1)}H{h.level}: {h.text.slice(0, 40)}{h.text.length > 40 ? '...' : ''}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </BlockStack>
+            </Card>
+            <AnalysisSummary analysis={urlResult.data.analysis} />
+            <DeepAnalysisSection deepAnalysis={urlResult.data.deepAnalysis} />
           </>
         )}
-      </div>
 
-      {stage === 'loading' && (
-        <div className="card py-16 text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-brand-accent border-t-transparent rounded-full mx-auto" />
-          <p className="text-sm text-brand-muted mt-4">{mode === 'url' ? 'Fetching page content and running deep AI analysis...' : 'Analyzing content for GEO readiness...'}</p>
-          <p className="text-xs text-brand-muted/50 mt-1">Scanning across 7 AI engines</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="card py-8 text-center">
-          <XCircle size={32} className="text-red-400 mx-auto" />
-          <p className="text-sm text-red-400 mt-2">{error}</p>
-        </div>
-      )}
-
-      {stage === 'result' && urlResult?.data && (
-        <>
-          <div className="card">
-            <div className="flex items-center gap-2 mb-3"><Globe size={16} className="text-brand-accent" /><h3 className="text-sm font-semibold">Page Audit</h3></div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-              <div><span className="text-brand-muted text-xs">URL</span><p className="truncate">{urlResult.data.url}</p></div>
-              <div><span className="text-brand-muted text-xs">Title</span><p className="truncate">{urlResult.data.pageTitle}</p></div>
-              <div><span className="text-brand-muted text-xs">Word Count</span><p>{urlResult.data.wordCount.toLocaleString()}</p></div>
-              <div><span className="text-brand-muted text-xs">Headings</span><p>{urlResult.data.headings.length}</p></div>
-            </div>
-            {urlResult.data.metaDescription && (
-              <div className="mt-3 pt-3 border-t border-brand-border">
-                <span className="text-brand-muted text-xs">Meta Description</span>
-                <p className="text-sm text-brand-text/70 mt-0.5">{urlResult.data.metaDescription}</p>
-              </div>
+        {stage === 'result' && contentResult?.data && (
+          <BlockStack gap="400">
+            <AnalysisSummary analysis={contentResult.data} />
+            {contentResult.data.suggestions.length > 0 && (
+              <Card>
+                <BlockStack gap="300">
+                  <InlineStack gap="200" blockAlign="center">
+                    <Lightbulb size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+                    <Text as="h3" variant="headingSm">Suggestions</Text>
+                  </InlineStack>
+                  <ul style={{ margin: 0, paddingLeft: 'var(--p-space-400)' }}>
+                    {contentResult.data.suggestions.map((s, i) => (
+                      <li key={i} style={{ marginBottom: 'var(--p-space-100)' }}>
+                        <Text as="span" variant="bodyMd">{s}</Text>
+                      </li>
+                    ))}
+                  </ul>
+                </BlockStack>
+              </Card>
             )}
-            {urlResult.data.headings.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-brand-border">
-                <span className="text-brand-muted text-xs">Page Structure</span>
-                <div className="flex flex-wrap gap-1.5 mt-1.5">
-                  {urlResult.data.headings.slice(0, 15).map((h, i) => (
-                    <span key={i} className={`text-xs px-2 py-0.5 rounded ${h.level === 1 ? 'bg-brand-accent/20 text-brand-accent' : h.level === 2 ? 'bg-blue-500/20 text-blue-400' : 'bg-brand-border text-brand-muted'}`}>
-                      {'  '.repeat(h.level - 1)}H{h.level}: {h.text.slice(0, 40)}{h.text.length > 40 ? '...' : ''}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          <AnalysisSummary analysis={urlResult.data.analysis} />
-          <DeepAnalysisSection deepAnalysis={urlResult.data.deepAnalysis} />
-        </>
-      )}
-
-      {stage === 'result' && contentResult?.data && (
-        <>
-          <AnalysisSummary analysis={contentResult.data} />
-          {contentResult.data.suggestions.length > 0 && (
-            <div className="card">
-              <div className="flex items-center gap-2 mb-4"><Lightbulb size={16} className="text-brand-accent" /><h3 className="text-sm font-semibold">Suggestions</h3></div>
-              <ul className="space-y-2">
-                {contentResult.data.suggestions.map((s, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-brand-text/80">
-                    <span className="text-brand-accent font-bold shrink-0">{i + 1}.</span>
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </>
-      )}
-    </div>
+          </BlockStack>
+        )}
+      </BlockStack></div>
+    </Page>
   );
 }

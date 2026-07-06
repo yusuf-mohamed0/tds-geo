@@ -1,3 +1,5 @@
+@import '@shopify/polaris/build/esm/styles.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -62,4 +64,43 @@
   .badge-red { @apply badge bg-red-900/30 text-red-400; }
   .badge-blue { @apply badge bg-blue-900/30 text-blue-400; }
   .badge-gray { @apply badge bg-gray-800 text-gray-400; }
+}
+
+[data-polaris-theme="dark-experimental"] {
+  --p-color-bg: #171414;
+  --p-color-bg-surface: #1F1B1B;
+  --p-color-bg-fill: #2D2A2A;
+  --p-color-bg-fill-hover: #3D3A3A;
+  --p-color-bg-fill-active: #4D4A4A;
+  --p-color-bg-fill-brand: #FCB900;
+  --p-color-bg-fill-brand-hover: #e6a800;
+  --p-color-bg-fill-brand-active: #d49a00;
+  --p-color-bg-fill-brand-selected: #FCB900;
+  --p-color-bg-fill-brand-disabled: rgba(252, 185, 0, 0.3);
+  --p-color-bg-surface-hover: #2D2A2A;
+  --p-color-bg-surface-active: #3D3A3A;
+  --p-color-bg-surface-selected: #2D2A2A;
+  --p-color-bg-surface-secondary: #2D2A2A;
+  --p-color-bg-surface-tertiary: #3D3A3A;
+  --p-color-text: #FCF6F2;
+  --p-color-text-secondary: #9CA3AF;
+  --p-color-text-disabled: #4B5563;
+  --p-color-text-link: #FCB900;
+  --p-color-text-link-hover: #fcd34d;
+  --p-color-text-brand: #FCB900;
+  --p-color-text-brand-on-bg-fill: #171414;
+  --p-color-text-brand-on-bg-fill-hover: #171414;
+  --p-color-border: #2D2A2A;
+  --p-color-border-hover: #4B5563;
+  --p-color-border-disabled: #1F1B1B;
+  --p-color-border-secondary: #2D2A2A;
+  --p-color-border-focus: #FCB900;
+  --p-color-icon: #9CA3AF;
+  --p-color-icon-hover: #FCF6F2;
+  --p-color-icon-secondary: #6B7280;
+  --p-color-input-bg-surface: #171414;
+  --p-color-input-bg-surface-hover: #1F1B1B;
+  --p-color-input-border: #2D2A2A;
+  --p-color-input-border-hover: #4B5563;
+  --p-color-input-border-active: #FCB900;
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { Page, Card, Text, Button, Spinner, Banner, BlockStack, InlineStack, Badge } from '@shopify/polaris';
 import { Globe, Search, CheckCircle, XCircle, Lightbulb, Clock, Monitor } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
 import { apiFetch } from '../api/client';
 
 interface Engine {
@@ -25,14 +25,14 @@ interface CitationResponse {
 }
 
 const engineColors: Record<string, string> = {
-  ChatGPT: 'bg-teal-500/10 text-teal-400 border-teal-500/20',
-  Perplexity: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  'Google AI Overviews': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  Gemini: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
-  Claude: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  Copilot: 'bg-green-500/10 text-green-400 border-green-500/20',
-  Grok: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  DeepSeek: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  ChatGPT: '#14b8a6',
+  Perplexity: '#3b82f6',
+  'Google AI Overviews': '#eab308',
+  Gemini: '#ec4899',
+  Claude: '#f97316',
+  Copilot: '#22c55e',
+  Grok: '#a855f7',
+  DeepSeek: '#06b6d4',
 };
 
 export default function CitationsPage() {
@@ -59,116 +59,135 @@ export default function CitationsPage() {
   const data = result?.data;
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <PageHeader title="AI Citation Tracking" description="Check if your domain is cited across 7 AI engines" />
-
-      <div className="card">
-        <label className="text-sm font-medium mb-2 block">Domain</label>
-        <div className="flex gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" />
-            <input
-              className="input pl-9"
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              placeholder="example.com"
-              onKeyDown={(e) => e.key === 'Enter' && check()}
-            />
-          </div>
-          <button onClick={check} disabled={loading || !domain.trim()} className="btn-primary flex items-center gap-2">
-            {loading ? (
-              <div className="animate-spin w-4 h-4 border-2 border-brand-bg border-t-transparent rounded-full" />
-            ) : (
-              <Search size={16} />
-            )}
-            {loading ? 'Checking...' : 'Check'}
-          </button>
-        </div>
-        <p className="text-xs text-brand-muted mt-2">Powered by 7 AI engines: ChatGPT, Perplexity, Gemini, Claude, Copilot, Grok, DeepSeek</p>
-      </div>
-
-      {loading && (
-        <div className="card py-12 text-center">
-          <div className="animate-spin w-6 h-6 border-2 border-brand-accent border-t-transparent rounded-full mx-auto" />
-          <p className="text-sm text-brand-muted mt-3">Scanning AI engines...</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="card text-center py-8">
-          <XCircle size={32} className="text-red-400 mx-auto" />
-          <p className="text-sm text-red-400 mt-2">{error}</p>
-        </div>
-      )}
-
-      {data && (
-        <>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="card text-center py-5">
-              <p className="text-3xl font-bold text-brand-accent">{data.citationCount}</p>
-              <p className="text-xs text-brand-muted mt-1">Engines citing you</p>
-            </div>
-            <div className="card text-center py-5">
-              <p className="text-3xl font-bold text-brand-text">{data.engines.length}</p>
-              <p className="text-xs text-brand-muted mt-1">Engines checked</p>
-            </div>
-            <div className="card text-center py-5">
-              <p className="text-3xl font-bold text-green-400">{data.recommendations.length}</p>
-              <p className="text-xs text-brand-muted mt-1">Recommendations</p>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="flex items-center gap-2 mb-4">
-              <Monitor size={16} className="text-brand-accent" />
-              <h3 className="text-sm font-semibold">Engine Results</h3>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {data.engines.map((engine) => (
-                <div
-                  key={engine.name}
-                  className={`flex items-start gap-3 p-3 rounded-lg border ${engineColors[engine.name] || 'bg-brand-bg text-brand-text border-brand-border'}`}
-                >
-                  {engine.cited ? (
-                    <CheckCircle size={18} className="text-green-400 shrink-0 mt-0.5" />
-                  ) : (
-                    <XCircle size={18} className="text-red-400 shrink-0 mt-0.5" />
-                  )}
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">{engine.name}</p>
-                    <p className="text-xs opacity-70 mt-0.5 truncate">{engine.snippet || (engine.cited ? 'Cited' : 'Not cited')}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-4 mt-4 pt-3 border-t border-brand-border text-xs text-brand-muted">
-              <span className="flex items-center gap-1">
-                <Clock size={12} /> {new Date(data.timestamp).toLocaleString()}
-              </span>
-              <span className="flex items-center gap-1">
-                <Globe size={12} /> {data.domain}
-              </span>
-            </div>
-          </div>
-
-          {data.recommendations.length > 0 && (
-            <div className="card">
-              <div className="flex items-center gap-2 mb-4">
-                <Lightbulb size={16} className="text-brand-accent" />
-                <h3 className="text-sm font-semibold">Recommendations</h3>
+    <Page title="AI Citation Tracking" subtitle="Check if your domain is cited across 7 AI engines">
+      <div style={{ maxWidth: 900 }}><BlockStack gap="400">
+        <Card>
+          <BlockStack gap="400">
+            <Text as="span" variant="bodyMd" fontWeight="medium">Domain</Text>
+            <div style={{ display: 'flex', gap: 'var(--p-space-300)' }}>
+              <div style={{ position: 'relative', flex: 1, maxWidth: 400 }}>
+                <Globe size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--p-color-text-secondary)' }} />
+                <input
+                  className="input"
+                  style={{ paddingLeft: 36 }}
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  placeholder="example.com"
+                  onKeyDown={(e) => e.key === 'Enter' && check()}
+                />
               </div>
-              <ul className="space-y-2">
-                {data.recommendations.map((rec, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-brand-text/80">
-                    <span className="text-brand-accent font-bold shrink-0">{i + 1}.</span>
-                    <span>{rec}</span>
-                  </li>
-                ))}
-              </ul>
+              <Button variant="primary" onClick={check} disabled={loading || !domain.trim()} loading={loading}>
+                Check
+              </Button>
             </div>
-          )}
-        </>
-      )}
-    </div>
+            <Text as="p" variant="bodyXs" tone="subdued">Powered by 7 AI engines: ChatGPT, Perplexity, Gemini, Claude, Copilot, Grok, DeepSeek</Text>
+          </BlockStack>
+        </Card>
+
+        {loading && (
+          <Card>
+            <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+              <Spinner accessibilityLabel="Checking citations" size="large" />
+              <div style={{ marginTop: 'var(--p-space-300)' }}><Text as="p" variant="bodySm" tone="subdued">Scanning AI engines...</Text></div>
+            </div>
+          </Card>
+        )}
+
+        {error && (
+          <Banner tone="critical">{error}</Banner>
+        )}
+
+        {data && (
+          <>
+            <div className="grid grid-cols-3 gap-4">
+              <Card>
+                <div style={{ textAlign: 'center', padding: 'var(--p-space-200)' }}>
+                  <Text as="p" variant="heading2xl" fontWeight="bold" tone="critical">{
+                    data.citationCount === 0 ? (
+                      <span style={{ color: 'var(--p-color-text-critical)' }}>{data.citationCount}</span>
+                    ) : (
+                      <span style={{ color: 'var(--p-color-bg-fill-brand)' }}>{data.citationCount}</span>
+                    )
+                  }</Text>
+                  <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">Engines citing you</Text></div>
+                </div>
+              </Card>
+              <Card>
+                <div style={{ textAlign: 'center', padding: 'var(--p-space-200)' }}>
+                  <Text as="p" variant="heading2xl" fontWeight="bold">{data.engines.length}</Text>
+                  <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">Engines checked</Text></div>
+                </div>
+              </Card>
+              <Card>
+                <div style={{ textAlign: 'center', padding: 'var(--p-space-200)' }}>
+                  <Text as="p" variant="heading2xl" fontWeight="bold" tone="success">{data.recommendations.length}</Text>
+                  <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">Recommendations</Text></div>
+                </div>
+              </Card>
+            </div>
+
+            <Card>
+              <BlockStack gap="400">
+                <InlineStack gap="200" blockAlign="center">
+                  <Monitor size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+                  <Text as="h3" variant="headingSm">Engine Results</Text>
+                </InlineStack>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {data.engines.map((engine) => (
+                    <div
+                      key={engine.name}
+                      style={{
+                        display: 'flex', gap: 'var(--p-space-300)', padding: 'var(--p-space-300)',
+                        borderRadius: 'var(--p-space-200)', border: '1px solid',
+                        borderColor: engine.cited ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)',
+                        background: engine.cited ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)',
+                      }}
+                    >
+                      {engine.cited ? (
+                        <CheckCircle size={18} style={{ color: 'var(--p-color-icon-success)', flexShrink: 0, marginTop: 2 }} />
+                      ) : (
+                        <XCircle size={18} style={{ color: 'var(--p-color-icon-critical)', flexShrink: 0, marginTop: 2 }} />
+                      )}
+                      <div style={{ minWidth: 0 }}>
+                        <Text as="p" variant="bodyMd" fontWeight="medium">{engine.name}</Text>
+                        <Text as="p" variant="bodySm" tone="subdued" truncate>{engine.snippet || (engine.cited ? 'Cited' : 'Not cited')}</Text>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 'var(--p-space-400)', paddingTop: 'var(--p-space-300)', borderTop: '1px solid var(--p-color-border)', fontSize: 'var(--p-font-size-200)' }}>
+                  <InlineStack gap="100" blockAlign="center">
+                    <Clock size={12} />
+                    <Text as="span" variant="bodyXs" tone="subdued">{new Date(data.timestamp).toLocaleString()}</Text>
+                  </InlineStack>
+                  <InlineStack gap="100" blockAlign="center">
+                    <Globe size={12} />
+                    <Text as="span" variant="bodyXs" tone="subdued">{data.domain}</Text>
+                  </InlineStack>
+                </div>
+              </BlockStack>
+            </Card>
+
+            {data.recommendations.length > 0 && (
+              <Card>
+                <BlockStack gap="300">
+                  <InlineStack gap="200" blockAlign="center">
+                    <Lightbulb size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+                    <Text as="h3" variant="headingSm">Recommendations</Text>
+                  </InlineStack>
+                  <ul style={{ margin: 0, paddingLeft: 'var(--p-space-400)' }}>
+                    {data.recommendations.map((rec, i) => (
+                      <li key={i} style={{ marginBottom: 'var(--p-space-200)' }}>
+                        <Text as="span" variant="bodyMd">{rec}</Text>
+                      </li>
+                    ))}
+                  </ul>
+                </BlockStack>
+              </Card>
+            )}
+          </>
+        )}
+      </BlockStack></div>
+    </Page>
   );
 }

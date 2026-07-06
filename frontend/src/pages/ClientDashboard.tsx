@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { FileText, DollarSign, Target, ArrowLeft, Store } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Page, Card, Text, Spinner, Banner, BlockStack, InlineStack } from '@shopify/polaris';
+import { ArrowLeft, FileText, DollarSign, Target, Store } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
 import { apiFetch } from '../api/client';
 
@@ -19,34 +20,24 @@ export default function ClientDashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="h-6 w-24 bg-brand-border rounded animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="card animate-pulse">
-              <div className="w-10 h-10 rounded-xl bg-brand-border" />
-              <div className="mt-4 space-y-2">
-                <div className="h-8 w-24 bg-brand-border rounded" />
-                <div className="h-4 w-32 bg-brand-border rounded" />
-              </div>
-            </div>
-          ))}
+      <Page title="Client Dashboard" backAction={{ content: 'Clients', url: '/admin/clients' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
+          <Spinner accessibilityLabel="Loading client data" size="large" />
         </div>
-      </div>
+      </Page>
     );
   }
 
   if (!data) {
     return (
-      <div className="space-y-6">
-        <Link to="/clients" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
-          ← Back to clients
-        </Link>
-        <div className="card text-center py-16">
-          <Store size={40} className="mx-auto text-brand-muted/40" />
-          <p className="text-brand-muted mt-4">Client not found</p>
-        </div>
-      </div>
+      <Page title="Client not found" backAction={{ content: 'Clients', url: '/admin/clients' }}>
+        <Card>
+          <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+            <Store size={40} style={{ margin: '0 auto', opacity: 0.4 }} />
+            <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="p" variant="bodyMd" tone="subdued">Client not found</Text></div>
+          </div>
+        </Card>
+      </Page>
     );
   }
 
@@ -63,65 +54,64 @@ export default function ClientDashboard() {
   const costTotal = parseFloat(String(costs.total_cost_mtd || costs.total || costs.mtd || '0'));
   const costOpenai = parseFloat(String(costs.openai || costs.openai_cost || '0'));
   const costSerp = parseFloat(String(costs.serp || costs.serpapi || '0'));
-
   const keywordStats = (data.keywordStats || data.keywords || {}) as Record<string, number>;
 
   return (
-    <div className="space-y-6">
-      <Link to="/admin/clients" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
-        ← Back to clients
-      </Link>
+    <Page title="Client Dashboard" backAction={{ content: 'Clients', url: '/admin/clients' }}>
+      <BlockStack gap="400">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <MetricCard icon={<FileText size={20} />} label="Total Articles" value={pipeline.total} color="#818CF8" />
+          <MetricCard icon={<FileText size={20} />} label="Published" value={pipeline.published} color="#34D399" />
+          <MetricCard icon={<Target size={20} />} label="Keywords" value={keywordStats.total || 0} color="#F472B6" />
+          <MetricCard icon={<DollarSign size={20} />} label="MTD Costs" value={`$${costTotal.toFixed(2)}`} color="#FBBF24" />
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <MetricCard icon={<FileText size={20} />} label="Total Articles" value={pipeline.total} color="#818CF8" />
-        <MetricCard icon={<FileText size={20} />} label="Published" value={pipeline.published} color="#34D399" />
-        <MetricCard icon={<Target size={20} />} label="Keywords" value={keywordStats.total || 0} color="#F472B6" />
-        <MetricCard icon={<DollarSign size={20} />} label="MTD Costs" value={`$${costTotal.toFixed(2)}`} color="#FBBF24" />
-      </div>
+        <Card>
+          <BlockStack gap="400">
+            <Text as="h3" variant="headingSm">Article Pipeline</Text>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--p-space-300)', height: 128 }}>
+              {[
+                { label: 'Draft', value: pipeline.draft, color: '#6B7280' },
+                { label: 'Generated', value: pipeline.generated, color: '#CA8A04' },
+                { label: 'Approved', value: pipeline.approved, color: '#3B82F6' },
+                { label: 'Published', value: pipeline.published, color: '#22C55E' },
+              ].map((stage) => {
+                const max = Math.max(pipeline.draft, pipeline.generated, pipeline.approved, pipeline.published, 1);
+                const height = (stage.value / max) * 100;
+                return (
+                  <div key={stage.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--p-space-100)' }}>
+                    <Text as="span" variant="headingLg" fontWeight="bold">{stage.value}</Text>
+                    <div style={{ width: '100%', borderRadius: 'var(--p-space-100)', background: stage.color, height: `${Math.max(height, 4)}%`, minHeight: 4, transition: 'height 0.3s' }} />
+                    <Text as="span" variant="bodyXs" tone="subdued">{stage.label}</Text>
+                  </div>
+                );
+              })}
+            </div>
+          </BlockStack>
+        </Card>
 
-      <div className="card">
-        <h3 className="text-sm font-semibold mb-4">Article Pipeline</h3>
-        <div className="flex items-end gap-3 h-32">
-          {[
-            { label: 'Draft', value: pipeline.draft, color: 'bg-gray-600' },
-            { label: 'Generated', value: pipeline.generated, color: 'bg-yellow-600' },
-            { label: 'Approved', value: pipeline.approved, color: 'bg-blue-600' },
-            { label: 'Published', value: pipeline.published, color: 'bg-green-500' },
-          ].map((stage) => {
-            const max = Math.max(pipeline.draft, pipeline.generated, pipeline.approved, pipeline.published, 1);
-            const height = (stage.value / max) * 100;
-            return (
-              <div key={stage.label} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-lg font-bold">{stage.value}</span>
-                <div className="w-full rounded-t-md transition-all duration-300" style={{ height: `${Math.max(height, 4)}%`, backgroundColor: stage.color.replace('bg-', '').replace('-', '') }} />
-                <span className="text-xs text-brand-muted">{stage.label}</span>
+        {(costOpenai > 0 || costSerp > 0) && (
+          <Card>
+            <BlockStack gap="400">
+              <Text as="h3" variant="headingSm">Cost Breakdown</Text>
+              <InlineStack align="space-between" blockAlign="center">
+                <Text as="span" variant="bodyMd" tone="subdued">OpenAI</Text>
+                <Text as="span" variant="bodyMd" fontWeight="medium">${costOpenai.toFixed(2)}</Text>
+              </InlineStack>
+              <div style={{ height: 8, borderRadius: 4, background: 'var(--p-color-bg)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', borderRadius: 4, background: 'var(--p-color-bg-fill-brand)', transition: 'width 0.3s', width: `${costTotal > 0 ? (costOpenai / costTotal) * 100 : 0}%` }} />
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {(costOpenai > 0 || costSerp > 0) && (
-        <div className="card">
-          <h3 className="text-sm font-semibold mb-4">Cost Breakdown</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-brand-muted">OpenAI</span>
-              <span>${costOpenai.toFixed(2)}</span>
-            </div>
-            <div className="w-full h-2 bg-brand-border rounded-full overflow-hidden">
-              <div className="h-full bg-brand-accent rounded-full transition-all duration-300" style={{ width: `${costTotal > 0 ? (costOpenai / costTotal) * 100 : 0}%` }} />
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-brand-muted">SerpAPI</span>
-              <span>${costSerp.toFixed(2)}</span>
-            </div>
-            <div className="w-full h-2 bg-brand-border rounded-full overflow-hidden">
-              <div className="h-full bg-blue-500 rounded-full transition-all duration-300" style={{ width: `${costTotal > 0 ? (costSerp / costTotal) * 100 : 0}%` }} />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+              <InlineStack align="space-between" blockAlign="center">
+                <Text as="span" variant="bodyMd" tone="subdued">SerpAPI</Text>
+                <Text as="span" variant="bodyMd" fontWeight="medium">${costSerp.toFixed(2)}</Text>
+              </InlineStack>
+              <div style={{ height: 8, borderRadius: 4, background: 'var(--p-color-bg)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', borderRadius: 4, background: '#3B82F6', transition: 'width 0.3s', width: `${costTotal > 0 ? (costSerp / costTotal) * 100 : 0}%` }} />
+              </div>
+            </BlockStack>
+          </Card>
+        )}
+      </BlockStack>
+    </Page>
   );
 }

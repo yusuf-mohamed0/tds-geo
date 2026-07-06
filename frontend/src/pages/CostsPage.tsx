@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Page, Card, Text, Spinner, Banner, BlockStack, InlineStack } from '@shopify/polaris';
 import { DollarSign, TrendingUp } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
 import { apiFetch } from '../api/client';
 
 interface CostReport {
@@ -22,53 +22,45 @@ export default function CostsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <PageHeader title="Cost Tracking" description="Monitor your AI service spending" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="card animate-pulse">
-              <div className="h-8 w-20 bg-brand-border rounded" />
-              <div className="h-4 w-32 bg-brand-border rounded mt-2" />
-            </div>
-          ))}
+      <Page title="Cost Tracking" subtitle="Monitor your AI service spending">
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
+          <Spinner accessibilityLabel="Loading cost data" size="large" />
         </div>
-      </div>
+      </Page>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Cost Tracking" description="Monitor your AI service spending" />
-
-      {report ? (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="card relative overflow-hidden">
-              <svg className="absolute top-0 right-0 w-24 h-20 opacity-[0.04]" viewBox="0 0 200 120" fill="none">
-                <path d="M0 80C40 40 60 100 100 60C140 20 160 80 200 40V120H0V80Z" fill="currentColor" />
-              </svg>
-              <DollarSign size={20} className="text-green-400" />
-              <p className="text-3xl font-bold mt-3">${report.total.toFixed(2)}</p>
-              <p className="text-sm text-brand-muted mt-0.5">Total (30 days)</p>
+    <Page title="Cost Tracking" subtitle="Monitor your AI service spending">
+      <BlockStack gap="400">
+        {report ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <Card>
+                <DollarSign size={20} style={{ color: 'var(--p-color-icon-success)' }} />
+                <div style={{ marginTop: 'var(--p-space-300)' }}><Text as="p" variant="heading2xl" fontWeight="bold">${report.total.toFixed(2)}</Text></div>
+                <div style={{ marginTop: 'var(--p-space-050)' }}><Text as="p" variant="bodySm" tone="subdued">Total (30 days)</Text></div>
+              </Card>
+              {report.byProvider?.map((p) => (
+                <Card key={p.provider}>
+                  <TrendingUp size={20} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+                  <div style={{ marginTop: 'var(--p-space-300)' }}><Text as="p" variant="heading2xl" fontWeight="bold">${p.cost.toFixed(2)}</Text></div>
+                  <div style={{ marginTop: 'var(--p-space-050)' }} className="capitalize"><Text as="p" variant="bodySm" tone="subdued">{p.provider}</Text></div>
+                </Card>
+              ))}
             </div>
-            {report.byProvider?.map((p) => (
-              <div key={p.provider} className="card relative overflow-hidden">
-                <svg className="absolute top-0 right-0 w-24 h-20 opacity-[0.04]" viewBox="0 0 200 120" fill="none">
-                  <path d="M0 80C40 40 60 100 100 60C140 20 160 80 200 40V120H0V80Z" fill="currentColor" />
-                </svg>
-                <TrendingUp size={20} className="text-brand-accent" />
-                <p className="text-3xl font-bold mt-3">${p.cost.toFixed(2)}</p>
-                <p className="text-sm text-brand-muted mt-0.5 capitalize">{p.provider}</p>
-              </div>
-            ))}
-          </div>
-        </>
-      ) : (
-        <div className="card text-center py-16">
-          <DollarSign size={40} className="mx-auto text-brand-muted/40" />
-          <p className="text-brand-muted mt-4">Cost report requires a client ID. Navigate to a client dashboard for details.</p>
-        </div>
-      )}
-    </div>
+          </>
+        ) : (
+          <Card>
+            <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+              <DollarSign size={40} style={{ margin: '0 auto', opacity: 0.4 }} />
+              <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="p" variant="bodyMd" tone="subdued">
+                Cost report requires a client ID. Navigate to a client dashboard for details.
+              </Text></div>
+            </div>
+          </Card>
+        )}
+      </BlockStack>
+    </Page>
   );
 }

@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Calendar, Hash, BarChart3 } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
-import StatusBadge from '../components/StatusBadge';
+import { useParams } from 'react-router-dom';
+import { Page, Card, Text, Spinner, Banner, BlockStack, InlineStack, InlineGrid, Badge } from '@shopify/polaris';
 import { apiFetch } from '../api/client';
 
 interface ArticleDetail {
@@ -37,103 +35,116 @@ export default function ArticleDetailPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="h-6 w-24 bg-brand-border rounded animate-pulse" />
-        <div className="card animate-pulse space-y-3">
-          <div className="h-8 w-3/4 bg-brand-border rounded" />
-          <div className="h-4 w-1/2 bg-brand-border rounded" />
-          <div className="h-32 bg-brand-border rounded" />
+      <Page title="Loading..." backAction={{ content: 'Articles', url: '/admin/articles' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
+          <Spinner accessibilityLabel="Loading article" size="large" />
         </div>
-      </div>
+      </Page>
     );
   }
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <Link to="/admin/articles" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
-          ← Back to articles
-        </Link>
-        <div className="card text-center py-16">
-          <FileText size={40} className="mx-auto text-red-400/40" />
-          <p className="text-red-400 mt-4 font-medium">{error}</p>
-        </div>
-      </div>
+      <Page title="Error" backAction={{ content: 'Articles', url: '/admin/articles' }}>
+        <Banner tone="critical">{error}</Banner>
+      </Page>
     );
   }
 
   if (!article) {
     return (
-      <div className="space-y-6">
-        <Link to="/admin/articles" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
-          ← Back to articles
-        </Link>
-        <div className="card text-center py-16">
-          <FileText size={40} className="mx-auto text-brand-muted/40" />
-          <p className="text-brand-muted mt-4">Article not found</p>
-        </div>
-      </div>
+      <Page title="Not found" backAction={{ content: 'Articles', url: '/admin/articles' }}>
+        <Card>
+          <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+            <Text as="p" variant="bodyMd" tone="subdued">Article not found</Text>
+          </div>
+        </Card>
+      </Page>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <Link to="/admin/articles" className="btn-ghost flex items-center gap-1.5 text-sm w-fit">
-        ← Back to articles
-      </Link>
+    <Page
+      title={article.title}
+      backAction={{ content: 'Articles', url: '/admin/articles' }}
+      secondaryActions={[
+        { content: 'View SEO Analysis' },
+      ]}
+    >
+      <InlineGrid columns={{ xs: 1, md: '2fr 1fr' }} gap="400">
+        <BlockStack gap="400">
+          <Card>
+            <BlockStack gap="300">
+              <Text as="h3" variant="headingSm" tone="subdued">Content</Text>
+              <div
+                className="prose prose-invert prose-sm max-w-none text-brand-text/80 leading-relaxed"
+                style={{ color: 'var(--p-color-text)', fontSize: 'var(--p-font-size-325)', lineHeight: 1.7 }}
+                dangerouslySetInnerHTML={{ __html: article.content_html || '<p>No content</p>' }}
+              />
+            </BlockStack>
+          </Card>
 
-      <div className="card">
-        <div className="flex items-start gap-4">
-          <div className="p-2.5 rounded-xl bg-brand-accent/10 text-brand-accent shrink-0">
-            <FileText size={20} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-bold">{article.title}</h2>
-            <div className="flex items-center gap-3 mt-2 flex-wrap">
-              <StatusBadge status={article.status} />
-              {article.seo_score && (
-                <span className="text-xs text-brand-muted flex items-center gap-1">
-                  <BarChart3 size={12} /> SEO: {article.seo_score}
-                </span>
-              )}
-              {article.word_count && (
-                <span className="text-xs text-brand-muted flex items-center gap-1">
-                  <Hash size={12} /> {article.word_count} words
-                </span>
+          {article.meta_title && (
+            <Card>
+              <BlockStack gap="200">
+                <Text as="h3" variant="headingSm" tone="subdued">SEO Preview</Text>
+                <Text as="p" variant="bodySm">https://example.com/{article.id}</Text>
+                <Text as="p" variant="bodyMd" fontWeight="semibold">{article.meta_title}</Text>
+                <Text as="p" variant="bodySm" tone="subdued">{article.meta_description}</Text>
+                {article.tags?.length > 0 && (
+                  <div style={{ display: 'flex', gap: 'var(--p-space-100)', flexWrap: 'wrap' }}>
+                    {article.tags.map((tag) => (
+                      <Badge key={tag}>{tag}</Badge>
+                    ))}
+                  </div>
+                )}
+              </BlockStack>
+            </Card>
+          )}
+        </BlockStack>
+
+        <BlockStack gap={{ xs: '400', md: '200' }}>
+          <Card>
+            <BlockStack gap="300">
+              <Text as="h3" variant="headingSm" tone="subdued">Details</Text>
+              <InlineStack gap="200" align="start" blockAlign="center">
+                <Badge tone={
+                  article.status === 'published' ? 'success' :
+                  article.status === 'approved' ? 'info' :
+                  article.status === 'generated' ? 'warning' :
+                  article.status === 'rejected' ? 'critical' : 'attention'
+                }>{article.status}</Badge>
+              </InlineStack>
+              <div>
+                <Text as="p" variant="bodySm" tone="subdued">SEO Score</Text>
+                <Text as="p" variant="bodyMd" fontWeight="medium">{article.seo_score || '-'}</Text>
+              </div>
+              <div>
+                <Text as="p" variant="bodySm" tone="subdued">Word Count</Text>
+                <Text as="p" variant="bodyMd" fontWeight="medium">{article.word_count || '-'}</Text>
+              </div>
+              {article.keyword && (
+                <div>
+                  <Text as="p" variant="bodySm" tone="subdued">Keyword</Text>
+                  <Badge>{article.keyword}</Badge>
+                </div>
               )}
               {article.created_at && (
-                <span className="text-xs text-brand-muted flex items-center gap-1">
-                  <Calendar size={12} /> {new Date(article.created_at).toLocaleDateString()}
-                </span>
+                <div>
+                  <Text as="p" variant="bodySm" tone="subdued">Created</Text>
+                  <Text as="p" variant="bodyMd">{new Date(article.created_at).toLocaleDateString()}</Text>
+                </div>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {article.meta_title && (
-        <div className="card">
-          <h3 className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-2">SEO Preview</h3>
-          <p className="text-sm text-blue-400 truncate">https://example.com/{article.id}</p>
-          <p className="text-sm font-semibold text-brand-text mt-1">{article.meta_title}</p>
-          <p className="text-sm text-brand-muted mt-0.5">{article.meta_description}</p>
-          {article.tags?.length > 0 && (
-            <div className="flex gap-1.5 mt-2 flex-wrap">
-              {article.tags.map((tag) => (
-                <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full bg-brand-border text-brand-muted">{tag}</span>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="card">
-        <h3 className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-3">Content</h3>
-        <div
-          className="prose prose-invert prose-sm max-w-none text-brand-text/80 leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: article.content_html || '<p>No content</p>' }}
-        />
-      </div>
-    </div>
+              {article.updated_at && (
+                <div>
+                  <Text as="p" variant="bodySm" tone="subdued">Updated</Text>
+                  <Text as="p" variant="bodyMd">{new Date(article.updated_at).toLocaleDateString()}</Text>
+                </div>
+              )}
+            </BlockStack>
+          </Card>
+        </BlockStack>
+      </InlineGrid>
+    </Page>
   );
 }
