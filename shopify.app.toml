@@ -10,7 +10,7 @@ scopes = "write_products,read_products,write_content,read_content,write_script_t
 api_version = "2025-07"
 
 [[webhooks.subscriptions]]
-compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+compliance_topics = ["customers/data_request", "customers/redact", "shop/redact", "app/uninstalled"]
 uri = "https://16.192.29.174.nip.io/api/webhooks/compliance"
 
 [build]

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import Logo from '../components/Logo';
+import { useAppBridge } from '@shopify/app-bridge-react';
 
 export default function ShopifyEmbeddedPage() {
+  let shopify: ReturnType<typeof useAppBridge> | null = null;
+  try { shopify = useAppBridge(); } catch {} // may not be in Provider
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -58,7 +60,16 @@ export default function ShopifyEmbeddedPage() {
         </div>
 
         <p className="text-xs text-gray-400 text-center mt-8">
-          TDS Geo v2.0.1 — <a href="https://traffic.16.192.29.174.nip.io/admin" className="text-gray-600 underline">Admin Dashboard</a>
+          TDS Geo v2.0.1 — <a
+            href="/admin"
+            onClick={(e) => {
+              if (shopify) {
+                e.preventDefault();
+                shopify.redirect('/admin');
+              }
+            }}
+            className="text-gray-600 underline"
+          >Admin Dashboard</a>
         </p>
       </div>
     </div>
