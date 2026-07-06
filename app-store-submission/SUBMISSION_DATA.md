@@ -234,16 +234,16 @@ https://youtu.be/GvqorasmfGU
 ```
 1. Visit https://traffic-test.myshopify.com/admin and log in with the test account
 2. In the left sidebar, click "Apps" → "TDS Geo" to open the embedded app
-3. Dashboard tab — verify 4 stat cards load (Articles Generated, GEO Score, Published, Status)
-4. Click "Articles" tab — verify the list of 23 articles appears (7 published, 2 approved, 14 drafts)
-5. Click any article to view its full content and GEO score
-6. Click "Settings" tab — verify store connection status and preferences load
-7. Back on Dashboard — click "Generate Article" button to trigger AI content generation:
-   - Enter a topic e.g. "Spring HVAC maintenance tips"
-   - Select blog (default "News")
-   - Click "Generate"
-   - Wait ~30 seconds for AI to generate, then choose "Save as Draft" or "Publish"
-8. After publishing, visit https://traffic-test.myshopify.com/blogs/news to verify the article appears on the live storefront
+3. Dashboard tab — verify 4 metric cards load (Total Clients, Articles, Avg Keyword Relevance, MTD Costs)
+4. Click "Articles" tab — verify the list of generated articles appears with status badges
+5. Click any article to view its full content, status, and SEO metadata
+6. Click "GEO Analysis" tab — test both "Paste Content" and "Enter URL" modes:
+   - Paste sample content and click Analyze to see the score ring, engine cards, and LLM audit
+   - Enter a known URL and verify per-engine scores and recommendations load
+7. Click "Citations" tab — verify stats cards, color-coded engine badges, and numbered recommendations
+8. Click "Costs" tab — verify cost breakdown per model and monthly totals
+9. Click "Quality" tab — verify quality metrics and scores
+10. Click "Clients" tab — verify client list and click any client to view their dashboard
 ```
 
 ---
