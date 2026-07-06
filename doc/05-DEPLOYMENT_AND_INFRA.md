@@ -84,7 +84,7 @@ This pushes the app configuration (webhooks, scopes, URLs) to Shopify's platform
 | Variable | Value |
 |---|---|
 | `SHOPIFY_API_KEY` | `a178c8740049e04eec663378b6e30ad8` |
-| `SHOPIFY_API_SECRET` | `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` |
+| `SHOPIFY_API_SECRET` | `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` |
 | `SHOPIFY_APP_URL` | `https://16.192.29.174.nip.io` |
 | `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/ai_seo_automation` |
 | `WORDPRESS_API_URL` | `https://trafficdigitalsolutions.com` |
