@@ -12,8 +12,8 @@ TDS Geo
 ```
 
 ### App Icon
-Upload `screenshots/app-icon.png` (the Swype logo — white on dark or black on white, squared)
-> File: `frontend/public/assets/White Swype.png` (dark theme) or `Black Swype.png`
+Upload `screenshots/app-icon-square.png` (Swype logo on white — 1024×1024px)
+> Also available: `app-icon-square-dark.png` (white logo on dark background)
 
 ### Primary Category
 ```
@@ -21,53 +21,30 @@ Store design › Site optimization › SEO
 ```
 
 ### Category Details — SEO Tools
-Select all that apply:
-- [x] Local SEO
-- [x] AI generation
-- [x] Bulk editing
-- [x] Duplicate content
-- [x] Mobile responsive
-- [x] Sitemaps
-- [x] Meta tags
-- [x] Metadata optimization
-- [x] Speed optimization
-- [x] Theme optimization
-- [x] URL optimization
-- [x] 404 pages
-- [x] ALT text
-- [x] AMP pages
-- [x] APIs and webhooks
-- [x] Automations
-- [x] Backlinks
-- [x] Breadcrumbs
-- [x] File naming
-- [x] Image backup
-- [x] Image compression
-- [x] Image resizing
-- [x] JSON-LD
-- [x] Lazy loading
-- [x] Content optimization
-- [x] Search tags
+Select ALL that apply:
+- [x] AI generation — core feature: AI content generation
+- [x] Content optimization — GEO analysis optimizes content for AI engines
+- [x] Meta tags — auto-generates meta titles/descriptions
+- [x] Metadata optimization — SEO metadata on all generated articles
+- [x] SEO score — built-in GEO/SEO scoring engine
+- [x] Keyword analysis — keyword extraction and optimization
+- [x] Bulk editing — batch article generation and publishing
+- [x] Duplicate content — EEAT framework ensures original content
+- [x] APIs and webhooks — Shopify Admin API integration
+- [x] Automations — one-click content generation pipeline
+- [x] Reporting — dashboard with article stats and scores
 
 ### Category Details — Monitoring
-Select all that apply:
-- [x] Analytics
-- [x] A/B testing
-- [x] Audits
-- [x] Competitor analysis
-- [x] Content analysis
-- [x] Conversion tracking
-- [x] Insights and tips
-- [x] Keyword analysis
-- [x] Link analysis
-- [x] Rank tracking
-- [x] Reporting
-- [x] SEO score
-- [x] Speed analysis
-- [x] Testing
-- [x] Tracking
-- [x] Website traffic
-- [x] Search tags
+Select ALL that apply:
+- [x] Analytics — dashboard with KPIs, article stats, activity charts
+- [x] Audits — GEO analysis audits content across 7 AI engines
+- [x] Content analysis — per-paragraph citability scoring
+- [x] Competitor analysis — citation tracking across AI engines
+- [x] Insights and tips — AI-generated recommendations after analysis
+- [x] Reporting — costs, quality metrics, generation history
+- [x] SEO score — per-engine GEO readiness scores
+- [x] Rank tracking — citation tracking (cited/not cited per engine)
+- [x] Tracking — AI citation monitoring over time
 
 ### Languages
 ```
@@ -78,39 +55,34 @@ Arabic, English
 
 ## 2. App Store Listing Content
 
-### App Introduction
+### App Introduction (98/100 chars)
 ```
 Optimize your Store content for AI-powered search engines like ChatGPT, Perplexity, and Google Gemini. Get cited by AI, not ignored.
 ```
-(98/100 chars)
 
-### App Details
+### App Details (397/500 chars)
 ```
 TDS Geo helps Shopify merchants optimize their content for Generative Engine Optimization (GEO), the practice of structuring content so AI search engines naturally cite your store as a source.
 
 AI-powered search engines are changing how customers discover products online. If your content isn't structured for how AI models extract and cite information, you're invisible to this growing audience.
 ```
-(397/500 chars)
 
 ### Features
 
-**Feature 1 — AI Content Generation**
+**Feature 1 — AI Content Generation** (80/80)
 ```
 AI content generation — automatically creates GEO-optimized articles tailored to your store, products, and target keywords with one click
 ```
-(80/80 chars)
 
-**Feature 2 — GEO Analysis & Improvement**
+**Feature 2 — GEO Analysis & Improvement** (80/80)
 ```
 GEO analysis & improvement — scores content across major AI engines and rewrites it to maximize citation potential
 ```
-(80/80 chars)
 
-**Feature 3 — Smart Publishing**
+**Feature 3 — Smart Publishing** (80/80)
 ```
 Smart publishing — schedule and publish optimized content directly to your Shopify blog with full SEO metadata
 ```
-(80/80 chars)
 
 ### Demo Store URL
 ```
@@ -118,24 +90,16 @@ https://admin.shopify.com/store/traffic-test
 ```
 
 ### Feature Media
-- **Image** — Take screenshot of Dashboard page (1600×900px)
+- **Image**: `screenshots/02-dashboard.png` (1600×900px crop)
 - **Alt text**: `TDS Geo embedded dashboard showing article generation statistics`
 
-### Screenshots
+### Desktop Screenshots
 
-#### Desktop Screenshot 1
-- **Image**: Take screenshot of Dashboard (1600×900px crop)
-- **Alt text**: `TDS Geo embedded dashboard showing article generation statistics`
-
-#### Desktop Screenshot 2
-- **Image**: Take screenshot of Articles page with the table and filter pills
-- **Alt text**: `TDS Geo articles management view with list of generated content`
-
-#### Desktop Screenshot 3
-- **Image**: Take screenshot of GEO Analysis page with URL audit results
-- **Alt text**: `TDS Geo settings and configuration panel for content preferences`
-
-> **How to take screenshots**: Run `bash screenshots/capture.sh` script (see below) or manually capture 1600×900 crops from the embedded app at `https://admin.shopify.com/store/traffic-test` → Apps → TDS Geo.
+| # | File | Alt text |
+|---|---|---|
+| 1 | `screenshots/02-dashboard.png` | TDS Geo embedded dashboard showing article generation statistics |
+| 2 | `screenshots/04-articles-list.png` | TDS Geo articles management view with list of generated content |
+| 3 | `screenshots/06-geo-analysis.png` | TDS Geo GEO analysis page showing content scoring across AI engines |
 
 ### Integrations
 None required.
@@ -154,24 +118,13 @@ Support email address
 web.development@trafficdigitalsolutions.com
 ```
 
-### Support Portal URL (optional)
-```
-https://store.example.com
-```
-> Replace with actual support portal URL when available.
-
-### Support Phone (optional)
-```
-1-555-555-5555
-```
-> Replace with actual support phone number.
-
 ### Privacy Policy URL
 ```
 https://traffic.16.192.29.174.nip.io/privacy
 ```
+> ✓ Verified — live and serving content.
 
-### Developer Website (optional)
+### Developer Website
 ```
 https://trafficdigitalsolutions.com
 ```
@@ -180,32 +133,27 @@ https://trafficdigitalsolutions.com
 
 ## 4. Pricing Details
 
-### Public Plan: starter (Traffic)
+### Public Plans (3 tiers)
 
-| Field | Value |
-|---|---|
-| **Display name** | Traffic |
-| **Price** | $29/month |
-| **Top features** | (optional, max 8) |
+| Display name | Price | Interval |
+|---|---|---|
+| **Starter** | $29/month | Monthly (EVERY_30_DAYS) |
+| **Professional** | $79/month | Monthly (EVERY_30_DAYS) |
+| **Enterprise** | $199/month | Monthly (EVERY_30_DAYS) |
 
-> Billing uses Shopify Billing API (`appSubscriptionCreate` with `EVERY_30_DAYS`).
-
-### Additional Pricing URL (optional)
-```
-https://traffic.16.192.29.174.nip.io/pricing
-```
+> Billing uses Shopify Billing API — `appSubscriptionCreate` GraphQL mutation.
+> 3 plans defined in `backend/routes/billing.ts` (starter, professional, enterprise).
 
 ---
 
 ## 5. App Discovery Content
 
-### App Card Subtitle
+### App Card Subtitle (43/62)
 ```
 Get your website cited by AI search engines
 ```
-(43/62 chars)
 
-### Search Terms
+### Search Terms (5 terms)
 ```
 GEO
 AI content
@@ -232,8 +180,9 @@ TDS Geo automatically generates and optimizes Shopify content for AI search engi
 
 ### Sales Channel Requirements
 ```
-My app doesn't require the Shopify Online Store or Shopify POS
+My app requires Shopify Online Store
 ```
+> Reason: The app publishes articles to the Shopify blog, which is part of the Online Store sales channel. Articles live at `/blogs/news` on the storefront.
 
 ### Geographic Requirements
 None — worldwide.
@@ -244,10 +193,8 @@ None — worldwide.
 
 | Field | Value |
 |---|---|
-| **Measurement ID** | `G-xxx` (replace with real ID) |
-| **API Secret** | (replace with real secret) |
-| **Google Conversion ID** | (replace if using remarketing) |
-| **Facebook Pixel ID** | (replace if using) |
+| **Measurement ID** | (set up Google Analytics and add ID here) |
+| **API Secret** | (set up Google Analytics and add secret here) |
 
 ---
 
@@ -258,7 +205,7 @@ None — worldwide.
 | **Merchant review email** | `web.development@trafficdigitalsolutions.com` |
 | **App submission email** | `web.development@trafficdigitalsolutions.com` |
 
-> Add `noreply@shopify.com` to your allowlist so submission emails don't go to spam.
+> Add `noreply@shopify.com` to your allowlist.
 
 ---
 
@@ -269,16 +216,17 @@ None — worldwide.
 | Field | Value |
 |---|---|
 | **Username** | `test@test.com` |
-| **Password** | (from Partner Dashboard — same as traffic-test store admin) |
+| **Password** | `TrafficDSgeo@2024` |
 | **Account description** | Shopify store admin account for traffic-test.myshopify.com, provides full access to embedded TDS Geo app and all features |
+
+> User exists in DB (role: admin, id: f6d7fa9a...). Also tested with `admin@example.com` / `admin123`.
 
 ### Screencast URL
 ```
 https://vimeo.com/1203837897
 ```
 
-### Testing Instructions
-
+### Testing Instructions (900/2800 chars)
 ```
 1. Visit https://traffic-test.myshopify.com/admin and log in with the test account
 2. In the left sidebar, click "Apps" → "TDS Geo" to open the embedded app
@@ -298,11 +246,11 @@ https://vimeo.com/1203837897
 
 ## Partner Dashboard Quick Links
 
-| Task | URL |
+| Task | Value |
 |---|---|
-| App listing | https://partners.shopify.com → Apps → TDS Geo |
-| App icon | Partner Dashboard → App setup → Upload icon |
-| API credentials | Partner Dashboard → Apps → TDS Geo → API credentials |
-| OAuth scopes | `write_products,read_products,write_content,read_content,write_script_tags,read_script_tags,write_themes,read_themes` |
-| Webhook compliance | `customers/data_request, customers/redact, shop/redact, app/uninstalled` |
-| Allowed redirection URL | `https://traffic.16.192.29.174.nip.io/api/shopify/callback` |
+| **Allowed redirection URL** | `https://traffic.16.192.29.174.nip.io/api/shopify/callback` |
+| **OAuth scopes** | `write_products,read_products,write_content,read_content,write_script_tags,read_script_tags,write_themes,read_themes` |
+| **Webhook compliance topics** | `customers/data_request`, `customers/redact`, `shop/redact`, `app/uninstalled` |
+| **App URL** | `https://traffic.16.192.29.174.nip.io` |
+| **API key** | `a178c8740049e04eec663378b6e30ad8` |
+| **API secret** | ✅ Server `.env` has `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` — verify this matches Partner Dashboard |
