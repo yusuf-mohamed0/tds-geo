@@ -58,6 +58,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 | **AI Crawler robots.txt** | ✅ 10+ bots | ❌ | ❌ | ❌ | ❌ | ✅ |
 | **IndexNow Pinging** | ✅ Dual (IndexNow+Bing) | ✅ Bing only | ❌ | ❌ | ❌ | ❌ |
 | **Citation Tracking** | ✅ 7 AI engines | ✅ 6 engines | ✅ 10 engines | ❌ | ✅ 3–10 engines | ✅ 4 engines |
+| **Content Quality Gate** | ✅ Spam/fluff/density/readability | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Content Freshness** | ✅ Calendar + auto-regenerate | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Entity Consistency** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Cost Tracking** | ✅ Per-article | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -68,10 +69,10 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 | **Prompt Management** | ✅ Versioned + self-improvement | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Plugin System** | ✅ Hook-based | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **WooCommerce Support** | ✅ (TDS Geo plugin) | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Backlink Automation** | ❌ | ❌ | ❌ | ✅ ABC network | ❌ | ❌ |
+| **Backlink Automation** | ❌ (planned) | ❌ | ❌ | ✅ ABC network | ❌ | ❌ |
 | **Keyword Research** | ❌ (via SerpAPI) | ✅ Built-in | ✅ Built-in | ✅ Built-in | ❌ | ❌ |
 | **GSC/GA4 Integration** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **Image Generation** | ❌ | ❌ | ✅ Photosonic | ✅ HD images | ❌ | ❌ |
+| **Image Generation** | ✅ DALL-E + Pexels | ❌ | ✅ Photosonic | ✅ HD images | ❌ | ❌ |
 | **Multi-Language** | ❌ | ❌ | ✅ | ✅ 45+ | ❌ | ❌ |
 | **SERP Analysis / Content Scoring** | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
 | **UI Dashboard** | ✅ Polaris 13 dark-theme | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -87,7 +88,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 2. **No keyword research** — We lack built-in keyword discovery. Rely on external SerpAPI but no integration.
 3. **No analytics integration** — No Google Search Console or Google Analytics connection. Can't show traffic impact.
 4. **No backlink automation** — BlogSEO's ABC backlink network is a genuine differentiator we can't match.
-5. **No image generation** — Every competitor generates featured images automatically.
+5. ~~**No image generation**~~ — ✅ **RESOLVED.** DALL-E (OpenAI) image generation + Pexels royalty-free stock with semantic matching, caching, and alt-text generation. Integrated into article pipeline.
 
 ### Important Gaps
 6. **No auto-publishing scheduler** — No calendar-based publishing cadence.
@@ -122,6 +123,8 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 12. **No per-article credit limits** — Competitors cap articles/month. We're unlimited (your own API keys).
 13. **24-stage pipeline** — Most granular, auditable content pipeline in the market.
 14. **Monthly ops automation** — Freshness + citations + entity checks run on a schedule.
+15. **Content Quality Gate** — 10-point anti-spam/anti-fluff/readability/keyword/cannibalization check. No competitor validates content quality at this depth.
+16. **Image Generation** — DALL-E + Pexels dual engine with semantic matching. More flexible than competitors' single-provider approach.
 
 ---
 
@@ -130,7 +133,8 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 ### Priority 1 — Build (High Impact, Lower Effort)
 - ~~**[P0] Basic Web UI**~~ — ✅ **RESOLVED.** Full Polaris 13 dashboard with 7 admin pages (Dashboard, Articles, GEO, Citations, Clients, Costs, Quality). Dark theme.
 - ~~**[P0] Shopify App Store listing**~~ — ✅ **RESOLVED.** Submitted (Reference #121207, limited visibility). Awaiting manual review.
-- **[P1] Image generation** — Wire DALL-E or Stable Diffusion into the pipeline. All competitors have this.
+- ~~**[P1] Image generation**~~ — ✅ **RESOLVED.** DALL-E + Pexels dual engine integrated into article pipeline.
+- **[P1] Content Quality Gate** — ✅ **RESOLVED.** 10-point anti-spam/anti-fluff/readability/density/cannibalization check. Runs on every article generation.
 - **[P1] Free trial / demo mode** — Script that provisions a demo client with sample data in 30 seconds. (Test credentials exist but no self-serve flow.)
 
 ### Priority 2 — Integrate (Medium Impact)
@@ -168,7 +172,7 @@ TDS Geo's pricing advantage is massive: $0 platform cost vs $97–$1,597/mo for 
 1. **We're uniquely positioned** — Open source, dual-CMS (Shopify+Woo), dual-AI (OpenAI+Ollama), full AEO/GEO/LLMO stack. No competitor matches this combination.
 2. ~~**The UI gap is our biggest threat**~~ — ✅ **RESOLVED.** Polaris 13 dashboard closes the gap significantly. Competitors still lead on polish, but the CLI-only barrier is gone.
 3. **We lead on technical depth** — Content freshness, entity checks, cost tracking, 24-stage pipeline, plugin system, monthly ops automation. Features no competitor has.
-4. **We lag on content-surface features** — Keyword research, image gen, backlinks, multi-language, SERP scoring. These are table stakes competitors have.
+4. **We lag on content-surface features** — Keyword research, backlinks, multi-language, SERP scoring. Image gen is resolved (DALL-E + Pexels).
 5. **Pricing is our superpower** — $0 vs $97–$1,597/mo. Unbeatable for cost-conscious teams.
 6. **Distribution improving** — Shopify App Store submitted (limited visibility). No free trial or landing page yet. Competitors still invest more in distribution.
 7. **Walkthrough capability** — Playwright-based auto-screenshot + video recording script (`capture.sh`). App-store-ready media pipeline in place.
