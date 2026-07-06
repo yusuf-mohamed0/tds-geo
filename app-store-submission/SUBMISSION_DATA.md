@@ -86,7 +86,7 @@ Smart publishing — schedule and publish optimized content directly to your Sho
 
 ### Demo Store URL
 ```
-https://admin.shopify.com/store/tds-geo-review
+https://admin.shopify.com/store/traffic-test
 ```
 
 ### Feature Media
@@ -221,7 +221,7 @@ None — worldwide.
 |---|---|
 | **Username** | `test@test.com` |
 | **Password** | `TrafficDSgeo@2024` |
-| **Account description** | Shopify store admin account for tds-geo-review.myshopify.com, provides full access to embedded TDS Geo app and all features |
+| **Account description** | Shopify store admin account for traffic-test.myshopify.com, provides full access to embedded TDS Geo app and all features |
 
 > User exists in DB (role: admin, id: f6d7fa9a...). Also tested with `admin@example.com` / `admin123`.
 
@@ -232,7 +232,7 @@ https://youtu.be/GvqorasmfGU
 
 ### Testing Instructions (900/2800 chars)
 ```
-1. Visit https://admin.shopify.com/store/tds-geo-review and log in with the test account
+1. Visit https://traffic-test.myshopify.com/admin and log in with the test account
 2. In the left sidebar, click "Apps" → "TDS Geo" to open the embedded app
 3. Dashboard tab — verify 4 metric cards load (Total Clients, Articles, Avg Keyword Relevance, MTD Costs)
 4. Click "Articles" tab — verify the list of generated articles appears with status badges
