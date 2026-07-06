@@ -16,8 +16,12 @@ export default function QualityPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<{ data: Evaluation[] }>('/api/quality/low-quality')
-      .then((res) => setLowQuality(res.data || []))
+    apiFetch<unknown>('/api/quality/low-quality')
+      .then((res) => {
+        const r = res as Record<string, unknown>;
+        const items = (r.data || r.evaluations || r.results || []) as Evaluation[];
+        setLowQuality(Array.isArray(items) ? items : []);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

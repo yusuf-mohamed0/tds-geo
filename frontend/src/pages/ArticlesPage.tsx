@@ -32,7 +32,7 @@ export default function ArticlesPage() {
         title="Articles"
         description={data ? `${data.total} article${data.total !== 1 ? 's' : ''} total` : 'Manage your content'}
         action={
-          <button className="btn-primary flex items-center gap-2" onClick={() => navigate('/articles/generate')}>
+          <button className="btn-primary flex items-center gap-2 opacity-60 cursor-not-allowed" title="Coming soon">
             <Plus size={16} /> Generate
           </button>
         }

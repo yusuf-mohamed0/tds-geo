@@ -7,11 +7,10 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import MetricCard from '../components/MetricCard';
 import StatusBadge from '../components/StatusBadge';
 import { fetchDashboard, fetchHealth } from '../api/admin';
-import type { AdminDashboard, HealthStatus } from '../types';
 
 export default function AdminDashboard() {
-  const [dashboard, setDashboard] = useState<AdminDashboard | null>(null);
-  const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [dashboard, setDashboard] = useState<Record<string, unknown> | null>(null);
+  const [health, setHealth] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -45,6 +44,16 @@ export default function AdminDashboard() {
     return <div className="text-brand-muted">Failed to load dashboard.</div>;
   }
 
+  const d = dashboard as Record<string, Record<string, unknown>>;
+  const clients = (d.clients || {}) as Record<string, number>;
+  const articles = (d.articles || {}) as Record<string, number>;
+  const keywords = (d.keywords || {}) as Record<string, number | string>;
+  const publishing = (d.publishing || {}) as Record<string, number>;
+  const costs = (d.costs || {}) as Record<string, number | string>;
+  const activity = (d.activity || []) as Array<Record<string, unknown>>;
+  const recentArticles = (d.recentArticles || []) as Array<Record<string, unknown>>;
+  const checks = (health?.checks || {}) as Record<string, Record<string, string>>;
+
   return (
     <div className="space-y-6">
       <div>
@@ -53,15 +62,15 @@ export default function AdminDashboard() {
       </div>
 
       {/* System Health */}
-      {health?.checks && (
+      {Object.keys(checks).length > 0 && (
         <div className="card py-3 px-5">
           <div className="flex items-center gap-1 text-xs text-brand-muted mb-2.5">
             <div className="w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5" />
             System Status
           </div>
           <div className="flex gap-3 flex-wrap">
-            {Object.entries(health.checks).map(([key, val]) => {
-              const status = (val as { status: string })?.status || 'unknown';
+            {Object.entries(checks).map(([key, val]) => {
+              const status = val?.status || 'unknown';
               return (
                 <div key={key} className="flex items-center gap-2 py-1 px-2.5 rounded-lg bg-brand-bg/50">
                   <div className={`w-1.5 h-1.5 rounded-full ${
@@ -81,34 +90,10 @@ export default function AdminDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <MetricCard
-          icon={<Users size={20} />}
-          label="Total Clients"
-          value={dashboard.clients.total}
-          subtitle={`${dashboard.clients.active} active · ${dashboard.clients.new_30d} new`}
-          color="#818CF8"
-        />
-        <MetricCard
-          icon={<FileText size={20} />}
-          label="Articles"
-          value={dashboard.articles.total}
-          subtitle={`${dashboard.articles.published} published · ${dashboard.articles.pending_review} pending`}
-          color="#34D399"
-        />
-        <MetricCard
-          icon={<Target size={20} />}
-          label="Avg Keyword Relevance"
-          value={`${dashboard.keywords.avg_relevance}%`}
-          subtitle={`${dashboard.keywords.total} keywords tracked`}
-          color="#F472B6"
-        />
-        <MetricCard
-          icon={<DollarSign size={20} />}
-          label="MTD Costs"
-          value={`$${parseFloat(dashboard.costs.total_cost_mtd || '0').toFixed(2)}`}
-          subtitle={`${dashboard.publishing.this_week} published this week`}
-          color="#FBBF24"
-        />
+        <MetricCard icon={<Users size={20} />} label="Total Clients" value={clients.total ?? 0} subtitle={`${clients.active ?? 0} active · ${clients.new_30d ?? 0} new`} color="#818CF8" />
+        <MetricCard icon={<FileText size={20} />} label="Articles" value={articles.total ?? 0} subtitle={`${articles.published ?? 0} published · ${articles.pending_review ?? 0} pending`} color="#34D399" />
+        <MetricCard icon={<Target size={20} />} label="Avg Keyword Relevance" value={`${keywords.avg_relevance ?? '0'}%`} subtitle={`${keywords.total ?? 0} keywords tracked`} color="#F472B6" />
+        <MetricCard icon={<DollarSign size={20} />} label="MTD Costs" value={`$${parseFloat(String(costs.total_cost_mtd || '0')).toFixed(2)}`} subtitle={`${publishing.this_week ?? 0} published this week`} color="#FBBF24" />
       </div>
 
       {/* Activity Chart + Recent Articles */}
@@ -121,15 +106,13 @@ export default function AdminDashboard() {
               <span>Events</span>
             </div>
           </div>
-          {dashboard.activity.length > 0 ? (
+          {activity.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={dashboard.activity}>
+              <BarChart data={activity as Array<{ date: string; count: number }>}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2D2A2A" />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#6B7280' }} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#6B7280' }} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#1F1B1B', border: '1px solid #2D2A2A', borderRadius: 8, color: '#FCF6F2', fontSize: 12 }}
-                />
+                <Tooltip contentStyle={{ backgroundColor: '#1F1B1B', border: '1px solid #2D2A2A', borderRadius: 8, color: '#FCF6F2', fontSize: 12 }} />
                 <Bar dataKey="count" fill="#FCB900" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -141,32 +124,26 @@ export default function AdminDashboard() {
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold">Recent Articles</h3>
-            <span className="text-xs text-brand-muted">{dashboard.recentArticles.length}</span>
+            <span className="text-xs text-brand-muted">{recentArticles.length}</span>
           </div>
           <div className="space-y-1">
-            {dashboard.recentArticles.slice(0, 8).map((article) => (
-              <button
-                key={article.id}
-                onClick={() => navigate(`/articles/${article.id}`)}
-                className="w-full text-left p-3 rounded-xl hover:bg-brand-border/60 transition-all duration-150 group"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm truncate flex-1 group-hover:text-brand-accent transition-colors">{article.title}</p>
-                  <ChevronRight size={14} className="text-brand-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" />
-                </div>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <StatusBadge status={article.status} />
-                  {article.seo_score && (
-                    <span className="text-[11px] text-brand-muted/60">SEO: {article.seo_score}</span>
-                  )}
-                </div>
-              </button>
-            ))}
-            {dashboard.recentArticles.length > 0 && (
-              <button
-                onClick={() => navigate('/articles')}
-                className="w-full text-left p-2.5 mt-1 text-sm text-brand-accent/80 hover:text-brand-accent transition-colors rounded-lg hover:bg-brand-border/30"
-              >
+            {recentArticles.slice(0, 8).map((article) => {
+              const a = article as Record<string, unknown>;
+              return (
+                <button key={String(a.id)} onClick={() => navigate(`/articles/${a.id}`)} className="w-full text-left p-3 rounded-xl hover:bg-brand-border/60 transition-all duration-150 group">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm truncate flex-1 group-hover:text-brand-accent transition-colors">{String(a.title)}</p>
+                    <ChevronRight size={14} className="text-brand-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <StatusBadge status={String(a.status || 'draft')} />
+                    {a.seo_score && <span className="text-[11px] text-brand-muted/60">SEO: {a.seo_score}</span>}
+                  </div>
+                </button>
+              );
+            })}
+            {recentArticles.length > 0 && (
+              <button onClick={() => navigate('/articles')} className="w-full text-left p-2.5 mt-1 text-sm text-brand-accent/80 hover:text-brand-accent transition-colors rounded-lg hover:bg-brand-border/30">
                 View all articles →
               </button>
             )}

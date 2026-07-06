@@ -18,8 +18,8 @@ export default function ClientsPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    apiFetch<{ data: Client[] }>('/api/clients')
-      .then((res) => setClients(res.data || []))
+    apiFetch<{ clients: Client[] }>('/api/clients')
+      .then((res) => setClients(res.clients || []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
