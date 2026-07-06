@@ -40,11 +40,19 @@ export function createArticleRoutes(pool: Pool): Router {
     try {
       const user = (req as any).user;
       const { keyword, publish, blogId, tone, minWords, maxWords } = (req as any).validated;
-      const clientId = user.clientId || req.body.clientId;
+      let clientId = user.clientId || req.body.clientId;
 
       if (!clientId) {
-        res.status(400).json({ error: 'clientId is required' });
-        return;
+        if (user.role === 'admin' || user.role === 'super_admin') {
+          const defaultClient = await pool.query("SELECT id FROM clients WHERE is_active = true ORDER BY created_at DESC LIMIT 1");
+          if (defaultClient.rows.length > 0) {
+            clientId = defaultClient.rows[0].id;
+          }
+        }
+        if (!clientId) {
+          res.status(400).json({ error: 'clientId is required' });
+          return;
+        }
       }
 
       // Check budget
