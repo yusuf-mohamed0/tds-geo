@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, FileText,
-  DollarSign, CheckSquare, Search, ScrollText,
+  DollarSign, CheckSquare, Search, ScrollText, Lightbulb,
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -13,6 +13,7 @@ const navItems = [
   { to: '/admin/citations', icon: ScrollText, label: 'Citations' },
   { to: '/admin/costs', icon: DollarSign, label: 'Costs' },
   { to: '/admin/quality', icon: CheckSquare, label: 'Quality' },
+  { to: '/admin/keywords', icon: Lightbulb, label: 'Keywords' },
 ];
 
 export default function Sidebar() {

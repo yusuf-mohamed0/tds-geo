@@ -41,6 +41,7 @@ import openaiService from './services/openai';
 import ollamaService from './services/ollama';
 import seoService from './services/seo';
 import keywordService from './services/keywords';
+import keywordResearchEngine from './services/keywordResearchEngine';
 import webhookService from './services/webhooks';
 import vectorMemoryService from './services/vectorMemory';
 import vectorStore from './services/vectorStoreClient';
@@ -643,13 +644,29 @@ app.post('/api/webhooks/events/receive', async (req: Request, res: Response) => 
 app.post('/api/clients/:clientId/keywords/discover', authenticate, authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { industry, seedKeywords, count } = req.body;
-    const keywords = await keywordService.discoverKeywords(
+    const result = await keywordResearchEngine.discoverWithClustering(
+      pool,
       req.params.clientId,
       industry || 'maintenance',
       seedKeywords || ['home maintenance', 'property care'],
-      count || 20
+      count || 30
     );
-    res.json(keywords);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/api/clients/:clientId/keywords/strategy', authenticate, authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { industry, seedKeywords } = req.body;
+    const strategy = await keywordResearchEngine.suggestContentStrategy(
+      pool,
+      req.params.clientId,
+      industry || 'maintenance',
+      seedKeywords || ['home maintenance', 'property care']
+    );
+    res.json(strategy);
   } catch (err) {
     next(err);
   }
