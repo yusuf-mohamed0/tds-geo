@@ -1,13 +1,51 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+function getShopifyToken(): Promise<string | null> {
+  const s = (window as any).shopify;
+  if (s?.idToken) return s.idToken().catch(() => null);
+  const fromUrl = new URLSearchParams(window.location.search).get('id_token');
+  if (fromUrl) return Promise.resolve(fromUrl);
+  return new Promise(resolve => {
+    const check = setInterval(async () => {
+      const shop = (window as any).shopify;
+      if (shop?.idToken) {
+        clearInterval(check);
+        const t = await shop.idToken().catch(() => null);
+        if (t) resolve(t);
+      }
+    }, 200);
+    setTimeout(() => { clearInterval(check); resolve(null); }, 8000);
+  });
+}
+
 export default function ShopifyEmbeddedPage() {
   const navigate = useNavigate();
+  const [stats, setStats] = useState<{ total: number; published: number; avgSeo: number | null } | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setReady(true), 500);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    getShopifyToken().then(async token => {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/embedded/stats', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const s = data.articles || {};
+        setStats({
+          total: s.total || 0,
+          published: s.published || 0,
+          avgSeo: s.avg_seo_score != null ? Math.round(Number(s.avg_seo_score)) : null
+        });
+      } catch {}
+    });
   }, []);
 
   if (!ready) {
@@ -49,12 +87,20 @@ export default function ShopifyEmbeddedPage() {
 
         <div className="mt-6 grid grid-cols-2 gap-3">
           <div className="bg-white rounded-xl border border-gray-200 p-5 text-center shadow-sm">
-            <p className="text-2xl font-bold text-gray-900">0</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.total ?? 0}</p>
             <p className="text-xs text-gray-500 mt-1">Articles Generated</p>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-5 text-center shadow-sm">
-            <p className="text-2xl font-bold text-gray-900">—</p>
-            <p className="text-xs text-gray-500 mt-1">Status</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.avgSeo != null ? stats.avgSeo : '—'}</p>
+            <p className="text-xs text-gray-500 mt-1">GEO Score</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-5 text-center shadow-sm">
+            <p className="text-2xl font-bold text-gray-900">{stats?.published ?? 0}</p>
+            <p className="text-xs text-gray-500 mt-1">Published</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-5 text-center shadow-sm">
+            <p className="text-2xl font-bold text-gray-900">{stats != null ? (stats.total - stats.published) : '—'}</p>
+            <p className="text-xs text-gray-500 mt-1">Pending</p>
           </div>
         </div>
 

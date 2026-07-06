@@ -17,7 +17,7 @@ import QualityPage from './pages/QualityPage';
 import KeywordResearchPage from './pages/KeywordResearchPage';
 import BacklinksPage from './pages/BacklinksPage';
 import NotFoundPage from './pages/NotFoundPage';
-import EmbeddedApp from './components/EmbeddedApp';
+import ShopifyEmbeddedPage from './pages/ShopifyEmbeddedPage';
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/;
 
@@ -62,7 +62,7 @@ function RootPage() {
     );
   }
 
-  if (isShopify) return <EmbeddedApp />;
+  if (isShopify) return <ShopifyEmbeddedPage />;
   return <AdminDashboard />;
 }
 
