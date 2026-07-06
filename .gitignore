@@ -1,66 +1,57 @@
-# Dependencies
-node_modules/
 
-# Build output
-dist/
-
-# Environment files
-.env
-.env.backup
-.env.local
-.env.*.local
-
-# Understand Anything - generated knowledge graph artifacts
-.understand-anything/intermediate/
-.understand-anything/diff-overlay.json
-
-# Logs
-*.log
-logs/
-
-# Pipeline artifacts
-outputs/
-
-# Temp files
-/tmp/
-dump.rdb
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Editor files
-*.swp
-*.swo
 *~
-.vscode/
-.idea/
-
-# Build artifacts
-*.zip
-# Dead files (root-level standalone scripts)
-/billing.ts
-/complianceWebhooks.ts
-/heartbeatService.ts
-/shopifyInstall.ts
-/index.ts
-
-# Project assets
-*.png
-Fonts/
-Icons/
-*.odt
-n8n/
 assets/
-docker/
-*.sidcars.yml
-graphify-out/
-.graphifyignore
-*.bak
-*.orig
-trash/
-project-blueprint.md
-
-# Vault UI
 backend/vault-ui/node_modules/
 backend/vault-ui/package-lock.json
+*.bak
+/billing.ts
+# Build artifacts
+# Build output
+/complianceWebhooks.ts
+# Dead files (root-level standalone scripts)
+# Dependencies
+dist/
+docker/
+.DS_Store
+dump.rdb
+# Editor files
+.env
+.env.backup
+# Environment files
+.env.*.local
+.env.local
+Fonts/
+frontend/tsconfig.tsbuildinfo
+.graphifyignore
+graphify-out/
+/heartbeatService.ts
+Icons/
+.idea/
+/index.ts
+*.log
+logs/
+# Logs
+n8n/
+node_modules/
+*.odt
+*.orig
+# OS files
+outputs/
+# Pipeline artifacts
+*.png
+# Project assets
+project-blueprint.md
+/shopifyInstall.ts
+*.sidcars.yml
+*.swo
+*.swp
+# Temp files
+Thumbs.db
+/tmp/
+trash/
+.understand-anything/diff-overlay.json
+# Understand Anything - generated knowledge graph artifacts
+.understand-anything/intermediate/
+# Vault UI
+.vscode/
+*.zip
