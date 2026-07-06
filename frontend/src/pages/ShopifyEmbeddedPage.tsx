@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useAppBridge } from '@shopify/app-bridge-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ShopifyEmbeddedPage() {
-  let shopify: ReturnType<typeof useAppBridge> | null = null;
-  try { shopify = useAppBridge(); } catch {} // may not be in Provider
+  const navigate = useNavigate();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -63,10 +62,8 @@ export default function ShopifyEmbeddedPage() {
           TDS Geo v2.0.1 — <a
             href="/admin"
             onClick={(e) => {
-              if (shopify) {
-                e.preventDefault();
-                shopify.redirect('/admin');
-              }
+              e.preventDefault();
+              navigate('/admin');
             }}
             className="text-gray-600 underline"
           >Admin Dashboard</a>

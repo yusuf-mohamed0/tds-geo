@@ -1,22 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Users, FileText, Target, DollarSign, Activity, ChevronRight,
+  Users, FileText, Target, DollarSign, ChevronRight,
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import MetricCard from '../components/MetricCard';
 import StatusBadge from '../components/StatusBadge';
 import { fetchDashboard, fetchHealth } from '../api/admin';
+import type { AdminDashboard, HealthStatus } from '../types';
+
+interface HealthChecks {
+  [key: string]: { status: string; [key: string]: unknown };
+}
+
+interface HealthResponse {
+  checks: HealthChecks;
+  [key: string]: unknown;
+}
 
 export default function AdminDashboard() {
-  const [dashboard, setDashboard] = useState<Record<string, unknown> | null>(null);
-  const [health, setHealth] = useState<Record<string, unknown> | null>(null);
+  const [dashboard, setDashboard] = useState<AdminDashboard | null>(null);
+  const [health, setHealth] = useState<HealthResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     Promise.all([fetchDashboard(), fetchHealth()])
-      .then(([d, h]) => { setDashboard(d); setHealth(h); })
+      .then(([d, h]) => { setDashboard(d); setHealth(h as unknown as HealthResponse); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -44,15 +54,14 @@ export default function AdminDashboard() {
     return <div className="text-brand-muted">Failed to load dashboard.</div>;
   }
 
-  const d = dashboard as Record<string, Record<string, unknown>>;
-  const clients = (d.clients || {}) as Record<string, number>;
-  const articles = (d.articles || {}) as Record<string, number>;
-  const keywords = (d.keywords || {}) as Record<string, number | string>;
-  const publishing = (d.publishing || {}) as Record<string, number>;
-  const costs = (d.costs || {}) as Record<string, number | string>;
-  const activity = (d.activity || []) as Array<Record<string, unknown>>;
-  const recentArticles = (d.recentArticles || []) as Array<Record<string, unknown>>;
-  const checks = (health?.checks || {}) as Record<string, Record<string, string>>;
+  const clients = dashboard.clients || {};
+  const articles = dashboard.articles || {};
+  const keywords = dashboard.keywords || {};
+  const publishing = dashboard.publishing || {};
+  const costs = dashboard.costs || { total_cost_mtd: '0' };
+  const activity = dashboard.activity || [];
+  const recentArticles = dashboard.recentArticles || [];
+  const checks = health?.checks || {};
 
   return (
     <div className="space-y-6">
@@ -108,7 +117,7 @@ export default function AdminDashboard() {
           </div>
           {activity.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={activity as Array<{ date: string; count: number }>}>
+              <BarChart data={activity}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2D2A2A" />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#6B7280' }} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#6B7280' }} tickLine={false} />
@@ -128,16 +137,15 @@ export default function AdminDashboard() {
           </div>
           <div className="space-y-1">
             {recentArticles.slice(0, 8).map((article) => {
-              const a = article as Record<string, unknown>;
               return (
-                <button key={String(a.id)} onClick={() => navigate(`/admin/articles/${a.id}`)} className="w-full text-left p-3 rounded-xl hover:bg-brand-border/60 transition-all duration-150 group">
+                <button key={article.id} onClick={() => navigate(`/admin/articles/${article.id}`)} className="w-full text-left p-3 rounded-xl hover:bg-brand-border/60 transition-all duration-150 group">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm truncate flex-1 group-hover:text-brand-accent transition-colors">{String(a.title)}</p>
+                    <p className="text-sm truncate flex-1 group-hover:text-brand-accent transition-colors">{article.title}</p>
                     <ChevronRight size={14} className="text-brand-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" />
                   </div>
                   <div className="flex items-center gap-2 mt-1.5">
-                    <StatusBadge status={String(a.status || 'draft')} />
-                    {a.seo_score && <span className="text-[11px] text-brand-muted/60">SEO: {a.seo_score}</span>}
+                    <StatusBadge status={article.status || 'draft'} />
+                    {article.seo_score && <span className="text-[11px] text-brand-muted/60">SEO: {article.seo_score}</span>}
                   </div>
                 </button>
               );
