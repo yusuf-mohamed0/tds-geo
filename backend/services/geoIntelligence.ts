@@ -472,6 +472,116 @@ export class GeoIntelligenceService {
     };
   }
 
+  async llmDeepAnalysis(content: string, url?: string): Promise<{
+    summary: string;
+    engineSpecific: { engine: string; verdict: string; details: string[] }[];
+    topIssues: string[];
+    quickWins: string[];
+    strategicRecommendations: string[];
+  }> {
+    try {
+      const textSample = content.slice(0, 8000);
+      const prompt = `You are a GEO (Generative Engine Optimization) audit specialist. Analyze this content and provide a deep, specific assessment. Return ONLY valid JSON with these exact keys:
+
+{
+  "summary": "2-3 sentence overall assessment that references specific content from the text",
+  "engineSpecific": [
+    {
+      "engine": "ChatGPT",
+      "verdict": "passing/needs-work/poor",
+      "details": ["2-3 specific, content-referenced observations"]
+    }
+  ],
+  "topIssues": ["3-5 specific issues found in THIS content, referencing actual text patterns"],
+  "quickWins": ["2-3 specific, actionable fixes the author can make right now"],
+  "strategicRecommendations": ["2-3 long-term structural recommendations"]
+}
+
+IMPORTANT: Your analysis MUST reference specific content from the text. Do NOT give generic advice. Point to actual sentences, patterns, and structures you observed.
+
+${url ? `URL: ${url}` : ''}
+
+Content to analyze:
+${textSample}`;
+
+      const result = await openaiService.chat([
+        { role: 'system', content: 'You are a GEO audit specialist. Return ONLY valid JSON.' },
+        { role: 'user', content: prompt },
+      ], { temperature: 0.7, maxTokens: 2000 });
+
+      if (result) {
+        const parsed = JSON.parse(result);
+        return {
+          summary: parsed.summary || 'Content analysis completed.',
+          engineSpecific: parsed.engineSpecific || [],
+          topIssues: parsed.topIssues || [],
+          quickWins: parsed.quickWins || [],
+          strategicRecommendations: parsed.strategicRecommendations || [],
+        };
+      }
+    } catch (err) {
+      logger.warn('LLM deep analysis failed, falling back to rule-based', { error: (err as Error).message });
+    }
+    return { summary: '', engineSpecific: [], topIssues: [], quickWins: [], strategicRecommendations: [] };
+  }
+
+  async analyzeUrl(url: string): Promise<{
+    success: boolean;
+    url: string;
+    title: string;
+    contentLength: number;
+    analysis: GeoAnalysis;
+    deepAnalysis: Awaited<ReturnType<typeof this.llmDeepAnalysis>>;
+    pageTitle: string;
+    metaDescription: string;
+    headings: { level: number; text: string }[];
+    wordCount: number;
+  }> {
+    try {
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TDGGeoBot/1.0; +https://tds-geo.com)' },
+        signal: AbortSignal.timeout(15000),
+      });
+      const html = await response.text();
+
+      const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '';
+      const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)?.[1] || '';
+      const headings = [...html.matchAll(/<h([1-6])[^>]*>([^<]+)<\/h[1-6]>/gi)].map(m => ({
+        level: parseInt(m[1]),
+        text: m[2].trim(),
+      }));
+      const textContent = html
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
+        .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
+        .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&[a-z]+;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const wordCount = textContent.split(/\s+/).length;
+      const analysis = await this.analyze(textContent);
+      const deepAnalysis = await this.llmDeepAnalysis(textContent, url);
+
+      return {
+        success: true,
+        url,
+        title,
+        contentLength: textContent.length,
+        analysis,
+        deepAnalysis,
+        pageTitle: title,
+        metaDescription: metaDesc,
+        headings,
+        wordCount,
+      };
+    } catch (err) {
+      logger.error('URL analysis failed', { url, error: (err as Error).message });
+      throw err;
+    }
+  }
+
   async improveContent(content: string): Promise<string> {
     const analysis = await this.analyze(content);
     if (analysis.overallPassing && analysis.suggestions.length === 0) {

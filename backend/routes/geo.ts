@@ -22,6 +22,21 @@ export function createGeoRoutes(): Router {
     }
   });
 
+  // POST /api/geo/analyze-url — analyze a full URL for GEO readiness
+  router.post('/analyze-url', authenticate, async (req: Request, res: Response) => {
+    try {
+      const { url } = req.body;
+      if (!url || typeof url !== 'string') {
+        res.status(400).json({ success: false, error: 'url is required' });
+        return;
+      }
+      const result = await geoIntelligence.analyzeUrl(url);
+      res.json({ success: true, data: result });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: `URL analysis failed: ${err.message}` });
+    }
+  });
+
   // POST /api/geo/improve — rewrite content for better GEO
   router.post('/improve', authenticate, validate(geoImproveSchema), async (req: Request, res: Response) => {
     try {
