@@ -21,9 +21,7 @@ export default function ShopifyEmbeddedPage() {
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       {/* Top bar */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
-          <span className="text-white text-xs font-bold">T</span>
-        </div>
+        <img src="/assets/Black Swype.png" alt="Swype" className="h-7 w-auto object-contain" />
         <div>
           <h1 className="text-base font-semibold text-gray-900">TDS Geo</h1>
           <p className="text-xs text-gray-500">AI Content Engine</p>
@@ -33,11 +31,8 @@ export default function ShopifyEmbeddedPage() {
       {/* Content */}
       <div className="max-w-lg mx-auto mt-12 px-6">
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto">
-            <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="40" height="40" rx="10" fill="#FCB900" />
-              <path d="M12 28V12H16.5L22 21.5L27.5 12H32V28H27.5V18.5L22.5 27.5H21.5L16.5 18.5V28H12Z" fill="#171414" />
-            </svg>
+          <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto p-3">
+            <img src="/assets/Black Swype.png" alt="Swype" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mt-5">Connected</h2>
           <p className="text-sm text-gray-500 mt-2 leading-relaxed">
