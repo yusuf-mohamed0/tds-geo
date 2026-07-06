@@ -4,7 +4,6 @@ import {
   Page, Card, Text, Button, Spinner, Banner,
   IndexTable, Filters, Badge, BlockStack, Pagination,
 } from '@shopify/polaris';
-import { Sparkles } from 'lucide-react';
 import { apiFetch } from '../api/client';
 import type { ArticleSummary, PaginatedResponse } from '../types';
 
@@ -219,7 +218,7 @@ export default function ArticlesPage() {
               <BlockStack gap="400">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Text as="h2" variant="headingMd">Generate Article</Text>
-                  <Button variant="tertiary" icon={Sparkles as any} onClick={() => setShowGenerate(false)} accessibilityLabel="Close" />
+                  <Button variant="tertiary" onClick={() => setShowGenerate(false)} accessibilityLabel="Close" />
                 </div>
                 <Text as="p" variant="bodyMd" tone="subdued">Enter a topic to generate AI-powered content optimized for your store.</Text>
                 <input

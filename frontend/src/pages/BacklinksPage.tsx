@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Page, Card, Text, Button, Spinner, Banner, BlockStack, InlineStack, Tabs, Badge,
 } from '@shopify/polaris';
-import { Search, Mail, Link as LinkIcon, FileText, RefreshCw, Target } from 'lucide-react';
+import { Mail, Link as LinkIcon, FileText, RefreshCw, Target } from 'lucide-react';
 import { apiFetch } from '../api/client';
 
 interface Prospect {
@@ -189,7 +189,6 @@ export default function BacklinksPage() {
                   onClick={handleDiscover}
                   loading={discovering}
                   disabled={!targetDomain.trim()}
-                  icon={Search as any}
                 >Discover</Button>
               </div>
             </InlineStack>
