@@ -168,7 +168,7 @@ https://store.example.com
 
 ### Privacy Policy URL
 ```
-https://13.48.59.201.nip.io/privacy
+https://traffic.16.192.29.174.nip.io/privacy
 ```
 
 ### Developer Website (optional)
