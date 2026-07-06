@@ -47,13 +47,13 @@ export default function CostsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <Card>
               <DollarSign size={20} style={{ color: 'var(--p-color-icon-success)' }} />
-              <div style={{ marginTop: 'var(--p-space-300)' }}><Text as="p" variant="heading2xl" fontWeight="bold">${report.total.toFixed(2)}</Text></div>
+                <div style={{ marginTop: 'var(--p-space-300)' }}><Text as="p" variant="heading2xl" fontWeight="bold">${Number(report.total).toFixed(2)}</Text></div>
               <div style={{ marginTop: 'var(--p-space-050)' }}><Text as="p" variant="bodySm" tone="subdued">Total (30 days)</Text></div>
             </Card>
             {report.byProvider?.map((p) => (
               <Card key={p.provider}>
                 <TrendingUp size={20} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
-                <div style={{ marginTop: 'var(--p-space-300)' }}><Text as="p" variant="heading2xl" fontWeight="bold">${p.cost.toFixed(2)}</Text></div>
+                <div style={{ marginTop: 'var(--p-space-300)' }}><Text as="p" variant="heading2xl" fontWeight="bold">${Number(p.cost).toFixed(2)}</Text></div>
                 <div style={{ marginTop: 'var(--p-space-050)' }} className="capitalize"><Text as="p" variant="bodySm" tone="subdued">{p.provider}</Text></div>
               </Card>
             ))}

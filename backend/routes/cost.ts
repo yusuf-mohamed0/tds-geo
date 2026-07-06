@@ -63,8 +63,8 @@ export function createCostRoutes(pool: Pool): Router {
         success: true,
         data: {
           total: parseFloat(result.rows[0].total),
-          daily: dailyResult.rows,
-          byProvider: providerResult.rows,
+          daily: dailyResult.rows.map((r: any) => ({ ...r, cost: parseFloat(r.cost) })),
+          byProvider: providerResult.rows.map((r: any) => ({ ...r, cost: parseFloat(r.cost) })),
         }
       });
     } catch (err: any) {
