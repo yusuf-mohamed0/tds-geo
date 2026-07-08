@@ -51,11 +51,16 @@ class CitationTrackerService {
     try {
       const result = await checkAiCitations(domain);
       for (const citation of result.citations) {
+        const snippet = citation.cited
+          ? `Detected in ${citation.engine} search results`
+          : citation.confidence === 'unavailable'
+            ? 'Check unavailable — engine did not respond'
+            : 'Not detected in current search results';
         engineResults.push({
           name: citation.engine,
           cited: citation.cited,
           url: '',
-          snippet: result.summary,
+          snippet,
         });
       }
     } catch (err) {
@@ -124,7 +129,7 @@ class CitationTrackerService {
     }
   }
 
-  private generateRecommendations(engines: Array<{ name: string; cited: boolean }>, citationCount: number): string[] {
+  private generateRecommendations(engines: Array<{ name: string; cited: boolean; snippet?: string }>, citationCount: number): string[] {
     const recs: string[] = [];
 
     if (citationCount === 0) {

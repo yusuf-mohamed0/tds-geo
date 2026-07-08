@@ -419,6 +419,8 @@ export interface UrlAnalysisResult {
   metaDescription: string;
   headings: { level: number; text: string }[];
   wordCount: number;
+  ogImage?: string;
+  scrapeNote?: string;
 }
 
 export class GeoIntelligenceService {
@@ -540,45 +542,135 @@ ${textSample}`;
     return { summary: '', engineSpecific: [], topIssues: [], quickWins: [], strategicRecommendations: [] };
   }
 
+  private extractMetaTag(html: string, property: string): string {
+    const patterns = [
+      new RegExp(`<meta\\s+property=["']${property}["']\\s+content=["']([^"']+)["']`, 'i'),
+      new RegExp(`<meta\\s+name=["']${property}["']\\s+content=["']([^"']+)["']`, 'i'),
+      new RegExp(`<meta\\s+content=["']([^"']+)["']\\s+property=["']${property}["']`, 'i'),
+      new RegExp(`<meta\\s+content=["']([^"']+)["']\\s+name=["']${property}["']`, 'i'),
+    ];
+    for (const p of patterns) {
+      const m = html.match(p);
+      if (m) return this.decodeEntities(m[1]);
+    }
+    return '';
+  }
+
+  private decodeEntities(text: string): string {
+    return text
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&#x27;/g, "'")
+      .replace(/&#x2F;/g, '/')
+      .replace(/&#x60;/g, '`')
+      .replace(/&#x3D;/g, '=')
+      .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n)))
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&mdash;/g, '—')
+      .replace(/&ndash;/g, '–')
+      .replace(/&hellip;/g, '…')
+      .replace(/&rsquo;/g, "'")
+      .replace(/&lsquo;/g, "'")
+      .replace(/&rdquo;/g, '"')
+      .replace(/&ldquo;/g, '"');
+  }
+
+  private extractJsonLd(html: string): string {
+    const parts: string[] = [];
+    const jsonBlocks = html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+    for (const block of jsonBlocks) {
+      try {
+        const parsed = JSON.parse(block[1]);
+        const extract = (obj: Record<string, unknown>, depth = 0): void => {
+          if (depth > 3) return;
+          if (typeof obj === 'string') parts.push(obj);
+          else if (typeof obj === 'object' && obj) {
+            for (const val of Object.values(obj)) {
+              if (typeof val === 'string') parts.push(val);
+              else if (typeof val === 'object' && val) extract(val as Record<string, unknown>, depth + 1);
+            }
+          }
+        };
+        extract(parsed);
+      } catch { /* invalid JSON-LD, skip */ }
+    }
+    return parts.join(' ');
+  }
+
   async analyzeUrl(url: string): Promise<UrlAnalysisResult> {
     try {
       const response = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TDGGeoBot/1.0; +https://tds-geo.com)' },
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+        },
         signal: AbortSignal.timeout(15000),
+        redirect: 'follow',
       });
       const html = await response.text();
 
-      const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '';
-      const metaDesc = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)?.[1] || '';
-      const headings = [...html.matchAll(/<h([1-6])[^>]*>([^<]+)<\/h[1-6]>/gi)].map(m => ({
+      const title = this.extractMetaTag(html, 'og:title') || this.extractMetaTag(html, 'twitter:title') || html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '';
+      const metaDesc = this.extractMetaTag(html, 'description') || this.extractMetaTag(html, 'og:description') || '';
+      const ogImage = this.extractMetaTag(html, 'og:image');
+
+      const headings = [...html.matchAll(/<h([1-6])[^>]*>([\s\S]*?)<\/h[1-6]>/gi)].map(m => ({
         level: parseInt(m[1]),
-        text: m[2].trim(),
-      }));
-      const textContent = html
+        text: m[2].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(),
+      })).filter(h => h.text.length > 0);
+
+      const isSpa = !html.includes('<body') || html.match(/<body[^>]*>[\s\S]{0,500}<div\s+id=["']root["']/i) || html.match(/<body[^>]*>[\s\S]{0,500}<div\s+id=["']__next["']/i) || html.match(/<body[^>]*>[\s\S]{0,500}<div\s+id=["']app["']/i);
+
+      let textContent = html
         .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
         .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
         .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
         .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
         .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
+        .replace(/<svg[^>]*>[\s\S]*?<\/svg>/gi, '')
+        .replace(/<template[^>]*>[\s\S]*?<\/template>/gi, '')
+        .replace(/<!--[\s\S]*?-->/g, '');
+
+      const noscriptContent = [...textContent.matchAll(/<noscript[^>]*>([\s\S]*?)<\/noscript>/gi)].map(m => m[1]).join(' ');
+      textContent = textContent
+        .replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, '')
         .replace(/<[^>]+>/g, ' ')
         .replace(/&[a-z]+;/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-      const wordCount = textContent.split(/\s+/).length;
-      const analysis = await this.analyze(textContent);
-      const deepAnalysis = await this.llmDeepAnalysis(textContent, url);
+
+      let wordCount = textContent.split(/\s+/).length;
+
+      const jsonLdText = isSpa ? this.extractJsonLd(html) : '';
+      const altTexts = [...html.matchAll(/alt=["']([^"']+)["']/gi)].map(m => m[1]).join(' ');
+
+      let analysisText = textContent;
+      if (wordCount < 50) {
+        analysisText = [textContent, noscriptContent, jsonLdText, altTexts, metaDesc, title].filter(Boolean).join(' ');
+        wordCount = analysisText.split(/\s+/).length;
+      }
+
+      const analysis = await this.analyze(analysisText);
+      const deepAnalysis = await this.llmDeepAnalysis(analysisText, url);
 
       return {
         success: true,
         url,
         title,
-        contentLength: textContent.length,
+        contentLength: analysisText.length,
         analysis,
         deepAnalysis,
         pageTitle: title,
         metaDescription: metaDesc,
         headings,
         wordCount,
+        ogImage,
+        scrapeNote: isSpa && wordCount < 100
+          ? 'This site appears to be a JavaScript-heavy application. The scraper could only extract limited content. For full analysis, the site needs to be rendered with a JavaScript-enabled browser.'
+          : undefined,
       };
     } catch (err) {
       logger.error('URL analysis failed', { url, error: (err as Error).message });
@@ -859,53 +951,37 @@ export async function checkAiCitations(domain: string): Promise<{
   const checkedAt = new Date().toISOString();
   const results: CitationCheck[] = [];
 
-  // ChatGPT Search via public check
-  try {
-    const chatGptRes = await fetch(`https://chatgpt.com/search?q=site:${cleanDomain}`, {
-      method: 'HEAD',
-      signal: AbortSignal.timeout(5000),
-    });
-    results.push({
-      engine: 'ChatGPT',
-      cited: chatGptRes.ok,
-      confidence: 'low',
-      checkedAt,
-    });
-  } catch {
-    results.push({ engine: 'ChatGPT', cited: false, confidence: 'unavailable', checkedAt });
+  async function checkEngine(engine: string, searchUrl: string): Promise<void> {
+    try {
+      const res = await fetch(searchUrl, {
+        signal: AbortSignal.timeout(8000),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; TDGGeoBot/1.0; +https://tds-geo.com)',
+          'Accept': 'text/html,application/xhtml+xml',
+        },
+      });
+      if (!res.ok) {
+        results.push({ engine, cited: false, confidence: 'low', checkedAt });
+        return;
+      }
+      const body = await res.text();
+      const domainInResults = body.toLowerCase().includes(cleanDomain.toLowerCase());
+      results.push({
+        engine,
+        cited: domainInResults,
+        confidence: domainInResults ? 'medium' : 'low',
+        checkedAt,
+      });
+    } catch {
+      results.push({ engine, cited: false, confidence: 'unavailable', checkedAt });
+    }
   }
 
-  // Perplexity via public check
-  try {
-    const perplexityRes = await fetch(`https://www.perplexity.ai/search?q=site:${cleanDomain}`, {
-      method: 'HEAD',
-      signal: AbortSignal.timeout(5000),
-    });
-    results.push({
-      engine: 'Perplexity',
-      cited: perplexityRes.ok,
-      confidence: 'low',
-      checkedAt,
-    });
-  } catch {
-    results.push({ engine: 'Perplexity', cited: false, confidence: 'unavailable', checkedAt });
-  }
-
-  // Google AI Overviews — check via organic search presence as proxy
-  try {
-    const googleRes = await fetch(
-      `https://www.google.com/search?q=site:${cleanDomain}&sourceid=chrome&ie=UTF-8`,
-      { method: 'HEAD', signal: AbortSignal.timeout(5000) }
-    );
-    results.push({
-      engine: 'Google AI Overviews',
-      cited: googleRes.ok,
-      confidence: 'low',
-      checkedAt,
-    });
-  } catch {
-    results.push({ engine: 'Google AI Overviews', cited: false, confidence: 'unavailable', checkedAt });
-  }
+  await Promise.all([
+    checkEngine('ChatGPT', `https://chatgpt.com/search?q=site:${cleanDomain}`),
+    checkEngine('Perplexity', `https://www.perplexity.ai/search?q=site:${cleanDomain}`),
+    checkEngine('Google AI Overviews', `https://www.google.com/search?q=site:${cleanDomain}&sourceid=chrome&ie=UTF-8`),
+  ]);
 
   const overallCited = results.some(r => r.cited);
   const citedEngines = results.filter(r => r.cited).map(r => r.engine);
