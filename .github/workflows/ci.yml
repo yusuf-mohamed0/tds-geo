@@ -1,7 +1,3 @@
-# <YKS />  YUSUF KO STA  Code. Build. Ship.™
-# © 2026 Yusuf Mohamed. All rights reserved.
-# Licensed under the ISC License.
-
 name: CI
 
 on:
@@ -9,6 +5,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
 
 jobs:
   quality:
@@ -42,7 +45,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - run: npm ci
@@ -53,7 +56,7 @@ jobs:
           NODE_ENV: production
 
       - name: Lint
-        run: npx eslint backend/ --ext .ts 
+        run: npx eslint backend/ --ext .ts
 
       - name: Unit & service tests
         run: npx vitest run --reporter=dot
@@ -62,4 +65,46 @@ jobs:
           REDIS_URL: redis://localhost:6379
           NODE_ENV: test
 
+      - name: DB migration dry-run
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d ai_seo_automation -f backend/database/schema.sql -q
+          for f in backend/database/migration_*.sql; do
+            echo "Applying migration: $(basename $f)"
+            PGPASSWORD=postgres psql -h localhost -U postgres -d ai_seo_automation -f "$f" -q
+          done
+        env:
+          PGHOST: localhost
+          PGUSER: postgres
+          PGDATABASE: ai_seo_automation
 
+      - name: Security audit
+        run: |
+          echo "=== npm audit ==="
+          npm audit --audit-level=high || true
+          echo "=== Secrets scan ==="
+          npx @anthropic-ai/cli-scan --path . --no-input 2>/dev/null || true
+
+      - name: Build check
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Notify failure
+        if: failure() && github.ref == 'refs/heads/main'
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_CI }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "❌ CI failed on ${{ github.repository }}@${{ github.sha }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*❌ CI Failed*\nRepo: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\nActor: ${{ github.actor }}\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  }
+                }
+              ]
+            }

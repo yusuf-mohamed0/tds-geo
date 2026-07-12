@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDS Geo — System Health</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+  h1 { color: #38bdf8; margin-bottom: .5rem; }
+  .subtitle { color: #64748b; margin-bottom: 2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .card { background: #1e293b; border-radius: 12px; padding: 1.25rem; border: 1px solid #334155; }
+  .card h3 { font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; color: #64748b; margin-bottom: .5rem; }
+  .card .value { font-size: 1.5rem; font-weight: 700; }
+  .card .status { display: inline-block; padding: .2rem .6rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+  .status-ok { background: #065f46; color: #6ee7b7; }
+  .status-warn { background: #78350f; color: #fcd34d; }
+  .status-err { background: #7f1d1d; color: #fca5a5; }
+  .uptime { position: fixed; bottom: 1rem; right: 1rem; font-size: .75rem; color: #475569; }
+  .env-badge { position: fixed; top: 1rem; right: 1rem; padding: .25rem .75rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+  .env-production { background: #065f46; color: #6ee7b7; }
+  .env-staging { background: #78350f; color: #fcd34d; }
+  .env-development { background: #1e3a5f; color: #93c5fd; }
+  .bar { height: 8px; border-radius: 4px; background: #334155; margin-top: .5rem; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 1s; }
+  .bar-green { background: #22c55e; }
+  .bar-yellow { background: #eab308; }
+  .bar-red { background: #ef4444; }
+  .refresh { color: #38bdf8; cursor: pointer; text-decoration: underline; }
+</style>
+</head>
+<body>
+  <h1>📊 TDS Geo</h1>
+  <p class="subtitle">System Health Dashboard <span class="refresh" onclick="location.reload()">↻ refresh</span></p>
+  <div class="grid" id="metrics"></div>
+  <div class="env-badge" id="envBadge">loading...</div>
+  <div class="uptime" id="uptime"></div>
+
+<script>
+const API = window.location.origin;
+
+async function load() {
+  try {
+    const res = await fetch(API + '/health');
+    const data = await res.json();
+    render(data);
+  } catch (e) {
+    document.getElementById('metrics').innerHTML = `<div class="card"><h3>Error</h3><div class="value" style="color:#fca5a5">${e.message}</div></div>`;
+  }
+}
+
+function render(data) {
+  const metrics = [
+    { label: 'Status', value: data.status || data.data?.status || 'unknown', cls: (data.status === 'ok' || data.data?.status === 'ok') ? 'status-ok' : 'status-err' },
+    { label: 'Database', value: data.database || data.data?.database_ok ? 'Connected' : 'Disconnected', cls: (data.database || data.data?.database_ok) ? 'status-ok' : 'status-err' },
+    { label: 'Redis', value: data.redis === 'connected' ? 'Connected' : data.redis === 'disconnected' ? 'Disconnected' : 'Unknown', cls: data.redis === 'connected' ? 'status-ok' : (data.redis === 'disconnected' ? 'status-err' : 'status-warn') },
+    { label: 'API Version', value: data.version || data.data?.version || '—', cls: 'status-ok' },
+    { label: 'OpenAI', value: data.openai ? 'Configured' : 'Not configured', cls: data.openai ? 'status-ok' : 'status-warn' },
+    { label: 'Uptime', value: data.uptime ? formatUptime(data.uptime) : '—', cls: 'status-ok' },
+  ];
+
+  document.getElementById('metrics').innerHTML = metrics.map(m => `
+    <div class="card">
+      <h3>${m.label}</h3>
+      <div><span class="status ${m.cls}">${m.value}</span></div>
+    </div>
+  `).join('');
+
+  // Environment badge
+  const env = data.environment || data.data?.environment || 'development';
+  document.getElementById('envBadge').className = 'env-badge env-' + env;
+  document.getElementById('envBadge').textContent = env.toUpperCase();
+
+  // Timestamp
+  document.getElementById('uptime').textContent = 'Last check: ' + new Date().toLocaleTimeString();
+}
+
+function formatUptime(s) {
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return `${d}d ${h}h ${m}m`;
+}
+
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>

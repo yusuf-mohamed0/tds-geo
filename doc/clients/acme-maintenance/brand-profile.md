@@ -84,3 +84,6 @@ The "AI SEO Shopify Agent" workflow runs daily:
 - No actual website exists — content is published directly to Shopify blog
 - The n8n workflow handles fully automated daily content generation
 - Articles are created in statuses: published, generated, approved, draft (for testing all pipeline states)
+
+---
+*See [Client Dashboard](../../DASHBOARD.md) for overall progress*

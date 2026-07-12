@@ -176,3 +176,6 @@ Dr. Alanani also founded Dakahlia Poultry company (1981). He is a self-made entr
 - GMP (Good Manufacturing Practices)
 - MEGA manufacturing campus under construction in 10th of Ramadan City
 - Rigorous testing and regulatory compliance procedures
+
+---
+*See [Client Dashboard](../../DASHBOARD.md) for overall progress*

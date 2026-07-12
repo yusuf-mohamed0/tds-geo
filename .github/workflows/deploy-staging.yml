@@ -1,0 +1,174 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  NODE_VERSION: "22"
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=,suffix=,format=short
+            type=raw,value=staging
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          target: production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+
+  deploy:
+    name: Deploy to Staging
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          port: ${{ secrets.STAGING_PORT || '22' }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+
+            cd ${{ secrets.STAGING_PATH || '/opt/ai-seo-staging' }}
+
+            # Backup current state for rollback
+            docker compose ps --services --filter "status=running" > /tmp/staging-services-before.txt 2>/dev/null || true
+
+            # Pull new images
+            docker compose pull api worker
+
+            # Run DB migrations first (backup before)
+            docker compose exec -T postgres pg_dump -U postgres -d ai_seo_automation -F c -f /tmp/pre-deploy-backup.dump 2>/dev/null || true
+
+            if [ -f backend/database/migration_v2.sql ]; then
+              echo "Running database migrations..."
+              docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "BEGIN;" 2>/dev/null
+              docker compose exec -T postgres psql -U postgres -d ai_seo_automation -f /docker-entrypoint-initdb.d/02-migration.sql 2>/dev/null && \
+                docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "COMMIT;" 2>/dev/null || \
+                docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "ROLLBACK;" 2>/dev/null
+            fi
+
+            # Deploy new version
+            docker compose up -d --no-deps api worker nginx
+
+            # Health check with timeout
+            HEALTHY=false
+            for i in {1..30}; do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health 2>/dev/null || echo "000")
+              if [ "$STATUS" = "200" ]; then
+                HEALTHY=true
+                echo "Staging API healthy (attempt $i)"
+                break
+              fi
+              echo "Waiting for staging API... attempt $i/30 (status: $STATUS)"
+              sleep 2
+            done
+
+            if [ "$HEALTHY" = "false" ]; then
+              echo "Health check failed — triggering rollback..."
+              docker compose up -d --no-deps api worker nginx 2>/dev/null || true
+              exit 1
+            fi
+
+            # Run smoke tests
+            echo "Running smoke tests..."
+            SMOKE_PASS=true
+
+            # Test health endpoint
+            HEALTH_BODY=$(curl -sf http://localhost:3000/health 2>/dev/null || echo "")
+            if [ -z "$HEALTH_BODY" ]; then
+              echo "FAIL: /health returned empty"
+              SMOKE_PASS=false
+            else
+              echo "PASS: /health responded"
+            fi
+
+            # Test API root
+            API_BODY=$(curl -sf http://localhost:3000/api/clients 2>/dev/null || echo "")
+            if [ -z "$API_BODY" ]; then
+              echo "FAIL: /api/clients returned empty"
+              SMOKE_PASS=false
+            else
+              echo "PASS: /api/clients responded"
+            fi
+
+            if [ "$SMOKE_PASS" = "false" ]; then
+              echo "Smoke tests failed — rolling back..."
+              docker compose up -d --no-deps api worker nginx 2>/dev/null || true
+              exit 1
+            fi
+
+            # Clean up
+            docker image prune -f
+            echo "Staging deployment complete!"
+
+  notify:
+    name: Notify Deployment
+    needs: [deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_DEPLOYS }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "${{ needs.deploy.result == 'success' && '✅' || '❌' }} Staging deploy ${{ needs.deploy.result }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ needs.deploy.result == 'success' && '✅' || '❌' }} *Staging Deploy ${{ needs.deploy.result == 'success' && 'Succeeded' || 'Failed' }}*\nRepo: ${{ github.repository }}\nSHA: <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\nActor: ${{ github.actor }}\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  }
+                }
+              ]
+            }

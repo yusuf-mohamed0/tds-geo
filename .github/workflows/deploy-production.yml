@@ -1,0 +1,348 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy (branch, tag, or SHA)"
+        required: true
+        default: "main"
+      dry_run:
+        description: "Dry run — skip actual deploy"
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  NODE_VERSION: "22"
+  CANARY_PERCENT: 20
+  CANARY_WAIT_SECONDS: 120
+
+jobs:
+  validate:
+    name: Validate Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+        env:
+          NODE_ENV: production
+
+      - name: Lint
+        run: npx eslint backend/ --ext .ts
+
+      - name: Tests
+        run: npx vitest run --reporter=dot
+        env:
+          NODE_ENV: test
+
+      - name: Verify staging is healthy
+        run: |
+          STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.STAGING_DOMAIN }}/health 2>/dev/null || echo "000")
+          if [ "$STAGING_STATUS" != "200" ]; then
+            echo "Staging is NOT healthy (HTTP $STAGING_STATUS) — aborting production deploy"
+            exit 1
+          fi
+          echo "Staging is healthy (HTTP $STAGING_STATUS) — proceeding"
+
+  build:
+    name: Build & Push
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=prod-,suffix=,format=short
+            type=raw,value=production
+            type=raw,value=prev-production
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          target: production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+
+  deploy-canary:
+    name: Canary Deploy (20%)
+    needs: build
+    if: ${{ !github.event.inputs.dry_run }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy canary instance
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT || '22' }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd ${{ secrets.DEPLOY_PATH || '/opt/ai-seo' }}
+
+            # Backup DB before anything
+            docker compose exec -T postgres pg_dump -U postgres -d ai_seo_automation -F c -f /tmp/prod-pre-deploy-backup.dump
+            echo "DB backup created at /tmp/prod-pre-deploy-backup.dump"
+
+            # Tag current as prev-production for rollback
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:production ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:prev-production 2>/dev/null || true
+
+            # Pull canary image
+            docker compose pull api worker
+
+            # Run DB migrations in transaction
+            if [ -f backend/database/migration_v2.sql ]; then
+              echo "Running migrations..."
+              docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "BEGIN;"
+              docker compose exec -T postgres psql -U postgres -d ai_seo_automation -f /docker-entrypoint-initdb.d/02-migration.sql && \
+                docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "COMMIT;" || \
+                docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "ROLLBACK;"
+            fi
+
+            # Deploy canary (single instance)
+            docker compose up -d --no-deps --scale api=1 api
+            sleep 5
+
+            # Canary health check
+            CANARY_HEALTHY=false
+            for i in {1..15}; do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health 2>/dev/null || echo "000")
+              if [ "$STATUS" = "200" ]; then
+                CANARY_HEALTHY=true
+                echo "Canary healthy (attempt $i)"
+                break
+              fi
+              echo "Waiting for canary... attempt $i/15"
+              sleep 2
+            done
+
+            if [ "$CANARY_HEALTHY" = "false" ]; then
+              echo "Canary health check FAILED — initiating rollback"
+              docker compose up -d --no-deps --scale api=1 api
+              exit 1
+            fi
+
+            # Canary observation window
+            echo "Canary is healthy. Observing for ${{ env.CANARY_WAIT_SECONDS }} seconds..."
+            sleep ${{ env.CANARY_WAIT_SECONDS }}
+
+            # Final canary check
+            CANARY_STILL_HEALTHY=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health 2>/dev/null || echo "000")
+            if [ "$CANARY_STILL_HEALTHY" != "200" ]; then
+              echo "Canary degraded during observation — rolling back"
+              docker compose up -d --no-deps --scale api=1 api
+              exit 1
+            fi
+
+  deploy-full:
+    name: Full Production Deploy
+    needs: deploy-canary
+    if: ${{ !github.event.inputs.dry_run && needs.deploy-canary.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Full rollout
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT || '22' }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd ${{ secrets.DEPLOY_PATH || '/opt/ai-seo' }}
+
+            # Full rollout to all instances
+            docker compose up -d --no-deps api worker nginx
+
+            # Health check all services
+            for i in {1..30}; do
+              ALL_HEALTHY=true
+              for svc in api worker nginx; do
+                STATUS=$(docker compose ps --format "{{.Status}}" $svc 2>/dev/null | grep -c "Up" || true)
+                if [ "$STATUS" -eq 0 ]; then
+                  ALL_HEALTHY=false
+                fi
+              done
+              if [ "$ALL_HEALTHY" = "true" ]; then
+                echo "All services healthy!"
+                break
+              fi
+              sleep 2
+            done
+
+            # Verify API health
+            FINAL_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health 2>/dev/null || echo "000")
+            if [ "$FINAL_HEALTH" != "200" ]; then
+              echo "Production health check FAILED — rolling back"
+              docker compose up -d --no-deps api worker nginx
+              exit 1
+            fi
+
+            # Run smoke tests
+            echo "=== Smoke Tests ==="
+            FAILED=0
+
+            echo -n "Health endpoint: "
+            curl -sf http://localhost:3000/health > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+
+            echo -n "API clients: "
+            curl -sf http://localhost:3000/api/clients > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+
+            echo -n "API articles: "
+            curl -sf http://localhost:3000/api/articles > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+
+            echo -n "Nginx frontend: "
+            curl -sf http://localhost:80/ > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+
+            # Database connectivity check
+            echo -n "Database: "
+            docker compose exec -T postgres pg_isready -U postgres > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+
+            # Redis connectivity check
+            echo -n "Redis: "
+            docker compose exec -T redis redis-cli ping > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+
+            if [ "$FAILED" -ne 0 ]; then
+              echo "Smoke tests FAILED — rolling back"
+              docker compose up -d --no-deps api worker nginx
+              exit 1
+            fi
+
+            echo "=== All smoke tests passed ==="
+
+            # Clean up old images
+            docker image prune -f
+
+            echo "Production deployment complete! 🚀"
+
+  rollback:
+    name: Rollback
+    needs: deploy-canary
+    if: ${{ failure() && !github.event.inputs.dry_run }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rollback
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT || '22' }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd ${{ secrets.DEPLOY_PATH || '/opt/ai-seo' }}
+
+            echo "⚠️ Rolling back to previous version..."
+
+            # Restore previous image tag
+            PREV_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:prev-production"
+            echo "Restoring image: $PREV_IMAGE"
+
+            # Tag prev back to production
+            docker tag $PREV_IMAGE ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:production 2>/dev/null || true
+
+            # Redeploy previous version
+            docker compose up -d --no-deps api worker nginx
+
+            # Verify rollback healthy
+            for i in {1..20}; do
+              if curl -sf http://localhost:3000/health > /dev/null 2>&1; then
+                echo "Rollback successful — API healthy"
+                break
+              fi
+              sleep 3
+            done
+
+            echo "Rollback complete. Previous version is running."
+
+  notify:
+    name: Notify
+    needs: [deploy-full, rollback]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine status
+        id: status
+        run: |
+          if [ "${{ needs.deploy-full.result }}" = "success" ]; then
+            echo "icon=✅" >> $GITHUB_OUTPUT
+            echo "text=Production deploy succeeded" >> $GITHUB_OUTPUT
+          elif [ "${{ needs.rollback.result }}" = "success" ]; then
+            echo "icon=⚠️" >> $GITHUB_OUTPUT
+            echo "text=Production deploy FAILED — rolled back" >> $GITHUB_OUTPUT
+          elif [ "${{ needs.deploy-canary.result }}" = "failure" ]; then
+            echo "icon=❌" >> $GITHUB_OUTPUT
+            echo "text=Canary deploy failed — production unchanged" >> $GITHUB_OUTPUT
+          else
+            echo "icon=❌" >> $GITHUB_OUTPUT
+            echo "text=Production deploy failed — see logs" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_DEPLOYS }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "${{ steps.status.outputs.icon }} ${{ steps.status.outputs.text }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ steps.status.outputs.icon }} *${{ steps.status.outputs.text }}*\nRepo: ${{ github.repository }}\nRef: ${{ github.event.inputs.ref || 'main' }}\nSHA: <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\nActor: ${{ github.actor }}\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  }
+                }
+              ]
+            }

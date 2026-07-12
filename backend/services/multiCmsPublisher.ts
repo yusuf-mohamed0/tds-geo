@@ -509,6 +509,149 @@ class MultiCmsPublisherService {
   }
 
   // ══════════════════════════════════════════════════════════════
+  // WORDPRESS SYNC (Pull posts FROM WordPress INTO local articles table)
+  // ══════════════════════════════════════════════════════════════
+
+  async syncFromWordPress(clientId: string, connectionId?: string): Promise<{
+    synced: number;
+    updated: number;
+    skipped: number;
+    errors: string[];
+  }> {
+    if (!this.pool) throw new Error('MultiCmsPublisher not initialized');
+
+    const connections = connectionId
+      ? (await this.pool.query('SELECT * FROM cms_connections WHERE id = $1 AND client_id = $2', [connectionId, clientId])).rows
+      : await this.getConnections(clientId);
+
+    const wpConnections = connections.filter((c: any) => c.provider === 'wordpress' && c.is_active);
+
+    let totalSynced = 0, totalUpdated = 0, totalSkipped = 0;
+    const allErrors: string[] = [];
+
+    for (const conn of wpConnections) {
+      const apiKey = conn.config?.api_key;
+      const endpointUrl = conn.config?.site_url || conn.endpoint_url;
+      if (!apiKey || !endpointUrl) {
+        allErrors.push(`Connection ${conn.id}: missing api_key or endpoint_url`);
+        continue;
+      }
+
+      try {
+        const result = await this.syncFromSingleWordPress(clientId, conn, apiKey, endpointUrl);
+        totalSynced += result.synced;
+        totalUpdated += result.updated;
+        totalSkipped += result.skipped;
+        allErrors.push(...result.errors);
+
+        await this.pool.query('UPDATE cms_connections SET last_sync_at = NOW() WHERE id = $1', [conn.id]);
+      } catch (err: any) {
+        allErrors.push(`Connection ${conn.id}: ${err.message}`);
+      }
+    }
+
+    return { synced: totalSynced, updated: totalUpdated, skipped: totalSkipped, errors: allErrors };
+  }
+
+  private async wpFetch(
+    endpointUrl: string, apiKey: string, path: string, params: Record<string, any> = {}
+  ): Promise<any> {
+    const baseUrl = `${endpointUrl.replace(/\/+$/, '')}/wp-json/tds-geo/v1`;
+    const url = new URL(`${baseUrl}${path}`);
+    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
+
+    const response = await fetch(url.toString(), {
+      headers: { 'X-TDS-GEO-Key': apiKey, 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(30000),
+    });
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      throw new Error(`WordPress API ${response.status}: ${text.slice(0, 200)}`);
+    }
+    return response.json();
+  }
+
+  private async syncFromSingleWordPress(
+    clientId: string, connection: any, apiKey: string, endpointUrl: string
+  ): Promise<{ synced: number; updated: number; skipped: number; errors: string[] }> {
+    let page = 1;
+    let totalSynced = 0, totalUpdated = 0, totalSkipped = 0;
+    const errors: string[] = [];
+    const perPage = 100;
+    let hasMore = true;
+
+    while (hasMore) {
+      try {
+        const body = await this.wpFetch(endpointUrl, apiKey, '/posts', { limit: perPage, page });
+        const posts: any[] = body.data || body.posts || body || [];
+        const total = body.total || posts.length;
+
+        for (const post of posts) {
+          if (post.type && post.type !== 'post') {
+            totalSkipped++;
+            continue;
+          }
+
+          const wpStatus = post.status === 'publish' ? 'published' : 'draft';
+          const slug = post.slug || `wp-post-${post.id}`;
+          const metaTitle = post.meta?.title || post.meta_title || '';
+          const metaDescription = post.meta?.description || post.meta_description || '';
+          const tags: string[] = (post.tags || []).map((t: any) => typeof t === 'string' ? t : t.name || t.slug || '');
+          const publishedAt = post.publish_date || post.created_at || null;
+
+          const existing = await this.pool!.query(
+            `SELECT a.id FROM articles a
+             LEFT JOIN publishing_history ph ON ph.article_id = a.id AND ph.provider = 'wordpress'
+             WHERE (ph.external_id = $1 OR a.slug = $2) AND a.client_id = $3
+             LIMIT 1`,
+            [String(post.id), slug, clientId]
+          );
+
+          if (existing.rows.length > 0) {
+            const params: any[] = [post.title, post.content, metaTitle, metaDescription, tags, wpStatus];
+            let query: string;
+            if (publishedAt) {
+              params.push(publishedAt);
+              params.push(existing.rows[0].id);
+              query = `UPDATE articles SET title = $1, content_html = $2, meta_title = $3, meta_description = $4, tags = $5, status = $6, source = 'wordpress_sync', published_at = $7, updated_at = NOW() WHERE id = $8`;
+            } else {
+              params.push(existing.rows[0].id);
+              query = `UPDATE articles SET title = $1, content_html = $2, meta_title = $3, meta_description = $4, tags = $5, status = $6, source = 'wordpress_sync', updated_at = NOW() WHERE id = $7`;
+            }
+            await this.pool!.query(query, params);
+            totalUpdated++;
+          } else {
+            const insertResult = await this.pool!.query(
+              `INSERT INTO articles (client_id, title, slug, content_html, content_md, meta_title, meta_description, tags, status, source, published_at, word_count)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'wordpress_sync', $10, 0)
+               RETURNING id`,
+              [clientId, post.title, slug, post.content, post.content || '', metaTitle, metaDescription, tags, wpStatus, publishedAt || null]
+            );
+            const articleId = insertResult.rows[0].id;
+
+            await this.pool!.query(
+              `INSERT INTO publishing_history (article_id, client_id, cms_connection_id, provider, external_id, external_url, status)
+               VALUES ($1, $2, $3, 'wordpress', $4, $5, 'published')
+               ON CONFLICT DO NOTHING`,
+              [articleId, clientId, connection.id, String(post.id), post.permalink || '']
+            );
+
+            totalSynced++;
+          }
+        }
+
+        hasMore = page * perPage < total;
+        page++;
+      } catch (err: any) {
+        errors.push(`Page ${page}: ${err.message}`);
+        hasMore = false;
+      }
+    }
+
+    return { synced: totalSynced, updated: totalUpdated, skipped: totalSkipped, errors };
+  }
+
+  // ══════════════════════════════════════════════════════════════
   // REGISTER CUSTOM ADAPTER
   // ══════════════════════════════════════════════════════════════
 

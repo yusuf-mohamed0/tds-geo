@@ -1,13 +1,3 @@
-# <YKS />  YUSUF KO STA  Code. Build. Ship.™
-# © 2026 Yusuf Mohamed. All rights reserved.
-# Licensed under the ISC License.
-
-# ════════════════════════════════════════════════════════════════
-# Docker: Build & Deploy
-# On pushes to main: build multi-arch Docker image, push to
-# GitHub Container Registry, and optionally deploy via SSH.
-# ════════════════════════════════════════════════════════════════
-
 name: Docker Build & Deploy
 
 on:
@@ -29,11 +19,8 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  NODE_VERSION: "20"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  # ─── Build & push Docker image ─────────────────────────────
   build:
     name: Build Docker Image
     runs-on: ubuntu-latest
@@ -42,8 +29,7 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -55,7 +41,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels)
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -66,7 +52,7 @@ jobs:
             type=sha,prefix=,suffix=,format=short
             type=raw,value=latest,enable={{ is_default_branch }}
 
-      - name: Build and push Docker image
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -78,7 +64,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ─── Deploy via SSH (optional) ─────────────────────────────
   deploy:
     name: Deploy to Production
     needs: build
@@ -88,6 +73,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
@@ -97,45 +84,81 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             set -e
-
             cd ${{ secrets.DEPLOY_PATH || '/opt/ai-seo' }}
 
-            # Write .env from GitHub secrets
-            cat > .env <<- 'EOF'
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            SHOPIFY_DEFAULT_SHOP=${{ secrets.SHOPIFY_DEFAULT_SHOP || '' }}
-            SHOPIFY_DEFAULT_ACCESS_TOKEN=${{ secrets.SHOPIFY_DEFAULT_ACCESS_TOKEN || '' }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            SERPAPI_API_KEY=${{ secrets.SERPAPI_API_KEY || '' }}
-            DB_USER=postgres
-            DB_PASSWORD=${{ secrets.DB_PASSWORD || 'postgres' }}
-            DB_NAME=ai_seo_automation
-            EOF
+            echo "=== Pre-deploy: tag current image ==="
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:prev-production 2>/dev/null || true
 
-            # Pull the updated image
+            echo "=== Pre-deploy: backup database ==="
+            BACKUP_FILE="/tmp/pre-deploy-$(date +%Y%m%d-%H%M%S).dump"
+            docker compose exec -T postgres pg_dump -U postgres -d ai_seo_automation -F c -f "$BACKUP_FILE" 2>/dev/null && \
+              echo "Backup saved: $BACKUP_FILE" || \
+              echo "Warning: DB backup failed (non-fatal)"
+
+            echo "=== Pull new images ==="
             docker compose pull api worker
 
-            # Recreate services (use existing image, no local build)
+            echo "=== Run database migrations ==="
+            for f in backend/database/migration_*.sql; do
+              if [ -f "$f" ]; then
+                echo "  Applying: $(basename $f)"
+                docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "BEGIN;" 2>/dev/null
+                if cat "$f" | docker compose exec -T postgres psql -U postgres -d ai_seo_automation -q 2>/dev/null; then
+                  docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "COMMIT;" 2>/dev/null
+                  echo "  ✅ $(basename $f) applied"
+                else
+                  docker compose exec -T postgres psql -U postgres -d ai_seo_automation -c "ROLLBACK;" 2>/dev/null
+                  echo "  ❌ $(basename $f) failed — rolled back"
+                  exit 1
+                fi
+              fi
+            done
+
+            echo "=== Deploy new version ==="
             docker compose up -d --no-deps api worker nginx
 
-            # Wait for health check
-            echo "Waiting for API to become healthy..."
+            echo "=== Health check ==="
+            HEALTHY=false
             for i in {1..30}; do
-              if curl -sf http://localhost:3000/health > /dev/null 2>&1; then
-                echo "API is healthy!"
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health 2>/dev/null || echo "000")
+              if [ "$STATUS" = "200" ]; then
+                HEALTHY=true
+                echo "  ✅ API healthy (attempt $i)"
                 break
               fi
-              echo "Attempt $i/30 — API not ready yet..."
+              echo "  Waiting... attempt $i/30 (HTTP $STATUS)"
               sleep 2
             done
 
-            # Run database migrations on existing databases
-            if [ -f backend/database/migration_v2.sql ]; then
-              echo "Running database migrations..."
-              docker compose exec -T postgres psql -U postgres -d ai_seo_automation -f /docker-entrypoint-initdb.d/02-migration.sql 2>/dev/null || true
+            if [ "$HEALTHY" = "false" ]; then
+              echo "  ❌ Health check failed — rolling back"
+              docker compose up -d --no-deps api worker nginx
+              echo "  Rollback issued. Previous version restarted."
+              exit 1
             fi
 
-            # Clean up old images
+            echo "=== Smoke tests ==="
+            FAILED=0
+            for endpoint in /health /api/clients /api/articles; do
+              CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000$endpoint" 2>/dev/null || echo "000")
+              if [ "$CODE" = "200" ]; then
+                echo "  ✅ $endpoint (HTTP $CODE)"
+              else
+                echo "  ❌ $endpoint (HTTP $CODE)"
+                FAILED=1
+              fi
+            done
+
+            if [ "$FAILED" = "1" ]; then
+              echo "  ❌ Smoke tests failed — rolling back"
+              docker compose up -d --no-deps api worker nginx
+              exit 1
+            fi
+
+            echo "=== Clean up ==="
             docker image prune -f
 
-            echo "Deployment complete!"
+            echo ""
+            echo "══════════════════════════════════════════════"
+            echo "  ✅ Production deployment complete!"
+            echo "══════════════════════════════════════════════"

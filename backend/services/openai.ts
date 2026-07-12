@@ -57,6 +57,23 @@ class OpenAIService {
     return !OPENAI_API_KEY;
   }
 
+  private extractJson(text: string): any {
+    const trimmed = text.trim();
+    // Try direct parse first
+    try { return JSON.parse(trimmed); } catch {}
+    // Try extracting JSON object (handles markdown code blocks or wrapped text)
+    const objMatch = trimmed.match(/\{[\s\S]*\}/);
+    if (objMatch) {
+      try { return JSON.parse(objMatch[0]); } catch {}
+    }
+    // Try extracting JSON array
+    const arrMatch = trimmed.match(/\[[\s\S]*\]/);
+    if (arrMatch) {
+      try { return JSON.parse(arrMatch[0]); } catch {}
+    }
+    throw new Error(`Could not extract JSON from response: ${trimmed.slice(0, 200)}`);
+  }
+
   get provider(): string {
     return 'openai';
   }
@@ -190,8 +207,7 @@ class OpenAIService {
               { role: 'user', content: `Develop a strategic outline and creative plan for the definitive article about: "${keyword}"` }
             ],
             max_tokens: 1500,
-            temperature: 0.6,
-            response_format: { type: 'json_object' }
+            temperature: 0.6
           });
         },
         async () => {
@@ -206,7 +222,7 @@ class OpenAIService {
         return '';
       }
 
-      const parsed = JSON.parse(content);
+      const parsed = this.extractJson(content);
       logger.info('Outline phase complete', {
         keyword,
         creativeDna: parsed.creativeDna?.slice(0, 100),
@@ -369,8 +385,7 @@ class OpenAIService {
               { role: 'user', content: enrichedPrompt }
             ],
             max_tokens: this.maxTokens,
-            temperature: this.temperature,
-            response_format: { type: 'json_object' }
+            temperature: this.temperature
           });
         },
         async () => {
@@ -382,7 +397,7 @@ class OpenAIService {
       const tokensIn = response.usage?.prompt_tokens || 0;
       const tokensOut = response.usage?.completion_tokens || 0;
 
-      const result = JSON.parse(response?.choices?.[0]?.message?.content || '{}');
+      const result = this.extractJson(response?.choices?.[0]?.message?.content || '{}');
 
       if (!result.title || !result.content) {
         throw new Error('OpenAI response missing required fields (title, content)');

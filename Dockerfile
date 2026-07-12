@@ -79,6 +79,9 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 # Copy built frontend SPA from frontend-builder
 COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
 
+# Health dashboard (served at /health.html)
+COPY frontend/public/health.html /usr/share/nginx/html/health.html
+
 # Expose HTTP port
 EXPOSE 80
 

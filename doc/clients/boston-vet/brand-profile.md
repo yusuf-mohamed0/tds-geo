@@ -124,3 +124,6 @@
 | **Publish Frequency** | `manual` |
 | **Approval Mode** | `auto` |
 | **API Key** | *(to be generated after plugin install)* |
+
+---
+*See [Client Dashboard](../../DASHBOARD.md) for overall progress*

@@ -69,6 +69,16 @@ export function createCmsRoutes(pool: Pool): Router {
     }
   });
 
+  router.post("/sync/:clientId", authenticate, authorize("admin", "editor"), async (req: Request, res: Response) => {
+    try {
+      const { connection_id } = req.body;
+      const result = await multiCmsPublisher.syncFromWordPress(req.params.clientId, connection_id || undefined);
+      res.json({ success: true, data: result });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
   router.post("/connections/:connectionId/test", authenticate, async (req: Request, res: Response) => {
     try {
       const connections = await multiCmsPublisher.getConnections(req.body.client_id || (req as any).user.clientId);

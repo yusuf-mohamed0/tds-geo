@@ -1,15 +1,72 @@
-node_modules
-npm-debug.log
-dist
-.git
+# ─── Docker Build Ignore ─────────────────────────────────
+# Speeds up builds by excluding files from Docker context.
+
+# Dependencies (installed inside container)
+node_modules/
+frontend/node_modules/
+
+# Build output
+dist/
+frontend/dist/
+
+# Git
+.git/
 .gitignore
+.gitattributes
+
+# Environment
 .env
-.env.local
-.env.*.local
-*.md
-.vscode
-.idea
-logs
-frontend/node_modules
-frontend/dist
-coverage
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose*.yml
+
+# Documentation
+README.md
+LICENSE
+SECURITY.md
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# Temp
+tmp/
+temp/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Node
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Knowledge graphs
+graphify-out/
+.understand-anything/
+
+# Shopify
+shopify.app.toml
+shopify.app.tds-geo.toml
