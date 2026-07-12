@@ -28,10 +28,11 @@ export async function generateContent(
     minWords?: number;
     maxWords?: number;
     clientSettings?: Record<string, unknown>;
+    queue?: boolean;
   } = {}
 ): Promise<GenerateResult> {
-  if (!REDIS_AVAILABLE) {
-    logger.info('Pipeline: Redis unavailable, calling OpenAI directly', { clientId, keyword });
+  if (!REDIS_AVAILABLE || options.queue !== true) {
+    logger.info('Pipeline: calling AI provider directly', { clientId, keyword, queued: false });
     const article = await openaiService.generateBlogPost({
       keyword,
       tone: options.tone || 'educational',

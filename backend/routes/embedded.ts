@@ -68,7 +68,8 @@ export function createEmbeddedRoutes(pool: Pool): Router {
         `SELECT
           COUNT(*)::int AS total,
           COUNT(*) FILTER (WHERE status = 'published')::int AS published,
-          COUNT(*) FILTER (WHERE status = 'generated' OR status = 'approved')::int AS pending,
+          COUNT(*) FILTER (WHERE status = 'draft')::int AS drafts,
+          COUNT(*) FILTER (WHERE status IN ('draft', 'generated', 'approved'))::int AS pending,
           AVG(seo_score)::numeric AS avg_seo_score
         FROM articles WHERE client_id = $1`,
         [auth.clientId]
@@ -81,7 +82,7 @@ export function createEmbeddedRoutes(pool: Pool): Router {
       );
 
       res.json({
-        articles: articleStats.rows[0] || { total: 0, published: 0, pending: 0, avg_seo_score: null },
+        articles: articleStats.rows[0] || { total: 0, published: 0, drafts: 0, pending: 0, avg_seo_score: null },
         recentArticles: recentArticles.rows,
       });
     } catch (err) {
@@ -227,7 +228,8 @@ export function createEmbeddedRoutes(pool: Pool): Router {
         tone: client.brand_voice || 'educational',
         minWords: 1200,
         maxWords: 2500,
-        clientSettings: client.settings || {}
+        clientSettings: client.settings || {},
+        queue: false
       });
 
       if (generateResult.queued) {
@@ -246,7 +248,7 @@ export function createEmbeddedRoutes(pool: Pool): Router {
         finalContent = internalLinksService.injectLinks(finalContent, linkOpportunities);
       }
       const contentHtml = convert(finalContent);
-      const status = client.approval_mode === 'manual' ? 'generated' : 'approved';
+      const status = 'draft';
 
       const articleResult = await pool.query(
         `INSERT INTO articles (client_id, keyword_id, title, slug, content_md, content_html,

@@ -77,7 +77,9 @@ export const generateArticleSchema = Joi.object({
   blogId: Joi.alternatives().try(Joi.number(), Joi.string()).optional(),
   tone: Joi.string().optional(),
   minWords: Joi.number().integer().min(300).max(5000).optional(),
-  maxWords: Joi.number().integer().min(300).max(5000).optional()
+  maxWords: Joi.number().integer().min(300).max(5000).optional(),
+  status: Joi.string().valid('draft', 'generated', 'approved').default('draft'),
+  queue: Joi.boolean().default(false)
 });
 
 export const updateArticleSchema = Joi.object({

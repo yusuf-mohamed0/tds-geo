@@ -961,9 +961,13 @@ async function start(): Promise<void> {
 
     // ═══ Auto-Publish Scheduler ═══════════════
     try {
-      autoPublishService.initialize(pool);
-      const autoPublishInterval = parseInt(process.env.AUTO_PUBLISH_INTERVAL_MS || '30000', 10);
-      autoPublishService.start(autoPublishInterval);
+      if (process.env.AUTO_PUBLISH_ENABLED === 'true') {
+        autoPublishService.initialize(pool);
+        const autoPublishInterval = parseInt(process.env.AUTO_PUBLISH_INTERVAL_MS || '30000', 10);
+        autoPublishService.start(autoPublishInterval);
+      } else {
+        logger.info('Auto-publish scheduler disabled', { enabled: false });
+      }
     } catch (e) {
       logger.warn('Auto-publish service init failed', { error: (e as Error).message });
     }

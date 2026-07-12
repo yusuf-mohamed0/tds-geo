@@ -41,7 +41,7 @@ export function createArticleRoutes(pool: Pool): Router {
   router.post('/generate', clientRateLimit({ windowMs: 60_000, max: 10, name: 'generate', message: 'Generate limit reached. Max 10 requests per minute per client.' }), validate(generateArticleSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as any).user;
-      const { keyword, publish, blogId, tone, minWords, maxWords } = (req as any).validated;
+      const { keyword, publish, blogId, tone, minWords, maxWords, status: requestedStatus, queue } = (req as any).validated;
       let clientId = user.clientId || req.body.clientId;
 
       if (!clientId) {
@@ -103,7 +103,8 @@ export function createArticleRoutes(pool: Pool): Router {
         tone: tone || client.brand_voice || 'educational',
         minWords: minWords || parseInt(process.env.CONTENT_MIN_WORDS || '1200'),
         maxWords: maxWords || parseInt(process.env.CONTENT_MAX_WORDS || '2500'),
-        clientSettings: client.settings || {}
+        clientSettings: client.settings || {},
+        queue
       });
 
       // If queued async, return job ID and status endpoint
@@ -195,7 +196,7 @@ export function createArticleRoutes(pool: Pool): Router {
       const contentHtml = convert(finalContent);
 
       // Check approval mode
-      const status = client.approval_mode === 'manual' ? 'generated' : 'approved';
+      const status = publish ? 'approved' : (requestedStatus || 'draft');
 
       // Store article
       const articleResult = await pool.query(

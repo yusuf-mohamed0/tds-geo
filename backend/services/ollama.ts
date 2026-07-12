@@ -83,6 +83,57 @@ class OllamaService {
     }
   }
 
+  private parseJsonResponse(raw: string): any {
+    const trimmed = raw.trim();
+
+    try {
+      return JSON.parse(trimmed);
+    } catch {}
+
+    const fenced = trimmed.match(/```(?:json)?\s*\n?([\s\S]*?)```/i);
+    if (fenced) {
+      try {
+        return JSON.parse(fenced[1].trim());
+      } catch {}
+    }
+
+    const start = trimmed.indexOf('{');
+    if (start >= 0) {
+      let depth = 0;
+      let inString = false;
+      let escaped = false;
+
+      for (let i = start; i < trimmed.length; i++) {
+        const char = trimmed[i];
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
+        if (char === '\\' && inString) {
+          escaped = true;
+          continue;
+        }
+        if (char === '"') {
+          inString = !inString;
+          continue;
+        }
+        if (inString) continue;
+        if (char === '{') depth += 1;
+        if (char === '}') {
+          depth -= 1;
+          if (depth === 0) {
+            try {
+              return JSON.parse(trimmed.slice(start, i + 1));
+            } catch {}
+            break;
+          }
+        }
+      }
+    }
+
+    throw new Error(`Could not parse Ollama JSON response: ${trimmed.slice(0, 200)}`);
+  }
+
   // ══════════════════════════════════════════════
   // CHAT COMPLETION (core building block)
   // ══════════════════════════════════════════════
@@ -163,37 +214,35 @@ class OllamaService {
     let userPrompt = `Generate a complete SEO-optimized blog post about: "${keyword}"\n\n`;
     if (websiteIntelligence) userPrompt += `## CLIENT CONTEXT\n${websiteIntelligence}\n\n`;
     if (brandVoiceGuidance) userPrompt += `## BRAND VOICE GUIDANCE\n${brandVoiceGuidance}\n\n`;
-    userPrompt += `## CONTENT REQUIREMENTS\n- Tone: ${tone}\n- Min ${minWords} words, max ${maxWords} words\n- Structure: H2 sections with H3 subsections\n- Include meta title (≤60 chars) and meta description (≤160 chars)\n- Include 3-5 tags\n- Include FAQ section with 3-5 Q&A\n- Include natural CTA\n- Use E-E-A-T principles\n- NEVER include dangerous DIY repair instructions\n\nRespond as JSON:\n{\n  "title": "...",\n  "metaTitle": "...",\n  "metaDescription": "...",\n  "tags": [...],\n  "faqSection": "...",\n  "content": "..."\n}`;
+    userPrompt += `## CONTENT REQUIREMENTS\n- Tone: ${tone}\n- Min ${minWords} words, max ${maxWords} words\n- Structure: start with exactly one <h1>, then H2 sections with H3 subsections where useful\n- Include an FAQ section with 3-5 Q&A\n- Include a natural CTA at the end\n- Use E-E-A-T principles\n- NEVER include dangerous DIY repair instructions\n- Return ONLY the final article HTML. Do not return JSON. Do not wrap in markdown fences.`;
 
     try {
       logger.info('Generating blog post via Ollama', { keyword, model: this.defaultModel });
-      const { content: raw, tokensIn, tokensOut } = await this.chatCompletion(systemPrompt, userPrompt, { format: 'json' });
-      const result = JSON.parse(raw);
+      const { content: raw, tokensIn, tokensOut } = await this.chatCompletion(systemPrompt, userPrompt);
+      const content = this.cleanArticleHtml(raw);
+      const titleMatch = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
+      const title = titleMatch?.[1]?.replace(/<[^>]+>/g, '').trim() || this.titleFromKeyword(keyword);
+      const plainText = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 
-      if (!result.title || !result.content) {
-        throw new Error('Ollama response missing required fields (title, content)');
+      if (wordCount < Math.min(minWords, 500)) {
+        throw new Error(`Ollama response too short (${wordCount} words)`);
       }
-
-      if (result.faqSection) {
-        result.content += '\n\n---\n\n' + result.faqSection;
-      }
-
-      const wordCount = result.content.split(/\s+/).length;
       logger.info('Blog post generated via Ollama', {
         keyword,
-        title: result.title,
+        title,
         words: wordCount,
         tokensIn,
         tokensOut,
       });
 
       return {
-        title: result.title,
-        content: result.content,
-        metaTitle: result.metaTitle || result.title,
-        metaDescription: result.metaDescription || '',
-        tags: result.tags || [],
-        faqSection: result.faqSection || '',
+        title,
+        content,
+        metaTitle: title.slice(0, 60),
+        metaDescription: plainText.slice(0, 157).trim(),
+        tags: this.tagsFromKeyword(keyword),
+        faqSection: '',
         metadata: {
           model: this.defaultModel,
           temperature: this.temperature,
@@ -212,6 +261,51 @@ class OllamaService {
     }
   }
 
+  private titleFromKeyword(keyword: string): string {
+    return keyword
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  private cleanArticleHtml(raw: string): string {
+    let content = raw.trim();
+    content = content
+      .replace(/^```(?:html)?\s*\n?/i, '')
+      .replace(/\n?```\s*$/i, '')
+      .trim();
+
+    content = content
+      .replace(/<!doctype[^>]*>/i, '')
+      .replace(/<html[^>]*>/i, '')
+      .replace(/<head[^>]*>[\s\S]*?<\/head>/i, '')
+      .replace(/<\/html>/i, '')
+      .trim();
+
+    const bodyMatch = content.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    if (bodyMatch) {
+      content = bodyMatch[1].trim();
+    }
+
+    const articleMatch = content.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
+    if (articleMatch) {
+      content = articleMatch[1].trim();
+    }
+
+    content = content
+      .replace(/<\/?body[^>]*>/gi, '')
+      .replace(/<\/?article[^>]*>/gi, '')
+      .trim();
+
+    return content;
+  }
+
+  private tagsFromKeyword(keyword: string): string[] {
+    const words = keyword.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+    return Array.from(new Set(words)).slice(0, 5);
+  }
+
   // ══════════════════════════════════════════════
   // SEO ANALYSIS
   // ══════════════════════════════════════════════
@@ -228,7 +322,7 @@ Score 0-100 and provide improvements. Respond in JSON: { score, keywordDensity, 
       temperature: 0.3,
       maxTokens: 1500,
     });
-    return JSON.parse(raw);
+    return this.parseJsonResponse(raw);
   }
 
   // ══════════════════════════════════════════════
@@ -248,7 +342,7 @@ Focus on informational intent, question queries, and "near me" variations. Respo
       maxTokens: 1000,
     });
 
-    const result = JSON.parse(raw);
+    const result = this.parseJsonResponse(raw);
     const keywords = Array.isArray(result) ? result : (result as any).keywords || (result as any).variations || [];
     return keywords.slice(0, count);
   }
