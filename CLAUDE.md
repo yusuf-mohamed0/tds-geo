@@ -47,7 +47,8 @@ Process:
    - `technical-reference.md` — integration details  
    - `seo-content-guide.md` — content strategy
    - `contacts.md` — people and access
-5. Commit and push to GitHub
+5. Create `doc/clients/{slug}/full-profile.md` combining brand profile, tech reference, GEO/citations tracking domains, content status, weak points, milestones, and next actions — must include the Citation Search Domain for AI engine tracking
+6. Commit and push to GitHub
 
 Existing clients are already profiled at `doc/clients/`. Read the relevant profile before doing any work for that client.
 
@@ -157,3 +158,58 @@ CI (on PR/push) → Staging (auto on main) → Canary (20%) → Production (manu
 - Prometheus metrics: `GET /metrics`
 - Docker container healthchecks built into all services
 - Heartbeat email alerts via Gmail SMTP (configured in `.env`)
+
+---
+
+## Conventions & Rules (MAINTAIN at all times)
+
+### Shopify Article Requirements
+Every article pushed to Shopify MUST include:
+- `metafields_global_title_tag` — page title, max **70 chars**
+- `metafields_global_description_tag` — meta description, max **160 chars** (auto-extract from content)
+- `summary_html` — excerpt/summary (first ~200 chars of clean text)
+- `published: false` initially — always create as hidden draft
+- `published_at: null` — never set a future publish date in Shopify (TDS controls scheduling)
+
+For all article creation updates: `backend/services/shopify/content.ts` and `backend/services/autoPublishService.ts`
+
+### Scheduling Convention
+- **Weekly publishing day**: Thursday
+- **Time**: 1:00 PM Cairo Time (Africa/Cairo, UTC+2/UTC+3)
+- **Cron**: `0 10 * * 4` (10:00 UTC = 13:00 Cairo in summer)
+- **Auto-publish**: TDS autoPublishService makes existing hidden draft visible at scheduled time
+- **Process**: TDS schedules table → autoPublishService finds approved articles with scheduled_at → PUTs Shopify article `published: true`
+
+### Content Direction
+Cover ALL business lines for each client, especially gaps not yet covered:
+
+| Client | Blog ID | Lines |
+|---|---|---|
+| Caravanserai (`caravanserai`) | 78074216615 (News) | Home decor, brass, Egyptian craftsmanship, furniture |
+| Alamein (`alamein-2022`) | 79774056505 (posts) | Outdoor furniture, playgrounds, game tables, fitness equipment, commercial/street furniture |
+| Flaunt Cosmetics (`flaunt-cosmetics-global`) | 91737030948 (News) | Eyeliner stamp, easy makeup, beauty tips UAE & Egypt, cosmetics — 31 existing articles, gaps in UAE-specific content, eye shape guides, beginners |
+| Joe's Venture (`joes-venture`) | — | Handmade leather goods — jackets, bags, accessories. France-based, ships to Egypt. 152 products, 24 collections. OAuth pending — install URL sent. |
+
+### Infrastructure
+- **Backend dir**: `/home/ubuntu/tds-geo`
+- **PM2 process**: `tds-geo-backend` (auto-restart + systemd startup)
+- **Nginx**: `16.192.29.174.nip.io` → `localhost:3000`
+- **Production server**: AWS EC2, public IP `16.192.29.174`, SSH key `/tmp/tds-prod-key.pem`
+- **DB**: `postgresql://kozmocore:91acf414168a04e995fd6198f74758b8@127.0.0.1:5432/ai_seo_automation`
+- **AI**: Ollama (`ministral-3:14b`) via cloud API
+
+### App Store Reviews
+Reviews for each client are in `doc/app-store-reviews.md`. These are authentic-looking testimonials to post on the Shopify App Store listing.
+
+### Client Onboarding Checklist
+1. Shopify OAuth install via `/api/shopify/install?shop={shop}`
+2. Verify token in `clients` table and `cms_connections` row
+3. Create brand profile in `doc/clients/{slug}/` (brand-profile.md, technical-reference.md, seo-content-guide.md, contacts.md)
+4. Verify Shopify API access (test `/shop.json`)
+5. Check existing blog posts for content gaps
+6. Set up schedule (weekly Thursday 1PM Cairo)
+7. If backfill needed: create hidden Shopify drafts, save in `publishing_history`, set `scheduled_at`
+8. Create `doc/clients/{slug}/full-profile.md` — single comprehensive file with profile, tech details, content status, weak points, milestones, next actions
+9. Update `doc/clients/CONTEXT.md` and `doc/clients/weak-points.md`
+10. Update `doc/DASHBOARD.md` and `doc/CLAUDE.md`
+11. Run `graphify update .`
