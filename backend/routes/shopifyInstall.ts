@@ -12,7 +12,7 @@ import { SHOPIFY_COMPLIANCE_WEBHOOKS, verifyShopifyOAuthHmac } from '../utils/sh
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
-const SCOPES = 'read_content,read_products,write_content,write_products';
+const SCOPES = 'read_content,read_products,read_script_tags,read_themes,write_content,write_products,write_script_tags,write_themes';
 const WEBHOOK_API_VERSION = '2025-07';
 
 function isValidShop(shop: string): boolean {
@@ -122,14 +122,34 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
         scope: tokenData.scope,
       });
 
-      // Step 2: Save token to DB immediately
-      await pool.query(
-        `UPDATE clients SET shopify_token = $1, shopify_refresh_token = $2, shopify_token_expires_at = $3, is_active = true WHERE shopify_shop = $4`,
+      // Step 2: Save token to DB immediately. Create a client if this is a first install.
+      let clientResult = await pool.query(
+        `UPDATE clients
+            SET shopify_token = $1, shopify_refresh_token = $2, shopify_token_expires_at = $3,
+                shopify_api_version = '2025-07', is_active = true
+          WHERE shopify_shop = $4
+          RETURNING id`,
         [accessToken, refreshToken, tokenExpiresAt, shop]
       );
 
+      if (clientResult.rows.length === 0) {
+        const baseSlug = slugify(shop.replace('.myshopify.com', ''));
+        clientResult = await pool.query(
+          `INSERT INTO clients (name, slug, shopify_shop, shopify_token, shopify_refresh_token, shopify_token_expires_at, shopify_api_version, approval_mode, publish_frequency, is_active)
+           VALUES ($1, $2, $3, $4, $5, $6, '2025-07', 'auto', 'manual', true)
+           ON CONFLICT (slug) DO UPDATE SET
+             shopify_shop = EXCLUDED.shopify_shop,
+             shopify_token = EXCLUDED.shopify_token,
+             shopify_refresh_token = EXCLUDED.shopify_refresh_token,
+             shopify_token_expires_at = EXCLUDED.shopify_token_expires_at,
+             shopify_api_version = EXCLUDED.shopify_api_version,
+             is_active = true
+           RETURNING id`,
+          [shop.replace('.myshopify.com', ''), baseSlug, shop, accessToken, refreshToken, tokenExpiresAt]
+        );
+      }
+
       // Step 3: Update CMS connection
-      const clientResult = await pool.query('SELECT id FROM clients WHERE shopify_shop = $1', [shop]);
       const clientId = clientResult.rows[0]?.id;
       if (clientId) {
         const existingConn = await pool.query(
