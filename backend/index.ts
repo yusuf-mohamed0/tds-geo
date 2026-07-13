@@ -727,135 +727,30 @@ app.get('/.well-known/:keyFile', (req: Request, res: Response) => {
 
 // ─── Privacy Policy ────────────────────────
 app.get('/privacy', (_req: Request, res: Response) => {
-  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Privacy Policy - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}h1{color:#171414;border-bottom:2px solid #FCB900;padding-bottom:8px}h2{color:#142444;margin-top:32px}p{margin:8px 0}ul{list-style:disc;padding-left:20px}li{margin:4px 0}</style></head><body>
-<h1>Privacy Policy</h1>
-<p><strong>TDS Geo</strong> — <em>Last updated: June 23, 2026</em></p>
-<h2>Data We Collect</h2>
-<ul>
-<li><strong>Shop Information</strong>: Store name, domain, and API access token (for content publishing via Shopify Admin API).</li>
-<li><strong>Content Data</strong>: Generated articles, keywords, SEO scores, and GEO analysis results.</li>
-<li><strong>Usage Data</strong>: App interaction logs, feature usage, and API call records for service improvement and billing.</li>
-</ul>
-<h2>How We Use Your Data</h2>
-<ul>
-<li>To generate and publish AI-optimized content to your Shopify store.</li>
-<li>To analyze content for Generative Engine Optimization (GEO).</li>
-<li>To improve our AI models and service quality.</li>
-<li>To provide customer support and track billing.</li>
-</ul>
-<h2>Data Sharing</h2>
-<p>We do <strong>not</strong> sell, trade, or share your personal data with third parties except as required to operate the service (e.g., AI inference via OpenRouter API).</p>
-<h2>Data Retention</h2>
-<p>We retain your data for as long as your app is installed. Upon uninstall, we delete all shop-specific data (articles, keywords, logs) within 48 hours.</p>
-<h2>Your Rights</h2>
-<p>You may request a copy of your data or request deletion at any time via <a href="mailto:web.development@trafficdigitalsolutions.com">web.development@trafficdigitalsolutions.com</a>.</p>
-<h2>Contact</h2>
-<p>Traffic Digital Solutions<br>Villa 125 Axis 80, Cairo, Egypt<br>Email: <a href="mailto:web.development@trafficdigitalsolutions.com">web.development@trafficdigitalsolutions.com</a></p>
-</body></html>`);
+  res.sendFile(path.join(pagesDir, 'privacy.html'));
 });
 
 // ─── FAQ ────────────────────────────────────
 app.get('/faq', (_req: Request, res: Response) => {
-  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FAQ - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}h1{color:#171414;border-bottom:2px solid #FCB900;padding-bottom:8px}h2{color:#142444;margin-top:32px}p{margin:8px 0}strong{color:#171414}</style></head><body>
-<h1>Frequently Asked Questions</h1>
-<p><strong>TDS Geo</strong> — <em>Last updated: July 12, 2026</em></p>
-<h2>Do I need to write anything?</h2>
-<p>No. Once you install and subscribe, our team handles everything — keyword research, writing, SEO optimization, and weekly publishing. You just watch your traffic grow.</p>
-<h2>How often is content published?</h2>
-<p>Every Thursday at 1:00 PM Cairo time, a new GEO-optimized article is published to your store automatically.</p>
-<h2>What is GEO?</h2>
-<p>Generative Engine Optimization (GEO) is the practice of structuring content so AI search engines like ChatGPT, Perplexity, and Gemini naturally cite your store as a source. All articles we publish are GEO-optimized.</p>
-<h2>Which AI engines do you track?</h2>
-<p>We monitor citations across 8 AI engines: ChatGPT, Perplexity, Google AI Overviews, Gemini, Microsoft Copilot, Grok, Claude, and DeepSeek.</p>
-<h2>Can I customize the topics?</h2>
-<p>Yes. We research your products and audience to determine the best topics. You can also request specific topics by emailing us.</p>
-<h2>How do I cancel?</h2>
-<p>Uninstall the app from your Shopify admin. Your subscription will be cancelled immediately and no further charges will be made.</p>
-<h2>What happens to my content if I cancel?</h2>
-<p>Published articles remain on your store. We delete all app-specific data (drafts, analytics) within 48 hours of uninstall.</p>
-</body></html>`);
+  res.sendFile(path.join(pagesDir, 'faq.html'));
 });
-
-// ─── Changelog ──────────────────────────────
 app.get('/changelog', (_req: Request, res: Response) => {
-  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Changelog - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}h1{color:#171414;border-bottom:2px solid #FCB900;padding-bottom:8px}h2{color:#142444;margin-top:32px}p{margin:4px 0}.date{color:#838081;font-size:14px}.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;margin-right:6px}.tag-new{background:#eafaf1;color:#1e8449}.tag-fix{background:#fcf6f2;color:#8b6914}.tag-improve{background:#e8f0fe;color:#142444}</style></head><body>
-<h1>Changelog</h1>
-<p><strong>TDS Geo</strong></p>
-<h2><span class="tag tag-new">NEW</span> July 12, 2026</h2>
-<p>- Shopify App Store listing live</p>
-<p>- App Store requirements updated: Online Store required, POS removed</p>
-<p>- Citation tracking expanded to 8 AI engines</p>
-<p>- Auto-publisher now correctly skips non-Shopify clients</p>
-<p>- Shopify connector health check fixed for multi-store setups</p>
-<h2><span class="tag tag-new">NEW</span> July 8, 2026</h2>
-<p>- App submitted and approved on Shopify App Store</p>
-<p>- Pricing set at $40/month</p>
-<h2><span class="tag tag-improve">IMPROVE</span> June 30, 2026</h2>
-<p>- 24-stage content pipeline fully operational</p>
-<p>- Multi-tenant client management system</p>
-<h2><span class="tag tag-new">NEW</span> June 23, 2026</h2>
-<p>- Initial TDS Geo platform launch</p>
-<p>- Shopify OAuth integration</p>
-<p>- AI content generation with GEO optimization</p>
-<p>- Weekly auto-publish scheduler</p>
-</body></html>`);
+  res.sendFile(path.join(pagesDir, 'changelog.html'));
 });
-
-// ─── Tutorial ───────────────────────────────
 app.get('/tutorial', (_req: Request, res: Response) => {
-  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tutorial - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}h1{color:#171414;border-bottom:2px solid #FCB900;padding-bottom:8px}h2{color:#142444;margin-top:32px}p{margin:8px 0}ol{padding-left:20px}li{margin:8px 0}.step{background:#fcf6f2;border-radius:8px;padding:16px;margin:12px 0}.step-num{display:inline-block;background:#FCB900;color:#171414;font-weight:700;width:24px;height:24px;text-align:center;border-radius:50%;margin-right:8px}</style></head><body>
-<h1>How TDS Geo Works</h1>
-<p>Getting started takes 2 minutes. Here's everything you need to know.</p>
-<div class="step"><p><span class="step-num">1</span> <strong>Install the app</strong> — Click "Install" in the Shopify App Store. Authorize the required permissions (Online Store content access).</p></div>
-<div class="step"><p><span class="step-num">2</span> <strong>Choose your plan</strong> — Select the $40/month Traffic plan. First article is published within 7 days of activation.</p></div>
-<div class="step"><p><span class="step-num">3</span> <strong>We take over</strong> — Our team researches your products, industry, and target audience. We create GEO-optimized articles tailored to your store.</p></div>
-<div class="step"><p><span class="step-num">4</span> <strong>Weekly publishing</strong> — Every Thursday at 1:00 PM Cairo time, a new article goes live on your store automatically — with SEO titles, meta descriptions, and GEO optimization built in.</p></div>
-<div class="step"><p><span class="step-num">5</span> <strong>Watch your traffic grow</strong> — We track citations across 8 AI engines and optimize future content based on what works.</p></div>
-<h2>That's it</h2>
-<p>No dashboard to learn. No buttons to click. No writing, editing, or scheduling on your end. Results start week one.</p>
-<p>Need help? Email <a href="mailto:web.development@trafficdigitalsolutions.com">web.development@trafficdigitalsolutions.com</a></p>
-</body></html>`);
+  res.sendFile(path.join(pagesDir, 'tutorial.html'));
 });
-
-// ─── Documentation ──────────────────────────
 app.get('/docs', (_req: Request, res: Response) => {
-  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Documentation - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}h1{color:#171414;border-bottom:2px solid #FCB900;padding-bottom:8px}h2{color:#142444;margin-top:32px;border-bottom:1px solid #f0e8e2;padding-bottom:4px}h3{color:#171414;margin-top:24px}p{margin:8px 0}code{background:#fcf6f2;padding:2px 6px;border-radius:4px;font-size:14px}ul{padding-left:20px}li{margin:4px 0}.box{background:#fcf6f2;border-radius:8px;padding:16px;margin:12px 0;border-left:3px solid #FCB900}</style></head><body>
-<h1>TDS Geo Documentation</h1>
-<p><strong>Traffic Digital Solutions</strong> — <em>Generative Engine Optimization for Shopify</em></p>
-<h2>Overview</h2>
-<p>TDS Geo is a fully managed content service for Shopify stores. We research, write, and publish GEO-optimized articles to your store weekly — no effort required on your end.</p>
-<h2>Quick Start</h2>
-<div class="box"><strong>1. Install</strong> — Click "Install" from the Shopify App Store and authorize access.</div>
-<div class="box"><strong>2. Subscribe</strong> — Choose the $40/month Traffic plan.</div>
-<div class="box"><strong>3. Done</strong> — We handle everything. First article publishes within 7 days.</div>
-<h2>What You Get</h2>
-<ul>
-<li><strong>Weekly content</strong> — New article every Thursday at 1PM Cairo time</li>
-<li><strong>GEO optimization</strong> — Content structured for ChatGPT, Perplexity, Gemini, and 5 more AI engines</li>
-<li><strong>SEO metadata</strong> — Every article includes optimized title tags, meta descriptions, and keywords</li>
-<li><strong>Citation tracking</strong> — Monthly reports showing where your store is cited by AI engines</li>
-<li><strong>Zero work</strong> — No writing, editing, or scheduling. Ever.</li>
-</ul>
-<h2>Pricing</h2>
-<p><strong>Traffic Plan</strong> — $40/month or $350/year (save 27%).<br>All charges billed in USD via Shopify Billing. Recurring every 30 days.</p>
-<h2>Support</h2>
-<p>Email: <a href="mailto:web.development@trafficdigitalsolutions.com">web.development@trafficdigitalsolutions.com</a><br>Response time: Within 24 hours</p>
-<h2>App Permissions</h2>
-<p>TDS Geo requires access to:</p>
-<ul>
-<li><strong>Online Store content</strong> — To read and publish blog articles</li>
-<li><strong>Products</strong> — To research your product line for relevant content topics</li>
-<li><strong>Staff and contributors</strong> — To manage article authors</li>
-</ul>
-<h2>Data & Privacy</h2>
-<p>We do not sell or share your data. Published articles remain on your store even after uninstall. App-specific data is deleted within 48 hours of uninstall. See our <a href="/privacy">Privacy Policy</a> for details.</p>
-</body></html>`);
+  res.sendFile(path.join(pagesDir, 'docs.html'));
 });
 
-// ─── Serve Brand Assets (logos, icons) ──────
-const assetsDir = path.join(__dirname, 'public', 'assets');
+// ─── Serve Static Assets ──────────────────
+const publicDir = path.join(__dirname, 'public');
+app.use('/css', express.static(path.join(publicDir, 'css')));
+const assetsDir = path.join(publicDir, 'assets');
 app.use('/assets', express.static(assetsDir));
 app.use('/api/assets', express.static(assetsDir));
+const pagesDir = path.join(publicDir, 'pages');
 
 // ─── Shopify OAuth Redirect Pages ─────────
 app.get('/shopify/success', (_req: Request, res: Response) => {

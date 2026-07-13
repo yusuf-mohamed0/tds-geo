@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Changelog - TDS Geo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/brand.css">
+<style>
+.timeline{position:relative;max-width:720px;margin:40px auto 0;padding-left:40px}
+.timeline::before{content:'';position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;padding-bottom:40px;opacity:0;animation:fadeInUp 0.5s ease forwards}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-dot{position:absolute;left:-33px;top:6px;width:16px;height:16px;border-radius:50%;border:3px solid var(--gold);background:var(--white);z-index:1}
+.timeline-item.new .timeline-dot{background:var(--gold)}
+.timeline-date{font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.timeline-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.tag-new{background:#eafaf1;color:#1e8449}
+.tag-fix{background:#fcf6f2;color:#8b6914}
+.tag-improve{background:#e8f0fe;color:var(--navy)}
+.timeline-content{background:var(--cream);border-radius:var(--radius);padding:20px 24px}
+.timeline-content h3{font-size:16px;font-weight:600;color:var(--dark);margin-bottom:8px}
+.timeline-content ul{padding-left:18px;margin:0}
+.timeline-content li{margin:4px 0;font-size:14px;color:var(--text);line-height:1.6}
+.subscribe-section{text-align:center;margin-top:48px;padding:40px;background:var(--cream);border-radius:var(--radius)}
+.subscribe-section h3{font-size:18px;color:var(--dark);margin-bottom:8px}
+.subscribe-section p{color:var(--text-light);font-size:14px;margin-bottom:16px}
+@media(max-width:480px){
+  .timeline{padding-left:32px}
+  .timeline-dot{left:-25px;width:12px;height:12px}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="logo"><span class="logo-dot"></span>TDS <span class="logo-gold">GEO</span></div>
+<nav>
+<a href="/docs">Docs</a>
+<a href="/tutorial">Tutorial</a>
+<a href="/faq">FAQ</a>
+<a href="/changelog" class="active">Changelog</a>
+<a href="/privacy">Privacy</a>
+</nav>
+</div>
+</header>
+
+<section class="hero">
+<div class="hero-inner">
+<div class="hero-badge anim anim-d1">Product Updates</div>
+<h1 class="anim anim-d2">Changelog</h1>
+<p class="anim anim-d3">Every update, improvement, and fix for TDS Geo — tracked since launch.</p>
+</div>
+</section>
+
+<section class="section" style="padding-top:20px">
+<div class="section-inner">
+<div class="timeline">
+
+<div class="timeline-item new anim anim-d1">
+<div class="timeline-dot"></div>
+<div class="timeline-date">July 12, 2026</div>
+<div><span class="timeline-tag tag-new">New</span></div>
+<div class="timeline-content">
+<h3>App Store Listing Live</h3>
+<ul>
+<li>Shopify App Store listing approved and published</li>
+<li>Store requirements updated — Online Store required, POS requirement removed</li>
+<li>Citation tracking expanded to 8 AI engines (ChatGPT, Perplexity, Google AI Overviews, Gemini, Copilot, Grok, Claude, DeepSeek)</li>
+<li>Auto-publisher fixed to correctly skip non-Shopify clients</li>
+<li>Connector health check reliability improvements for multi-store setups</li>
+<li>New Resources site launched — docs, tutorial, FAQ, and changelog pages</li>
+</ul>
+</div>
+</div>
+
+<div class="timeline-item new anim anim-d2">
+<div class="timeline-dot"></div>
+<div class="timeline-date">July 8, 2026</div>
+<div><span class="timeline-tag tag-new">New</span></div>
+<div class="timeline-content">
+<h3>Shopify App Store Submission</h3>
+<ul>
+<li>App submitted and approved on Shopify App Store</li>
+<li>Pricing set at $40/month with $350/year option (27% savings)</li>
+</ul>
+</div>
+</div>
+
+<div class="timeline-item anim anim-d3">
+<div class="timeline-dot"></div>
+<div class="timeline-date">June 30, 2026</div>
+<div><span class="timeline-tag tag-improve">Improvement</span></div>
+<div class="timeline-content">
+<h3>Pipeline & Multi-Tenant Enhancements</h3>
+<ul>
+<li>24-stage content pipeline fully operational end-to-end</li>
+<li>Multi-tenant client management with per-client settings</li>
+<li>Auto-publish scheduler with Cairo timezone support</li>
+<li>Citation tracking service operational</li>
+</ul>
+</div>
+</div>
+
+<div class="timeline-item anim anim-d4">
+<div class="timeline-dot"></div>
+<div class="timeline-date">June 23, 2026</div>
+<div><span class="timeline-tag tag-new">Launch</span></div>
+<div class="timeline-content">
+<h3>TDS Geo Initial Launch</h3>
+<ul>
+<li>Platform launch with core content generation pipeline</li>
+<li>Shopify OAuth integration for secure store connections</li>
+<li>AI-powered content generation with GEO optimization</li>
+<li>Weekly auto-publish scheduler</li>
+<li>Multi-client support with per-store content strategies</li>
+</ul>
+</div>
+</div>
+
+</div>
+
+<div class="subscribe-section">
+<h3>Stay updated</h3>
+<p>Subscribe to get notified about new features and improvements.</p>
+<a href="mailto:web.development@trafficdigitalsolutions.com?subject=Subscribe%20to%20updates" class="btn btn-primary">Get Updates →</a>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="footer-inner">
+<div class="footer-col">
+<div class="logo" style="margin-bottom:12px"><span class="logo-dot"></span>TDS <span style="color:var(--gold)">GEO</span></div>
+<p>Fully managed GEO content service for Shopify stores. We write, optimize, and publish — you grow.</p>
+</div>
+<div class="footer-col">
+<h4>Resources</h4>
+<a href="/docs">Documentation</a>
+<a href="/tutorial">Tutorial</a>
+<a href="/faq">FAQ</a>
+<a href="/changelog">Changelog</a>
+</div>
+<div class="footer-col">
+<h4>Legal</h4>
+<a href="/privacy">Privacy Policy</a>
+</div>
+<div class="footer-col">
+<h4>Contact</h4>
+<a href="mailto:web.development@trafficdigitalsolutions.com">Email Support</a>
+<a href="https://trafficdigitalsolutions.com">Traffic Digital Solutions</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 Traffic Digital Solutions — TDS Geo. All rights reserved.</div>
+</footer>
+</body>
+</html>

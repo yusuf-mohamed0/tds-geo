@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial - TDS Geo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/brand.css">
+<style>
+.steps{max-width:720px;margin:40px auto 0}
+.step-card{display:flex;gap:24px;padding:28px;background:var(--cream);border-radius:var(--radius);margin-bottom:16px;transition:var(--transition);opacity:0;animation:fadeInUp 0.6s ease forwards;position:relative}
+.step-card::after{content:'';position:absolute;left:52px;bottom:-16px;width:2px;height:16px;background:var(--border)}
+.step-card:last-child::after{display:none}
+.step-card:hover{transform:translateX(4px);box-shadow:var(--shadow)}
+.step-num{flex-shrink:0;width:56px;height:56px;background:var(--gold);color:var(--dark);border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px}
+.step-body{flex:1}
+.step-body h3{font-size:17px;font-weight:600;color:var(--dark);margin-bottom:6px}
+.step-body p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:8px}
+.step-note{font-size:13px;color:var(--text-light);background:rgba(252,185,0,.08);padding:8px 14px;border-radius:var(--radius-sm);border-left:3px solid var(--gold)}
+/* Progress */
+.progress-bar{display:flex;justify-content:center;gap:12px;margin-bottom:40px;flex-wrap:wrap}
+.prog-step{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text-light)}
+.prog-step .circle{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:var(--transition)}
+.prog-step.completed .circle{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+.prog-step.active .circle{background:var(--gold);border-color:var(--gold);color:var(--dark);animation:pulse 1.5s ease-in-out infinite}
+/* Timeline Overview */
+.overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:36px}
+.overview-card{text-align:center;padding:24px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);transition:var(--transition)}
+.overview-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:rgba(252,185,0,.3)}
+.overview-icon{font-size:32px;margin-bottom:8px}
+.overview-card h4{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:4px}
+.overview-card p{font-size:12px;color:var(--text-light)}
+@media(max-width:480px){
+  .step-card{flex-direction:column;gap:12px;padding:20px}
+  .step-card::after{left:36px}
+  .step-num{width:44px;height:44px;font-size:18px;border-radius:12px}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="logo"><span class="logo-dot"></span>TDS <span class="logo-gold">GEO</span></div>
+<nav>
+<a href="/docs">Docs</a>
+<a href="/tutorial" class="active">Tutorial</a>
+<a href="/faq">FAQ</a>
+<a href="/changelog">Changelog</a>
+<a href="/privacy">Privacy</a>
+</nav>
+</div>
+</header>
+
+<section class="hero">
+<div class="hero-inner">
+<div class="hero-badge anim anim-d1">Step-by-Step Guide</div>
+<h1 class="anim anim-d2">How <span>TDS Geo</span> works</h1>
+<p class="anim anim-d3">Getting started takes 2 minutes. Here's exactly what happens from install to your first published article.</p>
+<div class="hero-cta anim anim-d4">
+<a href="https://apps.shopify.com/tds-geo" class="btn btn-primary">Install the App →</a>
+<a href="/faq" class="btn btn-secondary">FAQ</a>
+</div>
+</div>
+</section>
+
+<section class="section" style="padding-top:20px">
+<div class="section-inner">
+
+<div class="overview">
+<div class="overview-card anim anim-d1"><div class="overview-icon">⏱️</div><h4>2 minutes</h4><p>To install and subscribe</p></div>
+<div class="overview-card anim anim-d2"><div class="overview-icon">📝</div><h4>7 days</h4><p>To first published article</p></div>
+<div class="overview-card anim anim-d3"><div class="overview-icon">📈</div><h4>Weekly</h4><p>New content, every Thursday</p></div>
+<div class="overview-card anim anim-d4"><div class="overview-icon">🙌</div><h4>Zero effort</h4><p>From you, ever</p></div>
+</div>
+
+<div class="steps">
+<div class="progress-bar">
+<span class="prog-step active"><span class="circle">1</span> Install</span>
+<span class="prog-step"><span class="circle">2</span> Subscribe</span>
+<span class="prog-step"><span class="circle">3</span> Onboarding</span>
+<span class="prog-step"><span class="circle">4</span> Weekly Pub</span>
+<span class="prog-step"><span class="circle">5</span> Growth</span>
+</div>
+
+<div class="step-card anim anim-d1">
+<div class="step-num">1</div>
+<div class="step-body">
+<h3>Install the App</h3>
+<p>Click "Install" from the Shopify App Store. Authorize the required permissions — we need access to your Online Store content and products to research and publish articles.</p>
+<div class="step-note">Only takes about 30 seconds. No complex setup or configuration required.</div>
+</div>
+</div>
+
+<div class="step-card anim anim-d2">
+<div class="step-num">2</div>
+<div class="step-body">
+<h3>Choose Your Plan</h3>
+<p>Select the $40/month Traffic plan. All charges are processed securely through Shopify Billing — no separate accounts or payment setup needed.</p>
+<div class="step-note">Prefer annual billing? $350/year saves you 27% (two months free).</div>
+</div>
+</div>
+
+<div class="step-card anim anim-d3">
+<div class="step-num">3</div>
+<div class="step-body">
+<h3>We Research Your Store</h3>
+<p>Our team analyzes your products, industry, competitors, and target audience to build a content strategy. We identify gaps, keyword opportunities, and the topics that will drive the most visibility from AI search engines.</p>
+<div class="step-note">Your first article is published within 7 days of activation. We create it as a hidden draft so you can review it before it goes live.</div>
+</div>
+</div>
+
+<div class="step-card anim anim-d4">
+<div class="step-num">4</div>
+<div class="step-body">
+<h3>Weekly Publishing Begins</h3>
+<p>Every Thursday at 1:00 PM Cairo time, a new GEO-optimized article goes live on your store automatically — complete with SEO title tags, meta descriptions, strategic keywords, and structured data for AI engine discoverability.</p>
+<div class="step-note">No writing. No editing. No scheduling. It all happens automatically.</div>
+</div>
+</div>
+
+<div class="step-card anim anim-d5">
+<div class="step-num">5</div>
+<div class="step-body">
+<h3>Track Your Growth</h3>
+<p>We monitor your store's citations across 8 AI engines (ChatGPT, Perplexity, Gemini, and more) and optimize future content based on what's working. You'll see your AI search visibility grow over time.</p>
+<div class="step-note">Need to adjust topics or strategy? Just email us. We handle the rest.</div>
+</div>
+</div>
+</div>
+
+<div class="cta-banner" style="margin-top:48px">
+<h2>Ready to get started?</h2>
+<p>Install TDS Geo and get your first article within 7 days. No effort required on your end.</p>
+<a href="https://apps.shopify.com/tds-geo" class="btn btn-primary">Install from App Store →</a>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="footer-inner">
+<div class="footer-col">
+<div class="logo" style="margin-bottom:12px"><span class="logo-dot"></span>TDS <span style="color:var(--gold)">GEO</span></div>
+<p>Fully managed GEO content service for Shopify stores. We write, optimize, and publish — you grow.</p>
+</div>
+<div class="footer-col">
+<h4>Resources</h4>
+<a href="/docs">Documentation</a>
+<a href="/tutorial">Tutorial</a>
+<a href="/faq">FAQ</a>
+<a href="/changelog">Changelog</a>
+</div>
+<div class="footer-col">
+<h4>Legal</h4>
+<a href="/privacy">Privacy Policy</a>
+</div>
+<div class="footer-col">
+<h4>Contact</h4>
+<a href="mailto:web.development@trafficdigitalsolutions.com">Email Support</a>
+<a href="https://trafficdigitalsolutions.com">Traffic Digital Solutions</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 Traffic Digital Solutions — TDS Geo. All rights reserved.</div>
+</footer>
+</body>
+</html>
