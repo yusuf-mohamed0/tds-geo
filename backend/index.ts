@@ -157,10 +157,10 @@ app.use(helmet({
       frameAncestors: ["'self'", 'https://*.myshopify.com', 'https://admin.shopify.com'],
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.shopify.com'],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com', 'https://fonts.googleapis.com'],
       imgSrc: ["'self'", 'data:', 'https:', 'https://cdn.shopify.com'],
       connectSrc: ["'self'", 'https://*.myshopify.com', 'wss://*.myshopify.com', 'https://cdn.shopify.com'],
-      fontSrc: ["'self'", 'https://cdn.shopify.com'],
+      fontSrc: ["'self'", 'https://cdn.shopify.com', 'https://fonts.gstatic.com'],
     }
   } : false,
   crossOriginEmbedderPolicy: false,
@@ -740,7 +740,7 @@ app.get('/changelog', (_req: Request, res: Response) => {
 app.get('/tutorial', (_req: Request, res: Response) => {
   res.sendFile(path.join(pagesDir, 'tutorial.html'));
 });
-app.get('/docs', (_req: Request, res: Response) => {
+app.get('/documentation', (_req: Request, res: Response) => {
   res.sendFile(path.join(pagesDir, 'docs.html'));
 });
 
