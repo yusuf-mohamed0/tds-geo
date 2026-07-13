@@ -161,7 +161,7 @@ async function main() {
     // Clear any stale token first
     await page.evaluate(() => localStorage.clear());
     await emailInput.fill('admin@test.com');
-    await passInput.fill('admin123');
+    await passInput.fill('TDSg30!Pr0d#2026_X9');
     await submitBtn.click();
     await page.waitForTimeout(3000);
     await screenshot('after-login');

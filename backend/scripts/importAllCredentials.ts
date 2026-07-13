@@ -145,8 +145,8 @@ async function main() {
 
   // 7. Seed data users
   const seedUsers: CredInput[] = [
-    { category: 'other', service: 'system', label: 'Admin Panel — super_admin', username: 'admin@example.com', password: 'admin123', url: '' },
-    { category: 'other', service: 'system', label: 'Admin Panel — editor', username: 'editor@example.com', password: 'admin123', url: '' },
+    { category: 'other', service: 'system', label: 'Admin Panel — super_admin', username: 'admin@tds-geo.internal', password: 'TDSg30!Pr0d#2026_X9', url: '' },
+    { category: 'other', service: 'system', label: 'Admin Panel — editor', username: 'editor@tds-geo.internal', password: 'Ed1t0r!TDS#2026_X9', url: '' },
   ];
   for (const su of seedUsers) {
     if (!hasEntry(existingLookup2, su.label, su.service)) {

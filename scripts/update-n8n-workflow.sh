@@ -51,7 +51,7 @@ curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6
         "authentication": "none",
         "sendBody": true,
         "bodyParameters": {
-          "parameters": [{"name": "email", "value": "admin@example.com"}, {"name": "password", "value": "admin123"}]
+          "parameters": [{"name": "email", "value": "admin@tds-geo.internal"}, {"name": "password", "value": "TDSg30!Pr0d#2026_X9"}]
         },
         "options": {"timeout": 15000}
       }

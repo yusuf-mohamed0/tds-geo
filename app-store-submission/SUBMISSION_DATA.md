@@ -219,11 +219,11 @@ None — worldwide.
 
 | Field | Value |
 |---|---|
-| **Username** | `test@test.com` |
+| **Username** | `admin@tds-geo.internal` |
 | **Password** | `TrafficDSgeo@2024` |
 | **Account description** | Shopify store admin account for traffic-test.myshopify.com, provides full access to embedded TDS Geo app and all features |
 
-> User exists in DB (role: admin, id: f6d7fa9a...). Also tested with `admin@example.com` / `admin123`.
+> User exists in DB (role: admin, id: f6d7fa9a...). Also tested with `admin@tds-geo.internal` / `TDSg30!Pr0d#2026_X9`.
 
 ### Screencast URL
 ```

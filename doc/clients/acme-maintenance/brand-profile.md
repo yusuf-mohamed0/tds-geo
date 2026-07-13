@@ -75,8 +75,8 @@ The "AI SEO Shopify Agent" workflow runs daily:
 
 | Email | Role |
 |---|---|
-| `editor@example.com` | Editor |
-| `admin@example.com` | Admin (n8n workflow login) |
+| `editor@tds-geo.internal` | Editor |
+| `admin@tds-geo.internal` | Admin (n8n workflow login) |
 
 ## Notes
 - This is a **sample/development client** created via seed data for testing the TDS Geo content pipeline
