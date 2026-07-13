@@ -29,6 +29,16 @@ export default function Layout() {
             <Outlet />
           </ErrorBoundary>
         </main>
+        <footer className="border-t border-brand-border px-6 py-2 text-xs text-brand-muted flex items-center justify-between shrink-0 bg-white">
+          <span>TDS Geo</span>
+          <div className="flex gap-4">
+            <a href="/documentation" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Docs</a>
+            <a href="/tutorial" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Tutorial</a>
+            <a href="/faq" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">FAQ</a>
+            <a href="/changelog" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Changelog</a>
+            <a href="/privacy" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Privacy</a>
+          </div>
+        </footer>
       </div>
     </div>
   );

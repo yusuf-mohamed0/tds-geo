@@ -70,6 +70,16 @@ export default function LoginPage() {
           </button>
         </form>
       </div>
+      <footer className="absolute bottom-0 left-0 right-0 border-t border-brand-border px-6 py-3 text-xs text-brand-muted flex items-center justify-between bg-white">
+        <span>TDS Geo</span>
+        <div className="flex gap-4">
+          <a href="/documentation" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Docs</a>
+          <a href="/tutorial" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Tutorial</a>
+          <a href="/faq" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">FAQ</a>
+          <a href="/changelog" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Changelog</a>
+          <a href="/privacy" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Privacy</a>
+        </div>
+      </footer>
     </div>
   );
 }
