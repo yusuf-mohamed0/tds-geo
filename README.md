@@ -174,7 +174,7 @@ psql -d ai_seo_automation -f backend/database/schema.sql
 psql -d ai_seo_automation -f backend/database/seed.sql
 ```
 
-> The seed data includes demo accounts: `admin@example.com` / `admin123`
+> The seed data includes demo accounts: `admin@tds-geo.internal` / `TDSg30!Pr0d#2026_X9`
 
 ### Step 5: Start the App
 
@@ -199,7 +199,7 @@ npm run worker
 
 - **Frontend:** http://localhost:5173
 - **API:** http://localhost:3000
-- **Login:** `admin@example.com` / `admin123`
+- **Login:** `admin@tds-geo.internal` / `TDSg30!Pr0d#2026_X9`
 
 ---
 
@@ -330,7 +330,7 @@ For production, make sure to:
 POST /api/auth/login
 Content-Type: application/json
 
-{ "email": "admin@example.com", "password": "admin123" }
+{ "email": "admin@tds-geo.internal", "password": "TDSg30!Pr0d#2026_X9" }
 
 # Response: { "token": "eyJhbGci...", "user": { ... } }
 ```

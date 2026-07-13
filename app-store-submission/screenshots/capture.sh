@@ -42,7 +42,7 @@ import path from 'path';
 
 const OUTPUT = process.argv[2] || '.';
 const APP_URL = process.argv[3] || 'https://traffic.16.192.29.174.nip.io';
-const TEST_EMAIL = process.argv[4] || 'test@test.com';
+const TEST_EMAIL = process.argv[4] || 'admin@tds-geo.internal';
 const TEST_PASSWORD = process.argv[5] || '';
 
 async function shot(page, name, fullPage = false) {

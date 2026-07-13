@@ -8,11 +8,11 @@
 -- Run: psql -d ai_seo_automation -f backend/database/seed.sql
 
 -- ─── Admin User ──────────────────────────────
--- Password: admin123 (bcrypt hash)
+-- Password: TDSg30!Pr0d#2026_X9 (bcrypt hash)
 INSERT INTO users (email, password_hash, name, role, is_active)
 VALUES (
-  'admin@example.com',
-  '$2a$12$JxpFi1S9eQhA.OpYXf21TuYwi6uU4pkzAqrW4IyrlphabGG.J.DmG',
+  'admin@tds-geo.internal',
+  '$2a$12$ALds38BW1pmUbF80uArXB.u12.UsDx/LyWTD3bz6O58EvD7Jx5rym',
   'Admin User',
   'admin',
   true
@@ -37,8 +37,8 @@ ON CONFLICT (slug) DO NOTHING;
 -- ─── Editor User ─────────────────────────────
 INSERT INTO users (email, password_hash, name, role, client_id, is_active)
 SELECT
-  'editor@example.com',
-  '$2a$12$JxpFi1S9eQhA.OpYXf21TuYwi6uU4pkzAqrW4IyrlphabGG.J.DmG',
+  'editor@tds-geo.internal',
+  '$2a$12$DIxJ7Z7wbEQ2d/aw6or1geHWNDlzPA/vZ0nXiWJNX5r9fAXX/AquS',
   'Editor User',
   'editor',
   id,
@@ -191,6 +191,6 @@ WHERE a.status = 'published'
 -- ══════════════════════════════════════════════
 -- Seed Complete
 -- ══════════════════════════════════════════════
--- Users: admin@example.com / admin123, editor@example.com / admin123
--- Password hash generated via bcrypt.hashSync('admin123', 12)
+-- Users: admin@tds-geo.internal / TDSg30!Pr0d#2026_X9, editor@tds-geo.internal / Ed1t0r!TDS#2026_X9
+-- Password hash generated via bcrypt.hashSync('TDSg30!Pr0d#2026_X9', 12)
 -- Client: Acme Maintenance Co. with 10 keywords, articles, activity logs
