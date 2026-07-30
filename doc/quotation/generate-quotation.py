@@ -153,7 +153,7 @@ def create_document():
 
     c1 = hdr.cell(0, 1); c1.width = Cm(11.5)
     p = c1.paragraphs[0]; p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    r = p.add_run("Odoo Gold Implementation Partner\n"); r.font.size = Pt(9); r.font.color.rgb = GRAY
+    r = p.add_run("Odoo Implementation Services - {ODOO_PARTNER_STATUS}\n"); r.font.size = Pt(9); r.font.color.rgb = GRAY
     r = p.add_run("Villa 125, Axis 80, 5th Settlement, Cairo, Egypt\n"); r.font.size = Pt(8); r.font.color.rgb = GRAY
     r = p.add_run("webdevelopment@trafficdigitalsolutions.com  -  trafficdigitalsolutions.com"); r.font.size = Pt(8); r.font.color.rgb = GRAY
 
@@ -236,7 +236,52 @@ def create_document():
         ("Local presence", "Cairo-based team available for workshops, stakeholder meetings, and on-site support"),
     ], [Cm(5.0), Cm(12.0)])
 
-    body(doc, "Relevant references and case studies can be shared upon request, subject to client confidentiality approvals.", size=8.5, color=GRAY, italic=True)
+    body(doc, "Why Traffic wins:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Proof Point", "Proposal Value"], [
+        ("Completed Odoo implementations", "{COMPLETED_ODOO_IMPLEMENTATIONS}+ implementations across selected industries"),
+        ("Average go-live time", "{AVERAGE_GO_LIVE_TIME} for projects of similar scope"),
+        ("Client satisfaction", "{CLIENT_SATISFACTION_RATE}% satisfaction based on post-project feedback"),
+        ("Certified capability", "{ODOO_CERTIFICATIONS} Odoo certifications and {ODOO_CONSULTANTS} active consultants"),
+        ("Support desk", "{SUPPORT_TEAM_SIZE} support specialists with documented SLA and escalation process"),
+        ("Local delivery", "Cairo-based team with on-site workshop and executive steering support when needed"),
+    ], [Cm(5.2), Cm(11.8)])
+
+    body(doc, "Our implementation approach:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Stage", "Output"], [
+        ("1. Discovery", "Stakeholder interviews, current-state review, data audit"),
+        ("2. Business Analysis", "Process maps, GAP Analysis, BRD, implementation priorities"),
+        ("3. Solution Design", "Target workflows, roles, approvals, reports, integrations"),
+        ("4. Configuration", "Odoo modules configured according to the approved BRD"),
+        ("5. Development", "Approved custom fields, reports, automations, and integrations"),
+        ("6. Testing", "Internal QA, UAT support, defect closure, acceptance evidence"),
+        ("7. Training", "Role-based sessions, user manual, SOPs, admin guide"),
+        ("8. Go-Live", "Production launch, checklist completion, stakeholder sign-off"),
+        ("9. Hypercare", "Post-launch support, stabilization, adoption monitoring"),
+        ("10. Continuous Support", "Ongoing SLA support, enhancements, and quarterly reviews if selected"),
+    ], [Cm(4.6), Cm(12.4)])
+
+    body(doc, "Representative case study:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Item", "Details"], [
+        ("Client", "{CASE_STUDY_CLIENT_NAME} ({CASE_STUDY_CONFIDENTIAL_NAME})"),
+        ("Industry", "{CASE_STUDY_INDUSTRY}"),
+        ("Modules", "{CASE_STUDY_MODULES}"),
+        ("Users", "{CASE_STUDY_USERS}"),
+        ("Timeline", "{CASE_STUDY_TIMELINE}"),
+        ("Results", "{CASE_STUDY_RESULTS}"),
+    ], [Cm(4.2), Cm(12.8)])
+
+    body(doc, "Proposed delivery team:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Role", "Responsibility"], [
+        ("Project Manager", "Timeline, communication, risks, milestones, and steering updates"),
+        ("Business Analyst", "Discovery workshops, BRD, process maps, acceptance criteria"),
+        ("Functional Consultant", "Odoo configuration, business rules, workflows, user journeys"),
+        ("Odoo Developer", "Custom fields, reports, automations, integrations, technical fixes"),
+        ("QA Specialist", "Test scenarios, defect tracking, UAT support, release checks"),
+        ("Trainer", "Role-based training, user manuals, SOPs, admin guide"),
+        ("Support Lead", "Hypercare, SLA tracking, escalation, post-go-live stabilization"),
+    ], [Cm(4.2), Cm(12.8)])
+
+    body(doc, "Final references and live case studies can be shared subject to client confidentiality approvals.", size=8.5, color=GRAY, italic=True)
 
     # ═══════════════════════════════════════════════════
     #  3. DISCOVERY OUTPUTS
@@ -357,6 +402,18 @@ def create_document():
         "Timeline assumes timely delivery of client inputs, data, and approvals. "
         "Any delays in client responsibilities may extend the timeline, which will be communicated promptly."
     ), size=9.5, italic=True)
+
+    body(doc, "High-level implementation timeline:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Workstream", "W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8"], [
+        ("Discovery", "X", "", "", "", "", "", "", ""),
+        ("Configuration", "", "X", "X", "", "", "", "", ""),
+        ("Data Migration", "", "", "X", "X", "", "", "", ""),
+        ("Customization", "", "", "", "X", "X", "X", "", ""),
+        ("Testing and UAT", "", "", "", "", "", "X", "X", ""),
+        ("Training", "", "", "", "", "", "", "X", ""),
+        ("Go-Live", "", "", "", "", "", "", "", "X"),
+        ("Hypercare", "", "", "", "", "", "", "", "X"),
+    ], [Cm(4.0), Cm(1.3), Cm(1.3), Cm(1.3), Cm(1.3), Cm(1.3), Cm(1.3), Cm(1.3), Cm(1.3)])
 
     body(doc, "Milestone acceptance checkpoints:", bold=True, color=NAVY, after=4)
     styled_table(doc, ["Milestone", "Acceptance Evidence", "Sign-off Required"], [
@@ -502,7 +559,35 @@ def create_document():
         ("Gold", "Extended business hours", "8 hours", "1-3 business days for standard issues", "Support lead, project manager, senior consultant"),
     ], [Cm(2.2), Cm(3.0), Cm(2.7), Cm(4.4), Cm(4.0)])
 
+    body(doc, "Support priority matrix:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Severity", "Definition", "Response", "Resolution Target"], [
+        ("Critical", "Production system unavailable or core transaction blocked", "2 hours", "8 business hours"),
+        ("High", "Major business function impaired with no practical workaround", "4 hours", "24 business hours"),
+        ("Medium", "Issue affects a limited process and workaround is available", "1 business day", "3 business days"),
+        ("Low", "Minor issue, question, cosmetic defect, or enhancement request", "2 business days", "Next agreed release"),
+    ], [Cm(2.4), Cm(7.2), Cm(3.0), Cm(3.8)])
+
     body(doc, "Emergency support for production-blocking issues can be added as a separate paid add-on if required.", size=8.5, color=GRAY, italic=True)
+
+    body(doc, "Warranty scope:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Included During Warranty", "Excluded From Warranty"], [
+        ("Bug fixes for approved deliverables that do not match the signed BRD", "New requirements or changes after requirements freeze"),
+        ("Configuration corrections for agreed workflows", "Odoo license fees, hosting, infrastructure, or third-party service fees"),
+        ("Integration fixes for integrations explicitly included in scope", "Third-party API changes, downtime, or vendor-side defects"),
+        ("Data import corrections caused by implementation error", "Incorrect, incomplete, or late client-provided data"),
+        ("Clarification support for trained users during hypercare", "New training sessions outside the agreed training plan"),
+    ], [Cm(8.2), Cm(8.2)])
+
+    body(doc, "Definition of done:", bold=True, color=NAVY, after=4)
+    for done_item in [
+        "The module or deliverable matches the approved BRD and agreed acceptance criteria",
+        "Configuration or development has passed internal QA checks",
+        "Client UAT has been completed with no unresolved critical or high-priority issues",
+        "Documentation, SOPs, or user guidance has been delivered where applicable",
+        "Training has been completed for the agreed user groups where applicable",
+        "The nominated client approver has provided written sign-off or accepted go-live approval",
+    ]:
+        bullet(doc, done_item)
 
     for label, desc in [
         ("Bronze: Basic", "{BRONZE_PRICE}/month. Email-only support, bug fixes, 48-hour response time, quarterly system health check."),
@@ -630,7 +715,9 @@ def create_document():
          "materially breaches any provision and fails to cure the breach within 15 days of receiving written notice. "
          "10.2 If you terminate without cause before the project is complete, you will pay for all work "
          "satisfactorily completed up to the termination date, plus any non-cancellable commitments made on your behalf. "
-         "10.3 Upon termination for any reason, you must pay all amounts due for work completed."),
+         "10.3 Client delays exceeding 30 calendar days may require project rescheduling and revised delivery dates, "
+         "subject to Traffic Digital Solutions resource availability. "
+         "10.4 Upon termination for any reason, you must pay all amounts due for work completed."),
         ("11. Force Majeure",
          "Neither party shall be liable for delays or failures caused by events beyond its reasonable control, "
          "including but not limited to: acts of God, war, terrorism, pandemic, government action, "
