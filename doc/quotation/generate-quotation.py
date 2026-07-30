@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a polished Traffic Digital Solutions Quotation as .docx — English Only"""
+"""Generate Traffic Digital Solutions Odoo Implementation Quotation — English Only"""
 
 from docx import Document
 from docx.shared import Inches, Pt, Cm, RGBColor
@@ -17,7 +17,6 @@ GRAY = RGBColor(0x83, 0x80, 0x81)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 DARK_GRAY = RGBColor(0x3D, 0x3B, 0x3B)
 
-LOGO_PATH = "/root/tds-geo/assets/logos/tds-geo-black.png"
 OUTPUT_PATH = "/root/tds-geo/doc/quotation/TDS-GEO-Quotation.docx"
 
 
@@ -28,7 +27,10 @@ def set_shading(cell, hex_color):
 
 
 def no_borders(table):
-    pr = table._tbl.tblPr or parse_xml(f'<w:tblPr {nsdecls("w")}/>')
+    pr = table._tbl.tblPr
+    if pr is None:
+        pr = parse_xml(f'<w:tblPr {nsdecls("w")}/>')
+        table._tbl.insert(0, pr)
     pr.append(parse_xml(
         f'<w:tblBorders {nsdecls("w")}>'
         f'<w:top w:val="none" w:sz="0" w:space="0" w:color="auto"/>'
@@ -76,11 +78,21 @@ def body(doc, text, size=10, color=DARK_GRAY, bold=False, italic=False, after=6)
     return p
 
 
-def bullet(doc, text):
+def bullet(doc, text, indent=0.5):
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(2)
-    p.paragraph_format.left_indent = Cm(0.5)
+    p.paragraph_format.left_indent = Cm(indent)
     r = p.add_run(f"  \u2022  {text}")
+    r.font.size = Pt(9.5)
+    r.font.color.rgb = DARK_GRAY
+    return p
+
+
+def numbered(doc, num, text, indent=0.5):
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(2)
+    p.paragraph_format.left_indent = Cm(indent)
+    r = p.add_run(f"  {num}.  {text}")
     r.font.size = Pt(9.5)
     r.font.color.rgb = DARK_GRAY
     return p
@@ -111,18 +123,15 @@ def create_document():
     no_borders(hdr)
 
     c0 = hdr.cell(0, 0); c0.width = Cm(4.5)
-    if os.path.exists(LOGO_PATH):
-        lp = c0.paragraphs[0]; lp.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        lp.add_run().add_picture(LOGO_PATH, width=Cm(4.0))
+    lp = c0.paragraphs[0]; lp.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    r = lp.add_run("Traffic Digital Solutions")
+    r.bold = True; r.font.size = Pt(18); r.font.color.rgb = BLACK
 
     c1 = hdr.cell(0, 1); c1.width = Cm(11.5)
     p = c1.paragraphs[0]; p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    r = p.add_run("Traffic Digital Solutions"); r.bold = True; r.font.size = Pt(20); r.font.color.rgb = BLACK
-    p2 = c1.add_paragraph(); p2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    r = p2.add_run("AI-Powered Content & SEO Platform\n"); r.font.size = Pt(9); r.font.color.rgb = GRAY
-    r = p2.add_run("Commercial Registration: XXXXX  |  Tax ID: XXXXX\n"); r.font.size = Pt(8); r.font.color.rgb = GRAY
-    r = p2.add_run("Villa 125, Axis 80, 5th Settlement, Cairo, Egypt\n"); r.font.size = Pt(8); r.font.color.rgb = GRAY
-    r = p2.add_run("webdevelopment@trafficdigitalsolutions.com  |  trafficdigitalsolutions.com"); r.font.size = Pt(8); r.font.color.rgb = GRAY
+    r = p.add_run("Odoo Implementation Partner\n"); r.font.size = Pt(9); r.font.color.rgb = GRAY
+    r = p.add_run("Villa 125, Axis 80, 5th Settlement, Cairo, Egypt\n"); r.font.size = Pt(8); r.font.color.rgb = GRAY
+    r = p.add_run("webdevelopment@trafficdigitalsolutions.com  |  trafficdigitalsolutions.com"); r.font.size = Pt(8); r.font.color.rgb = GRAY
 
     rule(doc, "FCB900", 20)
 
@@ -133,7 +142,7 @@ def create_document():
     ti.alignment = WD_ALIGN_PARAGRAPH.CENTER
     ti.paragraph_format.space_before = Pt(18)
     ti.paragraph_format.space_after = Pt(2)
-    r = ti.add_run("PROFESSIONAL SERVICES QUOTATION")
+    r = ti.add_run("ODEO IMPLEMENTATION QUOTATION")
     r.bold = True; r.font.size = Pt(26); r.font.color.rgb = BLACK; r.font.name = 'Calibri Light'
 
     q = doc.add_paragraph()
@@ -150,10 +159,10 @@ def create_document():
     info = doc.add_table(rows=2, cols=2); no_borders(info)
 
     cells = [
-        (0, 0, "PREPARED FOR", ["{CLIENT_NAME}", "{CLIENT_ADDRESS}", "{CLIENT_EMAIL}"]),
-        (0, 1, "PROJECT DETAILS", ["Project: {PROJECT_NAME}", "Description: {PROJECT_DESC}", "Start Date: {START_DATE}", "Duration: {DURATION}"]),
+        (0, 0, "PREPARED FOR", ["{CLIENT_NAME}", "{CLIENT_ADDRESS}", "{CLIENT_EMAIL}", "{CLIENT_PHONE}"]),
+        (0, 1, "PROJECT DETAILS", ["Project: {PROJECT_NAME}", "Odoo Edition: {ODOO_EDITION}", "Users: {USER_COUNT}", "Start Date: {START_DATE}", "Duration: {DURATION}"]),
         (1, 0, "PAYMENT & CURRENCY", ["Currency: {CURRENCY}", "Payment Terms: {PAYMENT_TERMS}", "Tax: {TAX_TREATMENT}"]),
-        (1, 1, "DELIVERY METHOD", ["Format: Digital Delivery", "Schedule: {DELIVERY_SCHEDULE}", "Handover: {HANDOVER_METHOD}"]),
+        (1, 1, "DELIVERY METHOD", ["Format: Cloud / On-Premise", "Location: On-site / Remote", "Handover: {HANDOVER_METHOD}"]),
     ]
     for ri, ci, label, lines in cells:
         cell = info.cell(ri, ci)
@@ -166,45 +175,50 @@ def create_document():
     rule(doc, "FCB900", 10)
 
     # ═══════════════════════════════════════════════════════
-    #  1. PROJECT OVERVIEW
+    #  1. EXECUTIVE SUMMARY
     # ═══════════════════════════════════════════════════════
-    heading(doc, 1, "PROJECT OVERVIEW")
-    body(doc, "{PROJECT_OVERVIEW}")
-
-    p = doc.add_paragraph()
-    p.paragraph_format.space_after = Pt(4)
-    r = p.add_run("Key Objectives:")
-    r.bold = True; r.font.size = Pt(9.5); r.font.color.rgb = NAVY
-    for obj in ["{OBJECTIVE_1}", "{OBJECTIVE_2}", "{OBJECTIVE_3}"]:
-        bullet(doc, obj)
+    heading(doc, 1, "EXECUTIVE SUMMARY")
+    body(doc, "{EXECUTIVE_SUMMARY}")
 
     # ═══════════════════════════════════════════════════════
-    #  2. SCOPE OF SERVICES
+    #  2. SCOPE OF WORK — MODULES & SERVICES
     # ═══════════════════════════════════════════════════════
-    heading(doc, 2, "SCOPE OF SERVICES")
-    body(doc, "The following services are included in this engagement:")
+    heading(doc, 2, "SCOPE OF WORK — ODOO MODULES & SERVICES")
+    body(doc, "We will implement, configure, and deploy the following Odoo modules and services for your organization:")
 
-    services = [
-        ("AI-Powered Content Generation",
-         "Automated creation of SEO-optimized articles tailored to your brand voice, target keywords, and audience. Each article follows our proprietary EEAT Content Framework for quality, topical authority, and long-term ranking performance."),
-        ("SEO Optimization Pipeline",
-         "Full on-page SEO including meta tags, headings, keyword placement, internal linking, schema markup, readability scoring, and content structure optimization."),
-        ("Multi-Platform Publishing",
-         "Direct API-based publishing to Shopify, WordPress, Webflow, or Ghost. Includes scheduled publishing with an integrated approval workflow."),
-        ("Google Search Console Integration",
-         "Real-time search performance tracking: impressions, clicks, CTR, and average position. Full sync and analysis of your search presence."),
-        ("Analytics & Reporting Dashboard",
-         "Real-time dashboard with metric cards, performance charts, top queries table, and exportable monthly reports."),
-        ("Multi-Language Content Support",
-         "Content generation and SEO in up to 13 languages: English, Arabic, French, German, Spanish, Portuguese, Italian, Russian, Turkish, Japanese, Chinese, Korean, and Dutch."),
+    modules = [
+        "Odoo Installation & Server Setup",
+        "Sales & CRM Module — Configuration & Customization",
+        "Accounting & Invoicing — Chart of Accounts, Tax Rules, Reports",
+        "Inventory & Warehouse Management — Stock Locations, Transfers, Valuation",
+        "Purchasing & Vendor Management",
+        "Human Resources — Employee Records, Contracts, Leaves, Payroll",
+        "Manufacturing / Bill of Materials (if applicable)",
+        "Website & E-commerce Module — Storefront Setup & Theme",
+        "Email Marketing & Campaign Automation",
+        "Project Management & Timesheets",
     ]
 
-    for title, desc in services:
+    for mod in modules:
+        bullet(doc, mod)
+
+    doc.add_paragraph()
+    body(doc, "Additional Services Included:")
+
+    extras = [
+        ("System Configuration", "Odoo Online / On-Premise setup, user roles, security groups, email server configuration, and localized settings."),
+        ("Data Migration", "Secure import of master data (customers, vendors, products, chart of accounts, open invoices, inventory balances) from your existing system. Includes data cleansing and validation."),
+        ("Customization & Development", "Custom fields, views, reports, and workflows tailored to your business processes. Any custom module development as specified in the requirements."),
+        ("User Training", "Hands-on training sessions for your team — up to {TRAINING_SESSIONS} group sessions covering all deployed modules."),
+        ("Testing & Quality Assurance", "Module integration testing, user acceptance testing (UAT) support, and bug fixing during the implementation phase."),
+        ("Go-Live Support", "Dedicated support during the first {GO_LIVE_SUPPORT_DAYS} business days after go-live to ensure smooth operations."),
+    ]
+
+    for label, desc in extras:
         sp = doc.add_paragraph()
         sp.paragraph_format.space_before = Pt(6)
         sp.paragraph_format.space_after = Pt(2)
-        r = sp.add_run(f"  {title}")
-        r.bold = True; r.font.size = Pt(10); r.font.color.rgb = NAVY
+        r = sp.add_run(f"  {label}"); r.bold = True; r.font.size = Pt(10); r.font.color.rgb = NAVY
         body(doc, desc, size=9.5, after=4)
 
     # ═══════════════════════════════════════════════════════
@@ -213,29 +227,37 @@ def create_document():
     heading(doc, 3, "EXCLUSIONS")
     body(doc, "The following are explicitly not included unless separately agreed in writing:")
     for ex in [
-        "Website design, development, or hosting services",
-        "Graphic design or brand identity creation (except AI-generated article images)",
-        "Manual content writing, editing, or proofreading",
-        "Paid advertising management (Google Ads, Social Media Ads)",
-        "Domain registration, email hosting, or SSL certificates",
-        "Third-party software licenses or subscriptions",
-        "Video production, animation, or photography",
+        "Odoo Online subscription fees or Odoo Enterprise license costs (paid directly to Odoo S.A.)",
+        "Third-party Odoo apps or modules purchased from the Odoo App Store",
+        "Website content creation (copywriting, photography, video)",
+        "Custom mobile app development",
+        "Ongoing support and maintenance beyond the warranty period",
+        "Hardware, hosting infrastructure, or IT equipment",
+        "Graphic design or branding outside of Odoo website theme customization",
     ]:
         bullet(doc, ex)
 
     # ═══════════════════════════════════════════════════════
-    #  4. TIMELINE & MILESTONES
+    #  4. IMPLEMENTATION METHODOLOGY & TIMELINE
     # ═══════════════════════════════════════════════════════
-    heading(doc, 4, "TIMELINE & MILESTONES")
+    heading(doc, 4, "IMPLEMENTATION METHODOLOGY & TIMELINE")
 
-    for phase, dur, desc in [
-        ("Phase 1 — Setup & Onboarding", "Days 1-5",
-         "Account creation, platform configuration, API integrations, brand profile setup, keyword research initialization, and test run."),
-        ("Phase 2 — First Content Batch", "Days 6-12",
-         "Initial content generation (up to 5 articles), review and revision cycle, and publishing pipeline validation."),
-        ("Phase 3 — Ongoing Delivery", "Weekly",
-         "Scheduled content generation per agreed cadence with continuous optimization and monthly performance reporting."),
-    ]:
+    phases = [
+        ("Phase 1 — Discovery & Requirements", "Week 1",
+         "Business process analysis, requirements gathering, module selection finalization, and project plan approval."),
+        ("Phase 2 — System Configuration", "Weeks 2-3",
+         "Server setup, Odoo installation, module configuration, chart of accounts setup, email and workflow configuration."),
+        ("Phase 3 — Data Migration", "Weeks 3-4",
+         "Data extraction, cleansing, transformation, and import. Reconciliation and validation with your team."),
+        ("Phase 4 — Customization & Development", "Weeks 4-6",
+         "Custom fields, views, reports, workflows, and any required module development. Iterative review cycles."),
+        ("Phase 5 — Testing & Training", "Weeks 6-7",
+         "Integration testing, UAT, bug fixing, and user training sessions. Acceptance sign-off."),
+        ("Phase 6 — Go-Live & Hypercare", "Week 8",
+         "Production deployment, go-live support, and hypercare period with dedicated assistance."),
+    ]
+
+    for phase, dur, desc in phases:
         mp = doc.add_paragraph()
         mp.paragraph_format.space_before = Pt(6)
         mp.paragraph_format.space_after = Pt(2)
@@ -243,7 +265,7 @@ def create_document():
         r2 = mp.add_run(f"  —  {dur}"); r2.font.size = Pt(9); r2.font.color.rgb = GOLD; r2.bold = True
         body(doc, desc, size=9.5, after=4)
 
-    body(doc, "Total estimated duration: {DURATION} from start date. Timeline may be adjusted based on client feedback cycles and scope changes.", size=9.5, italic=True)
+    body(doc, "Total estimated duration: {DURATION} from project kickoff. Timeline is based on timely client feedback and data availability.", size=9.5, italic=True)
 
     # ═══════════════════════════════════════════════════════
     #  5. CLIENT RESPONSIBILITIES
@@ -251,12 +273,13 @@ def create_document():
     heading(doc, 5, "CLIENT RESPONSIBILITIES")
     body(doc, "To ensure successful delivery, you agree to:")
     for rsp in [
-        "Provide API access to your CMS platforms (Shopify, WordPress, etc.)",
-        "Share brand guidelines, target keywords, and content preferences",
-        "Review and approve generated content within 3 business days of delivery",
-        "Provide timely feedback on content quality and strategic direction",
-        "Maintain a valid payment method and adhere to agreed payment terms",
-        "Designate a point of contact for day-to-day coordination",
+        "Appoint a project manager and key stakeholders for each department",
+        "Provide timely access to existing data, templates, and business documentation",
+        "Make decisions on configuration and customization within agreed timelines",
+        "Provide test users and participate in UAT",
+        "Ensure availability for training sessions",
+        "Provide Odoo Online / Enterprise license credentials in a timely manner",
+        "Approve milestones and sign off on deliverables",
     ]:
         bullet(doc, rsp)
 
@@ -267,10 +290,12 @@ def create_document():
 
     items = [
         ("#", "SERVICE", "QTY", "UNIT PRICE", "TOTAL"),
-        ("1", "Setup & Onboarding", "1", "{SETUP_PRICE}", "{SETUP_TOTAL}"),
-        ("2", "{PLAN_NAME} — {BILLING_CYCLE}", "{PLAN_QTY}", "{PLAN_UNIT_PRICE}", "{PLAN_TOTAL}"),
-        ("3", "Extra Article Pack (×{EXTRA_QTY})", "{EXTRA_QTY}", "{EXTRA_UNIT_PRICE}", "{EXTRA_TOTAL}"),
-        ("4", "Strategy Consulting ({CONSULT_HRS} hours)", "{CONSULT_HRS}", "{CONSULT_RATE}/hr", "{CONSULT_TOTAL}"),
+        ("1", "Odoo Installation & Server Setup", "1", "{SETUP_PRICE}", "{SETUP_TOTAL}"),
+        ("2", "Core Modules Configuration ({NUM_MODULES} modules)", "{MODULE_QTY}", "{MODULE_UNIT_PRICE}", "{MODULE_TOTAL}"),
+        ("3", "Data Migration Services", "{MIG_HOURS} hrs", "{MIG_RATE}/hr", "{MIG_TOTAL}"),
+        ("4", "Customization & Development", "{DEV_HOURS} hrs", "{DEV_RATE}/hr", "{DEV_TOTAL}"),
+        ("5", "User Training ({TRAINING_SESSIONS} sessions)", "{TRAINING_QTY}", "{TRAINING_UNIT_PRICE}", "{TRAINING_TOTAL}"),
+        ("6", "Project Management & Coordination", "{PM_HOURS} hrs", "{PM_RATE}/hr", "{PM_TOTAL}"),
     ]
 
     tbl = doc.add_table(rows=len(items), cols=5)
@@ -294,7 +319,7 @@ def create_document():
             p.paragraph_format.space_before = Pt(2)
             p.paragraph_format.space_after = Pt(2)
 
-    # Subtotal & Discount rows
+    # Subtotal & Discount
     for label, val in [("Subtotal", "{SUBTOTAL}"), ("Discount ({DISCOUNT_PCT}%)", "({DISCOUNT_AMOUNT})")]:
         tr = tbl.add_row()
         for ci in range(5):
@@ -324,12 +349,27 @@ def create_document():
         elif ci == 3:
             r = p.add_run("{CURRENCY}"); r.font.size = Pt(9); r.font.color.rgb = GRAY
 
-    vat = doc.add_paragraph()
-    vat.paragraph_format.space_before = Pt(4)
-    r = vat.add_run("VAT (14%) will be added where applicable. All prices in {CURRENCY} unless otherwise stated.  ")
-    r.font.size = Pt(8); r.font.color.rgb = GRAY; r.italic = True
-    r2 = vat.add_run("Quarterly prepaid plans include a 10% discount. Annual prepaid plans include a 15% discount.")
-    r2.font.size = Pt(8); r2.font.color.rgb = GOLD; r2.bold = True
+    # Post-implementation support
+    doc.add_paragraph()
+    support_p = doc.add_paragraph()
+    support_p.paragraph_format.space_after = Pt(2)
+    r = support_p.add_run("Post-Implementation Support & Maintenance")
+    r.bold = True; r.font.size = Pt(10); r.font.color.rgb = NAVY
+
+    support_options = [
+        ("Bronze — Basic Support", "{BRONZE_SUPPORT_PRICE}/month — Email support, bug fixes, 48h response time."),
+        ("Silver — Standard Support", "{SILVER_SUPPORT_PRICE}/month — Email + phone support, bug fixes, minor changes, 24h response."),
+        ("Gold — Premium Support", "{GOLD_SUPPORT_PRICE}/month — All Silver + dedicated account manager, 8h response, quarterly business reviews."),
+    ]
+
+    for label, desc in support_options:
+        sp = doc.add_paragraph()
+        sp.paragraph_format.space_after = Pt(2)
+        sp.paragraph_format.left_indent = Cm(0.5)
+        r = sp.add_run(f"  {label}:  "); r.bold = True; r.font.size = Pt(9.5); r.font.color.rgb = NAVY
+        r2 = sp.add_run(desc); r2.font.size = Pt(9.5); r2.font.color.rgb = DARK_GRAY
+
+    body(doc, "VAT (14%) will be added where applicable. All prices in {CURRENCY}.", size=8, color=GRAY, italic=True)
 
     # ═══════════════════════════════════════════════════════
     #  7. PAYMENT SCHEDULE
@@ -337,11 +377,12 @@ def create_document():
     heading(doc, 7, "PAYMENT SCHEDULE")
 
     options = [
-        ("Option A — Full Upfront (Recommended)", "100% upon signing. Best value."),
-        ("Option B — 50/50 Split", "50% upon signing, 50% upon delivery confirmation."),
-        ("Option C — 30/70 Split", "30% deposit upon signing, 70% within 15 days of completion."),
-        ("Option D — Net 15", "Full payment within 15 days of invoice date."),
-        ("Option E — Net 30", "Full payment within 30 days of invoice date."),
+        ("Milestone-Based (Recommended)", 
+         "30% upon signing  |  30% upon UAT sign-off  |  30% upon go-live  |  10% upon 30-day post-go-live review"),
+        ("50/50 Split", "50% upon signing, 50% upon successful go-live."),
+        ("Monthly Installments", "Equal monthly payments over the implementation period."),
+        ("Net 30", "Full payment within 30 days of final invoice."),
+        ("Full Upfront", "Full payment upon signing. Includes a 5% discount on the total project value."),
     ]
     for label, desc in options:
         pp = doc.add_paragraph()
@@ -357,24 +398,26 @@ def create_document():
     heading(doc, 8, "TERMS & CONDITIONS")
 
     terms = [
-        ("1. Minimum Term",
-         "The initial commitment is a minimum of three (3) calendar months. After the initial term, the agreement auto-renews monthly unless either party gives 30 days' written cancellation notice."),
+        ("1. Project Scope",
+         "The scope of work is defined in Section 2 above. Any additional work outside this scope will be billed separately at our standard hourly rate of {ADDITIONAL_WORK_RATE}/hour upon your written approval."),
         ("2. Payment Terms",
-         "All fees are in the stated currency. Invoices are due according to the selected payment schedule. Late payments incur 2% monthly interest on overdue amounts. Services may be suspended if payment is more than 15 days past due."),
-        ("3. Intellectual Property",
-         "You own all content generated specifically for your brand upon full payment. We retain ownership of our platform, algorithms, software, and methodologies."),
-        ("4. Confidentiality",
-         "All non-public information shared during this engagement is strictly confidential and will not be disclosed to third parties without your consent."),
-        ("5. Data Protection & Security",
-         "We maintain industry-standard security measures including encryption (AES-256 at rest, TLS 1.3 in transit), access controls, and regular backups. Your data will be deleted within 90 days of contract termination, unless retention is required by law."),
-        ("6. No Guarantee of Rankings",
-         "We deliver high-quality content and apply SEO best practices. However, search engine rankings depend on many factors beyond our control and are never guaranteed."),
-        ("7. Limitation of Liability",
-         "Our total liability is capped at the total fees paid in the twelve (12) months preceding any claim. We are not liable for indirect, incidental, or consequential damages."),
-        ("8. Termination",
-         "Either party may terminate for material breach with 15 days' written notice. If you terminate before the minimum term ends, the remaining balance for the minimum term becomes immediately due."),
-        ("9. Governing Law & Dispute Resolution",
-         "This agreement is governed by {GOVERNING_LAW}. Disputes will first be resolved through good-faith negotiation, then mediation, and finally binding arbitration if necessary."),
+         "Invoices are due according to the selected payment schedule. Late payments incur 2% monthly interest on overdue amounts. Work may be suspended if payment is more than 15 days past due."),
+        ("3. Change Orders",
+         "Any changes to the agreed scope must be submitted via a formal change order and approved in writing by both parties. Work on change orders begins only after approval."),
+        ("4. Intellectual Property",
+         "Upon full payment, you own all custom-developed code, configurations, and reports created specifically for this project. We retain ownership of our pre-existing methodologies, tools, and frameworks."),
+        ("5. Confidentiality",
+         "All business information shared during this engagement is strictly confidential. We will sign an NDA if required."),
+        ("6. Data Protection & Security",
+         "We follow industry-standard security practices including encrypted data transfer, access controls, and secure handling of your business data in compliance with applicable data protection regulations."),
+        ("7. Warranty",
+         "We warrant that all work will conform to the agreed specifications. Any defects reported within 30 days of go-live will be corrected at no additional charge."),
+        ("8. Limitation of Liability",
+         "Our total liability is capped at the total fees paid under this quotation. We are not liable for indirect, incidental, or consequential damages, including loss of data or business interruption."),
+        ("9. Termination",
+         "Either party may terminate for material breach with 15 days' written notice. In the event of termination, you will pay for all work completed up to the termination date."),
+        ("10. Governing Law",
+         "This agreement is governed by {GOVERNING_LAW}. Both parties will first attempt to resolve disputes through good-faith negotiation."),
     ]
 
     for label, desc in terms:
@@ -432,7 +475,7 @@ def create_document():
     r.font.size = Pt(7); r.font.color.rgb = GRAY; r.italic = True
 
     doc.save(OUTPUT_PATH)
-    print(f"Quotation saved to: {OUTPUT_PATH}")
+    print(f"Odoo Implementation Quotation saved to: {OUTPUT_PATH}")
     print(f"File size: {os.path.getsize(OUTPUT_PATH) / 1024:.1f} KB")
 
 
