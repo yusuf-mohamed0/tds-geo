@@ -91,6 +91,37 @@ def bullet(doc, text, indent=0.5):
     return p
 
 
+def styled_table(doc, headers, rows, widths=None):
+    table = doc.add_table(rows=1, cols=len(headers))
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    if widths:
+        for i, width in enumerate(widths):
+            for row in table.rows:
+                row.cells[i].width = width
+
+    for i, header in enumerate(headers):
+        cell = table.cell(0, i)
+        set_shading(cell, "171414")
+        p = cell.paragraphs[0]
+        p.paragraph_format.space_before = Pt(3)
+        p.paragraph_format.space_after = Pt(3)
+        r = p.add_run(header)
+        r.bold = True
+        r.font.size = Pt(8)
+        r.font.color.rgb = WHITE
+
+    for row_data in rows:
+        row = table.add_row()
+        for i, value in enumerate(row_data):
+            p = row.cells[i].paragraphs[0]
+            p.paragraph_format.space_before = Pt(3)
+            p.paragraph_format.space_after = Pt(3)
+            r = p.add_run(value)
+            r.font.size = Pt(8.5)
+            r.font.color.rgb = DARK_GRAY
+    return table
+
+
 def create_document():
     doc = Document()
 
@@ -196,23 +227,50 @@ def create_document():
     ]:
         bullet(doc, reason)
 
+    body(doc, "Implementation strength at a glance:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Capability", "Current Position"], [
+        ("Projects delivered", "100+ digital and ERP-related projects delivered since 2019"),
+        ("Industries served", "Retail, healthcare, manufacturing, professional services, education, and e-commerce"),
+        ("Delivery model", "Business analysis, configuration, development, migration, training, launch, and support"),
+        ("Support availability", "Dedicated post-go-live support with clear response times and escalation path"),
+        ("Local presence", "Cairo-based team available for workshops, stakeholder meetings, and on-site support"),
+    ], [Cm(5.0), Cm(12.0)])
+
+    body(doc, "Relevant references and case studies can be shared upon request, subject to client confidentiality approvals.", size=8.5, color=GRAY, italic=True)
+
     # ═══════════════════════════════════════════════════
-    #  3. SCOPE OF WORK
+    #  3. DISCOVERY OUTPUTS
     # ═══════════════════════════════════════════════════
-    heading(doc, 3, "SCOPE OF WORK - ODOO MODULES & SERVICES")
-    body(doc, "We will implement, configure, and deploy the following Odoo modules and services for your organization:")
+    heading(doc, 3, "DISCOVERY OUTPUTS")
+    body(doc, (
+        "The first stage is designed to remove ambiguity before configuration starts. "
+        "It gives both teams a shared written understanding of the business processes, gaps, risks, and implementation priorities."
+    ))
+    styled_table(doc, ["Discovery Output", "Purpose", "Client Approval"], [
+        ("Process Mapping", "Current and target workflows for each selected department", "Required"),
+        ("GAP Analysis", "Fit-gap review between standard Odoo and required business processes", "Required"),
+        ("Business Requirements Document", "Final written scope, rules, reports, roles, and exceptions", "Required"),
+        ("Implementation Plan", "Confirmed phases, owners, data requirements, dependencies, and milestone dates", "Required"),
+        ("Data Migration Plan", "Data sources, ownership, cleansing rules, mapping, and reconciliation method", "Required"),
+    ], [Cm(4.2), Cm(9.0), Cm(3.2)])
+
+    # ═══════════════════════════════════════════════════
+    #  4. SCOPE OF WORK
+    # ═══════════════════════════════════════════════════
+    heading(doc, 4, "CLIENT-SPECIFIC SCOPE OF WORK")
+    body(doc, (
+        "This proposal is based on the modules and business processes confirmed during the initial discussion. "
+        "Only the modules listed below are included in this quotation. Any additional module, workflow, integration, "
+        "or report requested after approval will be handled through the change request process in Section 12."
+    ))
 
     modules = [
-        "Odoo Installation & Server Configuration (Cloud / On-Premise)",
-        "Sales & CRM: pipeline management, lead tracking, quotation templates, invoicing workflow",
-        "Accounting & Finance: chart of accounts, tax rules, multi-currency, financial reports, bank reconciliation",
-        "Inventory & Warehouse Management: stock locations, transfers, valuation methods, reordering rules",
-        "Purchasing & Vendor Management: purchase orders, vendor pricing, approval workflows",
-        "Human Resources: employee records, contracts, leave management, payroll configuration",
-        "Manufacturing / Bill of Materials: BOM structure, work orders, routing (if applicable)",
-        "Website & E-commerce: storefront setup, theme customization, product pages, checkout flow",
-        "Email Marketing: campaign creation, subscriber management, performance analytics",
-        "Project Management: project planning, task assignment, timesheets, profitability analysis",
+        "{MODULE_1}: {MODULE_1_SCOPE}",
+        "{MODULE_2}: {MODULE_2_SCOPE}",
+        "{MODULE_3}: {MODULE_3_SCOPE}",
+        "{MODULE_4}: {MODULE_4_SCOPE}",
+        "{MODULE_5}: {MODULE_5_SCOPE}",
+        "Odoo Installation & Environment Setup: cloud or on-premise setup, access rights, base configuration, and email settings",
     ]
 
     for mod in modules:
@@ -251,27 +309,20 @@ def create_document():
         r = sp.add_run(f"  {label}"); r.bold = True; r.font.size = Pt(10); r.font.color.rgb = NAVY
         body(doc, desc, size=9.5, after=4)
 
-    # ═══════════════════════════════════════════════════
-    #  4. EXCLUSIONS
-    # ═══════════════════════════════════════════════════
-    heading(doc, 4, "EXCLUSIONS")
-    body(doc, "The following are explicitly excluded from this quotation unless separately agreed in writing:")
-    for ex in [
-        "Odoo Online subscription fees or Odoo Enterprise license costs (paid directly to Odoo S.A. by you)",
-        "Third-party Odoo apps or modules purchased from the Odoo App Store",
-        "Website content creation (copywriting, photography, videography)",
-        "Custom mobile or tablet application development",
-        "Ongoing support and maintenance beyond the 30-day warranty period (separate support plans available in Section 7)",
-        "Hardware, server infrastructure, or IT equipment procurement",
-        "Graphic design, brand identity, or logo creation beyond Odoo website theme configuration",
-        "Integration with systems not explicitly listed in this quotation",
-    ]:
-        bullet(doc, ex)
+    body(doc, "Deliverables matrix:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Phase", "Main Deliverable", "Client Approval"], [
+        ("Discovery", "BRD, GAP Analysis, process maps, implementation plan", "Required"),
+        ("Configuration", "Configured modules, roles, workflows, templates, and base reports", "Required"),
+        ("Migration", "Imported master data and reconciliation report", "Required"),
+        ("Customization", "Approved custom fields, reports, automations, and integrations", "Required"),
+        ("Training", "User manual, admin guide, recorded sessions, and attendance record", "Required"),
+        ("Go-Live", "Production system, launch checklist, warranty start confirmation", "Required"),
+    ], [Cm(4.0), Cm(9.0), Cm(3.3)])
 
     # ═══════════════════════════════════════════════════
     #  5. IMPLEMENTATION METHODOLOGY & TIMELINE
     # ═══════════════════════════════════════════════════
-    heading(doc, 5, "IMPLEMENTATION METHODOLOGY & TIMELINE")
+    heading(doc, 5, "IMPLEMENTATION METHODOLOGY & MILESTONES")
 
     phases = [
         ("Phase 1: Discovery & Requirements", "Week 1",
@@ -307,6 +358,16 @@ def create_document():
         "Any delays in client responsibilities may extend the timeline, which will be communicated promptly."
     ), size=9.5, italic=True)
 
+    body(doc, "Milestone acceptance checkpoints:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Milestone", "Acceptance Evidence", "Sign-off Required"], [
+        ("Discovery complete", "Approved BRD, GAP Analysis, process maps, and project plan", "Yes"),
+        ("Configuration complete", "Configured modules demonstrated to client stakeholders", "Yes"),
+        ("Migration complete", "Reconciliation report accepted by client owner", "Yes"),
+        ("UAT complete", "All critical and high-priority issues closed or accepted", "Yes"),
+        ("Training complete", "Training materials delivered and attendance recorded", "Yes"),
+        ("Go-live approved", "Launch checklist completed and production access confirmed", "Yes"),
+    ], [Cm(4.4), Cm(9.0), Cm(3.0)])
+
     # ═══════════════════════════════════════════════════
     #  6. CLIENT RESPONSIBILITIES
     # ═══════════════════════════════════════════════════
@@ -325,18 +386,56 @@ def create_document():
         bullet(doc, rsp)
 
     # ═══════════════════════════════════════════════════
-    #  7. INVESTMENT & PRICING
+    #  7. ASSUMPTIONS, RISKS, AND SUCCESS CRITERIA
     # ═══════════════════════════════════════════════════
-    heading(doc, 7, "INVESTMENT & PRICING")
+    heading(doc, 7, "ASSUMPTIONS, RISKS, AND SUCCESS CRITERIA")
+    body(doc, "Key assumptions:", bold=True, color=NAVY, after=4)
+    for assumption in [
+        "The Client will provide clean and complete master data in the agreed format",
+        "Odoo licenses, hosting access, SMTP details, payment gateway credentials, and third-party API credentials will be available when needed",
+        "Client stakeholders will be available for discovery workshops, UAT, training, and approvals",
+        "Legacy system data exports will be technically accessible and legally authorized for migration",
+        "Internet connectivity, devices, printers, barcode scanners, and other local infrastructure are outside this quotation unless explicitly listed",
+    ]:
+        bullet(doc, assumption)
+
+    body(doc, "Main delivery risks and mitigation:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Risk", "Potential Impact", "Mitigation"], [
+        ("Delayed approvals", "Timeline extension", "Approval deadlines and weekly steering updates"),
+        ("Poor data quality", "Migration delays or reconciliation issues", "Early data audit, cleansing template, and sample import"),
+        ("Scope changes", "Additional cost and timeline", "Formal change request workflow before development"),
+        ("Third-party API issues", "Integration delays", "Early credential validation and sandbox testing"),
+        ("Low user adoption", "Reduced business value", "Role-based training, SOPs, and hypercare support"),
+    ], [Cm(4.0), Cm(5.6), Cm(6.8)])
+
+    body(doc, "Project success metrics:", bold=True, color=NAVY, after=4)
+    for metric in [
+        "Approved BRD and implementation plan before configuration starts",
+        "100% of agreed master data migrated or formally excluded by client sign-off",
+        "Financial reports reconcile with agreed legacy balances before go-live",
+        "Inventory opening balances reconcile with the approved migration file",
+        "All critical and high-priority UAT issues resolved before production launch",
+        "User acceptance sign-off received from the nominated client project owner",
+    ]:
+        bullet(doc, metric)
+
+    # ═══════════════════════════════════════════════════
+    #  8. INVESTMENT & PRICING
+    # ═══════════════════════════════════════════════════
+    heading(doc, 8, "INVESTMENT & PRICING")
 
     items = [
         ("#", "SERVICE / DELIVERABLE", "QTY", "UNIT PRICE", "TOTAL"),
-        ("1", "Odoo Installation & Server Setup", "1", "{SETUP_PRICE}", "{SETUP_TOTAL}"),
-        ("2", "Core Module Configuration ({NUM_MODULES} modules)", "{MODULE_QTY}", "{MODULE_UNIT_PRICE}", "{MODULE_TOTAL}"),
-        ("3", "Data Migration & Cleansing", "{MIG_HOURS} hrs", "{MIG_RATE}/hr", "{MIG_TOTAL}"),
-        ("4", "Custom Development & Configuration", "{DEV_HOURS} hrs", "{DEV_RATE}/hr", "{DEV_TOTAL}"),
-        ("5", "User Training ({TRAINING_SESSIONS} sessions)", "{TRAINING_QTY}", "{TRAINING_UNIT_PRICE}", "{TRAINING_TOTAL}"),
-        ("6", "Project Management & Coordination", "{PM_HOURS} hrs", "{PM_RATE}/hr", "{PM_TOTAL}"),
+        ("1", "Discovery, BRD, GAP Analysis, and Implementation Plan", "1", "{DISCOVERY_PRICE}", "{DISCOVERY_TOTAL}"),
+        ("2", "Odoo Installation and Environment Setup", "1", "{SETUP_PRICE}", "{SETUP_TOTAL}"),
+        ("3", "{MODULE_1} Configuration", "1", "{MODULE_1_PRICE}", "{MODULE_1_TOTAL}"),
+        ("4", "{MODULE_2} Configuration", "1", "{MODULE_2_PRICE}", "{MODULE_2_TOTAL}"),
+        ("5", "{MODULE_3} Configuration", "1", "{MODULE_3_PRICE}", "{MODULE_3_TOTAL}"),
+        ("6", "Data Migration and Reconciliation", "1", "{MIGRATION_PRICE}", "{MIGRATION_TOTAL}"),
+        ("7", "Custom Reports, Workflows, and Integrations", "1", "{CUSTOMIZATION_PRICE}", "{CUSTOMIZATION_TOTAL}"),
+        ("8", "User Training, Manuals, SOPs, and Admin Guide", "1", "{TRAINING_PRICE}", "{TRAINING_TOTAL}"),
+        ("9", "Go-Live Support and Hypercare", "1", "{HYPERCARE_PRICE}", "{HYPERCARE_TOTAL}"),
+        ("10", "Project Management and Coordination", "1", "{PM_PRICE}", "{PM_TOTAL}"),
     ]
 
     tbl = doc.add_table(rows=len(items), cols=5)
@@ -390,13 +489,20 @@ def create_document():
 
     doc.add_paragraph()
 
-    # ── Post-Implementation Support ──
-    support_heading = doc.add_paragraph()
-    support_heading.paragraph_format.space_after = Pt(4)
-    r = support_heading.add_run("Post-Implementation Support Plans (Optional)")
-    r.bold = True; r.font.size = Pt(11); r.font.color.rgb = NAVY; r.font.name = 'Calibri Light'
+    # ═══════════════════════════════════════════════════
+    #  9. SUPPORT SLA
+    # ═══════════════════════════════════════════════════
+    heading(doc, 9, "SUPPORT SLA AND POST-GO-LIVE OPTIONS")
 
     body(doc, "After the 30-day warranty period, the following support plans are available:", size=9.5, after=4)
+
+    styled_table(doc, ["Plan", "Working Hours", "Response Time", "Resolution Target", "Escalation"], [
+        ("Bronze", "Business hours", "48 hours", "Best effort based on issue severity", "Support lead"),
+        ("Silver", "Business hours", "24 hours", "2-5 business days for standard issues", "Support lead, then project manager"),
+        ("Gold", "Extended business hours", "8 hours", "1-3 business days for standard issues", "Support lead, project manager, senior consultant"),
+    ], [Cm(2.2), Cm(3.0), Cm(2.7), Cm(4.4), Cm(4.0)])
+
+    body(doc, "Emergency support for production-blocking issues can be added as a separate paid add-on if required.", size=8.5, color=GRAY, italic=True)
 
     for label, desc in [
         ("Bronze: Basic", "{BRONZE_PRICE}/month. Email-only support, bug fixes, 48-hour response time, quarterly system health check."),
@@ -412,34 +518,61 @@ def create_document():
     body(doc, "VAT (14%) will be added where applicable. All prices in {CURRENCY} unless otherwise stated.", size=8, color=GRAY, italic=True)
 
     # ═══════════════════════════════════════════════════
-    #  8. PAYMENT SCHEDULE
+    #  10. PAYMENT SCHEDULE
     # ═══════════════════════════════════════════════════
-    heading(doc, 8, "PAYMENT SCHEDULE")
+    heading(doc, 10, "PAYMENT SCHEDULE")
 
-    options = [
-        ("Milestone-Based",
-         "30% upon signing, 30% upon UAT sign-off, 30% upon successful go-live, 10% upon 30-day post-go-live review"),
-        ("50/50 Split", "50% upon signing, 50% upon successful go-live."),
-        ("Monthly Installments", "Equal monthly payments over the implementation period."),
-        ("Net 30", "Full payment within 30 days of final invoice."),
-        ("Full Upfront with 5% Discount", "Full payment upon signing. A 5% discount applies to the total project value."),
-    ]
-    for label, desc in options:
-        pp = doc.add_paragraph()
-        pp.paragraph_format.space_after = Pt(2)
-        r = pp.add_run(f"  {label}"); r.bold = True; r.font.size = Pt(10); r.font.color.rgb = NAVY
-        body(doc, desc, size=9.5, after=4)
-
-    body(doc, "Selected Payment Terms: {SELECTED_PAYMENT_TERMS}", size=10, bold=True, color=BLACK)
+    body(doc, "Selected payment terms: {SELECTED_PAYMENT_TERMS}", size=10, bold=True, color=BLACK)
+    styled_table(doc, ["Payment Milestone", "Trigger", "Percentage", "Amount"], [
+        ("Initial Payment", "Upon quotation signing", "30%", "{PAYMENT_1_AMOUNT}"),
+        ("Configuration Milestone", "Upon approval of configured core modules", "30%", "{PAYMENT_2_AMOUNT}"),
+        ("Go-Live Milestone", "Upon successful production launch", "30%", "{PAYMENT_3_AMOUNT}"),
+        ("Post-Go-Live Review", "After 30-day warranty review", "10%", "{PAYMENT_4_AMOUNT}"),
+    ], [Cm(4.2), Cm(7.0), Cm(2.2), Cm(3.0)])
 
     # ═══════════════════════════════════════════════════
-    #  9. TERMS & CONDITIONS (Lawyer-Reviewed)
+    #  11. CHANGE REQUEST PROCESS
     # ═══════════════════════════════════════════════════
-    heading(doc, 9, "TERMS & CONDITIONS")
+    heading(doc, 11, "CHANGE REQUEST PROCESS")
+    body(doc, (
+        "After BRD approval and requirements freeze, any new requirement or material change must follow the process below. "
+        "This keeps cost, delivery dates, and responsibilities clear for both parties."
+    ))
+    styled_table(doc, ["Step", "Action", "Output"], [
+        ("1", "Client submits written change request", "Logged change request"),
+        ("2", "Traffic Digital Solutions reviews business and technical impact", "Impact analysis"),
+        ("3", "Cost, timeline, and dependency impact are estimated", "Change quotation"),
+        ("4", "Client approves or rejects the change in writing", "Signed approval or rejection"),
+        ("5", "Approved change is scheduled for delivery", "Updated project plan"),
+    ], [Cm(1.4), Cm(8.0), Cm(6.8)])
+
+    # ═══════════════════════════════════════════════════
+    #  12. EXCLUSIONS AND REQUIREMENTS FREEZE
+    # ═══════════════════════════════════════════════════
+    heading(doc, 12, "EXCLUSIONS AND REQUIREMENTS FREEZE")
+    body(doc, "The following are explicitly excluded from this quotation unless separately agreed in writing:")
+    for ex in [
+        "Any requirement, module, report, integration, or workflow not listed in the approved Business Requirements Document",
+        "Changes requested after BRD approval and requirements freeze, unless approved through a signed change request",
+        "Odoo Online subscription fees or Odoo Enterprise license costs (paid directly to Odoo S.A. by you)",
+        "Third-party Odoo apps or modules purchased from the Odoo App Store",
+        "Website content creation (copywriting, photography, videography)",
+        "Custom mobile or tablet application development",
+        "Ongoing support and maintenance beyond the 30-day warranty period, unless covered by a selected support plan",
+        "Hardware, server infrastructure, or IT equipment procurement",
+        "Graphic design, brand identity, or logo creation beyond Odoo website theme configuration",
+        "Integration with systems not explicitly listed in this quotation",
+    ]:
+        bullet(doc, ex)
+
+    # ═══════════════════════════════════════════════════
+    #  13. TERMS & CONDITIONS
+    # ═══════════════════════════════════════════════════
+    heading(doc, 13, "TERMS & CONDITIONS")
 
     terms = [
         ("1. Scope of Work",
-         "The scope of work is defined exclusively in Section 3 of this Quotation. Any services, deliverables, or modifications "
+         "The scope of work is defined exclusively in Section 4 of this Quotation. Any services, deliverables, or modifications "
          "not expressly listed are excluded unless subsequently agreed in a written change order signed by both parties. "
          "Additional work will be billed at {ADDITIONAL_WORK_RATE}/hour."),
         ("2. Fees & Payment",
@@ -453,12 +586,13 @@ def create_document():
          "Work on any change begins only after both parties sign the change order. "
          "Changes requested orally or via informal channels are not binding."),
         ("4. Intellectual Property",
-         "4.1 Custom Developments: Upon full payment of all amounts due, you own all custom-developed code, "
-         "configurations, reports, and workflows created specifically for this project. "
-         "We grant you a perpetual, irrevocable, royalty-free license to use such developments. "
-         "4.2 Our IP: We retain all rights, title, and interest in our pre-existing methodologies, frameworks, "
-         "tools, libraries, know-how, and Odoo modules not developed specifically for this project. "
-         "4.3 Odoo IP: Odoo S.A. retains all rights to the Odoo platform and its modules."),
+         "4.1 Client-Specific Work: Upon full payment of all amounts due, you own the custom code, configurations, "
+         "reports, workflows, documents, and deliverables created specifically and exclusively for this project. "
+         "4.2 Traffic Digital Solutions Materials: We retain ownership of our pre-existing methods, templates, tools, "
+         "libraries, reusable components, know-how, implementation accelerators, and generic Odoo modules that were not "
+         "created exclusively for you. Where such materials are used in your project, we grant you a non-exclusive, "
+         "perpetual license to use them as part of your implemented Odoo system. "
+         "4.3 Odoo Platform: Odoo S.A. retains all rights to the Odoo platform, standard modules, and licensed software."),
         ("5. Confidentiality",
          "Each party agrees to hold the other's Confidential Information in strict confidence. "
          "'Confidential Information' means all non-public information disclosed in connection with this Quotation, "
@@ -531,9 +665,9 @@ def create_document():
         body(doc, desc, size=9.5, after=3)
 
     # ═══════════════════════════════════════════════════
-    #  10. ACCEPTANCE & SIGNATURE
+    #  14. ACCEPTANCE & SIGNATURE
     # ═══════════════════════════════════════════════════
-    heading(doc, 10, "ACCEPTANCE & SIGNATURE")
+    heading(doc, 14, "ACCEPTANCE & SIGNATURE")
 
     body(doc,
          "By signing below, both parties acknowledge that they have read, understood, and agree to be bound "
