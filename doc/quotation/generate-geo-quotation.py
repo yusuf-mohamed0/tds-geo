@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Traffic Digital Solutions - TDS GEO Empire Quotation
+Traffic Digital Solutions - TDS GEO Growth Proposal
 Client-ready proposal for AI SEO, AEO, GEO, LLMO, content automation, and citation growth.
 """
 
@@ -21,7 +21,7 @@ GRAY = RGBColor(0x83, 0x80, 0x81)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 DARK_GRAY = RGBColor(0x3D, 0x3B, 0x3B)
 
-OUTPUT_PATH = "/root/tds-geo/doc/quotation/TDS-GEO-Empire-Quotation.docx"
+OUTPUT_PATH = "/root/tds-geo/doc/quotation/TDS-GEO-Growth-Proposal.docx"
 
 
 def set_shading(cell, hex_color):
@@ -171,7 +171,7 @@ def create_document():
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     title.paragraph_format.space_before = Pt(18)
     title.paragraph_format.space_after = Pt(2)
-    r = title.add_run("TDS GEO EMPIRE QUOTATION")
+    r = title.add_run("TDS GEO GROWTH PROPOSAL")
     r.bold = True
     r.font.size = Pt(26)
     r.font.color.rgb = BLACK
@@ -215,12 +215,68 @@ def create_document():
     body(doc, (
         "TDS GEO is a growth system for businesses that want to be found, cited, and trusted across Google, "
         "AI Overviews, ChatGPT, Perplexity, Gemini, Copilot, and the wider answer-engine ecosystem. "
-        "The objective is not simply to publish more content. The objective is to build a measurable GEO empire: "
-        "search visibility, answer extraction, entity authority, citation share, and compounding content assets."
+        "The objective is not simply to publish more content. The objective is to improve qualified organic visibility, "
+        "increase AI-search readiness, strengthen brand authority, reduce content production cost, and create a faster "
+        "publishing operation with measurable reporting."
     ))
     body(doc, "This quotation covers the setup, onboarding, subscription, content workflow, reporting, and support for the selected TDS GEO plan.")
 
-    heading(doc, 2, "WHY TDS GEO")
+    heading(doc, 2, "WHAT IS TDS GEO")
+    body(doc, (
+        "TDS GEO is a SaaS-enabled AI visibility platform and managed growth workflow. It connects to your website or CMS, "
+        "builds a structured brand and content profile, generates SEO and AI-search-ready content, prepares metadata, supports "
+        "publishing, tracks performance signals, and produces monthly actions for continuous improvement."
+    ))
+    styled_table(doc, ["Component", "What It Does"], [
+        ("Dashboard", "Shows clients, content status, publishing activity, costs, quality checks, and GEO signals"),
+        ("Research Engine", "Finds topics, gaps, weak points, keywords, search intent, and citation opportunities"),
+        ("Writing Engine", "Creates original SEO, AEO, GEO, and LLMO-ready content using the approved brand profile"),
+        ("SEO Engine", "Prepares titles, meta descriptions, summaries, internal-link prompts, and structured content"),
+        ("Publishing Engine", "Creates drafts or publishes to connected CMS platforms according to the approved workflow"),
+        ("Reporting Engine", "Tracks output, search indicators, publishing accuracy, weak points, and next actions"),
+    ], [Cm(4.2), Cm(12.7)])
+
+    body(doc, "Key terms in plain English:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Term", "Meaning"], [
+        ("SEO", "Search Engine Optimization: improving visibility in Google and traditional search results"),
+        ("AEO", "Answer Engine Optimization: structuring content so answer engines can extract direct answers"),
+        ("GEO", "Generative Engine Optimization: improving how AI search systems retrieve, summarize, mention, and cite a brand"),
+        ("LLMO", "Large Language Model Optimization: strengthening brand/entity signals used by AI systems over time"),
+        ("Citation", "A mention or source reference from an AI/search platform to your brand or content"),
+        ("Entity", "The recognized identity of your brand, products, people, locations, and topics across the web"),
+    ], [Cm(3.0), Cm(13.9)])
+
+    heading(doc, 3, "HOW TDS GEO WORKS")
+    styled_table(doc, ["Step", "Platform Flow", "Output"], [
+        ("1", "Client and website connection", "CMS/API access, brand inputs, markets, languages, approval workflow"),
+        ("2", "Research Engine", "Topics, keywords, content gaps, weak points, competitor and citation opportunities"),
+        ("3", "Writing Engine", "Original content drafts aligned with brand voice, audience, and product priorities"),
+        ("4", "SEO Engine", "Metadata, summaries, answer-first sections, internal-link prompts, schema-ready structure"),
+        ("5", "Publishing Engine", "Draft creation, scheduling, or publishing according to client approval rules"),
+        ("6", "Citation Tracking", "AI visibility checks, citation indicators, brand entity coverage where supported"),
+        ("7", "Reports", "Monthly performance report, weak points, and next action plan"),
+    ], [Cm(1.4), Cm(6.2), Cm(9.0)])
+
+    body(doc, "Dashboard and report views included in the platform:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["View", "What the Client Sees"], [
+        ("Executive Dashboard", "Content output, quality status, costs, publishing pipeline, and monthly progress"),
+        ("Content Calendar", "Planned, drafted, approved, scheduled, and published content by week"),
+        ("Publishing Queue", "Drafts waiting for approval, scheduled posts, failed publishes, and CMS status"),
+        ("GEO / Citations", "Tracked AI-search prompts, brand mentions, citation checks, and visibility notes"),
+        ("Reports", "Monthly SEO/GEO summary, weak points, actions completed, and next recommended moves"),
+    ], [Cm(4.2), Cm(12.7)])
+
+    heading(doc, 4, "BUSINESS OUTCOMES")
+    styled_table(doc, ["Business Outcome", "How We Support It"], [
+        ("More qualified organic reach", "Build content around intent, products, categories, and commercial questions"),
+        ("Higher AI visibility readiness", "Structure content for extractability, citation potential, and entity clarity"),
+        ("Stronger brand authority", "Create consistent topical coverage and brand facts across content assets"),
+        ("Lower content production cost", "Automate research, drafting, metadata, formatting, and publishing workflow"),
+        ("Faster publishing velocity", "Move from manual content operations to repeatable weekly or monthly pipeline"),
+        ("Better marketing visibility", "Report on output, indexing indicators, keyword growth, content gaps, and weak points"),
+    ], [Cm(5.0), Cm(11.9)])
+
+    heading(doc, 5, "WHY TDS GEO")
     styled_table(doc, ["Problem", "How TDS GEO Solves It"], [
         ("Organic traffic is becoming less predictable", "Builds content for SEO, answer extraction, and AI citation surfaces"),
         ("AI engines summarize before users click", "Structures content so brands can be mentioned, quoted, and cited"),
@@ -229,20 +285,22 @@ def create_document():
         ("Most tools only generate text", "Combines strategy, content, CMS publishing, quality controls, and monthly optimization"),
     ], [Cm(6.0), Cm(10.8)])
 
-    body(doc, "GEO empire operating model:", bold=True, color=NAVY, after=4)
+    body(doc, "AI visibility operating model:", bold=True, color=NAVY, after=4)
     styled_table(doc, ["Layer", "Purpose"], [
         ("SEO Foundation", "Technical readiness, metadata, internal linking, keyword and topic coverage"),
         ("AEO Structure", "Answer-first sections, FAQs, schema-ready formatting, snippet-friendly writing"),
         ("GEO Citability", "Clear claims, original structure, source-ready passages, comparison tables, brand context"),
         ("LLMO Authority", "Consistent entity signals, topical depth, brand facts, authoritative references"),
-        ("Monthly Ops", "Freshness checks, content gaps, weak-point fixes, reporting, and next actions"),
+        ("Citation Growth", "Improve readiness for brand mentions and source citations in AI-search experiences"),
+        ("Reporting", "Measure outputs, search indicators, citation checks, weak points, and next actions"),
+        ("Optimization", "Freshness checks, content gaps, weak-point fixes, and monthly improvement cycles"),
     ], [Cm(4.5), Cm(12.2)])
 
-    heading(doc, 3, "SCOPE OF WORK")
+    heading(doc, 6, "SCOPE OF WORK")
     body(doc, "Included deliverables for the selected program:")
     for item in [
         "Client onboarding and brand profile setup",
-        "Website and CMS connection for Shopify, WordPress, or supported CMS platforms",
+        "Website and CMS connection for {PRIMARY_CMS} and any additional approved properties",
         "AI SEO, AEO, GEO, and LLMO content strategy setup",
         "Keyword, topic, content gap, and weak-point mapping",
         "Article, product description, and blog content generation according to approved plan limits",
@@ -264,17 +322,26 @@ def create_document():
     ]:
         bullet(doc, item)
 
-    heading(doc, 4, "PACKAGE OPTIONS")
-    styled_table(doc, ["Plan", "Best For", "Monthly Fee", "Core Inclusions"], [
-        ("Starter", "Small stores testing AI SEO and content automation", "$29/month", "Basic content generation, SEO metadata, draft publishing workflow"),
-        ("Professional", "Growing stores that need consistent content and GEO analysis", "$79/month", "Higher content volume, GEO analysis, citations, reporting, priority workflow"),
-        ("Enterprise", "Multi-site brands, agencies, or aggressive GEO growth", "$199/month", "Advanced workflow, citation tracking, support SLA, monthly strategy review"),
-    ], [Cm(2.8), Cm(5.0), Cm(2.8), Cm(6.4)])
+    heading(doc, 7, "PACKAGE COMPARISON")
+    styled_table(doc, ["Feature", "Starter", "Professional", "Enterprise"], [
+        ("Monthly price", "$29", "$79", "$199"),
+        ("Best for", "Small store", "Growing brand", "Multi-site or agency"),
+        ("Articles / month", "{STARTER_ARTICLES}", "{PRO_ARTICLES}", "{ENT_ARTICLES}"),
+        ("Product descriptions / month", "{STARTER_PRODUCTS}", "{PRO_PRODUCTS}", "{ENT_PRODUCTS}"),
+        ("Tracked keywords", "{STARTER_KEYWORDS}", "{PRO_KEYWORDS}", "{ENT_KEYWORDS}"),
+        ("Websites / stores", "1", "{PRO_WEBSITES}", "{ENT_WEBSITES}"),
+        ("GEO audit", "Basic", "Included", "Advanced"),
+        ("Citation tracking", "Not included", "Limited", "Full"),
+        ("AI visibility dashboard", "Basic", "Included", "Included"),
+        ("Multi-language", "Not included", "{PRO_LANGUAGES}", "{ENT_LANGUAGES}"),
+        ("Monthly report", "Summary", "Detailed", "Executive review"),
+        ("Support SLA", "Standard", "Priority", "Enterprise"),
+    ], [Cm(4.5), Cm(4.0), Cm(4.0), Cm(4.0)])
 
     body(doc, "Selected plan: {SELECTED_PLAN}", bold=True, color=BLACK)
     body(doc, "Recommended setup and onboarding fee: {SETUP_FEE}. Final setup fee depends on CMS complexity, number of stores, language count, and migration needs.", size=9.5, color=GRAY, italic=True)
 
-    heading(doc, 5, "PRICING")
+    heading(doc, 8, "PRICING")
     items = [
         ("#", "SERVICE / DELIVERABLE", "QTY", "UNIT PRICE", "TOTAL"),
         ("1", "TDS GEO Setup and Onboarding", "1", "{SETUP_FEE}", "{SETUP_TOTAL}"),
@@ -325,7 +392,16 @@ def create_document():
                 r.font.size = Pt(10 if label == "TOTAL" else 9)
                 r.font.color.rgb = BLACK
 
-    heading(doc, 6, "IMPLEMENTATION TIMELINE")
+    body(doc, "What is included in the commercial items:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Item", "Included"], [
+        ("Setup and Onboarding", "Account setup, CMS connection, access testing, brand intake, approval workflow"),
+        ("Subscription", "Platform access, selected package limits, content workflow, dashboard, reporting"),
+        ("Strategy Setup", "Brand profile, technical reference, SEO/GEO content guide, topic pillars, weak points"),
+        ("Content Add-On", "Additional articles, product descriptions, or content assets beyond plan limits"),
+        ("Training / Strategy Session", "Live walkthrough, content process, reporting review, team enablement"),
+    ], [Cm(5.0), Cm(11.8)])
+
+    heading(doc, 9, "IMPLEMENTATION TIMELINE")
     styled_table(doc, ["Stage", "Timeline", "Output", "Client Approval"], [
         ("Kickoff", "Day 1", "Access checklist, stakeholders, target markets, content priorities", "Required"),
         ("Brand Profile", "Days 1-3", "Voice, audience, products, offers, differentiators, weak points", "Required"),
@@ -335,19 +411,40 @@ def create_document():
         ("Monthly Optimization", "Ongoing", "Report, weak points, next content actions, performance review", "Monthly"),
     ], [Cm(3.6), Cm(3.2), Cm(7.2), Cm(2.4)])
 
-    heading(doc, 7, "SUCCESS METRICS")
-    for metric in [
-        "Approved brand profile, technical reference, and SEO content guide completed during onboarding",
-        "CMS publishing connection tested successfully before content operations begin",
-        "Content calendar approved for the first month",
-        "Published or draft content delivered according to selected plan limits",
-        "SEO metadata included for every generated article or content item",
-        "Monthly report delivered with performance, weak points, and next actions",
-        "Citation and AI visibility tracking reviewed where included in the selected plan",
-    ]:
-        bullet(doc, metric)
+    body(doc, "Week-by-week rollout:", bold=True, color=NAVY, after=4)
+    styled_table(doc, ["Week", "Focus", "Output"], [
+        ("Week 1", "Onboarding and technical connection", "Access, brand profile, CMS test, initial content priorities"),
+        ("Week 2", "Research and strategy setup", "Topics, keywords, content calendar, weak points, GEO opportunities"),
+        ("Week 3", "First production cycle", "First drafts, metadata, approvals, publishing workflow validation"),
+        ("Week 4", "Reporting and optimization baseline", "Output report, indexed-page checks, next-month action plan"),
+        ("Monthly", "Continuous growth cycle", "Content production, reporting, weak-point fixes, strategy refinement"),
+    ], [Cm(2.4), Cm(5.8), Cm(8.5)])
 
-    heading(doc, 8, "SUPPORT SLA")
+    heading(doc, 10, "MEASURABLE KPIS")
+    body(doc, "The following metrics are tracked as operating indicators. They are not guarantees of rankings, traffic, sales, or AI citations.", size=9.5, color=GRAY, italic=True)
+    styled_table(doc, ["KPI", "What We Measure"], [
+        ("Content velocity", "Number of approved drafts, scheduled posts, and published assets per month"),
+        ("Publishing accuracy", "Percentage of content published with correct metadata, summary, tags, and approval status"),
+        ("Indexed page growth", "Indexed or discoverable content pages where search data is available"),
+        ("Organic keyword growth", "Movement in tracked keyword count and query coverage from Google Search Console"),
+        ("Technical SEO readiness", "Metadata completion, internal-link prompts, broken-link findings, schema-ready sections"),
+        ("Brand entity coverage", "Consistency of brand, products, locations, services, and differentiators across content"),
+        ("Internal linking coverage", "Recommended links added or queued between relevant content, products, and collections"),
+        ("AI visibility checks", "Tracked prompts, mentions, citations, and citation gaps where included in the selected plan"),
+    ], [Cm(5.0), Cm(11.8)])
+
+    heading(doc, 11, "PROOF AND CASE STUDY")
+    styled_table(doc, ["Proof Point", "Example / Placeholder"], [
+        ("Client", "{CASE_STUDY_CLIENT_NAME} ({CASE_STUDY_INDUSTRY})"),
+        ("Scope", "{CASE_STUDY_SCOPE}: articles, product descriptions, metadata, GEO audit, reporting"),
+        ("Output", "{CASE_STUDY_ARTICLES} articles generated, {CASE_STUDY_PRODUCTS} product descriptions improved"),
+        ("Indexing", "{CASE_STUDY_INDEXED_PAGES} pages indexed or submitted for indexing"),
+        ("Search signals", "{CASE_STUDY_KEYWORD_GROWTH} tracked keyword/query growth where GSC data is available"),
+        ("AI visibility", "{CASE_STUDY_AI_MENTIONS} AI mentions/citation checks where tracking is included"),
+        ("Operational impact", "{CASE_STUDY_TIME_SAVED} estimated content operations time saved"),
+    ], [Cm(4.3), Cm(12.5)])
+
+    heading(doc, 12, "SUPPORT SLA")
     styled_table(doc, ["Severity", "Definition", "Response", "Target"], [
         ("Critical", "Publishing pipeline unavailable for active client", "4 business hours", "Same or next business day workaround"),
         ("High", "Major CMS/API issue or failed scheduled publish", "1 business day", "2 business days"),
@@ -356,7 +453,7 @@ def create_document():
     ], [Cm(2.6), Cm(7.0), Cm(3.2), Cm(3.8)])
     body(doc, "Business hours: Sunday to Thursday, 9:00 AM to 6:00 PM Cairo time, excluding Egyptian public holidays.", size=8.5, color=GRAY, italic=True)
 
-    heading(doc, 9, "CLIENT RESPONSIBILITIES")
+    heading(doc, 13, "CLIENT RESPONSIBILITIES")
     for responsibility in [
         "Provide CMS admin access, API tokens, or app installation permissions where required",
         "Provide brand guidelines, product information, target markets, preferred topics, and restricted claims",
@@ -367,7 +464,7 @@ def create_document():
     ]:
         bullet(doc, responsibility)
 
-    heading(doc, 10, "TERMS AND CONDITIONS")
+    heading(doc, 14, "TERMS AND CONDITIONS")
     terms = [
         ("1. Scope", "The scope is limited to the deliverables listed in this quotation and the selected plan. Any extra websites, languages, integrations, content volume, manual writing, or custom development must be quoted separately."),
         ("2. Subscription", "Monthly plans are prepaid and renew every 30 days unless cancelled according to the agreed notice period. Quarterly or annual billing may be offered by separate agreement."),
@@ -391,7 +488,7 @@ def create_document():
         r.font.color.rgb = NAVY
         body(doc, desc, size=9.5, after=3)
 
-    heading(doc, 11, "ACCEPTANCE")
+    heading(doc, 15, "ACCEPTANCE")
     body(doc, "By signing below, both parties confirm acceptance of this quotation, selected plan, pricing, scope, and terms.", size=9.5, after=10)
 
     sig = doc.add_table(rows=1, cols=2)
@@ -431,7 +528,7 @@ def create_document():
     r.italic = True
 
     doc.save(OUTPUT_PATH)
-    print(f"TDS GEO Empire Quotation saved to: {OUTPUT_PATH}")
+    print(f"TDS GEO Growth Proposal saved to: {OUTPUT_PATH}")
     print(f"File size: {os.path.getsize(OUTPUT_PATH) / 1024:.1f} KB")
 
 
