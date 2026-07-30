@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Traffic Digital Solutions — Odoo Implementation Quotation
+Traffic Digital Solutions - Odoo Implementation Quotation
 Professional Services Agreement Template
-v2.0 — Legal Review Pass Complete
 """
 
 from docx import Document
@@ -125,7 +124,7 @@ def create_document():
     p = c1.paragraphs[0]; p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     r = p.add_run("Odoo Gold Implementation Partner\n"); r.font.size = Pt(9); r.font.color.rgb = GRAY
     r = p.add_run("Villa 125, Axis 80, 5th Settlement, Cairo, Egypt\n"); r.font.size = Pt(8); r.font.color.rgb = GRAY
-    r = p.add_run("webdevelopment@trafficdigitalsolutions.com  |  trafficdigitalsolutions.com"); r.font.size = Pt(8); r.font.color.rgb = GRAY
+    r = p.add_run("webdevelopment@trafficdigitalsolutions.com  -  trafficdigitalsolutions.com"); r.font.size = Pt(8); r.font.color.rgb = GRAY
 
     rule(doc, "FCB900", 20)
 
@@ -142,7 +141,7 @@ def create_document():
     q = doc.add_paragraph()
     q.alignment = WD_ALIGN_PARAGRAPH.CENTER
     q.paragraph_format.space_after = Pt(6)
-    r = q.add_run("Quotation No: {NUMBER}     |     Issued: {ISSUE_DATE}     |     Valid Until: {VALID_UNTIL}")
+    r = q.add_run("Quotation No: {NUMBER}    -    Issued: {ISSUE_DATE}    -    Valid Until: {VALID_UNTIL}")
     r.font.size = Pt(9); r.font.color.rgb = GRAY
 
     rule(doc, "FCB900", 12)
@@ -188,32 +187,32 @@ def create_document():
 
     body(doc, "Why leading organizations choose us:")
     for reason in [
-        "Proven Odoo expertise — Certified Odoo development team with end-to-end implementation experience",
-        "100+ satisfied clients — From startups to large enterprises across multiple industries",
-        "Full-service capability — Beyond Odoo: web, branding, marketing, and content under one roof",
-        "Data-driven methodology — Structured implementation with clear milestones, testing, and sign-off at every phase",
-        "Post-go-live commitment — Multi-tier support options to keep your business running smoothly",
-        "Located in Cairo — On-site visits and face-to-face meetings available when needed",
+        "Proven Odoo expertise: certified development team covering setup, configuration, launch, and support",
+        "Over 100 satisfied clients: from startups to large enterprises across multiple industries",
+        "Full service capability: Odoo, web, branding, marketing, and content all under one roof",
+        "Structured delivery: clear milestones, testing, and sign off at every phase of the project",
+        "Post go-live commitment: support plans to keep your business running smoothly after launch",
+        "Based in Cairo: on-site visits and face-to-face meetings available when you need them",
     ]:
         bullet(doc, reason)
 
     # ═══════════════════════════════════════════════════
     #  3. SCOPE OF WORK
     # ═══════════════════════════════════════════════════
-    heading(doc, 3, "SCOPE OF WORK — ODOO MODULES & SERVICES")
+    heading(doc, 3, "SCOPE OF WORK - ODOO MODULES & SERVICES")
     body(doc, "We will implement, configure, and deploy the following Odoo modules and services for your organization:")
 
     modules = [
         "Odoo Installation & Server Configuration (Cloud / On-Premise)",
-        "Sales & CRM — Pipeline management, lead tracking, quotation templates, invoicing workflow",
-        "Accounting & Finance — Chart of accounts, tax rules, multi-currency, financial reports, bank reconciliation",
-        "Inventory & Warehouse Management — Stock locations, transfers, valuation methods, reordering rules",
-        "Purchasing & Vendor Management — Purchase orders, vendor pricing, approval workflows",
-        "Human Resources — Employee records, contracts, leave management, payroll configuration",
-        "Manufacturing / Bill of Materials — BOM structure, work orders, routing (if applicable)",
-        "Website & E-commerce — Storefront setup, theme customization, product pages, checkout flow",
-        "Email Marketing — Campaign creation, subscriber management, performance analytics",
-        "Project Management — Project planning, task assignment, timesheets, profitability analysis",
+        "Sales & CRM: pipeline management, lead tracking, quotation templates, invoicing workflow",
+        "Accounting & Finance: chart of accounts, tax rules, multi-currency, financial reports, bank reconciliation",
+        "Inventory & Warehouse Management: stock locations, transfers, valuation methods, reordering rules",
+        "Purchasing & Vendor Management: purchase orders, vendor pricing, approval workflows",
+        "Human Resources: employee records, contracts, leave management, payroll configuration",
+        "Manufacturing / Bill of Materials: BOM structure, work orders, routing (if applicable)",
+        "Website & E-commerce: storefront setup, theme customization, product pages, checkout flow",
+        "Email Marketing: campaign creation, subscriber management, performance analytics",
+        "Project Management: project planning, task assignment, timesheets, profitability analysis",
     ]
 
     for mod in modules:
@@ -262,7 +261,7 @@ def create_document():
         "Third-party Odoo apps or modules purchased from the Odoo App Store",
         "Website content creation (copywriting, photography, videography)",
         "Custom mobile or tablet application development",
-        "Ongoing support and maintenance beyond the 30-day warranty period (separate support plans available — see Section 7)",
+        "Ongoing support and maintenance beyond the 30-day warranty period (separate support plans available in Section 7)",
         "Hardware, server infrastructure, or IT equipment procurement",
         "Graphic design, brand identity, or logo creation beyond Odoo website theme configuration",
         "Integration with systems not explicitly listed in this quotation",
@@ -275,22 +274,22 @@ def create_document():
     heading(doc, 5, "IMPLEMENTATION METHODOLOGY & TIMELINE")
 
     phases = [
-        ("Phase 1 — Discovery & Requirements", "Week 1",
+        ("Phase 1: Discovery & Requirements", "Week 1",
          "Business process workshops, requirements documentation, module selection finalization, "
          "and project plan with milestone dates."),
-        ("Phase 2 — System Configuration", "Weeks 2-3",
+        ("Phase 2: System Configuration", "Weeks 2-3",
          "Server setup, Odoo installation/activation, module configuration, chart of accounts, "
          "tax rules, email configuration, and user role setup."),
-        ("Phase 3 — Data Migration", "Weeks 3-4",
+        ("Phase 3: Data Migration", "Weeks 3-4",
          "Data extraction, cleansing, transformation, and import into Odoo. "
          "Full reconciliation with your team before proceeding."),
-        ("Phase 4 — Customization & Development", "Weeks 4-6",
+        ("Phase 4: Customization & Development", "Weeks 4-6",
          "Development of custom fields, views, reports, workflows, and modules. "
          "Iterative review and feedback cycles with your project team."),
-        ("Phase 5 — Testing & Training", "Weeks 6-7",
+        ("Phase 5: Testing & Training", "Weeks 6-7",
          "Integration testing, UAT, defect resolution, and user training sessions. "
          "Your acceptance sign-off is required to proceed to go-live."),
-        ("Phase 6 — Go-Live & Hypercare", "Week 8",
+        ("Phase 6: Go-Live & Hypercare", "Week 8",
          "Production deployment, data verification, go-live support, and {GO_LIVE_SUPPORT_DAYS}-day hypercare period."),
     ]
 
@@ -299,7 +298,7 @@ def create_document():
         mp.paragraph_format.space_before = Pt(6)
         mp.paragraph_format.space_after = Pt(2)
         r = mp.add_run(f"  {phase}"); r.bold = True; r.font.size = Pt(10); r.font.color.rgb = NAVY
-        r2 = mp.add_run(f"  —  {dur}"); r2.font.size = Pt(9); r2.font.color.rgb = GOLD; r2.bold = True
+        r2 = mp.add_run(f"  ({dur})"); r2.font.size = Pt(9); r2.font.color.rgb = GOLD; r2.bold = True
         body(doc, desc, size=9.5, after=4)
 
     body(doc, (
@@ -400,9 +399,9 @@ def create_document():
     body(doc, "After the 30-day warranty period, the following support plans are available:", size=9.5, after=4)
 
     for label, desc in [
-        ("Bronze — Basic", "{BRONZE_PRICE}/month — Email-only support, bug fixes, 48-hour response time, quarterly system health check."),
-        ("Silver — Standard", "{SILVER_PRICE}/month — Email + phone support, bug fixes, minor configuration changes, 24-hour response, monthly health check."),
-        ("Gold — Premium (Recommended)", "{GOLD_PRICE}/month — Dedicated account manager, priority phone + email, 8-hour response, unlimited minor changes, quarterly business review, discounted rate on major changes."),
+        ("Bronze: Basic", "{BRONZE_PRICE}/month. Email-only support, bug fixes, 48-hour response time, quarterly system health check."),
+        ("Silver: Standard", "{SILVER_PRICE}/month. Email and phone support, bug fixes, minor configuration changes, 24-hour response, monthly health check."),
+        ("Gold: Premium", "{GOLD_PRICE}/month. Dedicated account manager, priority phone and email, 8-hour response, unlimited minor changes, quarterly business review, discounted rate on major changes."),
     ]:
         sp = doc.add_paragraph()
         sp.paragraph_format.space_after = Pt(2)
@@ -418,12 +417,12 @@ def create_document():
     heading(doc, 8, "PAYMENT SCHEDULE")
 
     options = [
-        ("Milestone-Based (Recommended)",
-         "30% upon signing  |  30% upon UAT sign-off  |  30% upon successful go-live  |  10% upon 30-day post-go-live review"),
+        ("Milestone-Based",
+         "30% upon signing, 30% upon UAT sign-off, 30% upon successful go-live, 10% upon 30-day post-go-live review"),
         ("50/50 Split", "50% upon signing, 50% upon successful go-live."),
         ("Monthly Installments", "Equal monthly payments over the implementation period."),
         ("Net 30", "Full payment within 30 days of final invoice."),
-        ("Full Upfront — 5% Discount", "Full payment upon signing. A 5% discount applies to the total project value."),
+        ("Full Upfront with 5% Discount", "Full payment upon signing. A 5% discount applies to the total project value."),
     ]
     for label, desc in options:
         pp = doc.add_paragraph()
@@ -578,7 +577,7 @@ def create_document():
     r.font.size = Pt(7); r.font.color.rgb = GRAY
     r = ft.add_run("webdevelopment@trafficdigitalsolutions.com  •  trafficdigitalsolutions.com  •  +201271112396\n")
     r.font.size = Pt(7); r.font.color.rgb = GRAY
-    r = ft.add_run("Commercial Registration: XXXXX  |  Tax ID: XXXXX  |  Quotation No: {NUMBER}")
+    r = ft.add_run("Commercial Registration: XXXXX  -  Tax ID: XXXXX  -  Quotation No: {NUMBER}")
     r.font.size = Pt(7); r.font.color.rgb = GRAY; r.italic = True
 
     doc.save(OUTPUT_PATH)
