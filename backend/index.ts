@@ -42,6 +42,7 @@ import ollamaService from './services/ollama';
 import seoService from './services/seo';
 import keywordService from './services/keywords';
 import keywordResearchEngine from './services/keywordResearchEngine';
+import serpapiService from './services/serpapi';
 import webhookService from './services/webhooks';
 import vectorMemoryService from './services/vectorMemory';
 import vectorStore from './services/vectorStoreClient';
@@ -145,6 +146,14 @@ import { createCrawlerAnalyticsRoutes } from './routes/crawlerAnalytics';
 // ═══ AI SEO Services ═══════════════════════
 import citationTracker from './services/citationTracker';
 
+// ═══ Google Search Console ══════════════════
+import gscService from './services/googleSearchConsole';
+import { createGscRoutes } from './routes/googleSearchConsole';
+
+// ═══ Demo / Free Trial ══════════════════════
+import demoProvisioner from './services/demoProvisioner';
+import { createDemoRoutes } from './routes/demo';
+
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
@@ -156,11 +165,12 @@ app.use(helmet({
     directives: {
       frameAncestors: ["'self'", 'https://*.myshopify.com', 'https://admin.shopify.com'],
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.shopify.com'],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com', 'https://fonts.googleapis.com'],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.shopify.com', 'https://accounts.google.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com', 'https://cdnjs.cloudflare.com', 'https://fonts.googleapis.com', 'https://accounts.google.com'],
       imgSrc: ["'self'", 'data:', 'https:', 'https://cdn.shopify.com'],
       connectSrc: ["'self'", 'https://*.myshopify.com', 'wss://*.myshopify.com', 'https://cdn.shopify.com'],
-      fontSrc: ["'self'", 'https://cdn.shopify.com', 'https://fonts.gstatic.com'],
+      fontSrc: ["'self'", 'https://cdn.shopify.com', 'https://cdnjs.cloudflare.com', 'https://fonts.gstatic.com'],
+      frameSrc: ["'self'", 'https://accounts.google.com'],
     }
   } : false,
   crossOriginEmbedderPolicy: false,
@@ -250,6 +260,9 @@ app.use('/api/clients/:clientId/webhooks/events/receive', express.raw({ type: 'a
 // ─── Body Parsing ─────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// ─── CSRF Protection ────────────────────────
+app.use('/api', csrfProtection);
 
 // ─── Request Logging & Metrics ──────────────
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -407,6 +420,10 @@ app.get('/health', async (_req: Request, res: Response) => {
           status: openseoStatus,
           mode: 'docker_sidecar',
           url: process.env.OPENSEO_URL || ''
+        },
+        gsc: {
+          status: gscService.isConfigured() ? 'configured' : 'not_configured',
+          mode: 'oauth',
         }
       },
       stats
@@ -571,6 +588,12 @@ app.use('/api/billing', createBillingRoutes(pool));
 // ═══════ Credential Vault Route ════════════════
 app.use('/api/vault', createCredentialVaultRoutes(pool));
 
+// ═══════ Google Search Console Routes ════════════
+app.use('/api/gsc', createGscRoutes(pool));
+
+// ═══════ Demo / Free Trial Routes ════════════════
+app.use('/api/demo', createDemoRoutes(pool));
+
 // ═══════ Worker Performance Scoring Routes ═══════
 app.use('/api/worker-scoring', createWorkerScoringRoutes(pool));
 
@@ -650,6 +673,10 @@ app.post('/api/webhooks/events/receive', async (req: Request, res: Response) => 
 
 app.post('/api/clients/:clientId/keywords/discover', authenticate, authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!serpapiService.isConfigured()) {
+      res.status(503).json({ error: 'Keyword research requires SERPAPI_API_KEY for real search metrics.' });
+      return;
+    }
     const { industry, seedKeywords, count } = req.body;
     const result = await keywordResearchEngine.discoverWithClustering(
       pool,
@@ -778,6 +805,26 @@ app.get('/shopify/error', (_req: Request, res: Response) => {
   const msg = String(_req.query.msg || 'unknown');
   const errorText = errors[msg] || 'Something went wrong. Please try again.';
   res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Error - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#171414;color:#FCF6F2;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#ff6b6b;font-size:24px;margin:0 0 8px}p{color:#FCF6F2;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#FCB900;color:#171414;border-radius:8px;text-decoration:none;font-weight:600}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✕</div><h1>Connection Failed</h1><p>${errorText}</p></div></body></html>`);
+});
+
+// ─── Handle App Store Install Redirect ──────
+// When Shopify App Store redirects to root with ?shop=..., redirect to OAuth if no token
+app.get('/', async (req: Request, res: Response, next: NextFunction) => {
+  const shop = String(req.query.shop || '').trim().toLowerCase();
+  if (shop && /^[a-zA-Z0-9][a-zA-Z0-9-]*\.myshopify\.com$/.test(shop)) {
+    try {
+      const result = await pool.query(
+        'SELECT shopify_token, is_active FROM clients WHERE shopify_shop = $1',
+        [shop]
+      );
+      const hasValidToken = result.rows.length > 0 && result.rows[0]?.shopify_token && result.rows[0]?.is_active;
+      if (!hasValidToken) {
+        res.redirect(`/api/shopify/install?shop=${encodeURIComponent(shop)}`);
+        return;
+      }
+    } catch { /* Fall through to static serving on DB error */ }
+  }
+  next();
 });
 
 // ─── Serve Frontend (production) ────────────
@@ -965,11 +1012,45 @@ async function start(): Promise<void> {
       logger.warn('Auto-publish service init failed', { error: (e as Error).message });
     }
 
+    // ═══ Demo Trial Expiry Checker ═══════════════
+    try {
+      const DEMO_EXPIRY_INTERVAL = parseInt(process.env.DEMO_EXPIRY_INTERVAL_MS || '3600000', 10);
+      const demoExpiryTimer = setInterval(async () => {
+        try {
+          const expired = await demoProvisioner.checkExpiredTrials();
+          if (expired > 0) {
+            logger.info('Demo trial expiry check completed', { expired });
+          }
+        } catch (err) {
+          logger.error('Demo trial expiry check failed', { error: (err as Error).message });
+        }
+      }, DEMO_EXPIRY_INTERVAL);
+
+      // Store timer reference for cleanup
+      (global as any).__demoExpiryTimer = demoExpiryTimer;
+    } catch (e) {
+      logger.warn('Demo expiry checker init failed', { error: (e as Error).message });
+    }
+
     // ═══ Citation Tracker Initialization ═══════
     try {
       citationTracker.initialize(pool);
     } catch (e) {
       logger.warn('CitationTracker init failed', { error: (e as Error).message });
+    }
+
+    // ═══════ Google Search Console ════════════════
+    try {
+      gscService.initialize(pool);
+    } catch (e) {
+      logger.warn('GSC service init failed', { error: (e as Error).message });
+    }
+
+    // ═══════ Demo Provisioner Init ════════════════
+    try {
+      demoProvisioner.initialize(pool);
+    } catch (e) {
+      logger.warn('DemoProvisioner init failed', { error: (e as Error).message });
     }
 
     // ════════════════════════════════════════════
@@ -1018,6 +1099,11 @@ async function shutdown(signal: string): Promise<void> {
   // Scheduler cleanup
   schedulerService.stop();
   autoPublishService.stop();
+
+  // Demo expiry cleanup
+  if ((global as any).__demoExpiryTimer) {
+    clearInterval((global as any).__demoExpiryTimer);
+  }
 
   // TDS GEO Core engine cleanup
   connectorManager.stopPeriodicHealthChecks();

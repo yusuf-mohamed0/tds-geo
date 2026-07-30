@@ -8,6 +8,9 @@ import { Events } from '../../event-bus/events';
 import shopifyService from '../../services/shopify';
 import { connectorManager } from '../../connector-manager';
 import { PublishResult, ContentPayload } from '../../sdk/connector-interface';
+import { countArticleWords, getMinimumArticleWords } from '../../services/contentLength';
+import { getArticleSafetyIssues } from '../../services/articleSafety';
+import { presentArticleHtml } from '../../services/articlePresentation';
 
 export interface PublishTarget {
   provider: 'shopify' | 'wordpress' | 'webflow' | 'ghost' | 'custom';
@@ -24,6 +27,29 @@ export class PublisherEngine {
 
   async publish(article: any, client: any, blogId?: number | string): Promise<PublishResult> {
     try {
+      const minimumArticleWords = getMinimumArticleWords(client);
+      const actualWordCount = countArticleWords(article.content_md || article.content_html || article.content);
+      const safetyIssues = getArticleSafetyIssues(
+        article.content_md || article.content_html || article.content,
+        client,
+        { allowHtml: !article.content_md && !!article.content_html },
+      );
+      if (safetyIssues.length > 0) {
+        const error = `Publication blocked: ${safetyIssues.join(' ')}`;
+        logger.error('Unsafe article blocked from publication', { articleId: article.id, clientId: client.id, safetyIssues });
+        return { success: false, provider: 'shopify', error };
+      }
+      if (actualWordCount < minimumArticleWords) {
+        const error = `Publication blocked: ${actualWordCount} words. Minimum required: ${minimumArticleWords} words.`;
+        logger.error('Short article blocked from publication', {
+          articleId: article.id,
+          clientId: client.id,
+          actualWordCount,
+          minimumArticleWords,
+        });
+        return { success: false, provider: 'shopify', error };
+      }
+
       const result = await shopifyService.publishArticleWithTracking(
         this.pool,
         client,
@@ -31,7 +57,7 @@ export class PublisherEngine {
         article.id,
         {
           title: article.title,
-          contentHtml: article.content_html || '',
+          contentHtml: presentArticleHtml(article.content_html, client),
           metaTitle: article.meta_title,
           metaDescription: article.meta_description,
           tags: article.tags || [],
@@ -63,6 +89,31 @@ export class PublisherEngine {
     blogId?: number | string
   ): Promise<PublishResult> {
     try {
+      const minimumArticleWords = getMinimumArticleWords(client);
+      const actualWordCount = countArticleWords(article.content_md || article.content_html || article.content);
+      const safetyIssues = getArticleSafetyIssues(
+        article.content_md || article.content_html || article.content,
+        client,
+        { allowHtml: !article.content_md && !!article.content_html },
+      );
+      if (safetyIssues.length > 0) {
+        const error = `Publication blocked: ${safetyIssues.join(' ')}`;
+        logger.error('Unsafe article blocked from publication', { articleId: article.id, clientId: client.id, safetyIssues });
+        await eventBus.emit(Events.PUBLISH_FAILED, { articleId: article.id, clientId: client.id, error });
+        return { success: false, provider: 'shopify', error };
+      }
+      if (actualWordCount < minimumArticleWords) {
+        const error = `Publication blocked: ${actualWordCount} words. Minimum required: ${minimumArticleWords} words.`;
+        logger.error('Short article blocked from publication', {
+          articleId: article.id,
+          clientId: client.id,
+          actualWordCount,
+          minimumArticleWords,
+        });
+        await eventBus.emit(Events.PUBLISH_FAILED, { articleId: article.id, clientId: client.id, error });
+        return { success: false, provider: 'shopify', error };
+      }
+
       let useConnector = false;
       let connection: any = null;
 
@@ -79,7 +130,7 @@ export class PublisherEngine {
         // cms_connections table may not exist — fall back to Shopify
       }
 
-      if (useConnector && connection) {
+      if (useConnector && connection && connection.provider !== 'shopify') {
         const target: PublishTarget = {
           provider: connection.provider,
           config: connection.config,
@@ -104,7 +155,7 @@ export class PublisherEngine {
         pool, client, blogId || null, article.id,
         {
           title: article.title,
-          contentHtml: article.content_html || '',
+          contentHtml: presentArticleHtml(article.content_html, client),
           metaTitle: article.meta_title,
           metaDescription: article.meta_description,
           tags: article.tags || [],

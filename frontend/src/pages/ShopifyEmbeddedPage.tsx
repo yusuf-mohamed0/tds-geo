@@ -51,7 +51,7 @@ export default function ShopifyEmbeddedPage() {
   if (!ready) {
     return (
       <div className="h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full" />
+        <div className="animate-spin w-6 h-6 border-2 border-gray-300 border-t-gray-600" />
       </div>
     );
   }
@@ -59,7 +59,7 @@ export default function ShopifyEmbeddedPage() {
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       {/* Top bar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3">
+      <div className="flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-4 sm:px-6">
         <img src="/assets/Black Swype.png" alt="Swype" className="h-7 w-auto object-contain" />
         <div>
           <h1 className="text-base font-semibold text-gray-900">TDS Geo</h1>
@@ -68,7 +68,7 @@ export default function ShopifyEmbeddedPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-lg mx-auto mt-12 px-6">
+      <div className="mx-auto mt-8 max-w-lg px-4 sm:mt-12 sm:px-6">
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center shadow-sm">
           <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto p-3">
             <img src="/assets/Black Swype.png" alt="Swype" className="w-full h-full object-contain" />

@@ -7,9 +7,12 @@ import { Pool } from 'pg';
 import { connectorManager } from '../connector-manager';
 import { logger } from '../utils/logger';
 import { sitesService } from '../services/sitesService';
+import { authenticate, authorize } from '../middleware/auth';
 
 export function createConnectorRoutes(pool: Pool): Router {
   const router = Router();
+
+  router.use(authenticate);
 
   const normalizeConnectorInput = (provider: string, body: Record<string, any>) => {
     const endpointUrl = body.endpointUrl || body.siteUrl || body.url || '';
@@ -31,7 +34,7 @@ export function createConnectorRoutes(pool: Pool): Router {
     res.json({ success: true, data: connectors });
   });
 
-  router.post('/connect/:provider', async (req: Request, res: Response) => {
+  router.post('/connect/:provider', authorize('admin'), async (req: Request, res: Response) => {
     try {
       const { provider } = req.params;
       const { clientId } = req.body;
@@ -88,7 +91,7 @@ export function createConnectorRoutes(pool: Pool): Router {
     }
   });
 
-  router.post('/:provider/test', async (req: Request, res: Response) => {
+  router.post('/:provider/test', authorize('admin'), async (req: Request, res: Response) => {
     try {
       const { provider } = req.params;
       const connector = connectorManager.get(provider);

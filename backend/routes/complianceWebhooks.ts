@@ -6,6 +6,7 @@ import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
 import axios from 'axios';
 import { logger } from '../utils/logger';
+import { authenticate } from '../middleware/auth';
 import { SHOPIFY_COMPLIANCE_WEBHOOKS, verifyShopifyWebhookHmac } from '../utils/shopifyWebhook';
 
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
@@ -158,7 +159,7 @@ async function handleShopRedact(req: Request, res: Response, pool: Pool) {
 export function createComplianceWebhookRoutes(pool: Pool): Router {
   const router = Router();
 
-  router.post('/subscribe', async (req: Request, res: Response) => {
+  router.post('/subscribe', authenticate, async (req: Request, res: Response) => {
     const { shop, accessToken } = req.body;
     if (!shop || !accessToken) {
       res.status(400).json({ error: 'shop and accessToken required' });
@@ -216,11 +217,6 @@ export function createComplianceWebhookRoutes(pool: Pool): Router {
         res.status(200).json({ success: true });
     }
   });
-
-  router.post('/app-uninstalled', (req, res) => handleAppUninstalled(req, res, pool));
-  router.post('/customers-data-request', (req, res) => handleCustomersDataRequest(req, res, pool));
-  router.post('/customers-redact', (req, res) => handleCustomersRedact(req, res, pool));
-  router.post('/shop-redact', (req, res) => handleShopRedact(req, res, pool));
 
   return router;
 }

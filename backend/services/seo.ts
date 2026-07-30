@@ -12,11 +12,21 @@ import openaiService from './openai';
 import { SeoAnalysis } from '../types';
 
 class SeoService {
-  async analyzeContent(content: string, keyword: string): Promise<SeoAnalysis> {
+  async analyzeContent(content: string, keyword: string, locale?: string): Promise<SeoAnalysis> {
+    const isEnglish = !locale || locale === 'en';
     try {
-      const analysis = await openaiService.analyzeSEO(content, keyword);
+      const analysis = await openaiService.analyzeSEO(content, keyword, locale);
+      // For non-English, use AI results directly without heuristic fallback
+      if (!isEnglish) {
+        return {
+          score: (analysis.score as number) || 50,
+          keywordDensity: (analysis.keywordDensity as number) || 0,
+          readabilityScore: (analysis.readabilityScore as number) || 50,
+          suggestions: (analysis.suggestions as string[]) || [],
+          headingStructure: (analysis.headingStructure as any) || { h1: false, h2: 0, h3: 0 }
+        };
+      }
       const heuristicResults = this.heuristicAnalysis(content, keyword);
-
       return {
         score: (analysis.score as number) || heuristicResults.score,
         keywordDensity: (analysis.keywordDensity as number) || heuristicResults.keywordDensity,
@@ -25,6 +35,20 @@ class SeoService {
         headingStructure: (analysis.headingStructure as any) || heuristicResults.headingStructure
       };
     } catch (err) {
+      if (!isEnglish) {
+        logger.warn('AI SEO analysis failed for non-English content, returning basic readability', { error: (err as Error).message, locale });
+        // Basic readability only — skip English-specific heuristics
+        const words = content.split(/\s+/).length;
+        const sentences = splitSentences(content);
+        const avgSentenceLength = sentences.length > 0 ? words / sentences.length : 0;
+        return {
+          score: 50,
+          keywordDensity: 0,
+          readabilityScore: Math.min(100, Math.max(0, Math.round(100 - (avgSentenceLength - 10) * 3))),
+          suggestions: [],
+          headingStructure: { h1: /^# /.test(content), h2: (content.match(/^## /gm) || []).length, h3: (content.match(/^### /gm) || []).length }
+        };
+      }
       logger.warn('AI SEO analysis failed, using heuristic analysis', { error: (err as Error).message });
       return this.heuristicAnalysis(content, keyword);
     }

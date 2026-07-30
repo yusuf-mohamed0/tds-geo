@@ -56,18 +56,17 @@ Generated: 2026-06-25
 ### CRITICAL
 
 **C1: GitHub PAT Token Removed from Git Remote URL**
-- Was: `https://yusuf-mohamed0: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@github.com/yusuf-mohamed0/tds-geo.git`
+- Was: `https://yusuf-mohamed0:<REDACTED_PAT>@github.com/yusuf-mohamed0/tds-geo.git`
 - Fixed to: `https://github.com/yusuf-mohamed0/tds-geo.git` (token removed)
 - **ACTION REQUIRED**: User must rotate this PAT on GitHub.com immediately
 
 **C2: Hardcoded Shopify Access Token — Removed from `.env.example`**
-- Was: `SHOPIFY_DEFAULT_ACCESS_TOKEN=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`
+- Was: `SHOPIFY_DEFAULT_ACCESS_TOKEN=<REDACTED_SHOPIFY_TOKEN>`
 - Fixed to: `SHOPIFY_DEFAULT_ACCESS_TOKEN=your-shopify-access-token-here`
 - **ACTION REQUIRED**: User must rotate this token in Shopify Admin
 
 **C3: JWT Secret Default in Source Code**
-- `const JWT_SECRET = process.env.JWT_SECRET || 'change-this-in-production-secret-key'`
-- **Fix**: Make JWT_SECRET mandatory in production (throw if unset)
+- **FIXED**: `middleware/auth.ts` now throws in production if JWT_SECRET is unset, and generates ephemeral random secret in dev
 
 **C4: API Key Authentication — Fixed with Constant-Time Comparison**
 - Before: `apiKey === allowedKey` (timing attack vulnerability)

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Page, Card, Text, Spinner, Banner, DataTable, BlockStack, InlineStack } from '@shopify/polaris';
-import { CheckSquare, TrendingDown, TrendingUp } from 'lucide-react';
+import { CheckSquare, TrendingDown, TrendingUp, AlertTriangle, ClipboardCheck } from 'lucide-react';
 import { apiFetch } from '../api/client';
 
 interface Evaluation {
@@ -12,20 +12,53 @@ interface Evaluation {
   evaluatedAt: string;
 }
 
+interface QualitySummary {
+  total_articles: number;
+  evaluated_articles: number;
+  healthy_articles: number;
+  low_quality_articles: number;
+  pending_articles: number;
+  threshold: number;
+}
+
 export default function QualityPage() {
   const [lowQuality, setLowQuality] = useState<Evaluation[]>([]);
+  const [summary, setSummary] = useState<QualitySummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [auditing, setAuditing] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    apiFetch<unknown>('/api/quality/low-quality')
-      .then((res) => {
-        const r = res as Record<string, unknown>;
-        const items = (r.data || r.evaluations || r.results || []) as Evaluation[];
-        setLowQuality(Array.isArray(items) ? items : []);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const [summaryResult, lowQualityResult] = await Promise.all([
+        apiFetch<QualitySummary>('/api/quality/summary'),
+        apiFetch<{ data: Evaluation[] }>('/api/quality/low-quality'),
+      ]);
+      setSummary(summaryResult);
+      setLowQuality(lowQualityResult.data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to load quality audit results.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const runAudit = async () => {
+    setAuditing(true);
+    setError('');
+    try {
+      await apiFetch('/api/quality/evaluate-all', { method: 'POST' });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to run the quality audit.');
+    } finally {
+      setAuditing(false);
+    }
+  };
 
   const rows = lowQuality.map((e) => [
     <Text as="span" variant="bodySm" tone="subdued">{e.id.slice(0, 8)}...</Text>,
@@ -44,40 +77,74 @@ export default function QualityPage() {
   ]);
 
   return (
-    <Page title="Quality Scores" subtitle="Article quality evaluation and scoring">
+    <Page
+      title="Quality Scores"
+      subtitle="Persisted article audits across readability, SEO, E-E-A-T, semantic coverage, CTA, and uniqueness"
+      primaryAction={{ content: auditing ? 'Auditing articles...' : 'Audit all articles', onAction: runAudit, loading: auditing, disabled: loading || auditing }}
+    >
       <BlockStack gap="400">
+        {error && <Banner tone="critical" onDismiss={() => setError('')}>{error}</Banner>}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
             <Spinner accessibilityLabel="Loading quality scores" size="large" />
           </div>
-        ) : lowQuality.length > 0 ? (
-          <Card padding="0">
-            <DataTable
-              columnContentTypes={['text', 'text', 'text', 'text']}
-              headings={['Article ID', 'Score', 'Dimensions', 'Date']}
-              rows={rows}
-            />
-          </Card>
         ) : (
-          <Card>
-            <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
-              <CheckSquare size={40} style={{ margin: '0 auto', color: 'var(--p-color-icon-success)', opacity: 0.4 }} />
-              <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="p" variant="headingMd" tone="success">All articles are healthy</Text></div>
-              <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">No low-quality scores detected</Text></div>
-            </div>
-          </Card>
+          <>
+            {summary && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                {[
+                  { label: 'Articles', value: summary.total_articles },
+                  { label: 'Audited', value: summary.evaluated_articles },
+                  { label: 'Meet threshold', value: summary.healthy_articles },
+                  { label: 'Needs review', value: summary.low_quality_articles },
+                  { label: 'Pending audit', value: summary.pending_articles },
+                ].map((metric) => (
+                  <Card key={metric.label}>
+                    <Text as="p" variant="heading2xl" fontWeight="bold">{metric.value}</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">{metric.label}</Text>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {lowQuality.length > 0 ? (
+              <Card padding="0">
+                <DataTable
+                  columnContentTypes={['text', 'text', 'text', 'text']}
+                  headings={['Article', 'Score', 'Dimensions', 'Audited']}
+                  rows={rows.map((row, index) => [
+                    <Text as="span" variant="bodyMd" fontWeight="medium">{lowQuality[index].title || lowQuality[index].id.slice(0, 8)}</Text>,
+                    ...row.slice(1),
+                  ])}
+                />
+              </Card>
+            ) : summary?.pending_articles ? (
+              <Card>
+                <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+                  <ClipboardCheck size={40} style={{ margin: '0 auto', color: 'var(--p-color-icon-warning)', opacity: 0.6 }} />
+                  <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="p" variant="headingMd">Quality audit is incomplete</Text></div>
+                  <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">{summary.pending_articles} article{summary.pending_articles === 1 ? '' : 's'} need{summary.pending_articles === 1 ? 's' : ''} an audit before a quality status can be reported.</Text></div>
+                </div>
+              </Card>
+            ) : (
+              <Card>
+                <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+                  <CheckSquare size={40} style={{ margin: '0 auto', color: 'var(--p-color-icon-success)', opacity: 0.6 }} />
+                  <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="p" variant="headingMd" tone="success">All audited articles meet the quality threshold</Text></div>
+                  <div style={{ marginTop: 'var(--p-space-100)' }}><Text as="p" variant="bodySm" tone="subdued">Every active article has a persisted score of at least {summary?.threshold || 65}/100.</Text></div>
+                </div>
+              </Card>
+            )}
+          </>
         )}
 
         <Card background="bg-surface-secondary">
           <BlockStack gap="300">
             <InlineStack gap="200" blockAlign="center">
-              <CheckSquare size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
-              <Text as="h3" variant="headingSm">Evaluate Content</Text>
+              <AlertTriangle size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
+              <Text as="h3" variant="headingSm">Audit rules</Text>
             </InlineStack>
-            <Text as="p" variant="bodyMd" tone="subdued">Use the API to evaluate content quality programmatically:</Text>
-            <div style={{ background: 'var(--p-color-bg)', padding: 'var(--p-space-300)', borderRadius: 'var(--p-space-200)', fontSize: 'var(--p-font-size-200)', fontFamily: 'monospace' }}>
-              POST /api/quality/evaluate {'{'} "articleId": "...", "content": "..." {'}'}
-            </div>
+            <Text as="p" variant="bodyMd" tone="subdued">Scores are persisted and refreshed by the audit action. Articles below {summary?.threshold || 65}/100 are listed above for review; unevaluated articles are never reported as healthy.</Text>
           </BlockStack>
         </Card>
       </BlockStack>

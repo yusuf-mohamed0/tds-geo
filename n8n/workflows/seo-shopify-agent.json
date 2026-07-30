@@ -1,0 +1,166 @@
+{
+  "name": "AI SEO Shopify Agent",
+  "nodes": [
+    {
+      "id": "cron-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "hoursInterval": null,
+              "minutesInterval": null,
+              "triggerAtDayOfMonth": null
+            }
+          ],
+          "triggerOnWeekdays": false,
+          "triggerOnWeekends": false
+        },
+        "scheduleType": "interval",
+        "scheduleInterval": {
+          "item": [
+            {
+              "name": "Days",
+              "value": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "set-client-id",
+      "name": "Set Client ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [350, 200],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "clientId",
+              "value": "YOUR_CLIENT_UUID_HERE"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "http-keywords",
+      "name": "Discover Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients/{{ $json.clientId }}/keywords/discover",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "industry",
+              "value": "maintenance"
+            },
+            {
+              "name": "seedKeywords",
+              "value": "[\"home maintenance\", \"property care\", \"preventative maintenance\", \"home repair tips\"]"
+            },
+            {
+              "name": "count",
+              "value": 20
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "http-generate",
+      "name": "Generate Article",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients/{{ $json.clientId }}/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "count",
+              "value": 1
+            },
+            {
+              "name": "publish",
+              "value": true
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "wait-30s",
+      "name": "Wait 30s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.2,
+      "position": [750, 400],
+      "parameters": {
+        "resume": "timeInterval",
+        "waitFor": 30,
+        "options": {}
+      }
+    },
+    {
+      "id": "http-logs",
+      "name": "Fetch Latest Articles",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [850, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/clients/{{ $json.clientId }}/articles?status=published&limit=1",
+        "authentication": "none",
+        "options": {
+          "timeout": 15000
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{ "node": "Set Client ID", "type": "main", "index": 0 }]]
+    },
+    "Set Client ID": {
+      "main": [[{ "node": "Discover Keywords", "type": "main", "index": 0 }]]
+    },
+    "Discover Keywords": {
+      "main": [[{ "node": "Generate Article", "type": "main", "index": 0 }]]
+    },
+    "Generate Article": {
+      "main": [[{ "node": "Wait 30s", "type": "main", "index": 0 }]]
+    },
+    "Wait 30s": {
+      "main": [[{ "node": "Fetch Latest Articles", "type": "main", "index": 0 }]]
+    },
+    "Fetch Latest Articles": {
+      "main": [[]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": ["seo", "shopify", "content-generation"],
+  "versionId": "1.0.0"
+}

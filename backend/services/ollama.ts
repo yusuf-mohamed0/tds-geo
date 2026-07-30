@@ -18,6 +18,8 @@ import { logger } from '../utils/logger';
 import { countKeywordOccurrences } from '../utils/stringUtils';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
 import { writingSystemPrompt } from '../prompts';
+import { getLocaleConfig } from '../utils/locale';
+import { assertMinimumArticleLength, getMinimumArticleWords } from './contentLength';
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || '';
 const OLLAMA_API_KEY  = process.env.OLLAMA_API_KEY || '';
@@ -40,6 +42,10 @@ class OllamaService {
   /** Whether we are talking to a local (free) instance vs. Ollama Cloud */
   get isLocal(): boolean {
     return !!OLLAMA_BASE_URL && !OLLAMA_API_KEY;
+  }
+
+  getClient(): any | null {
+    return this.client;
   }
 
   initialize(): void {
@@ -201,6 +207,8 @@ class OllamaService {
     const websiteIntelligence = (clientSettings as any).websiteIntelligence as string || '';
     const brandVoiceGuidance = (clientSettings as any).brandVoiceGuidance as string || '';
 
+    const localeCode = (clientSettings as any).locale || 'en';
+    const localeConfig = getLocaleConfig(localeCode);
     const systemPrompt = promptTemplate || writingSystemPrompt({
       TOPIC: keyword,
       SITE_NAME: (clientSettings as any).siteName || process.env.SITE_NAME || 'Website',
@@ -208,10 +216,12 @@ class OllamaService {
       CATEGORIES: (clientSettings as any).categories || '',
       DATE: new Date().toISOString().split('T')[0],
       YEAR: String(new Date().getFullYear()),
+      LANGUAGE: localeConfig.languageCode,
       GRAPHIFY_CONTEXT: (clientSettings as any).graphifyContext || '',
     });
 
     let userPrompt = `Generate a complete SEO-optimized blog post about: "${keyword}"\n\n`;
+    userPrompt += `IMPORTANT LANGUAGE REQUIREMENT: Write this entire article in ${localeConfig.languageCode}. All titles, body content, meta descriptions, tags, and any FAQ sections must be in ${localeConfig.languageCode}.\n\n`;
     if (websiteIntelligence) userPrompt += `## CLIENT CONTEXT\n${websiteIntelligence}\n\n`;
     if (brandVoiceGuidance) userPrompt += `## BRAND VOICE GUIDANCE\n${brandVoiceGuidance}\n\n`;
     userPrompt += `## CONTENT REQUIREMENTS\n- Tone: ${tone}\n- Min ${minWords} words, max ${maxWords} words\n- Structure: start with exactly one <h1>, then H2 sections with H3 subsections where useful\n- Include an FAQ section with 3-5 Q&A\n- Include a natural CTA at the end\n- Use E-E-A-T principles\n- NEVER include dangerous DIY repair instructions\n- Return ONLY the final article HTML. Do not return JSON. Do not wrap in markdown fences.`;
@@ -223,11 +233,7 @@ class OllamaService {
       const titleMatch = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
       const title = titleMatch?.[1]?.replace(/<[^>]+>/g, '').trim() || this.titleFromKeyword(keyword);
       const plainText = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      const wordCount = plainText.split(/\s+/).filter(Boolean).length;
-
-      if (wordCount < Math.min(minWords, 500)) {
-        throw new Error(`Ollama response too short (${wordCount} words)`);
-      }
+      const wordCount = assertMinimumArticleLength(content, getMinimumArticleWords(undefined, minWords), 'Ollama response');
       logger.info('Blog post generated via Ollama', {
         keyword,
         title,
@@ -310,12 +316,17 @@ class OllamaService {
   // SEO ANALYSIS
   // ══════════════════════════════════════════════
 
-  async analyzeSEO(content: string, keyword: string): Promise<Record<string, unknown>> {
+  async analyzeSEO(content: string, keyword: string, locale?: string): Promise<Record<string, unknown>> {
     if (this.isMockMode) return this.mockAnalyzeSEO(content, keyword);
     this.ensureInitialized();
 
-    const systemPrompt = `You are an SEO expert. Analyze the given content for the target keyword "${keyword}".
+    let systemPrompt = `You are an SEO expert. Analyze the given content for the target keyword "${keyword}".
 Score 0-100 and provide improvements. Respond in JSON: { score, keywordDensity, suggestions[], headingStructure[], readabilityScore }`;
+
+    if (locale && locale !== 'en') {
+      const localeConfig = getLocaleConfig(locale);
+      systemPrompt += `\nThe content is in ${localeConfig.languageCode}. Evaluate SEO for this language.`;
+    }
 
     const { content: raw } = await this.chatCompletion(systemPrompt, `Content:\n\n${content.slice(0, 8000)}`, {
       format: 'json',
@@ -345,6 +356,21 @@ Focus on informational intent, question queries, and "near me" variations. Respo
     const result = this.parseJsonResponse(raw);
     const keywords = Array.isArray(result) ? result : (result as any).keywords || (result as any).variations || [];
     return keywords.slice(0, count);
+  }
+
+  async generateKeywordResearchPool(seeds: string[], count: number): Promise<string[]> {
+    if (this.isMockMode) return [];
+    this.ensureInitialized();
+
+    const systemPrompt = `You are an SEO keyword researcher. Return a JSON object with a single "keywords" array containing ${count} unique, natural-language search queries. Use only the supplied business topics. Cover informational, comparison, commercial, question, beginner, care, and local-intent queries when genuinely relevant. Do not invent products, prices, statistics, competitors, claims, or locations. Do not include metrics or explanations.`;
+    const { content: raw } = await this.chatCompletion(systemPrompt, `Approved seed topics:\n${seeds.map((seed) => `- ${seed}`).join('\n')}`, {
+      format: 'json',
+      temperature: 0.4,
+      maxTokens: 4096,
+    });
+    const result = this.parseJsonResponse(raw);
+    const keywords = Array.isArray(result) ? result : (result as any).keywords || [];
+    return keywords.filter((keyword: unknown): keyword is string => typeof keyword === 'string').slice(0, count);
   }
 
   // ══════════════════════════════════════════════

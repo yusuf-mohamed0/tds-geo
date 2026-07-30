@@ -9,6 +9,8 @@ export interface ConnectorConfig {
   endpointUrl?: string;
   version?: string;
   capabilities?: ConnectorCapability[];
+  /** Default blog ID for publishing content. Used by Shopify connector. */
+  defaultBlogId?: number | string;
 }
 
 export interface ConnectorCapability {

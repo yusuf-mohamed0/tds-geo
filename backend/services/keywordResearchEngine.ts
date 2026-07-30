@@ -19,7 +19,7 @@ interface EnrichedKeyword {
   competition: number;
   cpc: number;
   difficulty: number;
-  trend: 'rising' | 'stable' | 'declining';
+  trend: 'rising' | 'stable' | 'declining' | 'unavailable';
   intent: 'informational' | 'commercial' | 'transactional' | 'navigational';
   isQuestion: boolean;
   serpFeatures: string[];
@@ -33,7 +33,7 @@ interface SerpAnalysis {
   featuredSnippet: boolean;
   peopleAlsoAsk: string[];
   relatedSearches: string[];
-  topResults: { title: string; url: string; snippet: string }[];
+  topResults?: { title: string; url: string; snippet: string }[];
   serpFeatures: string[];
 }
 
@@ -200,30 +200,24 @@ Return ONLY a JSON array of strings, no other text.`
   }
 
   private async enrichKeyword(keyword: string, industry: string): Promise<EnrichedKeyword | null> {
-    // Get real data from SerpAPI
     let serpData;
     try {
       serpData = await serpapiService.getKeywordData(keyword);
     } catch {
-      serpData = null;
+      return null;
     }
 
-    // Analyze SERP features
-    const serpFeatures = await this.analyzeSerpFeatures(keyword);
-
-    // Classify intent using AI
-    const intent = serpData
-      ? this.classifyIntent(keyword, serpData)
-      : 'informational';
+    const serpFeatures: SerpAnalysis = { featuredSnippet: false, peopleAlsoAsk: [], relatedSearches: [], serpFeatures: [] };
+    const intent = this.classifyIntent(keyword, serpData);
 
     const isQuestion = /^(what|how|why|when|where|which|who|can|does|is|are|do|does)\b/i.test(keyword);
 
-    const searchVolume = serpData?.search_volume || Math.round(50 + Math.random() * 300);
-    const competition = serpData?.competition || 0.5;
-    const cpc = serpData?.cpc || 0;
+    const searchVolume = serpData.search_volume;
+    const competition = serpData.competition;
+    const cpc = serpData.cpc;
     const difficulty = this.calculateDifficulty(competition, searchVolume, keyword);
 
-    const trend = this.detectTrend(searchVolume, keyword, industry);
+    const trend = 'unavailable' as const;
     const relevanceScore = this.calculateRelevanceScore(keyword, searchVolume, competition, industry);
     const opportunityScore = this.calculateOpportunityScore(searchVolume, difficulty, competition, relevanceScore, isQuestion);
 
@@ -304,17 +298,6 @@ Possible features: featured_snippet, people_also_ask, knowledge_panel, local_pac
     return Math.max(5, Math.min(95, Math.round(difficulty)));
   }
 
-  private detectTrend(volume: number, keyword: string, industry: string): 'rising' | 'stable' | 'declining' {
-    const risingTerms = /\b(2026|trends|new|modern|latest|innovative|future|upgrade|smart|eco|sustainable|green|digital|automated)\b/i;
-    const decliningTerms = /\b(old|obsolete|outdated|traditional|classic|basic|cheap)\b/i;
-
-    if (risingTerms.test(keyword)) return 'rising';
-    if (decliningTerms.test(keyword)) return 'declining';
-    if (volume > 500) return 'rising';
-    if (volume < 100) return 'declining';
-    return 'stable';
-  }
-
   private calculateRelevanceScore(keyword: string, volume: number, competition: number, industry: string): number {
     const k = keyword.toLowerCase();
     const industryTerms = industry.toLowerCase().split(/\s+/);
@@ -387,7 +370,7 @@ Rules:
       if (!content) return keywords;
 
       const clustering = JSON.parse(content);
-      const clusterMap = new Map<string, string[]>();
+      const clusterMap = new Map<string, string>();
 
       if (clustering.clusters) {
         for (const cluster of clustering.clusters) {

@@ -17,8 +17,12 @@ import costTracker from '../services/costTracker';
 import { convert } from '../utils/markdownToHtml';
 import { validate, embeddedGenerateSchema, embeddedPublishAllSchema, embeddedSyncSchema, embeddedGeoAnalyzeSchema, embeddedGeoImproveSchema } from '../validators/index';
 import shopifyService from '../services/shopify';
+import { getClientDefaultBlogId } from '../services/shopify/content';
 import { sitesService } from '../services/sitesService';
 import { publisherEngine } from '../engines/publisher';
+import { countArticleWords, getMinimumArticleWords } from '../services/contentLength';
+import { getArticleSafetyIssues } from '../services/articleSafety';
+import { presentArticleHtml } from '../services/articlePresentation';
 
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 
@@ -228,7 +232,7 @@ export function createEmbeddedRoutes(pool: Pool): Router {
         tone: client.brand_voice || 'educational',
         minWords: 1200,
         maxWords: 2500,
-        clientSettings: client.settings || {},
+        clientSettings: { ...(client.settings || {}), siteName: client.name },
         queue: false
       });
 
@@ -247,7 +251,22 @@ export function createEmbeddedRoutes(pool: Pool): Router {
       if (linkOpportunities.length > 0) {
         finalContent = internalLinksService.injectLinks(finalContent, linkOpportunities);
       }
-      const contentHtml = convert(finalContent);
+      const minimumArticleWords = getMinimumArticleWords(client);
+      const actualWordCount = countArticleWords(finalContent);
+      const safetyIssues = getArticleSafetyIssues(finalContent, client);
+      if (safetyIssues.length > 0) {
+        res.status(422).json({ error: 'Content safety check failed.', issues: safetyIssues });
+        return;
+      }
+      if (actualWordCount < minimumArticleWords) {
+        res.status(422).json({
+          error: `Content is too short to save: ${actualWordCount} words. Minimum required: ${minimumArticleWords} words.`,
+          wordCount: actualWordCount,
+          minimumWords: minimumArticleWords,
+        });
+        return;
+      }
+      const contentHtml = presentArticleHtml(convert(finalContent), client);
       const status = 'draft';
 
       const articleResult = await pool.query(
@@ -259,7 +278,7 @@ export function createEmbeddedRoutes(pool: Pool): Router {
           auth.clientId, keywordId, article.title,
           seoService.generateSlug(article.title) + '-' + Date.now().toString(36).slice(-4),
           finalContent, contentHtml, article.metaTitle, article.metaDescription,
-          article.tags, article.content.split(/\s+/).length,
+           article.tags, actualWordCount,
           status, seoAnalysis.score
         ]
       );
@@ -303,11 +322,11 @@ export function createEmbeddedRoutes(pool: Pool): Router {
         `SELECT config FROM cms_connections WHERE client_id = $1 AND provider = 'shopify' AND is_active = true LIMIT 1`,
         [auth.clientId]
       );
-      let blogId: number | null = null;
+      let blogId: number | string | null = getClientDefaultBlogId(client);
       if (blogResult.rows.length > 0) {
         try {
           const blogs = await shopifyService.fetchBlogs(blogResult.rows[0].config);
-          blogId = blogs[0]?.id || null;
+          blogId = blogId || blogs[0]?.id || null;
         } catch { /* */ }
       }
 

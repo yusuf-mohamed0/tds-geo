@@ -9,7 +9,7 @@
 
 import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
-import { authenticate } from '../middleware/auth';
+import { authenticate, authorizeClientAccess } from '../middleware/auth';
 import globalMemory from '../services/globalMemory';
 
 export function createMemoryRoutes(pool: Pool): Router {
@@ -19,7 +19,7 @@ export function createMemoryRoutes(pool: Pool): Router {
   router.use(authenticate);
 
   // ── Site Context ────────────────────────────
-  router.get('/sites/:clientId', async (req: Request, res: Response) => {
+  router.get('/sites/:clientId', authorizeClientAccess, async (req: Request, res: Response) => {
     try {
       const site = await globalMemory.getSite(req.params.clientId);
       if (!site) return res.status(404).json({ error: 'Site not found' });
@@ -29,7 +29,7 @@ export function createMemoryRoutes(pool: Pool): Router {
     }
   });
 
-  router.put('/sites/:clientId', async (req: Request, res: Response) => {
+  router.put('/sites/:clientId', authorizeClientAccess, async (req: Request, res: Response) => {
     try {
       await globalMemory.updateSite(req.params.clientId, req.body);
       res.json({ success: true });
@@ -39,7 +39,7 @@ export function createMemoryRoutes(pool: Pool): Router {
   });
 
   // ── Article History ─────────────────────────
-  router.get('/articles/:clientId', async (req: Request, res: Response) => {
+  router.get('/articles/:clientId', authorizeClientAccess, async (req: Request, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 20;
       const articles = await globalMemory.getArticleHistory(req.params.clientId, limit);
@@ -50,7 +50,7 @@ export function createMemoryRoutes(pool: Pool): Router {
   });
 
   // ── Knowledge Graph ─────────────────────────
-  router.get('/graph/:clientId', async (req: Request, res: Response) => {
+  router.get('/graph/:clientId', authorizeClientAccess, async (req: Request, res: Response) => {
     try {
       const graph = await globalMemory.getEntityGraph(req.params.clientId);
       res.json({ success: true, data: graph });
@@ -77,7 +77,7 @@ export function createMemoryRoutes(pool: Pool): Router {
     }
   });
 
-  router.get('/entities/:clientId/related/:entityName', async (req: Request, res: Response) => {
+  router.get('/entities/:clientId/related/:entityName', authorizeClientAccess, async (req: Request, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;
       const related = await globalMemory.findRelatedEntities(

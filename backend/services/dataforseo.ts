@@ -5,6 +5,7 @@
 import axios from 'axios';
 import { logger } from '../utils/logger';
 import { config } from '../utils/config';
+import { getLocaleConfig } from '../utils/locale';
 
 // ─── Types ─────────────────────────────────────
 
@@ -122,13 +123,20 @@ class DataForSeoService {
     }
   }
 
+  private resolveLocale(locale?: string): { language_code: string; location_code: number } {
+    if (!locale) return { language_code: 'en', location_code: 2840 };
+    const config = getLocaleConfig(locale);
+    return { language_code: config.dataforseoLanguage, location_code: config.dataforseoLocation };
+  }
+
   // ─── Keyword Research ────────────────────
 
-  async getKeywordVolume(keywords: string[]): Promise<KeywordVolume[]> {
+  async getKeywordVolume(keywords: string[], locale?: string): Promise<KeywordVolume[]> {
+    const { language_code, location_code } = this.resolveLocale(locale);
     const result = await this.request<any>('POST', '/keywords_data/google/search_volume/live', {
       keywords,
-      location_code: 2840,
-      language_code: 'en',
+      location_code,
+      language_code,
     });
     return (result || []).map((item: any) => ({
       keyword: item.keyword,
@@ -144,11 +152,12 @@ class DataForSeoService {
     }));
   }
 
-  async getKeywordIdeas(keyword: string): Promise<KeywordIdea[]> {
+  async getKeywordIdeas(keyword: string, locale?: string): Promise<KeywordIdea[]> {
+    const { language_code, location_code } = this.resolveLocale(locale);
     const result = await this.request<any>('POST', '/dataforseo_labs/google/keyword_suggestions/live', {
       keyword,
-      location_code: 2840,
-      language_code: 'en',
+      location_code,
+      language_code,
       limit: 20,
     });
     return (result?.items || []).map((item: any) => ({
@@ -160,11 +169,12 @@ class DataForSeoService {
     }));
   }
 
-  async getKeywordDifficulty(keywords: string[]): Promise<{ keyword: string; difficulty: number }[]> {
+  async getKeywordDifficulty(keywords: string[], locale?: string): Promise<{ keyword: string; difficulty: number }[]> {
+    const { language_code, location_code } = this.resolveLocale(locale);
     const result = await this.request<any>('POST', '/dataforseo_labs/google/keyword_ideas/live', {
       keywords,
-      location_code: 2840,
-      language_code: 'en',
+      location_code,
+      language_code,
     });
     return (result || []).map((item: any) => ({
       keyword: item.keyword,
@@ -174,11 +184,16 @@ class DataForSeoService {
 
   // ─── Domain Research ──────────────────────
 
-  async getDomainOverview(domain: string): Promise<DomainOverview | null> {
+  async getDomainAnalysis(domain: string, locale?: string): Promise<DomainOverview | null> {
+    return this.getDomainOverview(domain, locale);
+  }
+
+  async getDomainOverview(domain: string, locale?: string): Promise<DomainOverview | null> {
+    const { language_code, location_code } = this.resolveLocale(locale);
     const result = await this.request<any>('POST', '/dataforseo_labs/google/domain_overview/live', {
       target: domain,
-      location_code: 2840,
-      language_code: 'en',
+      location_code,
+      language_code,
     });
     if (!result?.[0]) return null;
     const d = result[0];
@@ -199,11 +214,12 @@ class DataForSeoService {
     };
   }
 
-  async getDomainKeywords(domain: string, limit = 50): Promise<{ keyword: string; position: number; traffic: number }[]> {
+  async getDomainKeywords(domain: string, limit = 50, locale?: string): Promise<{ keyword: string; position: number; traffic: number }[]> {
+    const { language_code, location_code } = this.resolveLocale(locale);
     const result = await this.request<any>('POST', '/dataforseo_labs/google/ranked_keywords/live', {
       target: domain,
-      location_code: 2840,
-      language_code: 'en',
+      location_code,
+      language_code,
       limit,
     });
     return (result?.[0]?.items || []).map((item: any) => ({
@@ -215,11 +231,12 @@ class DataForSeoService {
 
   // ─── Competitor Analysis ──────────────────
 
-  async getCompetitors(domain: string): Promise<{ domain: string; traffic: number; overlap: number }[]> {
+  async getCompetitors(domain: string, locale?: string): Promise<{ domain: string; traffic: number; overlap: number }[]> {
+    const { language_code, location_code } = this.resolveLocale(locale);
     const result = await this.request<any>('POST', '/dataforseo_labs/google/competitors_domain/live', {
       target: domain,
-      location_code: 2840,
-      language_code: 'en',
+      location_code,
+      language_code,
       limit: 10,
     });
     return (result?.[0]?.items || []).map((item: any) => ({
@@ -259,11 +276,12 @@ class DataForSeoService {
 
   // ─── SERP Analysis ────────────────────────
 
-  async getSerpResults(keyword: string): Promise<SerpResult[]> {
+  async getSerpResults(keyword: string, locale?: string): Promise<SerpResult[]> {
+    const { language_code, location_code } = this.resolveLocale(locale);
     const result = await this.request<any>('POST', '/serp/google/organic/live', {
       keyword,
-      location_code: 2840,
-      language_code: 'en',
+      location_code,
+      language_code,
       limit: 10,
     });
     return (result?.[0]?.items || [])
@@ -314,13 +332,13 @@ class DataForSeoService {
 
   // ─── Bulk Keyword Discovery for Content ───
 
-  async discoverContentKeywords(topic: string): Promise<{
+  async discoverContentKeywords(topic: string, locale?: string): Promise<{
     primary: string[];
     longTail: string[];
     questions: string[];
     related: string[];
   }> {
-    const ideas = await this.getKeywordIdeas(topic);
+    const ideas = await this.getKeywordIdeas(topic, locale);
     const primary: string[] = [];
     const longTail: string[] = [];
     const questions: string[] = [];

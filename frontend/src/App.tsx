@@ -5,6 +5,8 @@ import enTranslations from '@shopify/polaris/locales/en.json';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
+import DemoSignupPage from './pages/DemoSignupPage';
+import DemoUpgradePage from './pages/DemoUpgradePage';
 import AdminDashboard from './pages/AdminDashboard';
 import ClientsPage from './pages/ClientsPage';
 import ClientDashboard from './pages/ClientDashboard';
@@ -57,7 +59,7 @@ function RootPage() {
   if (isShopify === null) {
     return (
       <div className="h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full" />
+        <div className="animate-spin w-6 h-6 border-2 border-gray-300 border-t-gray-600" />
       </div>
     );
   }
@@ -76,6 +78,8 @@ export default function App() {
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/demo/signup" element={<DemoSignupPage />} />
+            <Route path="/demo/upgrade" element={<DemoUpgradePage />} />
             <Route path="/admin" element={<Layout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="clients" element={<ClientsPage />} />

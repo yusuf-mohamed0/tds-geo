@@ -5,30 +5,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Changelog - TDS Geo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/brand.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 .timeline{position:relative;max-width:720px;margin:40px auto 0;padding-left:40px}
 .timeline::before{content:'';position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--border)}
 .timeline-item{position:relative;padding-bottom:40px;opacity:0;animation:fadeInUp 0.5s ease forwards}
 .timeline-item:last-child{padding-bottom:0}
-.timeline-dot{position:absolute;left:-33px;top:6px;width:16px;height:16px;border-radius:50%;border:3px solid var(--gold);background:var(--white);z-index:1}
+.timeline-dot{position:absolute;left:-33px;top:6px;width:16px;height:16px;border:3px solid var(--gold);background:var(--white);z-index:1}
 .timeline-item.new .timeline-dot{background:var(--gold)}
-.timeline-date{font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.timeline-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.timeline-date{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.timeline-tag{display:inline-block;padding:3px 10px;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .tag-new{background:#eafaf1;color:#1e8449}
 .tag-fix{background:#fcf6f2;color:#8b6914}
-.tag-improve{background:#e8f0fe;color:var(--navy)}
-.timeline-content{background:var(--cream);border-radius:var(--radius);padding:20px 24px}
-.timeline-content h3{font-size:16px;font-weight:600;color:var(--dark);margin-bottom:8px}
+.tag-improve{background:#e8f0fe;color:var(--dark)}
+.timeline-content{background:var(--cream);padding:20px 24px;transition:var(--transition)}
+.timeline-content:hover{transform:translateX(4px);box-shadow:var(--shadow)}
+.timeline-content h3{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:600;color:var(--dark);margin-bottom:8px}
 .timeline-content ul{padding-left:18px;margin:0}
 .timeline-content li{margin:4px 0;font-size:14px;color:var(--text);line-height:1.6}
-.subscribe-section{text-align:center;margin-top:48px;padding:40px;background:var(--cream);border-radius:var(--radius)}
-.subscribe-section h3{font-size:18px;color:var(--dark);margin-bottom:8px}
+.subscribe-section{text-align:center;margin-top:48px;padding:40px;background:var(--cream)}
+.subscribe-section h3{font-family:'Unbounded',sans-serif;font-size:18px;color:var(--dark);margin-bottom:8px}
 .subscribe-section p{color:var(--text-light);font-size:14px;margin-bottom:16px}
-@media(max-width:480px){
+@media(max-width:768px){
   .timeline{padding-left:32px}
-  .timeline-dot{left:-25px;width:12px;height:12px}
+  .timeline-dot{left:-25px;width:14px;height:14px}
+}
+@media(max-width:480px){
+  .timeline{padding-left:28px}
+  .timeline-dot{left:-21px;width:12px;height:12px}
+  .timeline-content{padding:16px}
+  .timeline-content h3{font-size:14px}
+  .timeline-content li{font-size:13px}
 }
 </style>
 </head>
@@ -40,9 +50,9 @@
 <a href="/documentation">Docs</a>
 <a href="/tutorial">Tutorial</a>
 <a href="/faq">FAQ</a>
-<a href="/login">Sign In</a>
 <a href="/changelog" class="active">Changelog</a>
 <a href="/privacy">Privacy</a>
+<a href="/login" class="sign-in">Sign In</a>
 </nav>
 </div>
 </header>
@@ -133,7 +143,7 @@
 <footer>
 <div class="footer-inner">
 <div class="footer-col">
-<div class="logo" style="margin-bottom:12px"><img src="/assets/Black%20Swype.png" alt="Swype" style="height:24px;width:auto"> <span style="font-size:14px;color:var(--white)">TDS <span style="color:var(--gold)">GEO</span></span></div>
+<div class="logo" style="margin-bottom:12px"><img src="/assets/White%20Swype.png" alt="Swype" style="height:24px;width:auto"> <span style="font-size:14px;color:var(--white)">TDS <span style="color:var(--gold)">GEO</span></span></div>
 <p>Fully managed GEO content service for Shopify stores. We write, optimize, and publish — you grow.</p>
 </div>
 <div class="footer-col">

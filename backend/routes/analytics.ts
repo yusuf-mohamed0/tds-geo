@@ -9,6 +9,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import { authenticate, authorizeClientAccess } from '../middleware/auth';
+import { getClientDashboardProfile } from '../services/clientDashboardProfile';
 
 export function createAnalyticsRoutes(pool: Pool): Router {
   const router = Router();
@@ -20,7 +21,14 @@ export function createAnalyticsRoutes(pool: Pool): Router {
     try {
       const clientId = req.params.clientId;
 
-      const [articleStats, keywordStats, publishStats, recentArticles, costSummary] = await Promise.all([
+      const [clientResult, articleStats, keywordStats, publishStats, recentArticles, costSummary, teamRoles, cmsConnections] = await Promise.all([
+        pool.query(
+          `SELECT id, name, slug, shopify_shop, brand_voice, service_area, timezone,
+                  publish_frequency, preferred_publish_hour, approval_mode, is_active,
+                  locale, settings, updated_at
+           FROM clients WHERE id = $1`,
+          [clientId],
+        ),
         pool.query(
           `SELECT COUNT(*)::int as total,
                   COUNT(*) FILTER (WHERE status = 'published')::int as published,
@@ -61,10 +69,36 @@ export function createAnalyticsRoutes(pool: Pool): Router {
            FROM cost_tracking
            WHERE client_id = $1 AND created_at >= DATE_TRUNC('month', NOW())`,
           [clientId]
-        )
+        ),
+        pool.query(
+          `SELECT role, COUNT(*)::int AS count, ARRAY_AGG(COALESCE(name, email) ORDER BY COALESCE(name, email)) AS members
+           FROM users WHERE client_id = $1 GROUP BY role ORDER BY role`,
+          [clientId],
+        ),
+        pool.query(
+          `SELECT provider, is_primary, is_active, config->>'defaultBlogId' AS default_blog_id
+           FROM cms_connections WHERE client_id = $1 ORDER BY is_primary DESC, provider`,
+          [clientId],
+        ),
       ]);
 
+      if (clientResult.rows.length === 0) {
+        res.status(404).json({ error: 'Client not found' });
+        return;
+      }
+      const client = clientResult.rows[0];
+
       res.json({
+        client,
+        profile: getClientDashboardProfile(client),
+        team: teamRoles.rows,
+        connections: cmsConnections.rows,
+        contentRules: {
+          minimumWords: 1200,
+          requiresManualApproval: client.approval_mode === 'manual',
+          sourceFormat: 'Markdown',
+          safeguards: ['Fact and brand safety checks', 'Scoped client presentation', 'Length validation before publishing'],
+        },
         articles: articleStats.rows[0],
         keywords: keywordStats.rows[0],
         publishing: publishStats.rows[0],
@@ -314,6 +348,22 @@ export function createAnalyticsRoutes(pool: Pool): Router {
   });
 
   // ─── Keyword Analytics ──────────────────────
+  router.get('/:clientId/keywords', authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await pool.query(
+        `SELECT id, keyword, intent, source, last_used_at
+         FROM keywords
+         WHERE client_id = $1 AND is_active = true
+         ORDER BY keyword ASC`,
+        [req.params.clientId]
+      );
+
+      res.json(result.rows);
+    } catch (err) {
+      next(err);
+    }
+  });
+
   router.get('/:clientId/keyword-analytics', authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await pool.query(

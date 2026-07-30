@@ -5,13 +5,17 @@ export default {
     extend: {
       colors: {
         brand: {
-          bg: '#F5F3F0',
-          accent: '#FCB900',
+          bg: '#EEEEEE',
+          accent: '#F2B01C',
           text: '#1A1A1A',
           muted: '#6B7280',
           surface: '#FFFFFF',
           border: '#E5E7EB',
         },
+      },
+      fontFamily: {
+        heading: ['Unbounded', 'sans-serif'],
+        body: ['DM Sans', 'sans-serif'],
       },
     },
   },

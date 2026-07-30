@@ -187,7 +187,7 @@ Cover ALL business lines for each client, especially gaps not yet covered:
 |---|---|---|
 | Caravanserai (`caravanserai`) | 78074216615 (News) | Home decor, brass, Egyptian craftsmanship, furniture |
 | Alamein (`alamein-2022`) | 79774056505 (posts) | Outdoor furniture, playgrounds, game tables, fitness equipment, commercial/street furniture |
-| Flaunt Cosmetics (`flaunt-cosmetics-global`) | 91737030948 (News) | Eyeliner stamp, easy makeup, beauty tips UAE & Egypt, cosmetics — 31 existing articles, gaps in UAE-specific content, eye shape guides, beginners |
+| Flaunt Cosmetics (`flaunt-cosmetics-global`) | 116005503268 (Beauty Tips) | Eyeliner stamp, easy makeup, beauty tips UAE & Egypt, cosmetics — all new TDS content goes to Beauty Tips after manual approval |
 | Joe's Venture (`joes-venture`) | — | Handmade leather goods — jackets, bags, accessories. France-based, ships to Egypt. 152 products, 24 collections. OAuth pending — install URL sent. |
 
 ### Infrastructure

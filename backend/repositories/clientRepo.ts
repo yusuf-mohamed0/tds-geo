@@ -28,6 +28,7 @@ export interface ClientRecord {
   blacklist_keywords: string[];
   cta_template: string | null;
   target_audience: string | null;
+  locale: string;
   settings: Record<string, unknown>;
   is_active: boolean;
   created_at: Date;

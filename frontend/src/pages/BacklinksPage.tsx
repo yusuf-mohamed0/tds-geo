@@ -42,6 +42,12 @@ interface BacklinkItem {
   verified_at: string;
 }
 
+interface Client {
+  id: string;
+  name: string;
+  is_active: boolean;
+}
+
 export default function BacklinksPage() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [prospects, setProspects] = useState<Prospect[]>([]);
@@ -57,6 +63,8 @@ export default function BacklinksPage() {
   const [guestTopic, setGuestTopic] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [verifyResult, setVerifyResult] = useState('');
+  const [clients, setClients] = useState<Client[]>([]);
+  const [clientId, setClientId] = useState('');
 
   const tabs = [
     { id: 'prospects', content: 'Prospects' },
@@ -65,18 +73,31 @@ export default function BacklinksPage() {
     { id: 'guest-post', content: 'Guest Post' },
   ];
 
+  const withClient = (path: string) => `${path}?clientId=${encodeURIComponent(clientId)}`;
+
+  useEffect(() => {
+    apiFetch<{ clients: Client[] }>('/api/clients')
+      .then((res) => {
+        const activeClients = (res.clients || []).filter((client) => client.is_active !== false);
+        setClients(activeClients);
+        setClientId(activeClients[0]?.id || '');
+      })
+      .catch(() => setError('Unable to load clients.'));
+  }, []);
+
   const fetchData = async (tab: number) => {
+    if (!clientId) return;
     setLoading(true);
     setError('');
     try {
-      if (tab === 0) {
-        const data = await apiFetch<{ prospects: Prospect[] }>('/api/backlinks/prospects');
+      if (tab === 0 || tab === 3) {
+        const data = await apiFetch<{ prospects: Prospect[] }>(withClient('/api/backlinks/prospects'));
         setProspects(data.prospects || []);
       } else if (tab === 1) {
-        const data = await apiFetch<{ outreach: OutreachItem[] }>('/api/backlinks/outreach');
+        const data = await apiFetch<{ outreach: OutreachItem[] }>(withClient('/api/backlinks/outreach'));
         setOutreach(data.outreach || []);
       } else if (tab === 2) {
-        const data = await apiFetch<{ backlinks: BacklinkItem[] }>('/api/backlinks');
+        const data = await apiFetch<{ backlinks: BacklinkItem[] }>(withClient('/api/backlinks'));
         setBacklinks(data.backlinks || []);
       }
     } catch (err: unknown) {
@@ -86,14 +107,14 @@ export default function BacklinksPage() {
     }
   };
 
-  useEffect(() => { fetchData(selectedTab); }, [selectedTab]);
+  useEffect(() => { void fetchData(selectedTab); }, [selectedTab, clientId]);
 
   const handleDiscover = async () => {
-    if (!targetDomain.trim()) return;
+    if (!targetDomain.trim() || !clientId) return;
     setDiscovering(true);
     setError('');
     try {
-      const data = await apiFetch<{ prospects: Prospect[]; count: number }>('/api/backlinks/discover', {
+      const data = await apiFetch<{ prospects: Prospect[]; count: number }>(withClient('/api/backlinks/discover'), {
         method: 'POST',
         body: JSON.stringify({ targetDomain: targetDomain.trim(), limit: 20 }),
       });
@@ -108,7 +129,7 @@ export default function BacklinksPage() {
 
   const handleCreateOutreach = async (prospectId: string) => {
     try {
-      await apiFetch('/api/backlinks/outreach', {
+      await apiFetch(withClient('/api/backlinks/outreach'), {
         method: 'POST',
         body: JSON.stringify({ prospectId, pitchType: 'guest_post' }),
       });
@@ -123,7 +144,7 @@ export default function BacklinksPage() {
     setGenerating(true);
     setError('');
     try {
-      const result = await apiFetch<{ title: string; content: string; wordCount: number }>('/api/backlinks/generate-guest-post', {
+      const result = await apiFetch<{ title: string; content: string; wordCount: number }>(withClient('/api/backlinks/generate-guest-post'), {
         method: 'POST',
         body: JSON.stringify({ prospectId, topic: guestTopic.trim() }),
       });
@@ -138,7 +159,8 @@ export default function BacklinksPage() {
   const handleVerify = async () => {
     setVerifying(true);
     try {
-      const result = await apiFetch<{ checked: number; active: number; lost: number }>('/api/backlinks/verify', {
+      if (!clientId) return;
+      const result = await apiFetch<{ checked: number; active: number; lost: number }>(withClient('/api/backlinks/verify'), {
         method: 'POST',
       });
       setVerifyResult(`Checked ${result.checked}: ${result.active} active, ${result.lost} lost`);
@@ -165,6 +187,16 @@ export default function BacklinksPage() {
         {verifyResult && <Banner tone="success">{verifyResult}</Banner>}
 
         <Card>
+          <BlockStack gap="200">
+            <Text as="h2" variant="headingSm">Client</Text>
+            <select className="input" value={clientId} onChange={(e) => setClientId(e.target.value)} disabled={discovering || verifying}>
+              <option value="">Select a client</option>
+              {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
+            </select>
+          </BlockStack>
+        </Card>
+
+        <Card>
           <BlockStack gap="300">
           <div style={{ display: 'flex', gap: 'var(--p-space-200)', alignItems: 'center' }}>
             <Target size={18} style={{ opacity: 0.6 }} />
@@ -188,7 +220,7 @@ export default function BacklinksPage() {
                   variant="primary"
                   onClick={handleDiscover}
                   loading={discovering}
-                  disabled={!targetDomain.trim()}
+                  disabled={!targetDomain.trim() || !clientId}
                 >Discover</Button>
               </div>
             </InlineStack>
@@ -404,5 +436,3 @@ export default function BacklinksPage() {
     </Page>
   );
 }
-
-

@@ -57,6 +57,7 @@ export const updateClientSchema = Joi.object({
   monthlyTokenLimit: Joi.number().integer().min(0).optional(),
   monthlyCostLimit: Joi.number().min(0).optional(),
   isActive: Joi.boolean().optional(),
+  locale: Joi.string().optional(),
   settings: Joi.object().optional()
 });
 

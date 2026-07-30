@@ -50,6 +50,7 @@ export enum QueueNames {
   INTERNAL_LINKING = 'internal-linking',
   WEBHOOK_DELIVERY = 'webhook-delivery',
   DEFAULT = 'default',
+  DEAD_LETTER = 'dead-letter',
   // ── Enterprise Queues ──
   FACT_CHECK = 'fact-check',
   BRAND_VOICE = 'brand-voice',
@@ -181,7 +182,7 @@ function createWorker(
 
       // Move to dead-letter queue after max retries
       if (job.attemptsMade >= (job.opts.attempts || 3) - 1) {
-        const dlq = getQueue(QueueNames.DEFAULT);
+        const dlq = getQueue(QueueNames.DEAD_LETTER);
         await dlq.add(`${queueName}:dead-letter`, {
           originalJobId: job.id,
           originalQueue: queueName,

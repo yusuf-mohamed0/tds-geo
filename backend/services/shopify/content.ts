@@ -8,6 +8,22 @@ import { ShopifyConfig } from '../../types';
 import { refreshIfExpired } from './auth';
 import { buildClient, getQueue } from './client';
 
+export function getClientDefaultBlogId(client: { settings?: unknown }): number | string | null {
+  let settings: Record<string, unknown> = {};
+  if (typeof client.settings === 'string') {
+    try {
+      settings = JSON.parse(client.settings) as Record<string, unknown>;
+    } catch {
+      return null;
+    }
+  } else if (client.settings && typeof client.settings === 'object') {
+    settings = client.settings as Record<string, unknown>;
+  }
+
+  const blogId = settings.shopifyBlogId ?? settings.shopify_blog_id;
+  return typeof blogId === 'number' || typeof blogId === 'string' ? blogId : null;
+}
+
 export async function fetchArticles(shopConfig: ShopifyConfig, blogId: number | null = null, options: {
   limit?: number;
   fields?: string;
@@ -118,7 +134,7 @@ export async function publishArticleWithTracking(
     apiVersion: client.shopify_api_version
   };
 
-  let targetBlogId = blogId;
+  let targetBlogId = blogId || getClientDefaultBlogId(client);
   if (!targetBlogId) {
     const blogs = await fetchBlogs(shopConfig);
     targetBlogId = blogs[0]?.id;

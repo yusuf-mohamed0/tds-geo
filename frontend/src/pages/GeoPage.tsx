@@ -327,8 +327,8 @@ export default function GeoPage() {
             ) : (
               <BlockStack gap="300">
                 <Text as="span" variant="bodyMd" fontWeight="medium">Website URL</Text>
-                <div style={{ display: 'flex', gap: 'var(--p-space-300)' }}>
-                  <div style={{ position: 'relative', flex: 1, maxWidth: 500 }}>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <div className="relative w-full min-w-0 sm:max-w-[500px] sm:flex-1">
                     <Globe size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--p-color-text-secondary)' }} />
                     <input
                       className="input"

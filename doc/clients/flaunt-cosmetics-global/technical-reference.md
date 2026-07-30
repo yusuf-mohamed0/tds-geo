@@ -18,7 +18,7 @@
 - **Provider**: Shopify
 - **Status**: Active
 - **Capabilities**: publish, read
-- **Token**: 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
+- **Token**: `<REDACTED_SHOPIFY_TOKEN>`
 
 ## API Config
 - **Version**: 2025-07

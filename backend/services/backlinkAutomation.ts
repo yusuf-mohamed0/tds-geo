@@ -2,7 +2,6 @@ import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import dataforseo from './dataforseo';
 import openaiService from './openai';
-import ShopifyContentService from './shopify/content';
 
 interface BacklinkProspect {
   id: string;
@@ -52,6 +51,10 @@ class BacklinkAutomationService {
   ): Promise<BacklinkProspect[]> {
     const pool = this.getPool();
     const results: BacklinkProspect[] = [];
+
+    if (!dataforseo.isEnabled()) {
+      throw new Error('Backlink discovery requires DataForSEO. No prospect data is available until it is configured.');
+    }
 
     try {
       // 1. Use DataForSEO to find competitor referring domains
@@ -111,6 +114,7 @@ class BacklinkAutomationService {
       logger.info(`Discovered ${results.length} backlink prospects`, { clientId, targetDomain });
     } catch (err: any) {
       logger.error('Backlink prospect discovery failed', { clientId, targetDomain, error: err.message });
+      throw err;
     }
 
     return results;
@@ -163,10 +167,10 @@ class BacklinkAutomationService {
     return result.rows[0];
   }
 
-  async markSent(outreachId: string): Promise<void> {
+  async markSent(outreachId: string, clientId: string): Promise<void> {
     await this.getPool().query(
-      `UPDATE backlink_outreach SET status = 'sent', sent_at = NOW() WHERE id = $1`,
-      [outreachId]
+      `UPDATE backlink_outreach SET status = 'sent', sent_at = NOW() WHERE id = $1 AND client_id = $2`,
+      [outreachId, clientId]
     );
   }
 
@@ -262,7 +266,9 @@ Return JSON: { "title": string, "content": string, "wordCount": number, "backlin
       const domainData = await dataforseo.getDomainAnalysis(domain);
       dr = domainData?.referringDomains || 0;
       traffic = domainData?.organicTraffic || 0;
-    } catch {}
+    } catch (err) {
+      logger.warn('Backlink domain metrics unavailable', { sourceUrl, error: (err as Error).message });
+    }
 
     const result = await pool.query(
       `INSERT INTO backlinks

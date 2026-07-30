@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Page, Card, Text, Button, Spinner, Banner,
-  IndexTable, Filters, Badge, BlockStack, Pagination,
+  IndexTable, Filters, Badge, BlockStack, InlineStack, Pagination, Select,
 } from '@shopify/polaris';
+import { Languages } from 'lucide-react';
 import { apiFetch } from '../api/client';
+import { SUPPORTED_LOCALES, getLocaleName } from '../api/locale';
 import type { ArticleSummary, PaginatedResponse } from '../types';
 
 const statusOptions = [
@@ -17,9 +19,12 @@ const statusOptions = [
 ];
 
 export default function ArticlesPage() {
+  const [searchParams] = useSearchParams();
+  const clientId = searchParams.get('clientId');
   const [data, setData] = useState<PaginatedResponse<ArticleSummary> | null>(null);
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState(() => searchParams.get('status') || '');
+  const [localeFilter, setLocaleFilter] = useState(() => searchParams.get('locale') || '');
   const [loading, setLoading] = useState(true);
   const [showGenerate, setShowGenerate] = useState(false);
   const [keyword, setKeyword] = useState('');
@@ -60,12 +65,14 @@ export default function ArticlesPage() {
   const fetchArticles = useCallback(() => {
     setLoading(true);
     const params = new URLSearchParams({ limit: String(limit), offset: String((page - 1) * limit) });
+    if (clientId) params.set('clientId', clientId);
     if (statusFilter) params.set('status', statusFilter);
+    if (localeFilter) params.set('locale', localeFilter);
     apiFetch<PaginatedResponse<ArticleSummary>>(`/api/articles?${params}`)
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [page, statusFilter]);
+  }, [clientId, page, statusFilter, localeFilter]);
 
   useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
@@ -75,6 +82,16 @@ export default function ArticlesPage() {
     setStatusFilter(value);
     setPage(1);
   }, []);
+
+  const handleLocaleFilter = useCallback((value: string) => {
+    setLocaleFilter(value);
+    setPage(1);
+  }, []);
+
+  const localeOptions = [
+    { value: '', label: 'All languages' },
+    ...SUPPORTED_LOCALES.map(l => ({ value: l.code, label: `${l.nativeName} (${l.name})` })),
+  ];
 
   const filters = [
     {
@@ -96,16 +113,34 @@ export default function ArticlesPage() {
       ),
       shortcut: true,
     },
+    {
+      key: 'locale',
+      label: 'Language',
+      filter: (
+        <div style={{ padding: 'var(--p-space-200)', minWidth: 200 }}>
+          <Select
+            label="Language"
+            labelHidden
+            value={localeFilter}
+            onChange={handleLocaleFilter}
+            options={localeOptions}
+          />
+        </div>
+      ),
+      shortcut: true,
+    },
   ];
 
-  const appliedFilters = statusFilter
-    ? [{ key: 'status', label: `Status: ${statusFilter}`, onRemove: () => handleStatusFilter('') }]
-    : [];
+  const appliedFilters = [
+    ...(statusFilter ? [{ key: 'status', label: `Status: ${statusFilter}`, onRemove: () => handleStatusFilter('') }] : []),
+    ...(localeFilter ? [{ key: 'locale', label: `Language: ${getLocaleName(localeFilter)}`, onRemove: () => handleLocaleFilter('') }] : []),
+  ];
 
   const handleFiltersClearAll = useCallback(() => {
     handleStatusFilter('');
+    handleLocaleFilter('');
     setQueryValue('');
-  }, [handleStatusFilter]);
+  }, [handleStatusFilter, handleLocaleFilter]);
 
   const rowMarkup = (data?.data || []).map((article, index) => (
     <IndexTable.Row
@@ -124,6 +159,16 @@ export default function ArticlesPage() {
           article.status === 'generated' ? 'warning' :
           article.status === 'rejected' ? 'critical' : 'attention'
         }>{article.status}</Badge>
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        {article.locale ? (
+          <InlineStack gap="100" blockAlign="center">
+            <Languages size={12} style={{ opacity: 0.5 }} />
+            <Badge tone="info">{getLocaleName(article.locale)}</Badge>
+          </InlineStack>
+        ) : (
+          <Text as="span" variant="bodySm" tone="subdued">-</Text>
+        )}
       </IndexTable.Cell>
       <IndexTable.Cell>
         {article.scheduled_at ? (
@@ -181,6 +226,7 @@ export default function ArticlesPage() {
                 headings={[
                   { title: 'Title' },
                   { title: 'Status' },
+                  { title: 'Language' },
                   { title: 'Schedule' },
                   { title: 'Words' },
                   { title: 'SEO' },

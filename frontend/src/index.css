@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 @import '@shopify/polaris/build/esm/styles.css';
 
 @tailwind base;
@@ -11,9 +12,18 @@
     box-sizing: border-box;
   }
 
+  /* Keep the application visual language consistently sharp. */
+  #root *, #root *::before, #root *::after {
+    border-radius: 0 !important;
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Unbounded', sans-serif;
   }
 
   ::-webkit-scrollbar {
@@ -21,22 +31,32 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #F5F3F0;
+    background: #EEEEEE;
   }
 
   ::-webkit-scrollbar-thumb {
     background: #D1D5DB;
-    border-radius: 3px;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-brand-surface border border-brand-border rounded-lg p-5;
+    @apply bg-brand-surface border border-brand-border p-5;
+    transition: transform .2s ease-out, box-shadow .2s ease-out, border-color .2s ease-out;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 40px rgba(0,0,0,.1);
+    border-color: rgba(242,176,28,.3);
   }
 
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-150;
+    @apply px-4 py-2 font-heading font-medium text-sm uppercase;
+    transition: all .2s ease-out;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
   }
 
   .btn-primary {
@@ -52,11 +72,11 @@
   }
 
   .input {
-    @apply w-full px-3 py-2 bg-brand-bg border border-brand-border rounded-lg text-brand-text placeholder-brand-muted focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent text-sm;
+    @apply w-full px-3 py-2 bg-brand-bg border border-brand-border text-brand-text placeholder-brand-muted focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent text-sm;
   }
 
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium;
   }
 
   .badge-green { @apply badge bg-green-100 text-green-800; }
@@ -67,12 +87,12 @@
 }
 
 [data-polaris-theme] {
-  --p-color-bg-fill-brand: #FCB900;
-  --p-color-bg-fill-brand-hover: #e6a800;
-  --p-color-bg-fill-brand-active: #d49a00;
-  --p-color-bg-fill-brand-selected: #FCB900;
-  --p-color-text-link: #926d00;
-  --p-color-text-link-hover: #7a5a00;
-  --p-color-border-focus: #FCB900;
-  --p-color-input-border-active: #FCB900;
+  --p-color-bg-fill-brand: #F2B01C;
+  --p-color-bg-fill-brand-hover: #d99c18;
+  --p-color-bg-fill-brand-active: #c48a14;
+  --p-color-bg-fill-brand-selected: #F2B01C;
+  --p-color-text-link: #8a6300;
+  --p-color-text-link-hover: #6b4d00;
+  --p-color-border-focus: #F2B01C;
+  --p-color-input-border-active: #F2B01C;
 }

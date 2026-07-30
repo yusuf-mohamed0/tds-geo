@@ -223,7 +223,7 @@ None — worldwide.
 | **Password** | `TrafficDSgeo@2024` |
 | **Account description** | Shopify store admin account for traffic-test.myshopify.com, provides full access to embedded TDS Geo app and all features |
 
-> User exists in DB (role: admin, id: f6d7fa9a...). Also tested with `admin@tds-geo.internal` / `TDSg30!Pr0d#2026_X9`.
+> User exists in DB (role: admin, id: f6d7fa9a...). Also tested with `admin@tds-geo.internal` / `<REDACTED_PASSWORD>`.
 
 ### Screencast URL
 ```
@@ -257,4 +257,4 @@ https://youtu.be/GvqorasmfGU
 | **Webhook compliance topics** | `customers/data_request`, `customers/redact`, `shop/redact`, `app/uninstalled` |
 | **App URL** | `https://traffic.16.192.29.174.nip.io` |
 | **API key** | `a178c8740049e04eec663378b6e30ad8` |
-| **API secret** | ✅ Server `.env` has `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` — verify this matches Partner Dashboard |
+| **API secret** | ✅ Server `.env` has `<REDACTED_APP_SECRET>` — verify this matches Partner Dashboard |

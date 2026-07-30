@@ -16,12 +16,21 @@ import { JwtPayload, UserRole, DeviceFingerprint } from '../types';
 import { logger } from '../utils/logger';
 import deviceAuthService from '../services/deviceAuth';
 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+if (!GOOGLE_CLIENT_ID && process.env.NODE_ENV === 'production') {
+  logger.warn('GOOGLE_CLIENT_ID not set — Google Sign-In will be disabled');
+}
+
 const JWT_SECRET = (() => {
   const secret = process.env.JWT_SECRET;
   if (!secret && process.env.NODE_ENV === 'production') {
     throw new Error('JWT_SECRET environment variable is required in production');
   }
-  return secret || 'change-this-in-production-secret-key';
+  if (!secret) {
+    logger.warn('JWT_SECRET not set — using ephemeral random secret (tokens invalidated on restart)');
+    return crypto.randomBytes(32).toString('hex');
+  }
+  return secret;
 })();
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 const SESSION_TTL_HOURS = parseInt(process.env.SESSION_TTL_HOURS || '24', 10);
@@ -62,7 +71,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
       const allowedBuf = Buffer.from(allowedKey);
       const match = keyBuf.length === allowedBuf.length
         ? crypto.timingSafeEqual(keyBuf, allowedBuf)
-        : (crypto.timingSafeEqual(keyBuf, keyBuf), false);
+        : false;
       if (match) {
         (req as any).user = {
           id: 'connector',
@@ -443,6 +452,60 @@ export function requireResourceOwnership(pool: Pool, table: string) {
   };
 }
 
+// ─── Google OAuth ───────────────────────────
+
+let googleJwks: Record<string, string> | null = null;
+let googleJwksFetchedAt = 0;
+
+async function fetchGoogleJwks(): Promise<Record<string, string>> {
+  const cacheMaxAge = 3600_000;
+  if (googleJwks && Date.now() - googleJwksFetchedAt < cacheMaxAge) {
+    return googleJwks;
+  }
+  const res = await fetch('https://www.googleapis.com/oauth2/v3/certs');
+  const data = await res.json() as { keys: Array<{ kid: string; n: string; e: string; kty: string }> };
+  const keys: Record<string, string> = {};
+  for (const key of data.keys) {
+    if (key.kty === 'RSA') {
+      const pubKey = crypto.createPublicKey({
+        key: { kty: 'RSA', n: key.n, e: key.e },
+        format: 'jwk',
+      }).export({ type: 'spki', format: 'pem' }) as string;
+      keys[key.kid] = pubKey;
+    }
+  }
+  googleJwks = keys;
+  googleJwksFetchedAt = Date.now();
+  return keys;
+}
+
+interface GoogleTokenPayload {
+  sub: string;
+  email: string;
+  name?: string;
+  picture?: string;
+  email_verified?: boolean;
+  aud: string;
+  iss: string;
+  exp: number;
+  iat: number;
+}
+
+async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPayload> {
+  const header = JSON.parse(Buffer.from(idToken.split('.')[0], 'base64url').toString()) as { kid?: string; alg?: string };
+  if (!header.kid) throw new Error('Missing kid in Google token header');
+  const keys = await fetchGoogleJwks();
+  const pem = keys[header.kid];
+  if (!pem) throw new Error('Google public key not found for kid: ' + header.kid);
+  const payload = jwt.verify(idToken, pem, {
+    algorithms: ['RS256'],
+    audience: GOOGLE_CLIENT_ID,
+    issuer: ['https://accounts.google.com', 'accounts.google.com'],
+  }) as GoogleTokenPayload;
+  if (!payload.email_verified) throw new Error('Google email not verified');
+  return payload;
+}
+
 // ─── Auth Routes ─────────────────────────────
 
 export function createAuthRouter(pool: Pool): Router {
@@ -610,6 +673,87 @@ export function createAuthRouter(pool: Pool): Router {
     } catch (err) {
       next(err);
     }
+  });
+
+  // POST /api/auth/google
+  router.post('/google', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { credential } = req.body;
+      if (!credential) {
+        res.status(400).json({ error: 'Google credential is required' });
+        return;
+      }
+      if (!GOOGLE_CLIENT_ID) {
+        res.status(503).json({ error: 'Google Sign-In is not configured' });
+        return;
+      }
+
+      const googlePayload = await verifyGoogleToken(credential);
+      const googleId = googlePayload.sub;
+      const email = googlePayload.email;
+      const name = googlePayload.name || email.split('@')[0];
+
+      let user: any;
+      const existingByGoogle = await pool.query(
+        'SELECT * FROM users WHERE google_id = $1 AND is_active = true',
+        [googleId]
+      );
+      if (existingByGoogle.rows.length > 0) {
+        user = existingByGoogle.rows[0];
+      } else {
+        const existingByEmail = await pool.query(
+          'SELECT * FROM users WHERE email = $1 AND is_active = true',
+          [email]
+        );
+        if (existingByEmail.rows.length > 0) {
+          user = existingByEmail.rows[0];
+          await pool.query('UPDATE users SET google_id = $1, updated_at = NOW() WHERE id = $2', [googleId, user.id]);
+        } else {
+          const pwHash = await bcrypt.hash(crypto.randomUUID() + crypto.randomUUID(), 12);
+          const result = await pool.query(
+            `INSERT INTO users (email, password_hash, name, role, google_id, is_active)
+             VALUES ($1, $2, $3, 'admin', $4, true)
+             RETURNING *`,
+            [email, pwHash, name, googleId]
+          );
+          user = result.rows[0];
+        }
+      }
+
+      await pool.query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [user.id]);
+
+      const jti = uuidv4();
+      const token = generateToken({
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        clientId: user.client_id
+      }, undefined, jti);
+
+      logger.info('User logged in via Google', { userId: user.id, role: user.role });
+
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          client_id: user.client_id,
+        },
+      });
+    } catch (err) {
+      const message = (err as Error).message;
+      logger.warn('Google auth failed', { error: message });
+      res.status(401).json({ error: 'Google authentication failed: ' + message });
+    }
+  });
+
+  // GET /api/auth/config
+  router.get('/config', (_req: Request, res: Response) => {
+    res.json({
+      googleClientId: GOOGLE_CLIENT_ID || null,
+    });
   });
 
   // GET /api/auth/me

@@ -43,6 +43,18 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     return;
   }
 
+  // Skip for auth routes (no session yet — login/register are pre-auth)
+  if (req.originalUrl.startsWith('/api/auth/')) {
+    next();
+    return;
+  }
+
+  // Skip for embedded app routes (Shopify session token auth)
+  if (req.originalUrl.startsWith('/api/embedded/')) {
+    next();
+    return;
+  }
+
   const user = (req as any).user;
   const sessionId = user?.jti || user?.id || req.ip || 'unknown';
   const token = req.headers['x-csrf-token'] as string;

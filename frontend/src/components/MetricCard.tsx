@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 interface MetricCardProps {
   icon: ReactNode;
@@ -7,6 +8,8 @@ interface MetricCardProps {
   subtitle?: string;
   trend?: { value: number; positive: boolean };
   color?: string;
+  to?: string;
+  onClick?: () => void;
 }
 
 const waveSvg = (
@@ -15,9 +18,10 @@ const waveSvg = (
   </svg>
 );
 
-export default function MetricCard({ icon, label, value, subtitle, trend, color = '#FCB900' }: MetricCardProps) {
-  return (
-    <div className="relative card overflow-hidden group hover:border-opacity-50 transition-all duration-300 hover:shadow-lg hover:shadow-black/20">
+export default function MetricCard({ icon, label, value, subtitle, trend, color = '#FCB900', to, onClick }: MetricCardProps) {
+  const interactive = Boolean(to || onClick);
+  const card = (
+    <div className={`relative card overflow-hidden${interactive ? ' group cursor-pointer transition-all duration-300 hover:border-opacity-50 hover:shadow-lg hover:shadow-black/20' : ''}`}>
       {waveSvg}
       <div className="flex items-start justify-between relative z-10">
         <div
@@ -42,5 +46,19 @@ export default function MetricCard({ icon, label, value, subtitle, trend, color 
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-0.5 opacity-30" style={{ backgroundColor: color }} />
     </div>
+  );
+
+  if (!interactive) return card;
+
+  if (to) return (
+    <Link to={to} aria-label={`View ${label}`} className="block text-inherit no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+      {card}
+    </Link>
+  );
+
+  return (
+    <button type="button" onClick={onClick} aria-label={`View ${label}`} className="block w-full border-0 bg-transparent p-0 text-left text-inherit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+      {card}
+    </button>
   );
 }

@@ -84,6 +84,14 @@ jobs:
           echo "=== Secrets scan ==="
           npx @anthropic-ai/cli-scan --path . --no-input 2>/dev/null || true
 
+      - name: Frontend install
+        run: npm ci
+        working-directory: frontend
+
+      - name: Frontend tests
+        run: npx vitest run --reporter=dot
+        working-directory: frontend
+
       - name: Build check
         run: npm run build
         env:

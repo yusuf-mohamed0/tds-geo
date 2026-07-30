@@ -10,6 +10,7 @@
 import axios from 'axios';
 import { logger } from '../utils/logger';
 import { SerpApiResult } from '../types';
+import { getLocaleConfig } from '../utils/locale';
 
 const SERPAPI_API_KEY = process.env.SERPAPI_API_KEY || '';
 
@@ -26,25 +27,34 @@ interface SerpApiKeywordResponse {
 class SerpApiService {
   private baseUrl = 'https://serpapi.com';
 
+  isConfigured(): boolean {
+    return Boolean(SERPAPI_API_KEY);
+  }
+
   /**
    * Search for keyword data including volume, competition, and CPC.
    */
-  async getKeywordData(keyword: string): Promise<SerpApiResult> {
+  async getKeywordData(keyword: string, locale?: string): Promise<SerpApiResult> {
     if (!SERPAPI_API_KEY) {
-      logger.warn('SERPAPI_API_KEY not configured, returning estimated data');
-      return this.getEstimatedData(keyword);
+      throw new Error('SERPAPI_API_KEY is not configured; keyword metrics cannot be enriched');
     }
 
     try {
       // Google Keyword Planner data via SerpAPI
+      const params: Record<string, string> = {
+        api_key: SERPAPI_API_KEY,
+        engine: 'google_keyword_planner',
+        keyword,
+        google_domain: 'google.com',
+        device: 'desktop'
+      };
+      if (locale) {
+        const config = getLocaleConfig(locale);
+        params.gl = config.serpLocale;
+        params.hl = config.serpHl;
+      }
       const response = await axios.get(`${this.baseUrl}/search.json`, {
-        params: {
-          api_key: SERPAPI_API_KEY,
-          engine: 'google_keyword_planner',
-          keyword,
-          google_domain: 'google.com',
-          device: 'desktop'
-        },
+        params,
         timeout: 15000
       });
 
@@ -52,7 +62,7 @@ class SerpApiService {
 
       const result: SerpApiResult = {
         keyword,
-        search_volume: data.search_volume || this.estimateVolume(keyword),
+        search_volume: data.search_volume ?? 0,
         competition: this.parseCompetition(data.competition),
         cpc: data.cpc || 0,
         trend_score: this.calculateTrend(keyword),
@@ -67,23 +77,23 @@ class SerpApiService {
 
       return result;
     } catch (err) {
-      logger.warn('SerpAPI request failed, using estimated data', {
+      logger.warn('SerpAPI request failed', {
         keyword,
         error: (err as Error).message
       });
-      return this.getEstimatedData(keyword);
+      throw err;
     }
   }
 
   /**
    * Get keyword data for multiple keywords in batch.
    */
-  async getBulkKeywordData(keywords: string[]): Promise<SerpApiResult[]> {
+  async getBulkKeywordData(keywords: string[], locale?: string): Promise<SerpApiResult[]> {
     const results: SerpApiResult[] = [];
 
     for (const keyword of keywords) {
       try {
-        const data = await this.getKeywordData(keyword);
+        const data = await this.getKeywordData(keyword, locale);
         results.push(data);
         // Rate limiting: 1 request per second for free tier
         await new Promise(resolve => setTimeout(resolve, 1100));
@@ -132,50 +142,8 @@ class SerpApiService {
     }
   }
 
-  // ─── Fallback Heuristics ──────────────────────
-
-  private getEstimatedData(keyword: string): SerpApiResult {
-    return {
-      keyword,
-      search_volume: this.estimateVolume(keyword),
-      competition: this.estimateCompetition(keyword),
-      cpc: this.estimateCpc(keyword),
-      trend_score: this.calculateTrend(keyword),
-      related_keywords: []
-    };
-  }
-
-  private estimateVolume(keyword: string): number {
-    const wordCount = keyword.split(/\s+/).length;
-    // Short-tail keywords have higher volume
-    if (wordCount <= 2) return Math.round(100 + Math.random() * 900);
-    if (wordCount === 3) return Math.round(50 + Math.random() * 300);
-    return Math.round(20 + Math.random() * 150);
-  }
-
-  private competition = 0;
-
-  private estimateCompetition(keyword: string): number {
-    const wordCount = keyword.split(/\s+/).length;
-    // Long-tail = lower competition
-    return Math.round((1 - (wordCount - 1) * 0.12) * 100) / 100;
-  }
-
-  private estimateCpc(keyword: string): number {
-    // Service-related keywords have higher CPC
-    const highCpcTerms = /\b(repair|replacement|emergency|plumber|electrician|hvac|roof)\b/i;
-    return highCpcTerms.test(keyword)
-      ? Math.round((3 + Math.random() * 7) * 100) / 100
-      : Math.round((1 + Math.random() * 3) * 100) / 100;
-  }
-
   private calculateTrend(keyword: string): number {
-    // Keywords with "near me", "2024", "cost" are trending
-    const trendingIndicators = /\b(near me|\d{4}|cost|price|guide|tips|best|top|vs)\b/i;
-    const base = 50;
-    const bonus = trendingIndicators.test(keyword) ? 20 : 0;
-    const randomFactor = Math.floor(Math.random() * 20);
-    return Math.min(100, base + bonus + randomFactor);
+    return 50;
   }
 
   private parseCompetition(competition?: string): number {

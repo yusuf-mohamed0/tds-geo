@@ -5,7 +5,15 @@
 import crypto from 'crypto';
 
 function getMasterKey(): string {
-  return process.env.CREDENTIAL_VAULT_KEY || process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+  const key = process.env.CREDENTIAL_VAULT_KEY || process.env.ENCRYPTION_KEY;
+  if (!key && process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'CREDENTIAL_VAULT_KEY is required in production. '
+      + 'Set it before starting the server — existing encrypted data will be UNRECOVERABLE without the correct key. '
+      + 'Generate: openssl rand -hex 32'
+    );
+  }
+  return key || crypto.randomBytes(32).toString('hex');
 }
 
 export function encrypt(plaintext: string): string {

@@ -1,57 +1,41 @@
-
-*~
-assets/
-backend/vault-ui/node_modules/
-backend/vault-ui/package-lock.json
-*.bak
-/billing.ts
-# Build artifacts
-# Build output
-/complianceWebhooks.ts
-# Dead files (root-level standalone scripts)
-# Dependencies
-dist/
-docker/
-.DS_Store
-dump.rdb
-# Editor files
+# ─── Environment ────────────────────────────
 .env
-.env.backup
-# Environment files
-.env.*.local
 .env.local
-Fonts/
-frontend/tsconfig.tsbuildinfo
-.graphifyignore
-graphify-out/
-/heartbeatService.ts
-Icons/
-.idea/
-/index.ts
-*.log
-logs/
-# Logs
-n8n/
+.env.production
+.env.staging
+.env.backup
+
+# ─── Secrets / Credentials ──────────────────
+*.pem
+*.key
+*.p12
+*.pfx
+**/secrets/
+
+# ─── Build Output ───────────────────────────
+dist/
 node_modules/
-*.odt
-*.orig
-# OS files
-outputs/
-# Pipeline artifacts
-*.png
-# Project assets
-project-blueprint.md
-/shopifyInstall.ts
-*.sidcars.yml
-*.swo
-*.swp
-# Temp files
+frontend/dist/
+
+# ─── Logs ──────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+
+# ─── OS ────────────────────────────────────
+.DS_Store
 Thumbs.db
-/tmp/
-trash/
-.understand-anything/diff-overlay.json
-# Understand Anything - generated knowledge graph artifacts
-.understand-anything/intermediate/
-# Vault UI
+
+# ─── IDE ───────────────────────────────────
 .vscode/
-*.zip
+.idea/
+*.swp
+*.swo
+
+# ─── Temp ─────────────────────────────────
+tmp/
+*.dump
+dump.rdb
+
+# Deepwork state
+.slim/deepwork/

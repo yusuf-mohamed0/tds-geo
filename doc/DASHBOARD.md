@@ -29,6 +29,11 @@ gantt
     section Boston Vet
     Brand Profile                :done, 2026-07-07, 1d
     Cloudflare Bypass            :crit, active, 2026-07-08, 3d
+    Audit (Wayback Machine)      :done, 2026-07-21, 1d
+    2 Articles Written           :done, 2026-07-21, 1d
+
+    section Flaunt Cosmetics Global
+    Short Draft Remediation      :done, 2026-07-13, 1d
 
     section Infrastructure
     Client Validation Guard      :done, 2026-07-08, 1d
@@ -36,6 +41,15 @@ gantt
 
     section Caravanserai
     Added to DB                  :done, 2026-07-08, 1d
+    10 Product Descriptions      :done, 2026-07-21, 1d
+
+    section Acme Maintenance
+    Real Site Discovery          :done, 2026-07-21, 1d
+    Brand Profile (Real Site)    :done, 2026-07-21, 1d
+    Site Audit                   :done, 2026-07-21, 1d
+
+    section Boston Pharma
+    2 Articles Expanded          :done, 2026-07-21, 1d
 
 ```
 
@@ -54,9 +68,9 @@ gantt
 | Liquid Files | ✅ 6 `.liquid` | Shopify-ready with brand CSS |
 | App Install | ✅ **APPROVED & PUBLISHED** | `apps.shopify.com/tds-geo` |
 | Meta Descriptions | 🔴 Not applied | Waiting for app access |
-| Product Descriptions | 🔴 Not written | Waiting for app access |
+| Product Descriptions | ✅ **10 pilot descriptions** | Documented at `product-descriptions-pilot.md` |
 
-**Progress:** ██████████░░░░░ 65%
+**Progress:** ██████████░░░░░ 68%
 
 ---
 
@@ -82,6 +96,8 @@ gantt
 | Meta Descriptions | None | **All products** |
 | Wrong Article | About Boston, MA | ✅ About Boston Pharma Egypt |
 | Synced to Local DB | 0 articles | ✅ **56 blog posts** via WordPress sync |
+| Draft Articles | — | 16 drafts + 2 generated pending (no WP API key to publish) |
+| Articles Expanded This Session | — | 2 articles expanded to 1,599–1,910 words |
 
 **Effort:** ████████████████ 100% — All products published, all descriptions written, WordPress synced
 
@@ -94,10 +110,26 @@ gantt
 | Brand Profile | ✅ Complete | Colors, fonts, voice, stack |
 | Technical Reference | ✅ Complete | WordPress/WooCommerce stack |
 | SEO Content Guide | ✅ Complete | Vet pharma keywords |
-| Full Audit | 🔴 **BLOCKED** | Cloudflare blocks scraping |
-| Product Publishing | ⏳ Waiting | Audit must come first |
+| Full Audit | ✅ **Wayback Machine audit** | Created from 2026-05-13 snapshot |
+| Audit (Blocked Direct) | 🔴 Cloudflare WAF | Challenge mode — all automated access blocked |
+| Articles Written | ✅ **2 article drafts** | Pet Care Cairo + Vet Clinics Egypt (~1,500 words each) |
+| Product Publishing | ⏳ Waiting | Cloudflare must be unblocked |
 
-**Progress:** ██████░░░░░░░░ 30%
+**Progress:** ██████████░░░░░ 45%
+
+---
+
+### Flaunt Cosmetics Global `flaunt-cosmetics-global`
+
+| Dimension | Status | Detail |
+|-----------|--------|--------|
+| Brand Profile | Complete | UAE/Egypt beauty audience and product positioning documented |
+| Shopify Connection | Active | Beauty Tips is the enforced TDS publishing default |
+| Short Draft Repair | Complete | 4 placeholders replaced with 1,770–2,191-word fact-constrained drafts |
+| Content Safety Guard | Complete | Markdown-only generation rejects unsafe HTML, fabricated evidence, and unapproved Flaunt products |
+| Publishing State | Safe | All corrected Shopify drafts are hidden, unscheduled, and require manual approval |
+
+**Progress:** ███████████░░░░ 75%
 
 ---
 
@@ -105,9 +137,13 @@ gantt
 
 | Dimension | Score | Status |
 |-----------|-------|--------|
-| Brand Profile | ✅ Complete | Basic profile done |
+| Brand Profile (Real Site) | ✅ Complete | ACME Facility Maintenance — Houston, TX industrial supplies |
+| Technical Reference | ✅ Complete | WordPress 6.9.5 + ColorMag + SiteOrigin, GoDaddy |
+| SEO Content Guide | ✅ Complete | 4 content pillars, keyword strategy, phased recommendations |
+| Site Audit | ✅ Complete | No blog, no SEO plugin, no schema — full gap analysis |
+| Contacts | ✅ Complete | sales@acme-maintenance.com, 281-541-2181 |
 
-**Progress:** ██░░░░░░░░░░░░ 15%
+**Progress:** ██████████░░░░░ 50%
 
 ---
 
@@ -115,15 +151,17 @@ gantt
 
 | Client | Platform | Products | Progress | Next Action |
 |--------|----------|----------|----------|-------------|
-| Caravanserai | 🛒 Shopify | 229 | ██████████░░░░░ 65% | ✅ App approved — install on store |
-| Boston Pharma | 📝 WordPress | ~550 | ████████████████ 100% | Schema markup, content pipeline |
-| Boston Vet | 📝 WordPress | Unknown | ██████░░░░░░░░ 30% | Unblock Cloudflare |
-| Acme Maintenance | 🛒 Shopify | Test | ██░░░░░░░░░░░░ 15% | Needs audit |
+| Caravanserai | 🛒 Shopify | 229 | ██████████░░░░░ 68% | ✅ App approved — install on store |
+| Boston Pharma | 📝 WordPress | ~550 | ████████████████ 100% | 16 drafts + 2 articles pending, no WP API key |
+| Boston Vet | 📝 WordPress | Unknown | ██████████░░░░░ 45% | Cloudflare block — audit via Wayback, 2 articles ready |
+| Flaunt Cosmetics Global | 🛒 Shopify | 1 SKU | ███████████░░░░ 75% | Review 4 corrected hidden drafts |
+| Acme Maintenance | 📝 WordPress (real) | Brochure | ██████████░░░░░ 50% | **Real site** — acme-maintenance.com, industrial supplies |
 
 **Infrastructure:**
 - ✅ **WordPress sync route** built — `POST /api/cms/sync/:clientId` pulls WP posts into local DB
 - ✅ **Client validation guard** — DB trigger + middleware prevent articles for inactive clients
-- ✅ **Real API keys** stored for Boston Pharma and Boston Vet CMS connections
+- ❌ **No WordPress API keys** configured for Boston Pharma or Boston Vet (cms_connections.api_key_encrypted is null)
+- ❌ **No Shopify sessions** for client stores (only test stores have tokens)
 - ✅ **Test clients marked inactive** (traffic-test, test-client, e2e-pipeline-test-client)
 
 ---
@@ -133,9 +171,11 @@ gantt
 | Client | Articles | Descriptions | Meta Tags | Fixes | API Calls |
 |--------|----------|--------------|-----------|-------|-----------|
 | Caravanserai | 6 written | — | — | 10 issues documented | 0 (blocked) |
-| Boston Pharma | 14 published + 56 synced | 550+ auto | 550+ auto | Wrong article, post_type bug | ~500 batch calls |
-| Boston Vet | — | — | — | — | 0 (blocked) |
-| **Total** | **76 articles** | **550+ descriptions** | **550+ meta tags** | **11+ fixes** | **~500 API calls** |
+| Boston Pharma | 14 published + 56 synced + 2 expanded | 550+ auto | 550+ auto | Wrong article, post_type bug | ~500 batch calls |
+| Boston Vet | 2 article drafts | — | — | Audit created from Wayback Machine | 0 (blocked) |
+| Flaunt Cosmetics Global | 4 corrected hidden drafts | — | 4 refreshed | Length, factual-safety, and manual-approval guards | 4 generation calls |
+| Acme Maintenance | — | — | — | Full brand profile, audit, SEO guide created | 0 |
+| **Total** | **84 articles** | **550+ descriptions** | **550+ meta tags** | **16+ fixes** | **~504 API calls** |
 
 ---
 
@@ -145,33 +185,57 @@ gantt
 {
   "clients": {
     "caravanserai": {
-      "overall": 65,
-      "progress": 65,
+      "overall": 68,
+      "progress": 68,
       "products": 229,
       "articles": 6,
+      "product_descriptions": 10,
       "status": "blocked"
     },
     "boston-pharma": {
       "overall": 65,
       "progress": 100,
       "products": 550,
-      "articles": 70,
+      "articles": 72,
       "articles_synced_from_wp": 56,
+      "drafts_pending": 16,
+      "generated_pending": 2,
+      "has_api_key": false,
       "status": "active"
     },
     "boston-vet": {
       "overall": null,
-      "progress": 30,
+      "progress": 45,
       "products": null,
-      "articles": 0,
+      "articles": 2,
+      "audit_source": "wayback_machine",
+      "cloudflare_blocked": true,
+      "articles_written": 2,
       "status": "blocked"
+    },
+    "flaunt-cosmetics-global": {
+      "overall": 75,
+      "progress": 75,
+      "products": 1,
+      "articles": 4,
+      "status": "active",
+      "drafts_pending_review": 4,
+      "minimum_article_words": 1200
     },
     "acme-maintenance": {
       "overall": null,
-      "progress": 15,
+      "progress": 50,
+      "platform": "wordpress",
+      "site_url": "https://acme-maintenance.com",
+      "business": "ACME Facility Maintenance (real — industrial supplies, Houston TX)",
       "products": 0,
       "articles": 0,
-      "status": "inactive"
+      "has_brand_profile": true,
+      "has_technical_reference": true,
+      "has_seo_guide": true,
+      "has_contacts": true,
+      "has_audit": true,
+      "status": "active"
     }
   }
 }
@@ -194,5 +258,11 @@ After each session:
 
 - [Caravanserai Audit](clients/caravanserai/audit.md)
 - [Boston Pharma Audit](clients/boston-pharma/audit.md)
+- [Flaunt Cosmetics Global July Audit](clients/flaunt-cosmetics-global/audits/2026-07-audit.md)
 - [Monthly Audit Plan](clients/MONTHLY-AUDIT-PLAN.md)
 - [Audit Template](clients/audit-template.md)
+- [Boston Vet Audit](clients/boston-vet/audit.md)
+- [Acme Maintenance Audit](clients/acme-maintenance/audit.md)
+- [Caravanserai Product Descriptions](clients/caravanserai/product-descriptions-pilot.md)
+- [Boston Pharma Articles](clients/boston-pharma/articles/)
+- [Boston Vet Articles](clients/boston-vet/articles/)

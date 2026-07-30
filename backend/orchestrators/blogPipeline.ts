@@ -45,6 +45,8 @@ import CostOptimizationService from '../services/costOptimization';
 import observabilityService from '../services/observability';
 import enterpriseSecurity from '../services/enterpriseSecurity';
 import resilienceService from '../services/circuitBreaker';
+import { assertMinimumArticleLength, getMinimumArticleWords } from '../services/contentLength';
+import { presentArticleHtml } from '../services/articlePresentation';
 
 // ─── Pipeline Result Type ────────────────────
 
@@ -153,6 +155,7 @@ export class EnterprisePipelineOrchestrator {
       // ── Stage 0: Validate ──────────────────────
       const client = await this.clientRepo.findById(clientId);
       if (!client) throw new Error(`Client ${clientId} not found or inactive`);
+      const minimumArticleWords = getMinimumArticleWords(client, options.minWords);
 
       // ════════════════════════════════════════════
       // STAGE 1: Keyword Discovery & Enrichment
@@ -340,10 +343,11 @@ export class EnterprisePipelineOrchestrator {
           const article = await openaiService.generateBlogPost({
             keyword,
             tone: options.tone || client.brand_voice || 'educational',
-            minWords: options.minWords || 1200,
+            minWords: minimumArticleWords,
             maxWords: options.maxWords || 2500,
             clientSettings: {
               ...(client.settings || {}),
+              locale: client.locale || 'en',
               brandVoiceGuidance: brandGuidance,
               forbiddenPhrases,
               preferredTerminology: preferredTerms
@@ -454,10 +458,11 @@ export class EnterprisePipelineOrchestrator {
             const improvedArticle = await openaiService.generateBlogPost({
               keyword,
               tone: options.tone || client.brand_voice || 'educational',
-              minWords: options.minWords || 1200,
+               minWords: minimumArticleWords,
               maxWords: options.maxWords || 2500,
               clientSettings: {
                 ...(client.settings || {}),
+                locale: client.locale || 'en',
                 qualityFeedback: evalResult.feedback.slice(0, 500)
               }
             });
@@ -649,7 +654,7 @@ export class EnterprisePipelineOrchestrator {
                 `INSERT INTO article_images (article_id, client_id, image_url, alt_text, metadata, source, position)
                  VALUES ($1, $2, $3, $4, $5, 'pexels', 0)
                  ON CONFLICT DO NOTHING`,
-                ['pending', clientId, images.featuredImage.url, images.featuredImage.altText,
+                [null, clientId, images.featuredImage.url, images.featuredImage.altText,
                  JSON.stringify({
                    photographer: images.featuredImage.photographer,
                    photographerUrl: images.featuredImage.photographerUrl,
@@ -703,6 +708,8 @@ export class EnterprisePipelineOrchestrator {
       await this.runStage('article_storage', stages, async () => {
         const span = observabilityService.startSpan({ name: 'pipeline.store', traceId });
         try {
+          contentWordCount = assertMinimumArticleLength(contentMd, minimumArticleWords, 'Pipeline article');
+          contentHtml = presentArticleHtml(convert(contentMd), client);
           savedArticle = await this.repo.create({
             client_id: clientId,
             keyword_id: (kwResult.data as any)?.keywordId,
@@ -724,7 +731,7 @@ export class EnterprisePipelineOrchestrator {
           // Update the image records with the real article ID
           await this.pool.query(
             'UPDATE article_images SET article_id = $1 WHERE article_id = $2 AND client_id = $3',
-            [savedArticle.id, 'pending', clientId]
+            [savedArticle.id, null, clientId]
           );
 
           // Save JSON backup to /outputs
@@ -1090,4 +1097,3 @@ export class EnterprisePipelineOrchestrator {
     };
   }
 }
-

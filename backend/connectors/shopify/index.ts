@@ -93,7 +93,7 @@ export class ShopifyConnector implements ConnectorInterface {
     const config = this.getShopConfig();
     try {
       const blogs = await shopifyService.fetchBlogs(config);
-      const blogId = blogs[0]?.id;
+      const blogId = this.config?.defaultBlogId || blogs[0]?.id;
       if (!blogId) {
         return { success: false, error: 'No blog found', provider: 'shopify' };
       }

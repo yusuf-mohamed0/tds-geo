@@ -68,7 +68,7 @@ The app uses Shopify Admin API version **2025-07**. This is configured in:
 | Credential | Value |
 |---|---|
 | API Key | `a178c8740049e04eec663378b6e30ad8` |
-| API Secret | `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` |
+| API Secret | `<REDACTED_APP_SECRET>` |
 | App URL | `https://16.192.29.174.nip.io` |
 | Scopes | `read_products,write_products,read_content,write_content,read_script_tags,write_script_tags,read_themes,write_themes` |
 

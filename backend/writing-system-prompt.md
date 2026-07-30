@@ -21,6 +21,7 @@
   <categories>{{CATEGORIES}}</categories>
   <current_date>{{DATE}}</current_date>
   <current_year>{{YEAR}}</current_year>
+  <language>Write in {{LANGUAGE}}. If {{LANGUAGE}} is not English, produce ALL content in {{LANGUAGE}} — titles, body, meta, tags, FAQ, everything must be in {{LANGUAGE}}.</language>
   <knowledge_graph>{{GRAPHIFY_CONTEXT}}</knowledge_graph>
 </context>
 

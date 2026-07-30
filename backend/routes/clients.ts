@@ -127,6 +127,11 @@ export function createClientRoutes(pool: Pool): Router {
         }
       }
 
+      if (data.locale) {
+        fields.push(`locale = $${paramIndex++}`);
+        values.push(data.locale);
+      }
+
       if (data.settings) {
         fields.push(`settings = settings || $${paramIndex++}`);
         values.push(JSON.stringify(data.settings));

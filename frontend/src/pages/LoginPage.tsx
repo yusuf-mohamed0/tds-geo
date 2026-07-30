@@ -26,7 +26,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-brand-bg">
+    <div className="min-h-screen flex flex-col bg-brand-bg">
+      <main className="flex flex-1 items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8 flex flex-col items-center">
           <img src="/assets/White%20Swype.png" alt="Swype" className="h-10 w-auto object-contain" />
@@ -36,7 +37,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="card space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
+            <div className="border border-red-800 bg-red-900/20 p-3 text-sm text-red-400">
               {error}
             </div>
           )}
@@ -68,16 +69,19 @@ export default function LoginPage() {
           <button type="submit" disabled={loading} className="btn-primary w-full">
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
+
+
         </form>
       </div>
-      <footer className="absolute bottom-0 left-0 right-0 border-t border-brand-border px-6 py-3 text-xs text-brand-muted flex items-center justify-between bg-white">
+      </main>
+      <footer className="border-t border-brand-border bg-white px-4 py-3 text-xs text-brand-muted flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <span>TDS Geo</span>
-        <div className="flex gap-4">
-          <a href="/documentation" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Docs</a>
-          <a href="/tutorial" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Tutorial</a>
-          <a href="/faq" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">FAQ</a>
-          <a href="/changelog" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Changelog</a>
-          <a href="/privacy" className="hover:text-brand-accent transition-colors" target="_blank" rel="noopener noreferrer">Privacy</a>
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          <a href="/documentation" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Docs</a>
+          <a href="/tutorial" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Tutorial</a>
+          <a href="/faq" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">FAQ</a>
+          <a href="/changelog" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Changelog</a>
+          <a href="/privacy" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Privacy</a>
         </div>
       </footer>
     </div>

@@ -22,6 +22,8 @@ import {
 import openaiService from '../services/openai';
 import serpapiService from '../services/serpapi';
 import shopifyService from '../services/shopify';
+import { getClientDefaultBlogId } from '../services/shopify/content';
+import { presentArticleHtml } from '../services/articlePresentation';
 import keywordService from '../services/keywords';
 import seoService from '../services/seo';
 import internalLinksService from '../services/internalLinks';
@@ -190,7 +192,7 @@ async function handleShopifyPublish(job: Job): Promise<Record<string, unknown>> 
   logger.info('Worker: Publishing to Shopify', { articleId, blogId });
 
   const articleResult = await pool.query(
-    'SELECT a.*, c.shopify_shop, c.shopify_token, c.shopify_api_version FROM articles a JOIN clients c ON c.id = a.client_id WHERE a.id = $1',
+    'SELECT a.*, c.shopify_shop, c.shopify_token, c.shopify_api_version, c.settings, c.slug, c.name FROM articles a JOIN clients c ON c.id = a.client_id WHERE a.id = $1',
     [articleId]
   );
 
@@ -205,7 +207,7 @@ async function handleShopifyPublish(job: Job): Promise<Record<string, unknown>> 
     apiVersion: row.shopify_api_version
   };
 
-  let targetBlogId = blogId;
+  let targetBlogId = blogId || getClientDefaultBlogId(row);
   if (!targetBlogId) {
     const blogs = await shopifyService.fetchBlogs(shopConfig);
     targetBlogId = blogs[0]?.id;
@@ -214,7 +216,7 @@ async function handleShopifyPublish(job: Job): Promise<Record<string, unknown>> 
 
   const publishResult = await shopifyService.publishArticle(shopConfig, targetBlogId, {
     title: row.title,
-    contentHtml: row.content_html,
+    contentHtml: presentArticleHtml(row.content_html, row),
     metaTitle: row.meta_title,
     metaDescription: row.meta_description,
     tags: row.tags
@@ -685,7 +687,7 @@ function registerWorkers(): void {
   createWorker(QueueNames.SEO_ANALYSIS, handleSeoAnalysis, { concurrency });
   createWorker(QueueNames.INTERNAL_LINKING, handleInternalLinking, { concurrency });
   createWorker(QueueNames.WEBHOOK_DELIVERY, handleWebhookDelivery, { concurrency });
-  createWorker(QueueNames.DEFAULT, handleDeadLetter, { concurrency: 1 });
+  createWorker(QueueNames.DEAD_LETTER, handleDeadLetter, { concurrency: 1 });
 
   // ── Enterprise Workers ──
   createWorker(QueueNames.CLIENT_SCAN, handleClientScan, { concurrency: 2 });

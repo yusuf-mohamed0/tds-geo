@@ -1,0 +1,54 @@
+/* ══════════════════════════════════════════════════
+   Traffic Digital Solutions — Brand Design Tokens
+   Based on official brand book (2026)
+   ══════════════════════════════════════════════════ */
+
+/* ── Typography ──────────────────────────────── */
+@import url('/assets/fonts/fonts.css');
+
+/* Shadows Into Light — fallback for Reenie Beanie */
+@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
+
+:root {
+  /* ── Primary Colors ──────────────────────────── */
+  --tds-black:        #171414;
+  --tds-orange:       #FCB900;
+  --tds-cream:        #FCF6F2;
+
+  /* ── Secondary Colors ────────────────────────── */
+  --tds-navy:         #142444;
+  --tds-blue:         #769ACC;
+  --tds-gray-dark:    #3D3B3B;
+  --tds-peach:        #FFD498;
+  --tds-orange-deep:  #F89D4B;
+  --tds-gray-mid:     #838081;
+
+  /* ── Font Families ───────────────────────────── */
+  --tds-font-primary: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --tds-font-secondary: 'Reenie Beanie', 'Shadows Into Light', cursive;
+  --tds-font-mono: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', monospace;
+
+  /* ── Typography Scale ────────────────────────── */
+  --tds-text-xs:     11px;
+  --tds-text-sm:     13px;
+  --tds-text-base:   14px;
+  --tds-text-md:     16px;
+  --tds-text-lg:     22px;
+  --tds-text-xl:     26px;
+  --tds-text-2xl:    32px;
+  --tds-text-3xl:    40px;
+
+  /* ── Spacing ─────────────────────────────────── */
+  --tds-space-xs:    4px;
+  --tds-space-sm:    8px;
+  --tds-space-md:    16px;
+  --tds-space-lg:    24px;
+  --tds-space-xl:    32px;
+  --tds-space-2xl:   48px;
+
+  /* ── Radii ───────────────────────────────────── */
+  --tds-radius-sm:   6px;
+  --tds-radius-md:   10px;
+  --tds-radius-lg:   16px;
+  --tds-radius-full: 9999px;
+}

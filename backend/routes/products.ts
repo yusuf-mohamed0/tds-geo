@@ -106,8 +106,8 @@ export function createProductRoutes(pool: Pool): Router {
               { headers: { 'X-TDS-GEO-Key': conn.api_key || '' } }
             );
             if (wpRes.ok) {
-              const d = await wpRes.json();
-              const items = (d.data || []).filter(p => p.type === 'product');
+              const d: any = await wpRes.json();
+              const items = (d.data || []).filter((p: any) => p.type === 'product');
               for (const p of items) {
                 products.push({
                   id: p.id,
@@ -249,7 +249,7 @@ export function createProductRoutes(pool: Pool): Router {
         return;
       }
 
-      const result = await wpRes.json();
+      const result: any = await wpRes.json();
       res.json({ success: true, data: result.data });
     } catch (err) {
       next(err);

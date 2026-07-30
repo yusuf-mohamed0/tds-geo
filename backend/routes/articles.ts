@@ -26,11 +26,15 @@ import internalLinksService from '../services/internalLinks';
 import keywordService from '../services/keywords';
 import vectorMemoryService from '../services/vectorMemory';
 import costTracker from '../services/costTracker';
+import demoProvisioner from '../services/demoProvisioner';
 import { convert } from '../utils/markdownToHtml';
 import schemaGenerator from '../services/schemaGenerator';
 import indexNowService from '../services/indexNowService';
 import contentQualityGate from '../services/contentQualityGate';
 import serpContentScorer from '../services/serpContentScorer';
+import { countArticleWords, getMinimumArticleWords } from '../services/contentLength';
+import { getArticleSafetyIssues } from '../services/articleSafety';
+import { presentArticleHtml } from '../services/articlePresentation';
 
 export function createArticleRoutes(pool: Pool): Router {
   const router = Router();
@@ -64,6 +68,13 @@ export function createArticleRoutes(pool: Pool): Router {
         return;
       }
 
+      // Check demo trial limits
+      const demoCheck = await demoProvisioner.checkGenerationAllowed(clientId);
+      if (!demoCheck.allowed) {
+        res.status(402).json({ error: demoCheck.reason, code: 'demo_limit' });
+        return;
+      }
+
       const clientResult = await pool.query('SELECT * FROM clients WHERE id = $1 AND is_active = true', [clientId]);
       if (clientResult.rows.length === 0) {
         res.status(404).json({ error: 'Active client not found' });
@@ -71,6 +82,19 @@ export function createArticleRoutes(pool: Pool): Router {
       }
 
       const client = clientResult.rows[0];
+
+      // Check demo trial limits
+      if (client.is_demo) {
+        const demoCheck = await demoProvisioner.checkGenerationAllowed(clientId);
+        if (!demoCheck.allowed) {
+          res.status(402).json({ error: demoCheck.reason, code: 'demo_limit' });
+          return;
+        }
+      }
+
+      const clientLocale = client.locale || 'en';
+      const minimumArticleWords = getMinimumArticleWords(client, minWords);
+      const maximumArticleWords = Math.max(maxWords || parseInt(process.env.CONTENT_MAX_WORDS || '2500', 10), minimumArticleWords + 300);
 
       // Check for semantic duplicates
       const isDuplicate = await vectorMemoryService.isDuplicate(clientId, keyword);
@@ -101,9 +125,9 @@ export function createArticleRoutes(pool: Pool): Router {
       // Generate content via pipeline (BullMQ if available, direct otherwise)
       const generateResult = await generateContent(clientId, keyword, {
         tone: tone || client.brand_voice || 'educational',
-        minWords: minWords || parseInt(process.env.CONTENT_MIN_WORDS || '1200'),
-        maxWords: maxWords || parseInt(process.env.CONTENT_MAX_WORDS || '2500'),
-        clientSettings: client.settings || {},
+        minWords: minimumArticleWords,
+        maxWords: maximumArticleWords,
+        clientSettings: { ...(client.settings || {}), siteName: client.name, locale: clientLocale },
         queue
       });
 
@@ -134,7 +158,7 @@ export function createArticleRoutes(pool: Pool): Router {
       }
 
       // SEO Analysis
-      const seoAnalysis = await seoService.analyzeContent(article.content, keyword);
+      const seoAnalysis = await seoService.analyzeContent(article.content, keyword, clientLocale || 'en');
       const validation = seoService.validateContent(article);
 
       // Internal linking
@@ -145,6 +169,20 @@ export function createArticleRoutes(pool: Pool): Router {
       if (linkOpportunities.length > 0) {
         finalContent = internalLinksService.injectLinks(finalContent, linkOpportunities);
       }
+        const actualWordCount = countArticleWords(finalContent);
+        const safetyIssues = getArticleSafetyIssues(finalContent, client);
+        if (safetyIssues.length > 0) {
+          res.status(422).json({ error: 'Content safety check failed.', issues: safetyIssues });
+          return;
+        }
+        if (actualWordCount < minimumArticleWords) {
+        res.status(422).json({
+          error: `Content is too short to save: ${actualWordCount} words. Minimum required: ${minimumArticleWords} words.`,
+          wordCount: actualWordCount,
+          minimumWords: minimumArticleWords,
+        });
+        return;
+      }
 
       // Quality Gate — anti-spam, anti-fluff, anti-duplicate
       const existingArticlesResult = await pool.query(
@@ -152,7 +190,7 @@ export function createArticleRoutes(pool: Pool): Router {
         [clientId]
       );
       const qualityGateResult = await contentQualityGate.evaluate(finalContent, keyword, {
-        minWords: 800,
+        minWords: minimumArticleWords,
         maxWords: 3000,
         existingArticles: existingArticlesResult.rows,
       });
@@ -193,23 +231,25 @@ export function createArticleRoutes(pool: Pool): Router {
       }
 
       // Convert to HTML
-      const contentHtml = convert(finalContent);
+      const contentHtml = presentArticleHtml(convert(finalContent), client);
 
       // Check approval mode
-      const status = publish ? 'approved' : (requestedStatus || 'draft');
+      const status = client.approval_mode === 'manual'
+        ? 'generated'
+        : (publish ? 'approved' : (requestedStatus || 'draft'));
 
       // Store article
       const articleResult = await pool.query(
         `INSERT INTO articles (client_id, keyword_id, title, slug, content_md, content_html,
-                               meta_title, meta_description, tags, word_count, status, seo_score)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                               meta_title, meta_description, tags, word_count, status, seo_score, locale)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          RETURNING id, title, slug, content_md, content_html,
-                  meta_title, meta_description, tags, status, word_count, seo_score, created_at`,
+                  meta_title, meta_description, tags, status, word_count, seo_score, locale, created_at`,
         [
           clientId, keywordId, article.title, seoService.generateSlug(article.title) + '-' + Date.now().toString(36).slice(-4),
           finalContent, contentHtml, article.metaTitle, article.metaDescription,
-          article.tags, article.content.split(/\s+/).length,
-          status, seoAnalysis.score
+           article.tags, actualWordCount,
+          status, seoAnalysis.score, clientLocale
         ]
       );
       const savedArticle = articleResult.rows[0];
@@ -309,7 +349,7 @@ export function createArticleRoutes(pool: Pool): Router {
     try {
       const user = (req as any).user;
       const clientId = user.clientId || req.query.clientId as string;
-      const { status, search, limit: limitStr, offset: offsetStr } = req.query;
+      const { status, search, locale, limit: limitStr, offset: offsetStr } = req.query;
 
       const limit = parseInt(limitStr as string, 10) || 20;
       const offset = parseInt(offsetStr as string, 10) || 0;
@@ -319,7 +359,7 @@ export function createArticleRoutes(pool: Pool): Router {
         return;
       }
 
-      let query = `SELECT a.id, a.client_id, a.keyword_id, a.title, a.slug, a.meta_title, a.meta_description, a.tags, a.word_count, a.status, a.seo_score, a.quality_score, a.readability_score, a.source, a.scheduled_at, a.published_at, a.created_at, a.updated_at, a.editorial_status, k.keyword, k.search_volume, k.competition FROM articles a JOIN clients c ON c.id = a.client_id AND c.is_active = true LEFT JOIN keywords k ON k.id = a.keyword_id`;
+      let query = `SELECT a.id, a.client_id, a.keyword_id, a.title, a.slug, a.meta_title, a.meta_description, a.tags, a.word_count, a.status, a.seo_score, a.quality_score, a.readability_score, a.source, a.locale, a.scheduled_at, a.published_at, a.created_at, a.updated_at, a.editorial_status, k.keyword, k.search_volume, k.competition FROM articles a JOIN clients c ON c.id = a.client_id AND c.is_active = true LEFT JOIN keywords k ON k.id = a.keyword_id`;
       const params: any[] = [];
       const conditions: string[] = [];
 
@@ -331,6 +371,11 @@ export function createArticleRoutes(pool: Pool): Router {
       if (status) {
         params.push(status);
         conditions.push(`a.status = $${params.length}`);
+      }
+
+      if (locale) {
+        params.push(locale);
+        conditions.push(`a.locale = $${params.length}`);
       }
 
       // Full-text search across title, content, and meta fields
@@ -483,7 +528,20 @@ export function createArticleRoutes(pool: Pool): Router {
 
       // If content changed, regenerate HTML
       if (data.contentMd) {
-        const html = convert(data.contentMd);
+        const clientResult = await pool.query(
+          `SELECT c.name, c.slug FROM articles a JOIN clients c ON c.id = a.client_id WHERE a.id = $1`,
+          [req.params.id],
+        );
+        if (clientResult.rows.length === 0) {
+          res.status(404).json({ error: 'Article not found' });
+          return;
+        }
+        const safetyIssues = getArticleSafetyIssues(data.contentMd, clientResult.rows[0]);
+        if (safetyIssues.length > 0) {
+          res.status(422).json({ error: 'Content safety check failed.', issues: safetyIssues });
+          return;
+        }
+        const html = presentArticleHtml(convert(data.contentMd), clientResult.rows[0]);
         fields.push(`content_html = $${paramIndex++}`);
         values.push(html);
         fields.push(`word_count = $${paramIndex++}`);
@@ -514,6 +572,35 @@ export function createArticleRoutes(pool: Pool): Router {
   // ─── Approve Article ─────────────────────────
   router.post('/:id/approve', requireResourceOwnership(pool, 'articles'), async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const articleCheck = await pool.query(
+        `SELECT a.content_md, a.content_html, c.settings, c.name
+         FROM articles a JOIN clients c ON c.id = a.client_id
+         WHERE a.id = $1`,
+        [req.params.id]
+      );
+      if (articleCheck.rows.length === 0) {
+        res.status(404).json({ error: 'Article not found' });
+        return;
+      }
+      const minimumArticleWords = getMinimumArticleWords(articleCheck.rows[0]);
+      const actualWordCount = countArticleWords(articleCheck.rows[0].content_md || articleCheck.rows[0].content_html);
+      const safetyIssues = getArticleSafetyIssues(
+        articleCheck.rows[0].content_md || articleCheck.rows[0].content_html,
+        articleCheck.rows[0],
+        { allowHtml: !articleCheck.rows[0].content_md && !!articleCheck.rows[0].content_html },
+      );
+      if (safetyIssues.length > 0) {
+        res.status(422).json({ error: 'Article cannot be approved until content safety issues are fixed.', issues: safetyIssues });
+        return;
+      }
+      if (actualWordCount < minimumArticleWords) {
+        res.status(422).json({
+          error: `Article cannot be approved: ${actualWordCount} words. Minimum required: ${minimumArticleWords} words.`,
+          wordCount: actualWordCount,
+          minimumWords: minimumArticleWords,
+        });
+        return;
+      }
       const result = await pool.query(
         `UPDATE articles SET status = 'approved', updated_at = NOW()
          WHERE id = $1 AND status IN ('generated', 'reviewed')
@@ -594,23 +681,33 @@ export function createArticleRoutes(pool: Pool): Router {
       }
 
       const client = clientResult.rows[0];
+      const minimumArticleWords = getMinimumArticleWords(client);
+      const regenLocale = client.locale || 'en';
       const newArticle = await openaiService.generateBlogPost({
         keyword: article.keyword || article.title,
         tone: client.brand_voice || 'educational',
-        clientSettings: client.settings || {}
+        minWords: minimumArticleWords,
+        maxWords: Math.max(parseInt(process.env.CONTENT_MAX_WORDS || '2500', 10), minimumArticleWords + 300),
+        clientSettings: { ...(client.settings || {}), siteName: client.name, locale: regenLocale }
       });
 
-      const contentHtml = convert(newArticle.content);
+      const safetyIssues = getArticleSafetyIssues(newArticle.content, client);
+      if (safetyIssues.length > 0) {
+        res.status(422).json({ error: 'Regenerated content failed the safety check.', issues: safetyIssues });
+        return;
+      }
+
+      const contentHtml = presentArticleHtml(convert(newArticle.content), client);
 
       await pool.query(
         `UPDATE articles SET title = $1, content_md = $2, content_html = $3,
          meta_title = $4, meta_description = $5, tags = $6,
-         word_count = $7, status = 'generated', updated_at = NOW()
+         word_count = $7, status = 'generated', scheduled_at = NULL, updated_at = NOW()
          WHERE id = $8`,
         [
           newArticle.title, newArticle.content, contentHtml,
           newArticle.metaTitle, newArticle.metaDescription,
-          newArticle.tags, newArticle.content.split(/\s+/).length,
+          newArticle.tags, countArticleWords(newArticle.content),
           req.params.id
         ]
       );
@@ -646,6 +743,29 @@ export function createArticleRoutes(pool: Pool): Router {
       }
 
       const client = clientResult.rows[0];
+      if (client.approval_mode === 'manual' && article.status !== 'approved') {
+        res.status(409).json({ error: 'This client requires an approved article before publishing.' });
+        return;
+      }
+      const minimumArticleWords = getMinimumArticleWords(client);
+      const actualWordCount = countArticleWords(article.content_md || article.content_html);
+      const safetyIssues = getArticleSafetyIssues(
+        article.content_md || article.content_html,
+        client,
+        { allowHtml: !article.content_md && !!article.content_html },
+      );
+      if (safetyIssues.length > 0) {
+        res.status(422).json({ error: 'Article cannot be published until content safety issues are fixed.', issues: safetyIssues });
+        return;
+      }
+      if (actualWordCount < minimumArticleWords) {
+        res.status(422).json({
+          error: `Article cannot be published: ${actualWordCount} words. Minimum required: ${minimumArticleWords} words.`,
+          wordCount: actualWordCount,
+          minimumWords: minimumArticleWords,
+        });
+        return;
+      }
 
       // Inject JSON-LD schema into content before publishing
       let contentHtml = article.content_html || convert(article.content_md || '');
@@ -791,6 +911,36 @@ export function createArticleRoutes(pool: Pool): Router {
 
       if (scheduledDate <= new Date()) {
         res.status(400).json({ error: 'Scheduled time must be in the future' });
+        return;
+      }
+
+      const articleCheck = await pool.query(
+        `SELECT a.content_md, a.content_html, c.settings, c.name
+         FROM articles a JOIN clients c ON c.id = a.client_id
+         WHERE a.id = $1`,
+        [req.params.id]
+      );
+      if (articleCheck.rows.length === 0) {
+        res.status(404).json({ error: 'Article not found' });
+        return;
+      }
+      const minimumArticleWords = getMinimumArticleWords(articleCheck.rows[0]);
+      const actualWordCount = countArticleWords(articleCheck.rows[0].content_md || articleCheck.rows[0].content_html);
+      const safetyIssues = getArticleSafetyIssues(
+        articleCheck.rows[0].content_md || articleCheck.rows[0].content_html,
+        articleCheck.rows[0],
+        { allowHtml: !articleCheck.rows[0].content_md && !!articleCheck.rows[0].content_html },
+      );
+      if (safetyIssues.length > 0) {
+        res.status(422).json({ error: 'Article cannot be scheduled until content safety issues are fixed.', issues: safetyIssues });
+        return;
+      }
+      if (actualWordCount < minimumArticleWords) {
+        res.status(422).json({
+          error: `Article cannot be scheduled: ${actualWordCount} words. Minimum required: ${minimumArticleWords} words.`,
+          wordCount: actualWordCount,
+          minimumWords: minimumArticleWords,
+        });
         return;
       }
 

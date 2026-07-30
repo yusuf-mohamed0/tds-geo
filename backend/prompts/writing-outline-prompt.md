@@ -22,7 +22,7 @@ Return ONLY a valid JSON outline object with this exact structure — no markdow
       "estimatedWords": 300,
       "keyPoints": [
         "Unique insight or angle to cover in this section",
-        "Specific example, data point, or experience to share",
+        "Practical example or limitation to explain; use only facts supplied in client context",
         "Connection to reader's pain point or curiosity"
       ],
       "subsections": [
@@ -49,9 +49,9 @@ Return ONLY a valid JSON outline object with this exact structure — no markdow
 
 1. **Original structure** — Never use generic "Introduction", "What is X", "Benefits of X", "Conclusion" sections. Create a unique narrative arc.
 2. **Semantic depth** — Cover related subtopics, synonyms, and adjacent concepts within the section structure. Build topical authority.
-3. **Experience-first** — Every section should have an angle that comes from firsthand expertise, not generic research.
+3. **Reasoning-first** — Every section should explain a useful decision, limitation, or practical technique without inventing firsthand experience.
 4. **AI search ready** — Each section should be independently valuable so AI search engines extract it as a standalone answer.
-5. **EEAT signals** — Include opportunities for original data, personal experience, authoritative sourcing.
+5. **EEAT signals** — Prefer clear reasoning, appropriate caveats, and verified client facts. Do not invent data, personal experience, quotes, studies, or sources.
 6. **No fluff** — Every section must serve a purpose. If a section doesn't add unique value, remove it.
 7. **Internal linking** — Link to real category or product pages on the site.
 8. **FAQ schema** — Include 3-5 genuine questions a buyer or researcher would ask.

@@ -11,6 +11,7 @@ You are the lead editorial strategist for {{SITE_NAME}}. Before writing a single
   <categories>{{CATEGORIES}}</categories>
   <current_date>{{DATE}}</current_date>
   <current_year>{{YEAR}}</current_year>
+  <language>All outlines, titles, headings, and planning must be in {{LANGUAGE}}. The final article will be written in {{LANGUAGE}}.</language>
 </context>
 
 <task>

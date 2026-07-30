@@ -5,36 +5,38 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tutorial - TDS Geo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/brand.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 .steps{max-width:720px;margin:40px auto 0}
-.step-card{display:flex;gap:24px;padding:28px;background:var(--cream);border-radius:var(--radius);margin-bottom:16px;transition:var(--transition);opacity:0;animation:fadeInUp 0.6s ease forwards;position:relative}
+.step-card{display:flex;gap:24px;padding:28px;background:var(--cream);margin-bottom:16px;transition:var(--transition);opacity:0;animation:fadeInUp 0.6s ease forwards;position:relative}
 .step-card::after{content:'';position:absolute;left:52px;bottom:-16px;width:2px;height:16px;background:var(--border)}
 .step-card:last-child::after{display:none}
-.step-card:hover{transform:translateX(4px);box-shadow:var(--shadow)}
-.step-num{flex-shrink:0;width:56px;height:56px;background:var(--gold);color:var(--dark);border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px}
+.step-card:hover{transform:translateX(6px);box-shadow:var(--shadow-hover)}
+.step-num{flex-shrink:0;width:56px;height:56px;background:var(--gold);color:var(--dark);border-radius:0;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-weight:700;font-size:22px}
 .step-body{flex:1}
-.step-body h3{font-size:17px;font-weight:600;color:var(--dark);margin-bottom:6px}
+.step-body h3{font-family:'Unbounded',sans-serif;font-size:17px;font-weight:600;color:var(--dark);margin-bottom:6px}
 .step-body p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:8px}
-.step-note{font-size:13px;color:var(--text-light);background:rgba(252,185,0,.08);padding:8px 14px;border-radius:var(--radius-sm);border-left:3px solid var(--gold)}
+.step-note{font-size:13px;color:var(--text-light);background:rgba(var(--gold-rgb),.08);padding:8px 14px;border-left:3px solid var(--gold)}
 /* Progress */
 .progress-bar{display:flex;justify-content:center;gap:12px;margin-bottom:40px;flex-wrap:wrap}
 .prog-step{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text-light)}
-.prog-step .circle{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:var(--transition)}
+.prog-step .circle{width:24px;height:24px;border-radius:0;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:var(--transition)}
 .prog-step.completed .circle{background:var(--gold);border-color:var(--gold);color:var(--dark)}
 .prog-step.active .circle{background:var(--gold);border-color:var(--gold);color:var(--dark);animation:pulse 1.5s ease-in-out infinite}
 /* Timeline Overview */
 .overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:36px}
-.overview-card{text-align:center;padding:24px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);transition:var(--transition)}
-.overview-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:rgba(252,185,0,.3)}
+.overview-card{text-align:center;padding:24px;background:var(--white);border:1px solid var(--border);transition:var(--transition)}
+.overview-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:rgba(var(--gold-rgb),.3)}
 .overview-icon{font-size:32px;margin-bottom:8px}
 .overview-card h4{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:4px}
 .overview-card p{font-size:12px;color:var(--text-light)}
 @media(max-width:480px){
   .step-card{flex-direction:column;gap:12px;padding:20px}
   .step-card::after{left:36px}
-  .step-num{width:44px;height:44px;font-size:18px;border-radius:12px}
+  .step-num{width:44px;height:44px;font-size:18px}
 }
 </style>
 </head>
@@ -69,10 +71,10 @@
 <div class="section-inner">
 
 <div class="overview">
-<div class="overview-card anim anim-d1"><div class="overview-icon">⏱️</div><h4>2 minutes</h4><p>To install and subscribe</p></div>
-<div class="overview-card anim anim-d2"><div class="overview-icon">📝</div><h4>7 days</h4><p>To first published article</p></div>
-<div class="overview-card anim anim-d3"><div class="overview-icon">📈</div><h4>Weekly</h4><p>New content, every Thursday</p></div>
-<div class="overview-card anim anim-d4"><div class="overview-icon">🙌</div><h4>Zero effort</h4><p>From you, ever</p></div>
+<div class="overview-card anim anim-d1"><div class="overview-icon"><i class="fa-regular fa-clock"></i></div><h4>2 minutes</h4><p>To install and subscribe</p></div>
+<div class="overview-card anim anim-d2"><div class="overview-icon"><i class="fa-regular fa-file-pen"></i></div><h4>7 days</h4><p>To first published article</p></div>
+<div class="overview-card anim anim-d3"><div class="overview-icon"><i class="fa-solid fa-chart-line"></i></div><h4>Weekly</h4><p>New content, every Thursday</p></div>
+<div class="overview-card anim anim-d4"><div class="overview-icon"><i class="fa-regular fa-hand-peace"></i></div><h4>Zero effort</h4><p>From you, ever</p></div>
 </div>
 
 <div class="steps">
@@ -141,7 +143,7 @@
 <footer>
 <div class="footer-inner">
 <div class="footer-col">
-<div class="logo" style="margin-bottom:12px"><img src="/assets/Black%20Swype.png" alt="Swype" style="height:24px;width:auto"> <span style="font-size:14px;color:var(--white)">TDS <span style="color:var(--gold)">GEO</span></span></div>
+<div class="logo" style="margin-bottom:12px"><img src="/assets/White%20Swype.png" alt="Swype" style="height:24px;width:auto"> <span style="font-size:14px;color:var(--white)">TDS <span style="color:var(--gold)">GEO</span></span></div>
 <p>Fully managed GEO content service for Shopify stores. We write, optimize, and publish — you grow.</p>
 </div>
 <div class="footer-col">

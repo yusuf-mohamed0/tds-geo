@@ -52,10 +52,10 @@
 
 | Blog | ID | Status | Articles |
 |---|---|---|---|
-| **News** | `91737030948` | Active | 31 published articles |
-| **Beauty Tips** | `116005503268` | Inactive | 22 draft articles (needs audit) |
+| **News** | `91737030948` | Existing archive | Existing published articles only |
+| **Beauty Tips** | `116005503268` | TDS publishing default | 4 corrected TDS hidden drafts plus existing drafts |
 
-### TDS Hidden Drafts (Created Jul 12)
+### TDS Hidden Drafts (Beauty Tips)
 
 | # | Title | Notes |
 |---|---|---|
@@ -82,7 +82,7 @@
 | **Frequency** | Weekly |
 | **Day** | Thursday |
 | **Time** | 1:00 PM Cairo (`Africa/Cairo`) |
-| **Target Blog** | News (`91737030948`) |
+| **Target Blog** | Beauty Tips (`116005503268`) |
 | **First Auto-Publish** | Jul 16 |
 
 ---
@@ -92,7 +92,7 @@
 | Weak Point | Impact | Suggested Improvement |
 |---|---|---|
 | Single SKU — currently out of stock | Limits content relevance; no CTAs to product | Focus on brand-building, tutorials, and waitlist/notify-me funnels |
-| 22 draft articles in inactive Beauty Tips blog | Abandoned content; potential SEO duplication risk | Audit drafts — publish evergreen content on News or archive/redirect |
+| Existing Beauty Tips drafts need audit | Potential SEO duplication risk | Audit drafts before approval; keep new TDS content in Beauty Tips |
 | No direct contact person (only generic email) | Communication delays | Request a named point of contact; CC `wecare` as fallback |
 | No UAE-specific content yet | Missed local-market engagement | Prioritize climate/culture-specific articles (see content gaps) |
 | No beginner series | Higher barrier to conversion for new visitors | Build "Eyeliner Stamp 101" sequence targeting first-time buyers |

@@ -74,7 +74,8 @@ export const QueueJobTypeMap: Record<QueueNames, string[]> = {
   [QueueNames.SEO_ANALYSIS]: [JobTypes.SEO_ANALYSIS, JobTypes.CONTENT_REVIEW],
   [QueueNames.INTERNAL_LINKING]: [JobTypes.INTERNAL_LINKING],
   [QueueNames.WEBHOOK_DELIVERY]: [JobTypes.WEBHOOK_DELIVERY],
-  [QueueNames.DEFAULT]: [JobTypes.FULL_PIPELINE, JobTypes.EMBEDDING_GENERATION],
+  [QueueNames.DEFAULT]: [],
+  [QueueNames.DEAD_LETTER]: [],
   // ── Enterprise Queue Mappings ──
   [QueueNames.FACT_CHECK]: [JobTypes.FACT_CHECK, JobTypes.FACT_CHECK_SOURCES, JobTypes.CLAIM_VERIFICATION],
   [QueueNames.BRAND_VOICE]: [JobTypes.BRAND_VOICE_ANALYSIS, JobTypes.BRAND_VOICE_GENERATE],
@@ -223,7 +224,13 @@ export const QueueConfigs: Record<QueueNames, QueueConfig> = {
     name: QueueNames.DEFAULT,
     concurrency: 2,
     maxAttempts: 1,
-    description: 'Default/dead-letter queue'
+    description: 'Default queue for unassigned jobs'
+  },
+  [QueueNames.DEAD_LETTER]: {
+    name: QueueNames.DEAD_LETTER,
+    concurrency: 1,
+    maxAttempts: 1,
+    description: 'Dead-letter queue for failed jobs'
   },
   // ── Enterprise Queue Configs ──
   [QueueNames.FACT_CHECK]: {

@@ -53,14 +53,14 @@ if [ ! -f .env ]; then
 PORT=3000
 NODE_ENV=production
 JWT_SECRET=$(openssl rand -hex 32)
-DATABASE_URL=postgresql://tdsgeo:tdsgeo_pass@localhost:5432/ai_seo_automation
+DATABASE_URL=postgresql://tdsgeo:\${DB_PASSWORD:-tdsgeo_pass}@localhost:5432/ai_seo_automation
 OPENAI_API_KEY=
 OPENAI_BASE_URL=https://openrouter.ai/api/v1
 AI_PROVIDER=openrouter
 HEARTBEAT_URL=http://localhost:3000/api/admin/health
-HEARTBEAT_EMAIL_TO=youssif.m.h.g13@gmail.com
-SMTP_USER=youssif.m.h.g13@gmail.com
-SMTP_PASS=aizm fyqo clja tgsm
+HEARTBEAT_EMAIL_TO=\${HEARTBEAT_EMAIL_TO:-}
+SMTP_USER=\${SMTP_USER:-}
+SMTP_PASS=\${SMTP_PASS:-}
 SERVER_IP=$SERVER_IP
 DOMAIN=$DOMAIN
 EOF
@@ -115,12 +115,16 @@ sudo nginx -t && sudo systemctl restart nginx
 
 # ─── 8. SSL Certificate (Let's Encrypt) ─────────
 echo ">>> Getting SSL certificate..."
-sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email youssif.m.h.g13@gmail.com --redirect 2>&1 || echo "SSL failed — will retry after DNS propagates"
+SSL_EMAIL="${SSL_EMAIL:-admin@tds-geo.internal}"
+sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "$SSL_EMAIL" --redirect 2>&1 || echo "SSL failed — will retry after DNS propagates"
 
 # ─── 9. Heartbeat Cron ──────────────────────────
 echo ">>> Installing heartbeat monitor..."
 (crontab -l 2>/dev/null | grep -v heartbeat.sh || true) | crontab -
-CRON_LINE="*/5 * * * * SMTP_USER='youssif.m.h.g13@gmail.com' SMTP_PASS='aizm fyqo clja tgsm' HEARTBEAT_EMAIL_TO='youssif.m.h.g13@gmail.com' bash /home/ubuntu/tdsgeo/scripts/heartbeat.sh >> /var/log/tdsgeo-heartbeat.log 2>&1"
+SMTP_USER="${SMTP_USER:-}"
+SMTP_PASS="${SMTP_PASS:-}"
+HEARTBEAT_EMAIL_TO="${HEARTBEAT_EMAIL_TO:-}"
+CRON_LINE="*/5 * * * * SMTP_USER='$SMTP_USER' SMTP_PASS='$SMTP_PASS' HEARTBEAT_EMAIL_TO='$HEARTBEAT_EMAIL_TO' bash /home/ubuntu/tdsgeo/scripts/heartbeat.sh >> /var/log/tdsgeo-heartbeat.log 2>&1"
 (crontab -l 2>/dev/null; echo "$CRON_LINE") | crontab -
 
 # ─── 10. Test ───────────────────────────────────
@@ -129,7 +133,7 @@ echo "════════════════════════�
 echo "  ✅ TDS Geo Deployed!"
 echo "  🌐 http://$DOMAIN"
 echo "  🔒 https://$DOMAIN (after SSL)"
-echo "  📊 Heartbeat: every 5 min → youssif.m.h.g13@gmail.com"
+echo "  📊 Heartbeat: every 5 min → ${HEARTBEAT_EMAIL_TO:-configured email}"
 echo "════════════════════════════════════════════════"
 echo ""
 echo "To check status:  curl http://localhost:3000/api/admin/health"

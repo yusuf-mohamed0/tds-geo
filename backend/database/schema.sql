@@ -174,6 +174,7 @@ CREATE TABLE IF NOT EXISTS article_images (
   client_id         UUID REFERENCES clients(id) ON DELETE CASCADE,
   prompt            TEXT,
   image_url         TEXT,
+  source            VARCHAR(50),
   shopify_image_id  BIGINT,
   alt_text          VARCHAR(500),
   width             INTEGER,

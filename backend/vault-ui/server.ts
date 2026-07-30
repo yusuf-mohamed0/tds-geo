@@ -12,7 +12,13 @@ import { decrypt } from '../services/credentialEncryption';
 dotenv.config({ path: process.env.DOTENV_PATH || path.join(__dirname, '../../.env') });
 
 const PORT = parseInt(process.env.VAULT_UI_PORT || '3456', 10);
-const PAGE_PASSWORD = process.env.VAULT_PAGE_PASSWORD || 'TrafficDSgeo@2024';
+const PAGE_PASSWORD = (() => {
+  const pw = process.env.VAULT_PAGE_PASSWORD;
+  if (!pw && process.env.NODE_ENV === 'production') {
+    throw new Error('VAULT_PAGE_PASSWORD environment variable is required in production');
+  }
+  return pw || 'TrafficDSgeo@2024';
+})();
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const app = express();
@@ -79,10 +85,11 @@ app.get('/api/credentials/:id', requireSession, async (req, res, next) => {
     }
     const row = result.rows[0];
     let username = '', password = '', notes = '';
-    try { if (row.username) username = decrypt(row.username); } catch {}
-    try { if (row.password) password = decrypt(row.password); } catch {}
-    try { if (row.notes) notes = decrypt(row.notes); } catch {}
-    res.json({ ...row, username, password, notes });
+    const errors: string[] = [];
+    try { if (row.username) username = decrypt(row.username); } catch (e) { errors.push(`username: ${(e as Error).message}`); }
+    try { if (row.password) password = decrypt(row.password); } catch (e) { errors.push(`password: ${(e as Error).message}`); }
+    try { if (row.notes) notes = decrypt(row.notes); } catch (e) { errors.push(`notes: ${(e as Error).message}`); }
+    res.json({ ...row, username, password, notes, decryptionErrors: errors.length > 0 ? errors : undefined });
   } catch (err) { next(err); }
 });
 

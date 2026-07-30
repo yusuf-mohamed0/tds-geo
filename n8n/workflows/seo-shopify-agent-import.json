@@ -1,0 +1,223 @@
+{
+  "id": "fe6d6e24-8afa-4d72-a127-4aeec5a687bc",
+  "name": "AI SEO Shopify Agent",
+  "active": false,
+  "createdAt": "2026-06-07T09:40:00.000Z",
+  "updatedAt": "2026-06-07T09:40:00.000Z",
+  "versionId": "fe6d6e24-8afa-4d72-a127-4aeec5a687bc",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "cron-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "hoursInterval": null,
+              "minutesInterval": null,
+              "triggerAtDayOfMonth": null
+            }
+          ],
+          "triggerOnWeekdays": false,
+          "triggerOnWeekends": false
+        },
+        "scheduleType": "interval",
+        "scheduleInterval": {
+          "item": [
+            {
+              "name": "Days",
+              "value": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "set-client-id",
+      "name": "Set Client ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [350, 200],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "clientId",
+              "value": "cbe18ea6-f5b0-4520-afa5-45459e387a41"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "login",
+      "name": "Login to TDS Geo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/login",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "admin@example.com"
+            },
+            {
+              "name": "password",
+              "value": "admin123"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      }
+    },
+    {
+      "id": "http-keywords",
+      "name": "Discover Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [550, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/keywords/discover",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "industry",
+              "value": "maintenance"
+            },
+            {
+              "name": "seedKeywords",
+              "value": "[\"home maintenance\", \"property care\", \"preventative maintenance\", \"home repair tips\"]"
+            },
+            {
+              "name": "count",
+              "value": 20
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "http-generate",
+      "name": "Generate Article",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "count",
+              "value": 1
+            },
+            {
+              "name": "publish",
+              "value": true
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "wait-30s",
+      "name": "Wait 30s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.2,
+      "position": [750, 400],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 30,
+        "unit": "seconds",
+        "options": {}
+      }
+    },
+    {
+      "id": "http-logs",
+      "name": "Fetch Latest Articles",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [850, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/articles?status=published&limit=1",
+        "authentication": "none",
+        "options": {
+          "timeout": 15000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{ "node": "Set Client ID", "type": "main", "index": 0 }]]
+    },
+    "Set Client ID": {
+      "main": [[{ "node": "Login to TDS Geo", "type": "main", "index": 0 }]]
+    },
+    "Login to TDS Geo": {
+      "main": [[{ "node": "Discover Keywords", "type": "main", "index": 0 }]]
+    },
+    "Discover Keywords": {
+      "main": [[{ "node": "Generate Article", "type": "main", "index": 0 }]]
+    },
+    "Generate Article": {
+      "main": [[{ "node": "Wait 30s", "type": "main", "index": 0 }]]
+    },
+    "Wait 30s": {
+      "main": [[{ "node": "Fetch Latest Articles", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -18,6 +18,10 @@ interface ScanResult {
   error?: string;
 }
 
+function sanitizeArg(arg: string): string {
+  return arg.replace(/['\\]/g, '\\$&');
+}
+
 function execAsync(cmd: string, timeout: number, maxBuffer?: number): Promise<string> {
   return new Promise((resolve, reject) => {
     exec(cmd, { timeout, maxBuffer: maxBuffer || 1024 * 1024, shell: '/bin/bash' }, (err, stdout) => {
@@ -78,10 +82,11 @@ class KaliToolService {
 
   async runWpscan(url: string, options?: { enumerate?: string }): Promise<ScanResult> {
     await this.ensureDetected();
+    const safeUrl = sanitizeArg(url);
+    const safeEnumerate = sanitizeArg(options?.enumerate || 'vp,vt');
     return this.runWithCircuitBreaker('wpscan', url, async () => {
-      const enumerate = options?.enumerate || 'vp,vt';
       const start = Date.now();
-      const cmd = `wpscan --url "${url}" --enumerate ${enumerate} --no-banner --format json 2>/dev/null`;
+      const cmd = `wpscan --url '${safeUrl}' --enumerate ${safeEnumerate} --no-banner --format json 2>/dev/null`;
       const output = await execAsync(cmd, 120_000, 10 * 1024 * 1024);
       const data = JSON.parse(output);
 
@@ -96,9 +101,10 @@ class KaliToolService {
 
   async runWhatweb(url: string): Promise<ScanResult> {
     await this.ensureDetected();
+    const safeUrl = sanitizeArg(url);
     return this.runWithCircuitBreaker('whatweb', url, async () => {
       const start = Date.now();
-      const cmd = `whatweb "${url}" --colour=never --no-errors -a 3 2>/dev/null`;
+      const cmd = `whatweb '${safeUrl}' --colour=never --no-errors -a 3 2>/dev/null`;
       const output = await execAsync(cmd, 30_000);
       const trimmed = output.toString().trim();
 
@@ -113,9 +119,10 @@ class KaliToolService {
 
   async runNikto(url: string): Promise<ScanResult> {
     await this.ensureDetected();
+    const safeUrl = sanitizeArg(url);
     return this.runWithCircuitBreaker('nikto', url, async () => {
       const start = Date.now();
-      const cmd = `nikto -h "${url}" -nointeractive -Format json 2>/dev/null`;
+      const cmd = `nikto -h '${safeUrl}' -nointeractive -Format json 2>/dev/null`;
       const output = await execAsync(cmd, 180_000, 5 * 1024 * 1024);
 
       let findings: Record<string, unknown>[] = [];
@@ -132,10 +139,11 @@ class KaliToolService {
 
   async runNmap(target: string, portRange?: string): Promise<ScanResult> {
     await this.ensureDetected();
+    const safeTarget = sanitizeArg(target);
+    const safePorts = sanitizeArg(portRange || '80,443,8080,8443,3000,5000,5432,6379');
     return this.runWithCircuitBreaker('nmap', target, async () => {
-      const ports = portRange || '80,443,8080,8443,3000,5000,5432,6379';
       const start = Date.now();
-      const cmd = `nmap -sV -p ${ports} --open -T4 "${target}" -oX - 2>/dev/null`;
+      const cmd = `nmap -sV -p ${safePorts} --open -T4 '${safeTarget}' -oX - 2>/dev/null`;
       const output = await execAsync(cmd, 120_000, 2 * 1024 * 1024);
 
       return {

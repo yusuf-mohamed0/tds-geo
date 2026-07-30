@@ -1,0 +1,125 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "title": "TDS Geo — Production Overview",
+  "uid": "tdsgeo-prod",
+  "version": 1,
+  "timezone": "browser",
+  "editable": true,
+  "tags": ["tds-geo", "production"],
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "API Health",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0},
+      "targets": [
+        {"expr": "probe_success{job=\"api\"}", "legendFormat": "API Up"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {"steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+        }
+      }
+    },
+    {
+      "title": "Request Rate",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 8, "x": 4, "y": 0},
+      "targets": [
+        {"expr": "rate(http_requests_total[5m])", "legendFormat": "Requests/s"}
+      ]
+    },
+    {
+      "title": "Error Rate (5xx)",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 8, "x": 12, "y": 0},
+      "targets": [
+        {"expr": "rate(http_requests_total{status=~\"5..\"}[5m])", "legendFormat": "5xx/s"},
+        {"expr": "rate(http_requests_total{status=~\"4..\"}[5m])", "legendFormat": "4xx/s"}
+      ]
+    },
+    {
+      "title": "P95 Latency",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8},
+      "targets": [
+        {"expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))", "legendFormat": "p95"}
+      ]
+    },
+    {
+      "title": "Active Connections",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 8},
+      "targets": [
+        {"expr": "pg_stat_activity_count", "legendFormat": "Connections"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {"steps": [
+            {"color": "green", "value": null},
+            {"color": "yellow", "value": 50},
+            {"color": "red", "value": 80}
+          ]}
+        }
+      }
+    },
+    {
+      "title": "Database Size",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 8},
+      "targets": [
+        {"expr": "pg_database_size_bytes{datname=\"ai_seo_automation\"}", "legendFormat": "Size"}
+      ],
+      "fieldConfig": {
+        "defaults": {"unit": "bytes"}
+      }
+    },
+    {
+      "title": "System CPU Usage",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16},
+      "targets": [
+        {"expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)", "legendFormat": "CPU %"}
+      ]
+    },
+    {
+      "title": "Memory Usage",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16},
+      "targets": [
+        {"expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes", "legendFormat": "Used"},
+        {"expr": "node_memory_MemAvailable_bytes", "legendFormat": "Available"}
+      ]
+    },
+    {
+      "title": "Disk Usage",
+      "type": "gauge",
+      "gridPos": {"h": 8, "w": 4, "x": 16, "y": 16},
+      "targets": [
+        {"expr": "100 - ((node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"}) * 100)", "legendFormat": "Used %"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "max": 100,
+          "thresholds": {"steps": [
+            {"color": "green", "value": null},
+            {"color": "yellow", "value": 70},
+            {"color": "red", "value": 90}
+          ]}
+        }
+      }
+    },
+    {
+      "title": "Docker Containers",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 4, "x": 20, "y": 16},
+      "targets": [
+        {"expr": "count(container_last_seen)", "legendFormat": "Containers"}
+      ]
+    }
+  ],
+  "schemaVersion": 39
+}

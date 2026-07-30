@@ -6,15 +6,18 @@
 // Markdown to Shopify-Compatible HTML Converter
 // ──────────────────────────────────────────────
 
-import { marked } from 'marked';
 import { logger } from './logger';
 
-// Configure marked for Shopify compatibility
-// `headerIds` is not a marked option anymore — handled via renderer extension if needed
-marked.use({
-  breaks: false,
-  gfm: true
-});
+let marked: any = {};
+try {
+  const mod = require('marked');
+  marked = mod;
+  if (marked.use) {
+    marked.use({ breaks: false, gfm: true });
+  }
+} catch {
+  logger.warn('marked package not available — markdown features disabled');
+}
 
 interface ConvertOptions {
   shiftHeadings?: boolean;
@@ -38,19 +41,10 @@ function convert(markdown: string, options: ConvertOptions = {}): string {
   try {
     let html = marked.parse(markdown) as string;
 
-    // Shift heading levels (H1 → H2, etc.) for article body
+    // Shopify renders the article title itself. Remove a leading Markdown H1
+    // so it is not duplicated in the body, while leaving section headings intact.
     if (shiftHeadings) {
-      html = html
-        .replace(/<h1 /gi, '<h2 ')
-        .replace(/<\/h1>/gi, '</h2>')
-        .replace(/<h2 /gi, '<h3 ')
-        .replace(/<\/h2>/gi, '</h3>')
-        .replace(/<h3 /gi, '<h4 ')
-        .replace(/<\/h3>/gi, '</h4>')
-        .replace(/<h4 /gi, '<h5 ')
-        .replace(/<\/h4>/gi, '</h5>')
-        .replace(/<h5 /gi, '<h6 ')
-        .replace(/<\/h5>/gi, '</h6>');
+      html = html.replace(/^<h1\b[^>]*>[\s\S]*?<\/h1>\s*/i, '');
     }
 
     // Add responsive table wrappers

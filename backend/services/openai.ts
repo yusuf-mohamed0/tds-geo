@@ -11,9 +11,12 @@ import { logger } from '../utils/logger';
 import { countKeywordOccurrences } from '../utils/stringUtils';
 import { GeneratedArticle, GenerateBlogParams } from '../types';
 import { writingSystemPrompt, writingOutlinePrompt } from '../prompts';
+import { getLocaleConfig } from '../utils/locale';
 import resilience from '../services/circuitBreaker';
 import { crawlCompetitors } from './contentResearch';
 import dataforseo from './dataforseo';
+import { assertMinimumArticleLength, getMinimumArticleWords } from './contentLength';
+import { assertArticleSafety } from './articleSafety';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || '';
@@ -59,17 +62,20 @@ class OpenAIService {
 
   private extractJson(text: string): any {
     const trimmed = text.trim();
-    // Try direct parse first
-    try { return JSON.parse(trimmed); } catch {}
-    // Try extracting JSON object (handles markdown code blocks or wrapped text)
+    try { return JSON.parse(trimmed); } catch (e) {
+      logger.debug('extractJson: direct parse failed', { error: (e as Error).message });
+    }
     const objMatch = trimmed.match(/\{[\s\S]*\}/);
     if (objMatch) {
-      try { return JSON.parse(objMatch[0]); } catch {}
+      try { return JSON.parse(objMatch[0]); } catch (e) {
+        logger.debug('extractJson: object match parse failed', { error: (e as Error).message });
+      }
     }
-    // Try extracting JSON array
     const arrMatch = trimmed.match(/\[[\s\S]*\]/);
     if (arrMatch) {
-      try { return JSON.parse(arrMatch[0]); } catch {}
+      try { return JSON.parse(arrMatch[0]); } catch (e) {
+        logger.debug('extractJson: array match parse failed', { error: (e as Error).message });
+      }
     }
     throw new Error(`Could not extract JSON from response: ${trimmed.slice(0, 200)}`);
   }
@@ -166,7 +172,7 @@ class OpenAIService {
     });
   }
 
-  private getClient(): OpenAI | null {
+  getClient(): OpenAI | null {
     if (this.clientWrapper) return this.clientWrapper;
     if (!this.openaiClient) return null;
 
@@ -187,6 +193,8 @@ class OpenAIService {
       clientSettings = {}
     } = params;
 
+    const localeCode = (clientSettings as any).locale || 'en';
+    const localeConfig = getLocaleConfig(localeCode);
     const systemPrompt = writingOutlinePrompt({
       TOPIC: keyword,
       SITE_NAME: (clientSettings as any).siteName || process.env.SITE_NAME || 'Website',
@@ -194,6 +202,7 @@ class OpenAIService {
       CATEGORIES: (clientSettings as any).categories || '',
       DATE: new Date().toISOString().split('T')[0],
       YEAR: String(new Date().getFullYear()),
+      LANGUAGE: localeConfig.languageCode,
     });
 
     try {
@@ -264,6 +273,8 @@ class OpenAIService {
     const websiteIntelligence = (clientSettings as any).websiteIntelligence as string || '';
     const brandVoiceGuidance = (clientSettings as any).brandVoiceGuidance as string || '';
 
+    const localeCode = (clientSettings as any).locale || 'en';
+    const localeConfig = getLocaleConfig(localeCode);
     const systemPrompt = promptTemplate || writingSystemPrompt({
       TOPIC: keyword,
       SITE_NAME: (clientSettings as any).siteName || process.env.SITE_NAME || 'Website',
@@ -271,18 +282,20 @@ class OpenAIService {
       CATEGORIES: (clientSettings as any).categories || '',
       DATE: new Date().toISOString().split('T')[0],
       YEAR: String(new Date().getFullYear()),
+      LANGUAGE: localeConfig.languageCode,
       GRAPHIFY_CONTEXT: (clientSettings as any).graphifyContext || '',
     });
 
     // Run the two-pass pipeline: strategic outline phase first
     const outlineJson = await this.generateOutlinePhase(params);
     let enrichedPrompt = `Generate a complete SEO-optimized blog post about: "${keyword}"\n\n`;
+    enrichedPrompt += `IMPORTANT LANGUAGE REQUIREMENT: Write this entire article in ${localeConfig.languageCode}. All titles, body content, meta descriptions, tags, and any FAQ sections must be in ${localeConfig.languageCode}.\n\n`;
 
     // Inject strategic outline from phase one (guides structure, creative DNA, evidence)
     if (outlineJson) {
       enrichedPrompt += `## STRATEGIC OUTLINE (from planning phase — follow this plan)\n`;
       enrichedPrompt += `The following outline was developed during the strategic planning phase.\n`;
-      enrichedPrompt += `Adhere to its creative DNA, structural outline, sourced statistics, and expert quotes.\n`;
+      enrichedPrompt += `Adhere to its creative DNA, structural outline, and factual constraints.\n`;
       enrichedPrompt += `DO NOT deviate from the planned H2 structure or creative direction.\n\n`;
       enrichedPrompt += `${outlineJson}\n\n`;
     }
@@ -303,8 +316,8 @@ class OpenAIService {
     try {
       if (dataforseo.isEnabled()) {
         const [volumeData, keywordIdeas] = await Promise.all([
-          dataforseo.getKeywordVolume([keyword]).catch(() => null),
-          dataforseo.discoverContentKeywords(keyword).catch(() => null),
+          dataforseo.getKeywordVolume([keyword], localeCode).catch(() => null),
+          dataforseo.discoverContentKeywords(keyword, localeCode).catch(() => null),
         ]);
 
         if (volumeData?.[0]) {
@@ -370,7 +383,7 @@ class OpenAIService {
 
     enrichedPrompt += `- Use E-E-A-T principles: demonstrate Experience, Expertise, Authoritativeness, Trustworthiness\n\n`;
 
-    enrichedPrompt += `Format your response as JSON per the schema defined in the system prompt. The output must include: title, metaTitle (max 60), metaDescription (max 150), tags, categories, secondaryKeywords, entities, searchIntent, slug, content (full HTML), and a faqSection appended to content. Follow the system prompt's output format exactly.`;
+    enrichedPrompt += `Format your response as JSON per the schema defined in the system prompt. The output must include: title, metaTitle (max 60), metaDescription (max 150), tags, categories, secondaryKeywords, entities, searchIntent, slug, content (Markdown only), and a faqSection appended to content. Do not output raw HTML. Do not invent product names, first-party experience, tests, statistics, studies, quotes, or sources. Follow the system prompt's output format exactly.`;
 
     try {
       logger.info('Generating blog post via OpenAI', { keyword, model: this.defaultModel });
@@ -407,10 +420,18 @@ class OpenAIService {
         result.content += '\n\n---\n\n' + result.faqSection;
       }
 
+      assertArticleSafety(result.content, { name: (clientSettings as any).siteName });
+
+      const wordCount = assertMinimumArticleLength(
+        result.content,
+        getMinimumArticleWords(undefined, minWords),
+        'Generated article'
+      );
+
       logger.info('Blog post generated successfully', {
         keyword,
         title: result.title,
-        words: result.content.split(/\s+/).length,
+        words: wordCount,
         tokensIn,
         tokensOut
       });
@@ -425,7 +446,7 @@ class OpenAIService {
         metadata: {
           model: this.defaultModel,
           temperature: this.temperature,
-          wordCount: result.content.split(/\s+/).length,
+          wordCount,
           tokensIn,
           tokensOut
         } as unknown as GeneratedArticle['metadata']
@@ -440,11 +461,20 @@ class OpenAIService {
     }
   }
 
-  async analyzeSEO(content: string, keyword: string): Promise<Record<string, unknown>> {
+  async analyzeSEO(content: string, keyword: string, locale?: string): Promise<Record<string, unknown>> {
     if (this.isMockMode) {
       return this.mockAnalyzeSEO(content, keyword);
     }
     this.ensureInitialized();
+
+    let systemPrompt = `You are an SEO expert. Analyze the given content for the target keyword "${keyword}".
+Score the content from 0-100 and provide actionable improvements.
+Respond in JSON format with keys: score, keywordDensity, suggestions[], headingStructure[], readabilityScore.`;
+
+    if (locale && locale !== 'en') {
+      const localeConfig = getLocaleConfig(locale);
+      systemPrompt += `\nThe content is in ${localeConfig.languageCode}. Evaluate SEO for this language.`;
+    }
 
     const response = await resilience.getCircuitBreaker().call(
       'openai-seo-analyze',
@@ -452,16 +482,8 @@ class OpenAIService {
         return this.getClient()!.chat.completions.create({
           model: this.defaultModel,
           messages: [
-            {
-              role: 'system',
-              content: `You are an SEO expert. Analyze the given content for the target keyword "${keyword}".
-Score the content from 0-100 and provide actionable improvements.
-Respond in JSON format with keys: score, keywordDensity, suggestions[], headingStructure[], readabilityScore.`
-            },
-            {
-              role: 'user',
-              content: `Content:\n\n${content.slice(0, 8000)}`
-            }
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Content:\n\n${content.slice(0, 8000)}` }
           ],
           max_tokens: 1500,
           temperature: 0.3,
@@ -514,6 +536,34 @@ Respond with a JSON array of strings only.`
     const result = JSON.parse(response?.choices?.[0]?.message?.content || '{}');
     const keywords = Array.isArray(result) ? result : ((result as any).keywords || (result as any).variations || []);
     return keywords.slice(0, count);
+  }
+
+  async generateKeywordResearchPool(seeds: string[], count: number): Promise<string[]> {
+    if (this.isMockMode) return [];
+    this.ensureInitialized();
+
+    const response = await resilience.getCircuitBreaker().call(
+      'openai-keyword-pool',
+      async () => this.getClient()!.chat.completions.create({
+        model: this.defaultModel,
+        messages: [
+          {
+            role: 'system',
+            content: `You are an SEO keyword researcher. Return a JSON object with a single "keywords" array containing ${count} unique, natural-language search queries. Use only the supplied business topics. Cover informational, comparison, commercial, question, beginner, care, and local-intent queries when genuinely relevant. Do not invent products, prices, statistics, competitors, claims, or locations. Do not include metrics or explanations.`,
+          },
+          { role: 'user', content: `Approved seed topics:\n${seeds.map((seed) => `- ${seed}`).join('\n')}` },
+        ],
+        max_tokens: Math.max(this.maxTokens, 4096),
+        temperature: 0.4,
+        response_format: { type: 'json_object' },
+      }),
+      async () => null,
+    );
+
+    const result = this.extractJson(response?.choices?.[0]?.message?.content || '{}');
+    return Array.isArray(result.keywords)
+      ? result.keywords.filter((keyword: unknown): keyword is string => typeof keyword === 'string').slice(0, count)
+      : [];
   }
 
   /**

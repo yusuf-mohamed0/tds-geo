@@ -9,6 +9,8 @@
 // previously duplicated across services.
 // ══════════════════════════════════════════════════════════════════
 
+import limax from 'limax';
+
 export function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -24,10 +26,20 @@ export function splitSentences(text: string, minLength: number = 0): string[] {
 }
 
 export function generateSlug(title: string, maxLength: number = 200): string {
-  return title.toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
+  // Strip HTML tags and smart quotes before transliteration
+  const cleaned = title
+    .toString()
+    .replace(/<[^>]*>/g, '')        // Strip HTML tags
+    .replace(/['']/g, '');          // Remove smart quotes
+
+  // Use limax for transliteration (handles non-Latin scripts like Arabic, Japanese, etc.)
+  let slug = limax(cleaned, { separator: '-' });
+
+  // Collapse multiple hyphens and trim leading/trailing hyphens
+  slug = slug
     .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, maxLength);
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+
+  return slug.substring(0, maxLength);
 }

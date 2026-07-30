@@ -5,6 +5,7 @@ import shopifyService from './shopify';
 import schemaGenerator from './schemaGenerator';
 import indexNowService from './indexNowService';
 import openaiService from './openai';
+import { countArticleWords, getMinimumArticleWords } from './contentLength';
 
 export class AutoPublishService {
   private pool: Pool | null = null;
@@ -37,7 +38,7 @@ export class AutoPublishService {
       // Find articles that are approved and due for publishing
       const due = await this.pool.query(
         `SELECT a.*, c.name as client_name, c.shopify_shop, c.shopify_token,
-                c.approval_mode, c.keyword_categories
+                c.approval_mode, c.keyword_categories, c.settings
          FROM articles a
          JOIN clients c ON c.id = a.client_id
          WHERE a.status = 'approved'
@@ -64,6 +65,23 @@ export class AutoPublishService {
       logger.info('Auto-publishing scheduled article', { articleId: article.id, title: article.title });
 
       const client = this.buildClientRecord(article);
+      const minimumArticleWords = getMinimumArticleWords(client);
+      const actualWordCount = countArticleWords(article.content_md || article.content_html);
+      if (actualWordCount < minimumArticleWords) {
+        await this.pool!.query(
+          `UPDATE articles
+           SET status = 'rejected', scheduled_at = NULL, updated_at = NOW()
+           WHERE id = $1`,
+          [article.id]
+        );
+        logger.error('Scheduled article rejected for insufficient length', {
+          articleId: article.id,
+          title: article.title,
+          actualWordCount,
+          minimumArticleWords,
+        });
+        return;
+      }
 
       let contentHtml = article.content_html || '';
       try {
@@ -143,6 +161,7 @@ export class AutoPublishService {
       shopify_token: article.shopify_token,
       approval_mode: article.approval_mode,
       keyword_categories: article.keyword_categories,
+      settings: article.settings,
     };
   }
 }

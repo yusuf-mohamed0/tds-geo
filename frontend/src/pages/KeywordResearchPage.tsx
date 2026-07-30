@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Page, Card, Text, Button, Spinner, Banner, BlockStack, InlineStack, Badge,
 } from '@shopify/polaris';
@@ -18,7 +18,7 @@ interface KeywordCluster {
     difficulty: number;
     intent: string;
     opportunityScore: number;
-    trend: string;
+    trend: 'rising' | 'stable' | 'declining' | 'unavailable';
     isQuestion: boolean;
     relatedQuestions: string[];
   }[];
@@ -36,15 +36,33 @@ interface ResearchResult {
   };
 }
 
+interface Client {
+  id: string;
+  name: string;
+  is_active: boolean;
+}
+
 export default function KeywordResearchPage() {
   const [industry, setIndustry] = useState('');
   const [seeds, setSeeds] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ResearchResult | null>(null);
   const [error, setError] = useState('');
+  const [clients, setClients] = useState<Client[]>([]);
+  const [clientId, setClientId] = useState('');
+
+  useEffect(() => {
+    apiFetch<{ clients: Client[] }>('/api/clients')
+      .then((res) => {
+        const activeClients = (res.clients || []).filter((client) => client.is_active !== false);
+        setClients(activeClients);
+        setClientId(activeClients[0]?.id || '');
+      })
+      .catch(() => setError('Unable to load clients.'));
+  }, []);
 
   const handleResearch = async () => {
-    if (!industry.trim()) return;
+    if (!industry.trim() || !clientId) return;
     setLoading(true);
     setError('');
     setResult(null);
@@ -53,7 +71,7 @@ export default function KeywordResearchPage() {
         ? seeds.split(',').map(s => s.trim()).filter(Boolean)
         : [industry.trim() + ' services', industry.trim() + ' maintenance'];
 
-      const data = await apiFetch<ResearchResult>('/api/clients/current/keywords/discover', {
+      const data = await apiFetch<ResearchResult>(`/api/clients/${clientId}/keywords/discover`, {
         method: 'POST',
         body: JSON.stringify({ industry: industry.trim(), seedKeywords, count: 30 }),
       });
@@ -68,11 +86,11 @@ export default function KeywordResearchPage() {
   return (
     <Page
       title="Keyword Research"
-      subtitle="AI-powered keyword discovery with clustering, intent analysis, and opportunity scoring"
+      subtitle="Client-scoped keyword research using real SERP metrics only"
       primaryAction={{
         content: loading ? 'Researching...' : 'Start Research',
         onAction: handleResearch,
-        disabled: loading || !industry.trim(),
+        disabled: loading || !industry.trim() || !clientId,
       }}
     >
       <BlockStack gap="400">
@@ -80,6 +98,13 @@ export default function KeywordResearchPage() {
           <BlockStack gap="300">
             <Text as="h2" variant="headingSm">Research Parameters</Text>
             <InlineStack gap="300" align="start">
+              <div style={{ flex: 1 }}>
+                <Text as="p" variant="bodySm" tone="subdued">Client</Text>
+                <select className="input" value={clientId} onChange={(e) => setClientId(e.target.value)} disabled={loading}>
+                  <option value="">Select a client</option>
+                  {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
+                </select>
+              </div>
               <div style={{ flex: 1 }}>
                 <Text as="p" variant="bodySm" tone="subdued">Industry / Niche</Text>
                 <input

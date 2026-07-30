@@ -64,8 +64,8 @@ export default function CitationsPage() {
         <Card>
           <BlockStack gap="400">
             <Text as="span" variant="bodyMd" fontWeight="medium">Domain</Text>
-            <div style={{ display: 'flex', gap: 'var(--p-space-300)' }}>
-              <div style={{ position: 'relative', flex: 1, maxWidth: 400 }}>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="relative w-full min-w-0 sm:max-w-[400px] sm:flex-1">
                 <Globe size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--p-color-text-secondary)' }} />
                 <input
                   className="input"
@@ -99,7 +99,7 @@ export default function CitationsPage() {
 
         {data && (
           <>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <Card>
                 <div style={{ textAlign: 'center', padding: 'var(--p-space-200)' }}>
                   <Text as="p" variant="heading2xl" fontWeight="bold" tone="critical">{

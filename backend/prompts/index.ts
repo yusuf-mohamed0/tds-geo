@@ -30,6 +30,7 @@ export interface WritingPromptVars {
   CATEGORIES: string;
   DATE: string;
   YEAR: string;
+  LANGUAGE: string;
   GRAPHIFY_CONTEXT?: string;
 }
 

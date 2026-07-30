@@ -5,13 +5,16 @@
 # Script to update the n8n workflow with all fixes
 # Uses the credentials and client IDs obtained from fix-n8n-workflow.sh
 
-CLIENT_ID="38e6e8da-b1c7-436c-809d-03bb46b42a1d"
-CRED_ID="wUyDyyJNGFlrdFIH"
+CLIENT_ID="${N8N_CLIENT_ID:-38e6e8da-b1c7-436c-809d-03bb46b42a1d}"
+CRED_ID="${N8N_CRED_ID:-wUyDyyJNGFlrdFIH}"
+N8N_USER_ID="${N8N_USER_ID:-08a7ba98-26a5-4c27-9aef-e78ae2c589ce}"
+N8N_ADMIN_EMAIL="${N8N_ADMIN_EMAIL:-admin@tds-geo.internal}"
+N8N_ADMIN_PASSWORD="${N8N_ADMIN_PASSWORD:-TDSg30!Pr0d#2026_X9}"
 
 # Build the fixed workflow JSON and update via API
 curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6d6e24-8afa-4d72-a127-4aeec5a687bc" \
   -H 'Content-Type: application/json' \
-  -H 'X-User-Id: 08a7ba98-26a5-4c27-9aef-e78ae2c589ce' \
+  -H "X-User-Id: ${N8N_USER_ID}" \
   -d '{
   "name": "AI SEO Shopify Agent",
   "active": true,
@@ -35,7 +38,7 @@ curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6
       "typeVersion": 3.4,
       "position": [192, 80],
       "parameters": {
-        "values": {"string": [{"name": "clientId", "value": "'$CLIENT_ID'"}]},
+        "values": {"string": [{"name": "clientId", "value": "'"$CLIENT_ID"'"}]},
         "options": {}
       }
     },
@@ -51,7 +54,7 @@ curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6
         "authentication": "none",
         "sendBody": true,
         "bodyParameters": {
-          "parameters": [{"name": "email", "value": "admin@tds-geo.internal"}, {"name": "password", "value": "TDSg30!Pr0d#2026_X9"}]
+          "parameters": [{"name": "email", "value": "'"$N8N_ADMIN_EMAIL"'"}, {"name": "password", "value": "'"$N8N_ADMIN_PASSWORD"'"}]
         },
         "options": {"timeout": 15000}
       }

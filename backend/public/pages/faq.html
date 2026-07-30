@@ -5,25 +5,35 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FAQ - TDS Geo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/brand.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 .faq-list{max-width:720px;margin:36px auto 0}
-.faq-item{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;transition:var(--transition)}
-.faq-item:hover{border-color:rgba(252,185,0,.3)}
-.faq-q{padding:20px 24px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:15px;color:var(--dark);transition:var(--transition);background:none;border:none;width:100%;text-align:left;font-family:inherit}
-.faq-q:hover{color:var(--gold)}
+.faq-item{border:1px solid var(--border);margin-bottom:12px;overflow:hidden;transition:var(--transition)}
+.faq-item:hover{border-color:rgba(var(--gold-rgb),.3);box-shadow:var(--shadow);transform:translateX(2px)}
+.faq-q{padding:20px 24px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:15px;color:var(--dark);transition:var(--transition);background:none;border:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif}
+.faq-q:hover{color:var(--gold);transform:translateX(4px)}
 .faq-q .arrow{width:20px;height:20px;transition:var(--transition);flex-shrink:0;color:var(--text-light)}
 .faq-q.open .arrow{transform:rotate(180deg);color:var(--gold)}
 .faq-a{padding:0 24px;max-height:0;overflow:hidden;transition:all 0.3s ease;color:var(--text);font-size:14px;line-height:1.7}
-.faq-a.open{max-height:300px;padding:0 24px 20px}
+.faq-a.open{max-height:600px;padding:0 24px 20px}
 .categories{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:24px}
-.cat-btn{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:var(--white);font-size:13px;font-weight:500;color:var(--text);cursor:pointer;transition:var(--transition);font-family:inherit}
-.cat-btn:hover{border-color:var(--gold);color:var(--gold)}
+.cat-btn{padding:8px 20px;border:1px solid var(--border);background:var(--white);font-family:'Unbounded',sans-serif;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;transition:var(--transition);text-transform:uppercase}
+.cat-btn:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
 .cat-btn.active{background:var(--gold);color:var(--dark);border-color:var(--gold);font-weight:600}
-.still-questions{text-align:center;margin-top:48px;padding:40px;background:var(--cream);border-radius:var(--radius)}
-.still-questions h3{font-size:18px;color:var(--dark);margin-bottom:8px}
+.still-questions{text-align:center;margin-top:48px;padding:40px;background:var(--cream)}
+.still-questions h3{font-family:'Unbounded',sans-serif;font-size:18px;color:var(--dark);margin-bottom:8px}
 .still-questions p{color:var(--text-light);font-size:14px;margin-bottom:16px}
+@media(max-width:768px){
+  .faq-q{font-size:14px;padding:16px 18px}
+  .faq-a{font-size:13px}
+  .faq-a.open{padding:0 18px 16px}
+  .still-questions{padding:28px 20px}
+  .categories{gap:6px}
+  .cat-btn{padding:6px 14px;font-size:11px}
+}
 </style>
 </head>
 <body>
@@ -36,6 +46,7 @@
 <a href="/faq" class="active">FAQ</a>
 <a href="/changelog">Changelog</a>
 <a href="/privacy">Privacy</a>
+<a href="/login" class="sign-in">Sign In</a>
 </nav>
 </div>
 </header>
@@ -104,7 +115,7 @@
 <footer>
 <div class="footer-inner">
 <div class="footer-col">
-<div class="logo" style="margin-bottom:12px"><img src="/assets/Black%20Swype.png" alt="Swype" style="height:24px;width:auto"> <span style="font-size:14px;color:var(--white)">TDS <span style="color:var(--gold)">GEO</span></span></div>
+<div class="logo" style="margin-bottom:12px"><img src="/assets/White%20Swype.png" alt="Swype" style="height:24px;width:auto"> <span style="font-size:14px;color:var(--white)">TDS <span style="color:var(--gold)">GEO</span></span></div>
 <p>Fully managed GEO content service for Shopify stores. We write, optimize, and publish — you grow.</p>
 </div>
 <div class="footer-col">

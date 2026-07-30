@@ -1,0 +1,1 @@
+ALTER TABLE article_images ADD COLUMN IF NOT EXISTS source VARCHAR(50);

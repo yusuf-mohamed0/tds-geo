@@ -13,7 +13,10 @@ import { logger } from '../utils/logger';
 import openaiService from './openai';
 import { PexelsImage, PexelsCacheEntry } from '../types';
 
-const PEXELS_API_KEY = process.env.PEXELS_API_KEY || 'kMN5L7nByHBWNmTcJwaN1IwRlFq4mfJq8cAjzhSIRHvieSBRL9e6PT0r';
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY || '';
+if (!PEXELS_API_KEY && process.env.NODE_ENV === 'production') {
+  throw new Error('PEXELS_API_KEY environment variable is required in production');
+}
 
 interface PexelsSearchResponse {
   photos: Array<{

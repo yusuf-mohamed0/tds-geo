@@ -8,7 +8,7 @@
 | **App URL** | `https://traffic.16.192.29.174.nip.io` |
 | **Partner Dashboard** | https://partners.shopify.com (TDS Geo app) |
 | **Client ID** | `a178c8740049e04eec663378b6e30ad8` |
-| **Client secret** | Verify in Partner Dashboard → Apps → TDS Geo → API credentials<br>Server `.env` has: `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`<br>**Confirm both match before submitting** |
+| **Client secret** | Verify in Partner Dashboard → Apps → TDS Geo → API credentials<br>Server `.env` has: `<REDACTED_APP_SECRET>`<br>**Confirm both match before submitting** |
 | **Application URL** | `https://traffic.16.192.29.174.nip.io` |
 | **Allowed redirection URL(s)** | `https://traffic.16.192.29.174.nip.io/api/shopify/callback` |
 

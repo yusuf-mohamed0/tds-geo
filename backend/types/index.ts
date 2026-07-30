@@ -999,8 +999,9 @@ export interface AIService {
   maxTokens: number;
   temperature: number;
   generateBlogPost(params: GenerateBlogParams): Promise<GeneratedArticle>;
-  analyzeSEO(content: string, keyword: string): Promise<Record<string, unknown>>;
+  analyzeSEO(content: string, keyword: string, locale?: string): Promise<Record<string, unknown>>;
   generateKeywordVariations(seedKeyword: string, count?: number): Promise<string[]>;
+  generateKeywordResearchPool(seeds: string[], count: number): Promise<string[]>;
   generateArticleImage(articleTitle: string, keyword: string, tone?: string): Promise<{ imageUrl: string; altText: string; prompt: string }>;
   generateTitle(keyword: string, brandVoice?: string): Promise<string>;
   generateOutline(keyword: string, title: string, blacklistKeywords?: string[]): Promise<string[]>;
@@ -1009,6 +1010,7 @@ export interface AIService {
   generateMetadata(title: string, content: string, keyword: string): Promise<{ metaTitle: string; metaDescription: string }>;
   moderateContent(content: string): Promise<{ safe: boolean; flags: Array<{ category: string; severity: string; text: string }>; summary: string }>;
   chat(messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>, options?: { temperature?: number; maxTokens?: number }): Promise<string | null>;
+  getClient(): any | null;
 }
 
 // ─── 7. OBSERVABILITY + MONITORING ───
