@@ -1,16 +1,16 @@
-# Graph Report - tds-geo  (2026-07-30)
+# Graph Report - tds-geo  (2026-07-13)
 
 ## Corpus Check
-- 853 files · ~5,574,248 words
+- 804 files · ~5,529,811 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 11866 nodes · 20571 edges · 679 communities (570 shown, 109 thin omitted)
+- 11173 nodes · 19761 edges · 610 communities (500 shown, 110 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 275 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d739c1ad`
+- Built from commit: `11be100c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -597,78 +597,12 @@
 - [[_COMMUNITY_Community 607|Community 607]]
 - [[_COMMUNITY_Community 608|Community 608]]
 - [[_COMMUNITY_Community 609|Community 609]]
-- [[_COMMUNITY_Community 610|Community 610]]
-- [[_COMMUNITY_Community 611|Community 611]]
-- [[_COMMUNITY_Community 612|Community 612]]
-- [[_COMMUNITY_Community 613|Community 613]]
-- [[_COMMUNITY_Community 614|Community 614]]
-- [[_COMMUNITY_Community 615|Community 615]]
-- [[_COMMUNITY_Community 616|Community 616]]
-- [[_COMMUNITY_Community 617|Community 617]]
-- [[_COMMUNITY_Community 618|Community 618]]
-- [[_COMMUNITY_Community 619|Community 619]]
-- [[_COMMUNITY_Community 620|Community 620]]
-- [[_COMMUNITY_Community 621|Community 621]]
-- [[_COMMUNITY_Community 622|Community 622]]
-- [[_COMMUNITY_Community 623|Community 623]]
-- [[_COMMUNITY_Community 624|Community 624]]
-- [[_COMMUNITY_Community 625|Community 625]]
-- [[_COMMUNITY_Community 626|Community 626]]
-- [[_COMMUNITY_Community 627|Community 627]]
-- [[_COMMUNITY_Community 628|Community 628]]
-- [[_COMMUNITY_Community 629|Community 629]]
-- [[_COMMUNITY_Community 630|Community 630]]
-- [[_COMMUNITY_Community 631|Community 631]]
-- [[_COMMUNITY_Community 632|Community 632]]
-- [[_COMMUNITY_Community 633|Community 633]]
-- [[_COMMUNITY_Community 634|Community 634]]
-- [[_COMMUNITY_Community 635|Community 635]]
-- [[_COMMUNITY_Community 636|Community 636]]
-- [[_COMMUNITY_Community 637|Community 637]]
-- [[_COMMUNITY_Community 638|Community 638]]
-- [[_COMMUNITY_Community 639|Community 639]]
-- [[_COMMUNITY_Community 640|Community 640]]
-- [[_COMMUNITY_Community 641|Community 641]]
-- [[_COMMUNITY_Community 642|Community 642]]
-- [[_COMMUNITY_Community 643|Community 643]]
-- [[_COMMUNITY_Community 644|Community 644]]
-- [[_COMMUNITY_Community 645|Community 645]]
-- [[_COMMUNITY_Community 646|Community 646]]
-- [[_COMMUNITY_Community 647|Community 647]]
-- [[_COMMUNITY_Community 648|Community 648]]
-- [[_COMMUNITY_Community 649|Community 649]]
-- [[_COMMUNITY_Community 650|Community 650]]
-- [[_COMMUNITY_Community 651|Community 651]]
-- [[_COMMUNITY_Community 652|Community 652]]
-- [[_COMMUNITY_Community 653|Community 653]]
-- [[_COMMUNITY_Community 654|Community 654]]
-- [[_COMMUNITY_Community 655|Community 655]]
-- [[_COMMUNITY_Community 656|Community 656]]
-- [[_COMMUNITY_Community 657|Community 657]]
-- [[_COMMUNITY_Community 658|Community 658]]
-- [[_COMMUNITY_Community 659|Community 659]]
-- [[_COMMUNITY_Community 660|Community 660]]
-- [[_COMMUNITY_Community 661|Community 661]]
-- [[_COMMUNITY_Community 662|Community 662]]
-- [[_COMMUNITY_Community 663|Community 663]]
-- [[_COMMUNITY_Community 664|Community 664]]
-- [[_COMMUNITY_Community 665|Community 665]]
-- [[_COMMUNITY_Community 666|Community 666]]
-- [[_COMMUNITY_Community 667|Community 667]]
-- [[_COMMUNITY_Community 668|Community 668]]
-- [[_COMMUNITY_Community 669|Community 669]]
-- [[_COMMUNITY_Community 670|Community 670]]
-- [[_COMMUNITY_Community 671|Community 671]]
-- [[_COMMUNITY_Community 672|Community 672]]
-- [[_COMMUNITY_Community 673|Community 673]]
-- [[_COMMUNITY_Community 674|Community 674]]
-- [[_COMMUNITY_Community 675|Community 675]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `$()` - 1059 edges
 2. `$()` - 1059 edges
 3. `$()` - 1055 edges
-4. `logger` - 118 edges
+4. `logger` - 114 edges
 5. `__()` - 114 edges
 6. `StructuralAnalysis` - 112 edges
 7. `TreeSitterNode` - 98 edges
@@ -691,7 +625,7 @@
 ## Import Cycles
 - 1-file cycle: `backend/connectors/shopify/index.ts -> backend/connectors/shopify/index.ts`
 
-## Communities (679 total, 109 thin omitted)
+## Communities (610 total, 110 thin omitted)
 
 ### Community 0 - "Content and Editorial Data"
 Cohesion: 0.03
@@ -699,19 +633,23 @@ Nodes (72): AbTest, Article, ArticleWithEditorial, AuditLogEntry, BenchmarkDatas
 
 ### Community 1 - "Content and Editorial Comments"
 Cohesion: 0.02
-Nodes (88): AbTest, Article, ArticleWithEditorial, AuditLogEntry, BenchmarkDataset, BrandVoiceProfile, Citation, Client (+80 more)
+Nodes (87): AbTest, Article, ArticleWithEditorial, AuditLogEntry, BenchmarkDataset, BrandVoiceProfile, Citation, Client (+79 more)
 
 ### Community 2 - "Authentication and Authorization"
 Cohesion: 0.03
-Nodes (107): app, assetsDir, authLimiter, globalLimiter, pagesDir, pool, PORT, publicDir (+99 more)
+Nodes (108): app, assetsDir, authLimiter, globalLimiter, pagesDir, pool, PORT, publicDir (+100 more)
 
 ### Community 3 - "Backend Repositories and Middleware"
 Cohesion: 0.01
-Nodes (204): $(), _1(), a5, a7, Aee(), aie(), aM(), AO() (+196 more)
+Nodes (204): $(), _1(), _5(), a5, a7, Aee(), aie(), aM() (+196 more)
+
+### Community 4 - "AI Content Generation Services"
+Cohesion: 0.06
+Nodes (14): aeoSystemPrompt(), aiSeoConsultingPrompt(), combinedAiSeoPrompt(), geoSystemPrompt(), llmoSystemPrompt(), loadPrompt(), researchPrompt(), ResearchPromptVars (+6 more)
 
 ### Community 5 - "Enterprise Security and Safety"
 Cohesion: 0.06
-Nodes (13): builtinLanguageConfigs, builtinFrameworkConfigs, FrameworkRegistry, LanguageRegistry, FilePatternConfig, FilePatternConfigSchema, FrameworkConfig, FrameworkConfigSchema (+5 more)
+Nodes (12): builtinLanguageConfigs, builtinFrameworkConfigs, FrameworkRegistry, FilePatternConfig, FilePatternConfigSchema, FrameworkConfig, FrameworkConfigSchema, LanguageConfig (+4 more)
 
 ### Community 6 - "UI Components and Analytics"
 Cohesion: 0.19
@@ -719,15 +657,15 @@ Nodes (8): CheckboxFieldProps, FormFieldBase, FormRowProps, InputFieldProps, Sel
 
 ### Community 7 - "Content Intelligence and Knowledge Graph"
 Cohesion: 0.01
-Nodes (204): $(), _1(), a5, a7, Aee(), aie(), aM(), AO() (+196 more)
+Nodes (211): $(), _1(), a5, a7, Aee(), aie(), aM(), AO() (+203 more)
 
 ### Community 8 - "Mock Testing Utilities"
 Cohesion: 0.13
 Nodes (15): createMockPool(), createMockRequest(), createMockResponse(), mockContentSafety, mockCostTracker, mockInternalLinks, mockKeywordService, mockOpenAI (+7 more)
 
 ### Community 9 - "UI Card Components"
-Cohesion: 0.06
-Nodes (35): FileAnalysisMeta, FileMeta, KIND_TO_NODE_TYPE, NonCodeFileAnalysisMeta, NonCodeFileMeta, DockerfileParser, EnvParser, GraphQLParser (+27 more)
+Cohesion: 0.09
+Nodes (23): EnvParser, GraphQLParser, registerAllParsers(), JSONConfigParser, stripJsoncSyntax(), MakefileParser, MarkdownParser, ShellParser (+15 more)
 
 ### Community 10 - "Background Workers and Handlers"
 Cohesion: 0.01
@@ -738,28 +676,28 @@ Cohesion: 0.11
 Nodes (6): ObservabilityService, AiLatencyRecord, MetricsSnapshot, SystemAlert, TraceSpan, WorkerPerformance
 
 ### Community 12 - "Pipeline Orchestration and Testing"
-Cohesion: 0.06
-Nodes (25): EnterprisePipelineOrchestrator, EnterprisePipelineResult, PipelineStageResult, createMockPool(), ArticleRecord, ArticleRepo, createArticleRepo(), ClientRecord (+17 more)
+Cohesion: 0.05
+Nodes (23): EnterprisePipelineOrchestrator, ArticleRecord, ArticleRepo, createArticleRepo(), ClientRecord, ClientRepo, createClientRepo(), createKeywordRepo() (+15 more)
 
 ### Community 13 - "UI Layout and Auth Context"
 Cohesion: 0.08
 Nodes (39): createPostHandler(), createPostsHandler(), createWebhookHandler(), TdsGeoBlogCard(), renderContent(), TdsGeoBlogPost(), renderMarkdown(), TdsGeoContent() (+31 more)
 
 ### Community 14 - "Keyword Research and SEO Analytics"
-Cohesion: 0.05
-Nodes (48): aB(), Bo(), bx, C(), d2(), dee(), du(), E() (+40 more)
+Cohesion: 0.03
+Nodes (86): _0(), a(), aB(), Bne(), Bo(), bx, C(), cne() (+78 more)
 
 ### Community 15 - "TypeScript Configuration"
 Cohesion: 0.08
 Nodes (25): compilerOptions, baseUrl, declaration, declarationMap, esModuleInterop, forceConsistentCasingInFileNames, lib, module (+17 more)
 
 ### Community 16 - "Project Dependencies"
-Cohesion: 0.05
-Nodes (40): dependencies, axios, @fortawesome/fontawesome-svg-core, @fortawesome/free-solid-svg-icons, @fortawesome/react-fontawesome, lucide-react, react, react-dom (+32 more)
+Cohesion: 0.06
+Nodes (31): dependencies, axios, @fortawesome/fontawesome-svg-core, @fortawesome/free-solid-svg-icons, @fortawesome/react-fontawesome, lucide-react, react, react-dom (+23 more)
 
 ### Community 17 - "Shopify Authentication and Store"
-Cohesion: 0.04
-Nodes (54): AnalyticsEvent, engines, Events, EventType, EventBus, EventHandler, EventSubscription, LearningEngine (+46 more)
+Cohesion: 0.03
+Nodes (65): buckets, ClientBucket, ClientRateLimitOptions, OrchestratorTask, PipelineStep, EnterprisePipelineResult, PipelineStageResult, createMockPool() (+57 more)
 
 ### Community 18 - "TypeScript Compiler Settings"
 Cohesion: 0.09
@@ -770,12 +708,12 @@ Cohesion: 0.07
 Nodes (27): dependencies, @anthropic-ai/sdk, axios, bcryptjs, bullmq, cors, dotenv, exceljs (+19 more)
 
 ### Community 20 - "Resilience and Circuit Breaker"
-Cohesion: 0.10
-Nodes (14): ArticleEvaluator, EvaluationResult, CircuitBreaker, CircuitBreakerOptions, CircuitState, ScanResult, ToolInfo, JsonRpcResponse (+6 more)
+Cohesion: 0.08
+Nodes (13): ArticleEvaluator, EvaluationResult, CircuitBreaker, CircuitBreakerOptions, CircuitState, ResilienceService, ScanResult, ToolInfo (+5 more)
 
 ### Community 21 - "Multi-CMS Publishing Service"
 Cohesion: 0.10
-Nodes (9): MultiCmsPublisherService, Article, ArticleWithEditorial, CmsConnection, CmsProvider, PublisherAdapter, PublisherCapabilities, PublishResult (+1 more)
+Nodes (10): MultiCmsPublisherService, Article, ArticleWithEditorial, CmsConnection, CmsProvider, PublisherAdapter, PublisherCapabilities, PublishResult (+2 more)
 
 ### Community 22 - "API and Dashboard UI"
 Cohesion: 0.08
@@ -798,8 +736,8 @@ Cohesion: 0.03
 Nodes (29): WP_Post, __(), add_menu_page(), add_query_arg(), add_submenu_page(), esc_url_raw(), get_bloginfo(), get_locale() (+21 more)
 
 ### Community 27 - "AI Chat Engine"
-Cohesion: 0.14
-Nodes (14): ChatEngine, COMMAND_PATTERNS, CommandResult, ParsedCommand, PermissionCheck, addJob(), createQueue(), defaultJobOptions (+6 more)
+Cohesion: 0.23
+Nodes (5): ChatEngine, COMMAND_PATTERNS, CommandResult, ParsedCommand, PermissionCheck
 
 ### Community 28 - "Fact Checking Service"
 Cohesion: 0.22
@@ -807,7 +745,7 @@ Nodes (8): ClaimExtractionResult, FactCheckService, VerificationResult, Citation
 
 ### Community 30 - "Build and Dev Scripts"
 Cohesion: 0.09
-Nodes (23): scripts, build, dev, dev:full, docker:build, docker:down, docker:up, import:credentials (+15 more)
+Nodes (22): scripts, build, dev, dev:full, docker:build, docker:down, docker:up, import:credentials (+14 more)
 
 ### Community 31 - "Image Search and Caching"
 Cohesion: 0.24
@@ -815,7 +753,7 @@ Nodes (5): PexelsSearchResponse, PexelsService, SelectedImage, PexelsCacheEntry,
 
 ### Community 33 - "Admin UI and User Management"
 Cohesion: 0.13
-Nodes (10): Extract all intelligence from fetched pages., Extract all intelligence from fetched pages., Analyze heading structure to understand content hierarchy., Analyze heading structure to understand content hierarchy., Extract contact information., Extract contact information., Detect technology stack hints from HTML., Detect technology stack hints from HTML. (+2 more)
+Nodes (10): Extract all intelligence from fetched pages., Extract all intelligence from fetched pages., Extract call-to-action patterns., Extract call-to-action patterns., Analyze heading structure to understand content hierarchy., Analyze heading structure to understand content hierarchy., Extract contact information., Extract contact information. (+2 more)
 
 ### Community 34 - "Project Architecture and Docs"
 Cohesion: 0.10
@@ -827,7 +765,7 @@ Nodes (18): devDependencies, eslint, supertest, tsx, @types/bcryptjs, @types/cor
 
 ### Community 36 - "AI Content Evaluation"
 Cohesion: 0.01
-Nodes (205): $(), a5, a7, Aee(), aie(), aJ, ak(), aoe() (+197 more)
+Nodes (226): $(), a5, a7, Aee(), aie(), aJ, ak(), aoe() (+218 more)
 
 ### Community 37 - "Cost Optimization Service"
 Cohesion: 0.16
@@ -862,16 +800,16 @@ Cohesion: 0.26
 Nodes (4): PluginHookContext, PluginHookResult, PluginService, createMockPool()
 
 ### Community 45 - "Content Quality Scoring"
-Cohesion: 0.04
-Nodes (57): PublisherEngine, PublishTarget, FlauntArticleId, FlauntReplacementArticle, flauntReplacementContent, main(), main(), main() (+49 more)
+Cohesion: 0.05
+Nodes (43): PublisherEngine, createAnalyticsRoutes(), authenticateEmbedded(), createEmbeddedRoutes(), verifySessionToken(), FlauntArticleId, FlauntReplacementArticle, flauntReplacementContent (+35 more)
 
 ### Community 47 - "SEO Batch Processing"
 Cohesion: 0.24
 Nodes (10): article1, article2, article3, article4, article5, calculateSeoScore(), countWords(), insertArticle() (+2 more)
 
 ### Community 48 - "Brand Voice Management"
-Cohesion: 0.12
-Nodes (10): createComplianceWebhookRoutes(), hmacMiddleware(), verifyHmac(), createShopifyInstallRoutes(), normalizeWebhookBody(), SHOPIFY_COMPLIANCE_WEBHOOKS, verifyShopifyOAuthHmac(), verifyShopifyWebhookHmac() (+2 more)
+Cohesion: 0.18
+Nodes (7): createComplianceWebhookRoutes(), hmacMiddleware(), verifyHmac(), normalizeWebhookBody(), SHOPIFY_COMPLIANCE_WEBHOOKS, verifyShopifyOAuthHmac(), verifyShopifyWebhookHmac()
 
 ### Community 49 - "SEO Content Fixes"
 Cohesion: 0.36
@@ -902,12 +840,12 @@ Cohesion: 0.05
 Nodes (43): default, dependencies, fuse.js, ignore, tree-sitter-c-sharp, tree-sitter-cpp, tree-sitter-go, tree-sitter-java (+35 more)
 
 ### Community 56 - "Chat and Prompt Routes"
-Cohesion: 0.06
-Nodes (17): ghostConnector, PublisherCapabilities, shopifyConnector, webflowConnector, wordpressConnector, getClientDefaultBlogId(), closeLogBuffer(), initLogBuffer() (+9 more)
+Cohesion: 0.11
+Nodes (23): autoFixGraph(), buildErrors(), buildInvalidCollectionIssue(), COMPLEXITY_ALIASES, DIRECTION_ALIASES, DomainMetaSchema, EDGE_TYPE_ALIASES, EdgeTypeSchema (+15 more)
 
 ### Community 57 - "Shopify App Context"
-Cohesion: 0.08
-Nodes (33): a6(), Ag(), cC(), cs(), cx(), D(), dC(), di() (+25 more)
+Cohesion: 0.12
+Nodes (24): a6(), Ag(), cC(), cs(), cx(), D(), dC(), di() (+16 more)
 
 ### Community 58 - "Device Fingerprinting"
 Cohesion: 0.05
@@ -918,8 +856,8 @@ Cohesion: 0.06
 Nodes (38): dependencies, d3-force, @dagrejs/dagre, devlop, elkjs, graphology, graphology-communities-louvain, graphology-types (+30 more)
 
 ### Community 61 - "Brand Voice UI"
-Cohesion: 0.10
-Nodes (7): OdooConnectorService, OdooAuthResponse, OdooDashboardStats, OdooField, OdooModel, OdooRecord, OdooSearchReadResult
+Cohesion: 0.09
+Nodes (12): JsonRpcResponse, OdooClient, OdooConnectorService, OdooSession, OdooApiError, OdooAuthResponse, OdooConnection, OdooDashboardStats (+4 more)
 
 ### Community 62 - "Article Rewrite Scripts"
 Cohesion: 0.33
@@ -930,12 +868,12 @@ Cohesion: 0.05
 Nodes (37): 1. Basic App Information, 2. App Store Listing Content, 3. Support & Contact, 4. Pricing Details, 5. App Discovery Content, 6. Install Requirements, 7. Tracking Information, 8. Contact Information (+29 more)
 
 ### Community 64 - "Webhook Service"
-Cohesion: 0.07
-Nodes (37): createCredentialVaultRoutes(), cryptoRandomInt(), generatePassword(), CredInput, hasEntry(), main(), pool, CLIENTS_DIR (+29 more)
+Cohesion: 0.08
+Nodes (33): CredInput, hasEntry(), main(), pool, CLIENTS_DIR, detectCategory(), detectLabel(), insertCredential() (+25 more)
 
 ### Community 65 - "Article Creation Scripts"
 Cohesion: 0.02
-Nodes (106): _0(), a(), aB(), Bne(), bx, C(), cne(), cu() (+98 more)
+Nodes (113): _0(), a(), aB(), bee(), Bne(), bx, C(), cne() (+105 more)
 
 ### Community 66 - "Heading Fix Scripts"
 Cohesion: 0.60
@@ -981,6 +919,10 @@ Nodes (7): CompositeResult, ScoreDimensions, WorkerScoringEngine, PerformanceThr
 Cohesion: 0.10
 Nodes (18): ExportMenu(), FilterPanel(), ALL_COMPLEXITIES, ALL_EDGE_CATEGORIES, ALL_NODE_TYPES, Complexity, DashboardStore, DEFAULT_FILTERS (+10 more)
 
+### Community 101 - "Community 101"
+Cohesion: 0.21
+Nodes (7): extractParams(), extractReturnType(), extractScopedIdentifierPath(), hasModifier(), JavaExtractor, lastComponent(), require
+
 ### Community 102 - "Community 102"
 Cohesion: 0.09
 Nodes (16): KeyboardShortcutsHelp(), KeyboardShortcutsHelpProps, TokenGateProps, WarningBannerProps, useIsMobile(), formatShortcutKey(), KeyboardShortcut, useKeyboardShortcuts() (+8 more)
@@ -990,8 +932,8 @@ Cohesion: 0.18
 Nodes (22): ThemePicker(), DARK_ACCENT_SWATCHES, getAccent(), getPreset(), LIGHT_ACCENT_SWATCHES, PRESETS, applyTheme(), deriveFromAccent() (+14 more)
 
 ### Community 104 - "Community 104"
-Cohesion: 0.19
-Nodes (5): CeoAlert, CeoDirective, CeoHealthReport, IDepartmentManager, CeoOrchestrator
+Cohesion: 0.12
+Nodes (6): CeoAlert, CeoDirective, CeoHealthReport, IDepartmentManager, TaskResult, CeoOrchestrator
 
 ### Community 105 - "Community 105"
 Cohesion: 0.13
@@ -1015,15 +957,15 @@ Nodes (28): API Keys You'll Need, API Reference, Architecture, Authentication, C
 
 ### Community 110 - "Community 110"
 Cohesion: 0.03
-Nodes (94): _6(), aB(), An(), ar(), b$(), bx, C(), ce() (+86 more)
+Nodes (71): _6(), An(), Av(), b$(), b6(), bi(), Cl, cN (+63 more)
 
 ### Community 111 - "Community 111"
 Cohesion: 0.08
 Nodes (24): 1. Set your API key, 2. Create API route files, 3. Build your blog pages, Advanced Usage, API Reference, Architecture, Debug logging, `DELETE /api/vireon/posts/[id]` (+16 more)
 
 ### Community 112 - "Community 112"
-Cohesion: 0.07
-Nodes (23): GraphBuilder, BASE_CONCEPT_PATTERNS, buildConceptPatterns(), buildLanguageLessonPrompt(), detectLanguageConcepts(), extractJson(), getLanguageDisplayName(), LanguageLessonResult (+15 more)
+Cohesion: 0.14
+Nodes (11): cosineSimilarity(), SemanticSearchEngine, SemanticSearchOptions, FUSE_OPTIONS, SearchEngine, SearchOptions, SearchResult, GraphNode (+3 more)
 
 ### Community 113 - "Community 113"
 Cohesion: 0.09
@@ -1050,8 +992,8 @@ Cohesion: 0.09
 Nodes (20): Critical Constraints, Cross-batch context (neighborMap), Edge Signal Quick Reference, Edges for code files:, Edges for non-code files:, File Analyzer, Node type mapping by fileCategory:, Node Types and ID Conventions (+12 more)
 
 ### Community 119 - "Community 119"
-Cohesion: 0.15
-Nodes (18): buildDefaultsOnlyFilter(), CATEGORY_BY_EXT, countLines(), detectCategory(), detectLanguage(), __dirname, dotfileKey(), enumerateFiles() (+10 more)
+Cohesion: 0.10
+Nodes (25): createIgnoreFilter(), DEFAULT_IGNORE_PATTERNS, IgnoreFilter, DETECTABLE_DIRS, generateStarterIgnoreFile(), GENERIC_SUGGESTIONS, parseGitignorePatterns(), buildDefaultsOnlyFilter() (+17 more)
 
 ### Community 120 - "Community 120"
 Cohesion: 0.10
@@ -1066,8 +1008,8 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleDetection, moduleResolution (+11 more)
 
 ### Community 123 - "Community 123"
-Cohesion: 0.20
-Nodes (5): extractAttrProperties(), extractParams(), getStringContent(), RubyExtractor, require
+Cohesion: 0.15
+Nodes (9): ATTR_METHODS, extractAttrProperties(), extractParams(), getStringContent(), IMPORT_METHODS, RubyExtractor, TreeSitterNode, CallGraphEntry (+1 more)
 
 ### Community 124 - "Community 124"
 Cohesion: 0.13
@@ -1094,8 +1036,8 @@ Cohesion: 0.06
 Nodes (30): 1. SEO & Organic Growth, 2. Conversion Rate Optimization (CRO), 3. Marketing & Advertising, 4. E-Commerce Operations, 5. Brand Building, Audience Profiles, Authoritativeness, Content Architecture Rules (+22 more)
 
 ### Community 130 - "Community 130"
-Cohesion: 0.07
-Nodes (34): dg(), Eee(), f1(), Fa(), fC(), fg(), g7, gg() (+26 more)
+Cohesion: 0.06
+Nodes (48): bP(), Bv(), coe(), CP(), Do(), Ds(), ea(), ex() (+40 more)
 
 ### Community 131 - "Community 131"
 Cohesion: 0.10
@@ -1155,7 +1097,7 @@ Nodes (13): 10.1 JWT Authentication, 10.2 Role-Based Access Control, 10.3 Shopif
 
 ### Community 145 - "Community 145"
 Cohesion: 0.04
-Nodes (73): _1(), Ad(), aP(), ay(), Bh(), bi(), bu(), c4() (+65 more)
+Nodes (74): _1(), Aae(), Ad(), AE(), ax(), ay(), bi(), bu() (+66 more)
 
 ### Community 146 - "Community 146"
 Cohesion: 0.12
@@ -1206,8 +1148,8 @@ Cohesion: 0.18
 Nodes (11): 7.1 AI & Content Services, `brandVoice.ts` — Brand Voice Enforcement, `chatEngine.ts` — Natural Language Command Engine, `contentSafety.ts` — Content Safety & Hazard Detection, `factCheckService.ts` — Fact Verification, `internalLinks.ts` — Internal Linking Engine, `keywords.ts` — Keyword Research & Management, `openai.ts` — OpenAI Integration (+3 more)
 
 ### Community 159 - "Community 159"
-Cohesion: 0.02
-Nodes (75): _6(), a2(), A6(), b6(), CM(), cr(), ct(), DE() (+67 more)
+Cohesion: 0.03
+Nodes (74): _6(), a2(), A6(), An(), Av(), b6(), CM(), cr() (+66 more)
 
 ### Community 160 - "Community 160"
 Cohesion: 0.17
@@ -1232,10 +1174,6 @@ Nodes (9): Critical Constraints, Phase 1 -- Discovery (bundled scan + LLM narrat
 ### Community 165 - "Community 165"
 Cohesion: 0.31
 Nodes (9): author, name, description, homepage, keywords, license, name, repository (+1 more)
-
-### Community 166 - "Community 166"
-Cohesion: 0.21
-Nodes (5): builtinExtractors, require, TreeSitterLanguage, TreeSitterParser, TreeSitterPlugin
 
 ### Community 167 - "Community 167"
 Cohesion: 0.24
@@ -1279,7 +1217,11 @@ Nodes (8): Code Style, Contributing to TDS Geo, Contributing to Vireon, Developm
 
 ### Community 178 - "Community 178"
 Cohesion: 0.04
-Nodes (64): A1(), Aae(), aC(), AE(), ax(), b4(), Cg(), coe() (+56 more)
+Nodes (76): _4(), A1(), aC(), b4(), Ba(), Ch(), coe(), Da() (+68 more)
+
+### Community 179 - "Community 179"
+Cohesion: 0.19
+Nodes (5): BrandVoiceService, ArticleMemory, GlobalMemoryStats, SiteMemory, BrandVoiceProfile
 
 ### Community 180 - "Community 180"
 Cohesion: 0.25
@@ -1526,12 +1468,12 @@ Cohesion: 0.40
 Nodes (3): Instructions, Notes, /understand-dashboard
 
 ### Community 242 - "Community 242"
-Cohesion: 0.13
-Nodes (3): HealthStatus, createWordPressClient(), WordPressConnector
+Cohesion: 0.15
+Nodes (3): SyncResult, createWordPressClient(), WordPressConnector
 
 ### Community 244 - "Community 244"
-Cohesion: 0.13
-Nodes (22): aP(), Bd(), Bh(), c4(), d4(), eP(), Fs(), I1() (+14 more)
+Cohesion: 0.08
+Nodes (36): A1(), aP(), Bd(), Bh(), bie(), c4(), d4(), eP() (+28 more)
 
 ### Community 245 - "Community 245"
 Cohesion: 0.10
@@ -1546,7 +1488,7 @@ Cohesion: 0.10
 Nodes (19): Competitive Analysis — AI SEO Automation (2026), Competitor Landscape, Competitors' Weak Points (Our Advantages), Critical Gaps, Feature Comparison Matrix, Important Gaps, Key Takeaways, Nice-to-Have Gaps (+11 more)
 
 ### Community 253 - "Community 253"
-Cohesion: 0.15
+Cohesion: 0.16
 Nodes (5): AiEvaluationService, AbTest, BenchmarkDataset, BenchmarkTestCase, EvaluationResult
 
 ### Community 254 - "Community 254"
@@ -1554,8 +1496,8 @@ Cohesion: 0.09
 Nodes (14): I18nContext, I18nContextValue, I18nProvider(), en, getLocale(), Locale, LocaleKey, locales (+6 more)
 
 ### Community 255 - "Community 255"
-Cohesion: 0.04
-Nodes (76): applyLLMLayers(), buildLayerDetectionPrompt(), detectLayers(), LAYER_PATTERNS, LLMLayerResponse, matchFileToLayer(), parseLayerDetectionResponse(), toLayerId() (+68 more)
+Cohesion: 0.08
+Nodes (45): buildFileAnalysisPrompt(), buildProjectSummaryPrompt(), extractJson(), LLMFileAnalysis, LLMProjectSummary, parseFileAnalysisResponse(), parseProjectSummaryResponse(), VALID_COMPLEXITIES (+37 more)
 
 ### Community 257 - "Community 257"
 Cohesion: 0.10
@@ -1563,7 +1505,7 @@ Nodes (19): 1.1 Move the 18k-char System Prompt, 1.2 Upgrade Backend's `generate
 
 ### Community 258 - "Community 258"
 Cohesion: 0.03
-Nodes (72): _0(), a(), Bne(), bP(), cne(), cu(), Dae(), dB() (+64 more)
+Nodes (101): _0(), a(), aB(), ak(), ar(), bx, C(), ce() (+93 more)
 
 ### Community 259 - "Community 259"
 Cohesion: 0.11
@@ -1571,7 +1513,7 @@ Nodes (18): Animal Categories, Audience, Boston Veterinary Pharmaceutical — Br
 
 ### Community 269 - "Community 269"
 Cohesion: 0.10
-Nodes (7): CitationData, CitationResponse, Engine, engineColors, Client, KeywordCluster, ResearchResult
+Nodes (6): AuthProvider(), ClientCostReport, CostReport, Client, KeywordCluster, ResearchResult
 
 ### Community 270 - "Community 270"
 Cohesion: 0.20
@@ -1582,8 +1524,8 @@ Cohesion: 0.11
 Nodes (17): ╚══════════════════════════════════════╝, Allowed, ASCII Shield, Badges, Brand Voice, ║  Code. Build. Ship.™                ║, Color Palette, Identity (+9 more)
 
 ### Community 272 - "Community 272"
-Cohesion: 0.05
-Nodes (50): requireResourceOwnership(), buckets, ClientBucket, clientRateLimit(), ClientRateLimitOptions, createArticleRoutes(), createBillingRoutes(), PLANS (+42 more)
+Cohesion: 0.08
+Nodes (34): requireResourceOwnership(), createArticleRoutes(), createBillingRoutes(), PLANS, createChatRoutes(), createClientRoutes(), createGeoRoutes(), createWebhookRoutes() (+26 more)
 
 ### Community 273 - "Community 273"
 Cohesion: 0.11
@@ -1591,7 +1533,7 @@ Nodes (17): 1. Broken Navigation Links, 2. Raw HTML in Image Alt Attributes, 3. 
 
 ### Community 275 - "Community 275"
 Cohesion: 0.04
-Nodes (65): a(), AO(), b$(), b1(), Bc(), Bj(), cJ(), cu() (+57 more)
+Nodes (51): AO(), b$(), b1(), Bc(), Bj(), cF(), cJ(), dF() (+43 more)
 
 ### Community 276 - "Community 276"
 Cohesion: 0.19
@@ -1626,8 +1568,8 @@ Cohesion: 0.50
 Nodes (4): ak(), du(), hj(), kE()
 
 ### Community 285 - "Community 285"
-Cohesion: 0.29
-Nodes (16): refreshIfExpired(), buildClient(), getQueue(), fetchArticles(), fetchBlogs(), publishArticle(), publishArticleWithTracking(), uploadImage() (+8 more)
+Cohesion: 0.25
+Nodes (19): refreshIfExpired(), buildClient(), getQueue(), fetchArticles(), fetchBlogs(), getClientDefaultBlogId(), publishArticle(), publishArticleWithTracking() (+11 more)
 
 ### Community 286 - "Community 286"
 Cohesion: 0.12
@@ -1650,12 +1592,12 @@ Cohesion: 0.12
 Nodes (15): Content Gap Analysis, Entity Extraction, How Scores Feed the Pipeline, How SEO Scoring Works, Internal Linking, Keyword Optimization, Readability, Related Files (+7 more)
 
 ### Community 291 - "Community 291"
-Cohesion: 0.10
-Nodes (27): a6(), Ag(), cC(), cs(), cx(), D(), dC(), di() (+19 more)
+Cohesion: 0.07
+Nodes (16): GQ(), Hd(), kM(), lx(), q6(), qC, qQ(), rI() (+8 more)
 
 ### Community 292 - "Community 292"
-Cohesion: 0.33
-Nodes (4): extractImportSpecifiers(), extractParams(), extractReturnType(), TypeScriptExtractor
+Cohesion: 0.18
+Nodes (12): getStringValue(), hasChildOfType(), traverse(), builtinExtractors, LanguageExtractor, extractImportSpecifiers(), extractParams(), extractReturnType() (+4 more)
 
 ### Community 293 - "Community 293"
 Cohesion: 0.60
@@ -1674,24 +1616,24 @@ Cohesion: 0.25
 Nodes (13): animateNumber(), loadDashboard(), pipelinePct(), scheduleRefresh(), setGenState(), setLoading(), setStat(), setState() (+5 more)
 
 ### Community 304 - "Community 304"
-Cohesion: 0.11
-Nodes (12): avatarColors, Header(), HeaderProps, stringToColor(), iconMap, IconName, IconProps, allNavItems (+4 more)
+Cohesion: 0.17
+Nodes (11): avatarColors, Header(), HeaderProps, stringToColor(), iconMap, IconName, IconProps, allNavItems (+3 more)
 
 ### Community 305 - "Community 305"
-Cohesion: 0.13
-Nodes (10): Extract services/products mentioned across pages., Extract services/products mentioned across pages., Extract industries served., Extract industries served., Extract target audience descriptions., Extract target audience descriptions., Extract unique selling points / value propositions., Extract unique selling points / value propositions. (+2 more)
+Cohesion: 0.17
+Nodes (8): Extract services/products mentioned across pages., Extract services/products mentioned across pages., Extract unique selling points / value propositions., Extract unique selling points / value propositions., Extract industry-specific terms and jargon., Extract industry-specific terms and jargon., Extract readable text from HTML., Extract readable text from HTML.
 
 ### Community 307 - "Community 307"
 Cohesion: 0.03
-Nodes (64): _6(), a2(), An(), ar(), b$(), ce(), cN, cr() (+56 more)
+Nodes (63): _6(), a2(), An(), ar(), b$(), b6(), ce(), cN (+55 more)
 
 ### Community 308 - "Community 308"
 Cohesion: 0.14
 Nodes (13): Audit Dimensions (each client scored 0-100), Boston Pharmaceutical (Week 2-3), Boston Veterinary (Week 3), Cadence, Caravanserai (Week 1-2), Clients, Existing Tools (no build needed), First Month Priorities (+5 more)
 
 ### Community 309 - "Community 309"
-Cohesion: 0.10
-Nodes (20): ACME Facility Maintenance — SEO & Content Guide, Competitor Keywords to Target, Content Pillars, Content Workflow Recommendation, Current Situation (Gap Analysis), Differentiators to Leverage, Direct Competitors (Industrial Supply in Houston), Immediate (Month 1) (+12 more)
+Cohesion: 0.19
+Nodes (13): generateContent(), GenerateResult, getJobResult(), trackCost(), GeneratedArticle, addJob(), defaultJobOptions, getJobStatus() (+5 more)
 
 ### Community 310 - "Community 310"
 Cohesion: 0.14
@@ -1723,7 +1665,7 @@ Nodes (13): 7.3 System & Infrastructure Services, `aiEvaluation.ts` — AI Quali
 
 ### Community 319 - "Community 319"
 Cohesion: 0.18
-Nodes (9): Parse and add internal link if it's a relative path., Parse and add internal link if it's a relative path., Fetch a URL using Scrapling (preferred) or requests fallback (no Scrapling)., Fetch a URL using Scrapling (preferred) or requests fallback (no Scrapling)., Extract industry-specific terms and jargon., Extract industry-specific terms and jargon., Discover page URLs from homepage links + default crawl list., Discover page URLs from homepage links + default crawl list. (+1 more)
+Nodes (9): Parse and add internal link if it's a relative path., Parse and add internal link if it's a relative path., Fetch a URL using Scrapling (preferred) or requests fallback (no Scrapling)., Fetch a URL using Scrapling (preferred) or requests fallback (no Scrapling)., Extract meta description from homepage., Extract meta description from homepage., Discover page URLs from homepage links + default crawl list., Discover page URLs from homepage links + default crawl list. (+1 more)
 
 ### Community 320 - "Community 320"
 Cohesion: 0.24
@@ -1734,8 +1676,8 @@ Cohesion: 0.13
 Nodes (14): 1. Identity & Profile, 2. Technical Details, 3. Content Status, 4. Schedule, 5. Weak Points & Improvements, 6. Milestones & Timeline, 7. Notes, Blogs (+6 more)
 
 ### Community 322 - "Community 322"
-Cohesion: 0.07
-Nodes (28): A. Generators (Generac), ACME Facility Maintenance — Brand Profile, Acme Maintenance Co. — Brand Profile, B. Industrial Equipment, Backend Config, Brand Visual Identity, Brand Voice, C. Industrial Tools (+20 more)
+Cohesion: 0.17
+Nodes (11): Acme Maintenance Co. — Brand Profile, Backend Config, Brand Voice, Company Overview, Content Pillars (Home Maintenance), n8n Workflow, Notes, Seed Data Keywords (+3 more)
 
 ### Community 323 - "Community 323"
 Cohesion: 0.15
@@ -1762,8 +1704,8 @@ Cohesion: 0.17
 Nodes (11): Absolute Rules, Depth & EEAT, EEAT Content Framework, Final Validation, Human Writing, Long-Term Evergreen Content, Originality, Role (+3 more)
 
 ### Community 329 - "Community 329"
-Cohesion: 0.04
-Nodes (83): _4(), a3(), Av(), Ba(), bP(), Bv(), CP(), Da() (+75 more)
+Cohesion: 0.05
+Nodes (54): a3(), bP(), Bv(), CP(), dg(), Do(), Ds(), Dv() (+46 more)
 
 ### Community 330 - "Community 330"
 Cohesion: 0.17
@@ -1779,7 +1721,7 @@ Nodes (11): buildProductPrompt(), callAI(), extractJSON(), generateAndUpdateProd
 
 ### Community 333 - "Community 333"
 Cohesion: 0.04
-Nodes (71): $4(), a2(), aC(), ax(), Ba(), Cg(), Ch(), Da() (+63 more)
+Nodes (64): $4(), a2(), Aae(), aC(), AE(), ax(), Ba(), Cg() (+56 more)
 
 ### Community 334 - "Community 334"
 Cohesion: 0.17
@@ -1835,23 +1777,23 @@ Nodes (11): default, import, types, default, exports, ./components, ./styles.css
 
 ### Community 348 - "Community 348"
 Cohesion: 0.04
-Nodes (54): b1(), Bc(), bj(), cre(), cW(), dF(), dle(), doe() (+46 more)
+Nodes (54): b1(), Bc(), bj(), cF(), dF(), displayable(), dle(), doe() (+46 more)
 
 ### Community 349 - "Community 349"
 Cohesion: 0.04
-Nodes (61): _3(), a3(), b1(), Bc(), bj(), bP(), cre(), cW() (+53 more)
+Nodes (57): _3(), a3(), b1(), Bc(), bj(), C3(), dF(), displayable() (+49 more)
 
 ### Community 350 - "Community 350"
-Cohesion: 0.11
-Nodes (17): DemoStatus, getDemoStatus(), signupDemo(), upgradeDemo(), getLocaleName(), LocaleOption, SUPPORTED_LOCALE_CODES, SUPPORTED_LOCALES (+9 more)
+Cohesion: 0.20
+Nodes (5): MetricCardProps, Modal(), ModalProps, ClientKeyword, ClientAnalyticsOverview
 
 ### Community 351 - "Community 351"
 Cohesion: 0.20
 Nodes (9): How to Arrange Artisanal Pieces for Maximum Visual Impact, How to Choose Anchor Furniture for Your Living Room, How to Layer Textures Without Cluttering Your Space, How to Maintain the Look Over Time, How to Style Your Living Room with Artisanal Decor, What Accessories Work Best with Handcrafted Furniture, What Common Styling Mistakes to Avoid, What Makes Artisanal Decor Different from Mass-Produced Pieces (+1 more)
 
 ### Community 352 - "Community 352"
-Cohesion: 0.07
-Nodes (35): Ag(), An(), cC(), cs(), cx(), D(), dC(), di() (+27 more)
+Cohesion: 0.08
+Nodes (32): Ag(), cA(), cC(), cs(), cx(), D(), dC(), di() (+24 more)
 
 ### Community 353 - "Community 353"
 Cohesion: 0.20
@@ -1882,8 +1824,8 @@ Cohesion: 0.17
 Nodes (11): 1. Identity & Profile, 2. Technical Details, 3. Content Status, 4. Weak Points & Improvements, 5. Next Actions, 6. Notes, Boston Pharmaceutical Industries — Full Profile, Critical (+3 more)
 
 ### Community 361 - "Community 361"
-Cohesion: 0.08
-Nodes (12): bM(), ete(), Jd(), jM(), lk, PM(), Qee(), qk() (+4 more)
+Cohesion: 0.07
+Nodes (17): bM(), ete(), Jd(), jM(), Ks(), lk, lM, mM() (+9 more)
 
 ### Community 363 - "Community 363"
 Cohesion: 0.22
@@ -1914,8 +1856,8 @@ Cohesion: 0.22
 Nodes (8): API Setup, Caravanserai — Technical Reference, DNS & Verification, Production Branches & Locations, Schema & Structured Data, Shopify Store Details, TDS Geo Integration, Third-Party Services
 
 ### Community 370 - "Community 370"
-Cohesion: 0.29
-Nodes (8): Card(), CardBody(), CardBodyProps, CardFooter(), CardFooterProps, CardHeader(), CardHeaderProps, CardProps
+Cohesion: 0.22
+Nodes (4): CardBodyProps, CardFooterProps, CardHeaderProps, CardProps
 
 ### Community 371 - "Community 371"
 Cohesion: 0.22
@@ -1930,7 +1872,7 @@ Cohesion: 0.22
 Nodes (9): 7. Progress Tracker (`backend/engines/migration/tracker.ts`), `addItem(jobId, type, sourceId, sourceTitle): Promise<MigrationItem>`, `createJob(clientId, sourceUrl, destinationShop): Promise<MigrationJob>`, `getJobSummary(jobId): Promise<JobSummary>`, `getPendingItems(jobId, type, limit = 100): Promise<MigrationItem[]>`, Methods, Purpose, `updateItemStatus(itemId, status, destinationId?, error?)` (+1 more)
 
 ### Community 374 - "Community 374"
-Cohesion: 0.38
+Cohesion: 0.44
 Nodes (7): generate(), generateJson(), getClient(), isConfigured(), LlmMessage, LlmOptions, LlmResponse
 
 ### Community 375 - "Community 375"
@@ -1994,8 +1936,8 @@ Cohesion: 0.25
 Nodes (7): Architecture, Configuration, Current Status, Inbound Logging Endpoint, n8n Integration, Overview, What n8n Can Do
 
 ### Community 391 - "Community 391"
-Cohesion: 0.07
-Nodes (41): DEFAULT_CONFIG, ensureDir(), loadConfig(), loadDomainGraph(), loadFingerprints(), loadGraph(), loadMeta(), sanitiseFilePaths() (+33 more)
+Cohesion: 0.14
+Nodes (22): DEFAULT_CONFIG, ensureDir(), loadConfig(), loadDomainGraph(), loadFingerprints(), loadGraph(), loadMeta(), sanitiseFilePaths() (+14 more)
 
 ### Community 392 - "Community 392"
 Cohesion: 0.25
@@ -2046,12 +1988,12 @@ Cohesion: 0.29
 Nodes (7): 6.1 Tech Stack, 6.2 Routing (`App.tsx`), 6.3 Auth Flow (`hooks/useAuth.tsx`), 6.4 API Client (`services/api.ts`), 6.5 Styling (`styles.css`), 6.6 Shared Components, 6. Frontend Architecture
 
 ### Community 404 - "Community 404"
-Cohesion: 0.49
-Nodes (5): RegisteredConnector, ConnectorCapability, ConnectorConfig, ConnectorInterface, ConnectorRegistration
+Cohesion: 0.28
+Nodes (6): RegisteredConnector, ConnectorCapability, ConnectorConfig, ConnectorInterface, ConnectorRegistration, HealthStatus
 
 ### Community 405 - "Community 405"
-Cohesion: 0.11
-Nodes (20): aa, cA(), clamp(), formatHsl(), iA(), Ja(), jb(), kae() (+12 more)
+Cohesion: 0.14
+Nodes (15): applyLLMLayers(), buildLayerDetectionPrompt(), detectLayers(), LAYER_PATTERNS, LLMLayerResponse, matchFileToLayer(), parseLayerDetectionResponse(), toLayerId() (+7 more)
 
 ### Community 406 - "Community 406"
 Cohesion: 0.29
@@ -2066,12 +2008,12 @@ Cohesion: 0.29
 Nodes (5): Analyze the writing tone of the website., Analyze the writing tone of the website., Estimate formality level (0-1)., Estimate formality level (0-1)., float
 
 ### Community 409 - "Community 409"
-Cohesion: 0.11
-Nodes (17): Batch Processing (Traditional), Boston Pharmaceutical Industries' Approach to Innovation, Conclusion, Continuous Manufacturing, Continuous Manufacturing (Innovative), Continuous Manufacturing vs. Batch Processing, Defining Pharmaceutical Innovation: Beyond New Drugs, Digitalization and Industry 4.0 (+9 more)
+Cohesion: 0.14
+Nodes (16): BASE_CONCEPT_PATTERNS, buildConceptPatterns(), buildLanguageLessonPrompt(), detectLanguageConcepts(), extractJson(), getLanguageDisplayName(), LanguageLessonResult, parseLanguageLessonResponse() (+8 more)
 
 ### Community 411 - "Community 411"
-Cohesion: 0.08
-Nodes (35): A1(), aP(), Bd(), Bh(), bie(), c4(), d4(), eP() (+27 more)
+Cohesion: 0.07
+Nodes (41): A1(), aP(), Bd(), Bh(), bie(), c4(), d4(), eP() (+33 more)
 
 ### Community 412 - "Community 412"
 Cohesion: 0.29
@@ -2118,8 +2060,8 @@ Cohesion: 0.33
 Nodes (5): LinkedIn Drafts — July 2026, Post 1: Prompt Engineering Overhaul (Behind-the-Scenes Build), Post 2: The AI SEO Landscape (Original Data / Contrarian Take), Post 3: The 878-product problem (Building in Public), Post 4: The Prompt Research Nobody Asked For (Contrarian Take / Framework)
 
 ### Community 423 - "Community 423"
-Cohesion: 0.11
-Nodes (17): Action Items, Animal Categories (from homepage), Boston Veterinary Pharmaceutical — Site Audit, Brand Partners (logos on site), Content Analysis, Critical, High, Medium (+9 more)
+Cohesion: 0.20
+Nodes (10): cre(), eoe(), Jie(), Js(), lre(), nF(), sre(), wd() (+2 more)
 
 ### Community 424 - "Community 424"
 Cohesion: 0.33
@@ -2130,8 +2072,8 @@ Cohesion: 0.33
 Nodes (6): 8.1 Class: `EnterprisePipelineOrchestrator`, 8.2 Main Method, 8.3 Pipeline Stages (24 stages, executed in order), 8.4 PipelineResult, 8.5 Key Behaviors, 8. Pipeline Orchestrator (The Core Engine)
 
 ### Community 426 - "Community 426"
-Cohesion: 0.12
-Nodes (16): 1. ODOO QUOTATION CONFIGURATION, 2. COMPLETE QUOTATION LAYOUT & CONTENT, 3. WHAT MAKES THIS BETTER THAN COMPETITORS, 4. THREE BONUSES THAT MAKE IT UNMATCHABLE, 5. FINAL EXECUTION CHECKLIST (Lawyer's Sign-off), 6. IMPLEMENTATION IN ODOO ONLINE, A. Odoo Online Setup Checklist, A. PDF Layout Specification (+8 more)
+Cohesion: 0.33
+Nodes (4): CitationData, CitationResponse, Engine, engineColors
 
 ### Community 427 - "Community 427"
 Cohesion: 0.33
@@ -2182,8 +2124,8 @@ Cohesion: 0.33
 Nodes (6): scripts, build, clean, dev, prepublishOnly, typecheck
 
 ### Community 440 - "Community 440"
-Cohesion: 0.08
-Nodes (26): 1. Identity & Profile, 2. GEO Analysis / Citation Tracking, 2. Technical Details, 3. Content Status, 3. Technical Details, 4. Content Status, 4. Weak Points & Blockers, 5. Notes (+18 more)
+Cohesion: 0.25
+Nodes (7): 1. Identity & Profile, 2. Technical Details, 3. Content Status, 4. Weak Points & Blockers, 5. Notes, Client Profile: Acme Maintenance Co. (Traffic Test), GEO Analysis / Citation Tracking
 
 ### Community 441 - "Community 441"
 Cohesion: 0.40
@@ -2217,10 +2159,6 @@ Nodes (5): Definition, Part 4: LLMO — Large Language Model Optimization, Scope
 Cohesion: 0.40
 Nodes (4): How to Keep This Updated, Index, Quick Links, TDS Geo — Documentation
 
-### Community 449 - "Community 449"
-Cohesion: 0.17
-Nodes (3): ResilienceService, CircuitBreakerState, DeadLetterJob
-
 ### Community 450 - "Community 450"
 Cohesion: 0.40
 Nodes (5): 11.1 Test Infrastructure, 11.2 Test Files, 11.3 Testing Patterns, 11.4 Running Tests, 11. Testing Strategy
@@ -2234,8 +2172,8 @@ Cohesion: 0.40
 Nodes (5): 13.1 Quick Start, 13.2 TypeScript Checks, 13.3 Dev Mode Features, 13.4 Key Scripts (package.json), 13. Development Workflow
 
 ### Community 453 - "Community 453"
-Cohesion: 0.05
-Nodes (57): at(), B3(), bl(), C3(), CP(), d3(), dM(), eM() (+49 more)
+Cohesion: 0.06
+Nodes (43): at(), B3(), bl(), d3(), dM(), eM(), f3(), FP() (+35 more)
 
 ### Community 454 - "Community 454"
 Cohesion: 0.40
@@ -2270,8 +2208,8 @@ Cohesion: 0.60
 Nodes (4): main(), parseFrontmatter(), pool, slugify()
 
 ### Community 462 - "Community 462"
-Cohesion: 0.06
-Nodes (47): findChild(), findChildren(), getStringValue(), hasChildOfType(), traverse(), CSharpExtractor, extractParams(), extractReturnType() (+39 more)
+Cohesion: 0.23
+Nodes (8): CSharpExtractor, extractParams(), extractReturnType(), extractUsingSource(), hasModifier(), lastComponent(), StructuralAnalysis, require
 
 ### Community 464 - "Community 464"
 Cohesion: 0.12
@@ -2286,8 +2224,8 @@ Cohesion: 0.40
 Nodes (4): App Types, Authentication & Authorization, Shopify App Development Docs, Tools
 
 ### Community 467 - "Community 467"
-Cohesion: 0.04
-Nodes (59): at(), B3(), bl(), C3(), CP(), d3(), dM(), eM() (+51 more)
+Cohesion: 0.06
+Nodes (46): at(), B3(), bl(), d3(), dM(), eM(), f3(), FP() (+38 more)
 
 ### Community 468 - "Community 468"
 Cohesion: 0.40
@@ -2296,10 +2234,6 @@ Nodes (4): dependencies, dotenv, express, pg
 ### Community 469 - "Community 469"
 Cohesion: 0.33
 Nodes (5): Client Profiles — Context, Current Clients, Current Clients (6), Onboarding Process, TDS Geo — Client Profiles
-
-### Community 471 - "Community 471"
-Cohesion: 0.10
-Nodes (13): mockBlockStack, mockCard, mockText, StatusBadgeProps, toneMap, AuthProvider(), fetchMeMock, loginMock (+5 more)
 
 ### Community 472 - "Community 472"
 Cohesion: 0.50
@@ -2354,12 +2288,12 @@ Cohesion: 0.33
 Nodes (5): Blog IDs, CMS Connection, Flaunt Cosmetics Egypt — Technical Reference, Notes, Shopify Details
 
 ### Community 494 - "Community 494"
-Cohesion: 0.10
-Nodes (30): Bv(), coe(), Do(), Ds(), ea(), ex(), fl(), GE() (+22 more)
+Cohesion: 0.09
+Nodes (29): bP(), Bv(), coe(), Do(), Ds(), ea(), ex(), fl() (+21 more)
 
 ### Community 495 - "Community 495"
-Cohesion: 0.20
-Nodes (11): Ch(), Gae(), Ho(), ls(), pj(), pO(), qae(), sl() (+3 more)
+Cohesion: 0.33
+Nodes (6): Gae(), pO(), qae(), sl(), xae(), Yae()
 
 ### Community 499 - "Community 499"
 Cohesion: 0.67
@@ -2374,12 +2308,12 @@ Cohesion: 0.29
 Nodes (6): API Config, Blog IDs, CMS Connection, Flaunt Cosmetics Global — Technical Reference, Notes, Shopify Details
 
 ### Community 525 - "Community 525"
-Cohesion: 0.08
-Nodes (27): aa, Bk, clamp(), cO(), Fk(), formatHsl(), Hd(), Ja() (+19 more)
+Cohesion: 0.10
+Nodes (22): aa, Bk, clamp(), cO(), Fk(), formatHsl(), Ja(), jb() (+14 more)
 
 ### Community 526 - "Community 526"
 Cohesion: 0.03
-Nodes (89): A1(), Ad(), Av(), ax(), ay(), bi(), bie(), bu() (+81 more)
+Nodes (107): Aae(), Ad(), AE(), Av(), ax(), ay(), bi(), bu() (+99 more)
 
 ### Community 527 - "Community 527"
 Cohesion: 0.22
@@ -2406,120 +2340,100 @@ Cohesion: 0.25
 Nodes (7): Article Structure, Content Gap Analysis (Jul 12, 2026), Content Topics (Initial Batch), Content Topics (Priority Order), Flaunt Cosmetics Global — SEO & Content Guide, Image Guidelines, Keyword Categories
 
 ### Community 533 - "Community 533"
-Cohesion: 0.13
-Nodes (14): Biological and Biosimilar Products, Boston Pharmaceutical Industries: Contributing to Egyptian Healthcare, Conclusion, Egypt's Pharmaceutical Market: An Overview, Generic Pharmaceuticals, Introduction, Over-the-Counter (OTC) Products, Prescription-Only Medicines (POM) (+6 more)
+Cohesion: 0.40
+Nodes (4): mockCrawlCompetitors, mockCreate, mockDataForSeo, mockImagesGenerate
 
 ### Community 535 - "Community 535"
-Cohesion: 0.07
-Nodes (50): $4(), aC(), b6(), Ba(), Ch(), Da(), e3(), FE() (+42 more)
+Cohesion: 0.04
+Nodes (70): $4(), aC(), Ba(), Ch(), CP(), Da(), e3(), f1() (+62 more)
 
 ### Community 538 - "Community 538"
 Cohesion: 0.22
 Nodes (5): mockAdmin, mockClientUser, mockEditor, mockQuery, mockViewer
 
 ### Community 539 - "Community 539"
-Cohesion: 0.06
-Nodes (47): $3(), aM(), at(), B3(), bie(), bl(), C3(), d3() (+39 more)
+Cohesion: 0.07
+Nodes (45): $3(), aM(), at(), B3(), bie(), bl(), C3(), d3() (+37 more)
 
 ### Community 540 - "Community 540"
 Cohesion: 0.26
 Nodes (10): main(), classify(), ensureAllActiveKeywordPools(), ensureClientKeywordPool(), KeywordProfile, MODIFIERS, normalize(), PROFILES (+2 more)
 
-### Community 541 - "Community 541"
-Cohesion: 0.29
-Nodes (4): CostTracker, mockPool, mockQuery, CostEntry
-
 ### Community 544 - "Community 544"
-Cohesion: 0.06
-Nodes (21): Bk, cre(), ef(), eoe(), Fk(), Jd(), Jie(), Js() (+13 more)
-
-### Community 545 - "Community 545"
-Cohesion: 0.19
-Nodes (3): ContentPayload, PublishResult, WebflowConnector
+Cohesion: 0.05
+Nodes (34): aa, Bk, clamp(), cre(), ef(), eoe(), Fk(), formatHsl() (+26 more)
 
 ### Community 546 - "Community 546"
-Cohesion: 0.03
-Nodes (67): _0(), bM, Bne(), bre(), cne(), cO(), Dae(), dB() (+59 more)
-
-### Community 547 - "Community 547"
-Cohesion: 0.14
-Nodes (13): ACME Facility Maintenance — Site Audit, Brand Details, Business Model, Certifications, Colors, Issues Found, Navigation, Overview (+5 more)
+Cohesion: 0.24
+Nodes (10): bre(), Hb, nl(), th(), vre(), Wre(), Xa(), xre() (+2 more)
 
 ### Community 548 - "Community 548"
-Cohesion: 0.07
-Nodes (13): El(), F6(), i2(), qC, rI(), Sn(), Sw(), Tn() (+5 more)
+Cohesion: 0.08
+Nodes (10): El(), F6(), i2(), qC, rI(), Sn(), w6(), WC() (+2 more)
 
 ### Community 549 - "Community 549"
-Cohesion: 0.07
-Nodes (13): El(), F6(), i2(), qC, rI(), Sn(), Sw(), Tn() (+5 more)
-
-### Community 550 - "Community 550"
-Cohesion: 0.14
-Nodes (13): Conclusion, Government Veterinary Clinics, How Boston Veterinary Pharmaceutical Supports Clinics Across Egypt, Introduction, Mobile Veterinary Units, Private Veterinary Clinics and Hospitals, Questions to Ask Your Veterinarian, Services Offered by Veterinary Clinics in Egypt (+5 more)
+Cohesion: 0.08
+Nodes (10): i2(), qC, rI(), Sn(), Sw(), w6(), WC(), x6 (+2 more)
 
 ### Community 551 - "Community 551"
 Cohesion: 0.06
-Nodes (36): dg(), Dv(), Eee(), f1(), Fa(), fC(), fg(), g7 (+28 more)
+Nodes (40): dg(), Dv(), Eee(), f1(), Fa(), fC(), fg(), g7 (+32 more)
 
 ### Community 552 - "Community 552"
-Cohesion: 0.06
-Nodes (12): BrandVoiceService, ContentIntelligenceService, ArticleMemory, GlobalMemoryService, GlobalMemoryStats, SiteMemory, InternalLinksService, BrandVoiceProfile (+4 more)
+Cohesion: 0.11
+Nodes (6): ContentIntelligenceService, GlobalMemoryService, ContentCannibalization, KnowledgeGraphEntity, KnowledgeGraphRelationship, TopicSaturation
 
 ### Community 554 - "Community 554"
-Cohesion: 0.17
-Nodes (11): ACME Facility Maintenance — Technical Reference, Active Plugins, Contact Details, Content Architecture, Infrastructure Notes, OAuth / API Keys, Performance Profile, Platform Overview (+3 more)
+Cohesion: 0.25
+Nodes (7): findChild(), extractParams(), extractReturnType(), extractUseName(), lastSegment(), PhpExtractor, require
 
 ### Community 555 - "Community 555"
-Cohesion: 0.18
+Cohesion: 0.23
 Nodes (7): CppExtractor, extractFuncDeclName(), extractParams(), extractReturnType(), isStatic(), unwrapDeclaratorName(), require
 
 ### Community 556 - "Community 556"
-Cohesion: 0.10
-Nodes (22): aa, Bk, clamp(), cO(), Fk(), formatHsl(), Ja(), jb() (+14 more)
-
-### Community 557 - "Community 557"
-Cohesion: 0.17
-Nodes (11): Building a Relationship with Your Veterinarian, Common Pet Health Issues in Egypt's Climate, Conclusion, How Boston Veterinary Pharmaceutical Supports Pet Health, Introduction, Nutrition Tips for Dogs and Cats in Cairo, Pet Care in Cairo: A Pet Owner's Guide, Preventative Care: Vaccinations, Deworming, and Flea and Tick Control (+3 more)
+Cohesion: 0.08
+Nodes (27): aa, Bk, clamp(), cO(), Fk(), formatHsl(), Hd(), Ja() (+19 more)
 
 ### Community 558 - "Community 558"
 Cohesion: 0.14
 Nodes (16): bre(), GA(), Hb, nl(), qa(), Ro(), th(), Ui() (+8 more)
 
 ### Community 559 - "Community 559"
-Cohesion: 0.04
-Nodes (82): Ad(), Av(), ay(), bi(), bu(), Bv(), d1(), Do() (+74 more)
+Cohesion: 0.03
+Nodes (80): a6(), Ad(), Ag(), ay(), bu(), cC(), cs(), cx() (+72 more)
 
 ### Community 560 - "Community 560"
 Cohesion: 0.14
 Nodes (11): backlinkAutomation, BacklinkProspect, EnrichedProspect, GuestPostResult, BacklinkSummary, DomainOverview, KeywordIdea, KeywordVolume (+3 more)
 
 ### Community 561 - "Community 561"
-Cohesion: 0.17
-Nodes (11): Caravanserai Design — Enriched Product Descriptions (Pilot), Darb Console, Fatima's Hand Naqsha, Kura Chandelier, Marrakech Dresser, Nabaty Cupboard, Oyma Dresser, Rouge Bar (+3 more)
+Cohesion: 0.25
+Nodes (8): cu(), KO(), Ku(), ooe(), Sh(), xv(), YO(), ZO()
 
 ### Community 562 - "Community 562"
 Cohesion: 0.20
 Nodes (9): bearerFormat, scheme, type, components, securitySchemes, openapi, security, bearerAuth (+1 more)
 
 ### Community 563 - "Community 563"
-Cohesion: 0.17
-Nodes (11): Implementation Phases, Phase 1: Google Search Console Integration, Phase 2: Multi-Language Support (10+ languages), Phase 3: Free Trial / Demo Mode, Phase 4: Whitelabel / Agency Mode, Phase 5: Social Repurposing, Phase 6: Competitor Gap Analysis, Phase 7: SSO / Enterprise Auth (+3 more)
+Cohesion: 0.25
+Nodes (7): findChildren(), extractParams(), extractReturnType(), extractScopedPath(), isPublic(), RustExtractor, require
 
 ### Community 564 - "Community 564"
-Cohesion: 0.18
-Nodes (11): Gi(), m7(), no(), qy(), Re(), sle(), v7(), w2() (+3 more)
+Cohesion: 0.07
+Nodes (34): aP(), Bh(), c4(), ed(), eP(), f4(), Fs(), g4() (+26 more)
 
 ### Community 567 - "Community 567"
-Cohesion: 0.29
-Nodes (5): fetchDashboard(), fetchHealth(), MetricCardProps, AdminDashboard, HealthStatus
+Cohesion: 0.48
+Nodes (4): fetchDashboard(), fetchHealth(), AdminDashboard, HealthStatus
 
 ### Community 569 - "Community 569"
 Cohesion: 0.25
 Nodes (9): Cie(), Gae(), ih(), pO(), qae(), Qs, sl(), xae() (+1 more)
 
 ### Community 570 - "Community 570"
-Cohesion: 0.08
-Nodes (12): bM(), ete(), Jd(), jM(), lk, PM(), Qee(), qk() (+4 more)
+Cohesion: 0.17
+Nodes (12): bM(), ete(), jM(), Ks(), lM, mM(), Px(), Qee() (+4 more)
 
 ### Community 571 - "Community 571"
 Cohesion: 0.25
@@ -2530,8 +2444,8 @@ Cohesion: 0.20
 Nodes (9): bearerFormat, scheme, type, components, securitySchemes, openapi, security, bearerAuth (+1 more)
 
 ### Community 573 - "Community 573"
-Cohesion: 0.33
-Nodes (11): aeoSystemPrompt(), aiSeoConsultingPrompt(), combinedAiSeoPrompt(), geoSystemPrompt(), llmoSystemPrompt(), loadPrompt(), researchPrompt(), ResearchPromptVars (+3 more)
+Cohesion: 0.22
+Nodes (6): extractParams(), extractReceiverType(), extractResultType(), GoExtractor, isExported(), require
 
 ### Community 579 - "Community 579"
 Cohesion: 0.29
@@ -2546,24 +2460,24 @@ Cohesion: 0.29
 Nodes (6): Instructions, Review 1 — Caravanserai, Review 2 — Alamein Outdoor Furniture, Review 3 — Flaunt Cosmetics Global, Review 4 — Acme Maintenance (Traffic Test), Shopify App Store Reviews
 
 ### Community 583 - "Community 583"
-Cohesion: 0.18
-Nodes (9): Cl, ix(), jx(), kf(), lI(), oI(), q5(), vj() (+1 more)
+Cohesion: 0.21
+Nodes (10): FileAnalysisMeta, FileMeta, KIND_TO_NODE_TYPE, NonCodeFileAnalysisMeta, NonCodeFileMeta, DockerfileParser, EndpointInfo, ResourceInfo (+2 more)
+
+### Community 584 - "Community 584"
+Cohesion: 0.05
+Nodes (16): AnalyticsEngine, AnalyticsEvent, engines, Events, EventType, EventBus, EventHandler, EventSubscription (+8 more)
 
 ### Community 585 - "Community 585"
-Cohesion: 0.22
-Nodes (10): ar(), ce(), e2(), FT(), jT(), lN(), Mo(), nI() (+2 more)
+Cohesion: 0.17
+Nodes (13): ar(), ce(), e2(), FT(), jT(), lN(), Mo(), nd() (+5 more)
 
 ### Community 587 - "Community 587"
-Cohesion: 0.27
-Nodes (6): fetchGscOverview(), fetchGscStatus(), GscOverview, formatCtr(), GscPage(), GscOverview
-
-### Community 588 - "Community 588"
-Cohesion: 0.20
-Nodes (10): bee(), F0(), gee(), mee(), NS(), oS(), vee(), wee() (+2 more)
+Cohesion: 0.23
+Nodes (5): extractParams(), extractReturnType(), PythonExtractor, unwrapDecorated(), require
 
 ### Community 589 - "Community 589"
-Cohesion: 0.29
-Nodes (7): _3(), a3(), fy(), kh(), t3(), Xw(), yx()
+Cohesion: 0.18
+Nodes (11): _3(), a3(), C3(), e3(), fy(), hC(), jg(), kh() (+3 more)
 
 ### Community 591 - "Community 591"
 Cohesion: 0.40
@@ -2575,15 +2489,11 @@ Nodes (5): _5(), aQ(), iQ(), lQ(), N0()
 
 ### Community 593 - "Community 593"
 Cohesion: 0.20
-Nodes (9): mockAddVectors, mockCreateIndex, mockHealthCheck, mockIsHealthy, mockListIndices, mockPool, mockQuery, mockSearch (+1 more)
+Nodes (10): cre(), eoe(), Jie(), Js(), lre(), nF(), sre(), wd() (+2 more)
 
 ### Community 595 - "Community 595"
 Cohesion: 0.47
 Nodes (8): download_image(), extension_for(), fetch(), image_cdx_candidates(), is_valid_image(), main(), slug(), wayback_url()
-
-### Community 596 - "Community 596"
-Cohesion: 0.22
-Nodes (9): Aae(), AE(), cj(), dj(), Ev(), jae(), Mae(), Oae() (+1 more)
 
 ### Community 597 - "Community 597"
 Cohesion: 0.29
@@ -2602,272 +2512,28 @@ Cohesion: 0.33
 Nodes (6): Cl, kf(), oI(), q5(), vj(), Z5()
 
 ### Community 604 - "Community 604"
-Cohesion: 0.22
-Nodes (9): Aae(), AE(), cj(), dj(), Ev(), jae(), Mae(), Oae() (+1 more)
-
-### Community 605 - "Community 605"
-Cohesion: 0.22
-Nodes (7): mockFetchArticles, mockFetchBlogs, mockGetRateLimitStatus, mockPublishArticle, mockPublishArticleWithTracking, sampleArticle, validConfig
-
-### Community 607 - "Community 607"
-Cohesion: 0.47
-Nodes (8): body(), bullet(), create_document(), heading(), no_borders(), rule(), set_shading(), styled_table()
-
-### Community 609 - "Community 609"
-Cohesion: 0.29
-Nodes (6): ACME Facility Maintenance — Contacts, Company Registry / Certifications, Notes, Primary Business Contact, TDS Geo Internal Users, Website Contact Method
-
-### Community 611 - "Community 611"
-Cohesion: 0.29
-Nodes (6): eclipse, archived_url, product_count, products, timestamp, title
-
-### Community 612 - "Community 612"
-Cohesion: 0.29
-Nodes (6): brushes, archived_url, product_count, products, timestamp, title
-
-### Community 613 - "Community 613"
-Cohesion: 0.29
-Nodes (7): scout, archived_url, error, product_count, products, timestamp, title
-
-### Community 614 - "Community 614"
-Cohesion: 0.29
-Nodes (7): stationery, archived_url, error, product_count, products, timestamp, title
-
-### Community 615 - "Community 615"
-Cohesion: 0.29
-Nodes (7): scout, archived_url, error, product_count, products, timestamp, title
-
-### Community 616 - "Community 616"
-Cohesion: 0.29
-Nodes (7): stationery, archived_url, error, product_count, products, timestamp, title
-
-### Community 617 - "Community 617"
-Cohesion: 0.38
-Nodes (6): decryptWith(), encryptWith(), NEW_KEY_BUF, OLD_KEY_BUF, pool, rotate()
-
-### Community 618 - "Community 618"
-Cohesion: 0.33
-Nodes (6): accessories, archived_url, product_count, products, timestamp, title
-
-### Community 619 - "Community 619"
-Cohesion: 0.33
-Nodes (6): all, archived_url, product_count, products, timestamp, title
-
-### Community 620 - "Community 620"
-Cohesion: 0.33
-Nodes (6): all-bundles, archived_url, product_count, products, timestamp, title
-
-### Community 621 - "Community 621"
-Cohesion: 0.33
-Nodes (6): bags, archived_url, product_count, products, timestamp, title
-
-### Community 622 - "Community 622"
-Cohesion: 0.33
-Nodes (6): best-sellers, archived_url, product_count, products, timestamp, title
-
-### Community 623 - "Community 623"
-Cohesion: 0.33
-Nodes (6): brushes, archived_url, product_count, products, timestamp, title
-
-### Community 624 - "Community 624"
-Cohesion: 0.33
-Nodes (6): cane, archived_url, product_count, products, timestamp, title
-
-### Community 625 - "Community 625"
-Cohesion: 0.33
-Nodes (6): commander, archived_url, product_count, products, timestamp, title
-
-### Community 626 - "Community 626"
-Cohesion: 0.33
-Nodes (6): explorer, archived_url, product_count, products, timestamp, title
-
-### Community 627 - "Community 627"
-Cohesion: 0.33
-Nodes (6): accessories, archived_url, product_count, products, timestamp, title
-
-### Community 628 - "Community 628"
-Cohesion: 0.33
-Nodes (6): all, archived_url, product_count, products, timestamp, title
-
-### Community 629 - "Community 629"
-Cohesion: 0.33
-Nodes (6): all-bundles, archived_url, product_count, products, timestamp, title
-
-### Community 630 - "Community 630"
-Cohesion: 0.33
-Nodes (6): bags, archived_url, product_count, products, timestamp, title
-
-### Community 631 - "Community 631"
-Cohesion: 0.33
-Nodes (6): best-sellers, archived_url, product_count, products, timestamp, title
-
-### Community 632 - "Community 632"
-Cohesion: 0.33
-Nodes (6): cane, archived_url, product_count, products, timestamp, title
-
-### Community 633 - "Community 633"
-Cohesion: 0.33
-Nodes (6): commander, archived_url, product_count, products, timestamp, title
-
-### Community 634 - "Community 634"
-Cohesion: 0.33
-Nodes (6): eclipse, archived_url, product_count, products, timestamp, title
-
-### Community 635 - "Community 635"
-Cohesion: 0.33
-Nodes (6): explorer, archived_url, product_count, products, timestamp, title
-
-### Community 636 - "Community 636"
-Cohesion: 0.33
-Nodes (6): for-her, archived_url, product_count, products, timestamp, title
-
-### Community 637 - "Community 637"
-Cohesion: 0.33
-Nodes (6): frontpage, archived_url, product_count, products, timestamp, title
-
-### Community 638 - "Community 638"
-Cohesion: 0.33
-Nodes (6): gift-bundles, archived_url, product_count, products, timestamp, title
-
-### Community 639 - "Community 639"
-Cohesion: 0.33
-Nodes (6): jackets, archived_url, product_count, products, timestamp, title
-
-### Community 640 - "Community 640"
-Cohesion: 0.33
-Nodes (6): last-run, archived_url, product_count, products, timestamp, title
-
-### Community 641 - "Community 641"
-Cohesion: 0.33
-Nodes (6): limited-drops, archived_url, product_count, products, timestamp, title
-
-### Community 642 - "Community 642"
-Cohesion: 0.33
-Nodes (6): lone-wolf, archived_url, product_count, products, timestamp, title
-
-### Community 643 - "Community 643"
-Cohesion: 0.33
-Nodes (6): outdoor, archived_url, product_count, products, timestamp, title
-
-### Community 644 - "Community 644"
-Cohesion: 0.33
-Nodes (6): summer, archived_url, product_count, products, timestamp, title
-
-### Community 645 - "Community 645"
-Cohesion: 0.33
-Nodes (6): summer-04-for-her, archived_url, product_count, products, timestamp, title
-
-### Community 646 - "Community 646"
-Cohesion: 0.33
-Nodes (6): the-heritage-collection, archived_url, product_count, products, timestamp, title
-
-### Community 647 - "Community 647"
-Cohesion: 0.33
-Nodes (6): the-v-signature-collection, archived_url, product_count, products, timestamp, title
-
-### Community 648 - "Community 648"
-Cohesion: 0.33
-Nodes (6): wallets, archived_url, product_count, products, timestamp, title
-
-### Community 649 - "Community 649"
-Cohesion: 0.33
-Nodes (6): waxed-canvas, archived_url, product_count, products, timestamp, title
-
-### Community 650 - "Community 650"
-Cohesion: 0.33
-Nodes (6): womens-jackets, archived_url, product_count, products, timestamp, title
-
-### Community 651 - "Community 651"
-Cohesion: 0.33
-Nodes (6): for-her, archived_url, product_count, products, timestamp, title
-
-### Community 652 - "Community 652"
-Cohesion: 0.33
-Nodes (6): frontpage, archived_url, product_count, products, timestamp, title
-
-### Community 653 - "Community 653"
-Cohesion: 0.33
-Nodes (6): gift-bundles, archived_url, product_count, products, timestamp, title
-
-### Community 654 - "Community 654"
-Cohesion: 0.33
-Nodes (6): jackets, archived_url, product_count, products, timestamp, title
-
-### Community 655 - "Community 655"
-Cohesion: 0.33
-Nodes (6): last-run, archived_url, product_count, products, timestamp, title
-
-### Community 656 - "Community 656"
-Cohesion: 0.33
-Nodes (6): limited-drops, archived_url, product_count, products, timestamp, title
-
-### Community 657 - "Community 657"
-Cohesion: 0.33
-Nodes (6): lone-wolf, archived_url, product_count, products, timestamp, title
-
-### Community 658 - "Community 658"
-Cohesion: 0.33
-Nodes (6): outdoor, archived_url, product_count, products, timestamp, title
-
-### Community 659 - "Community 659"
-Cohesion: 0.33
-Nodes (6): summer, archived_url, product_count, products, timestamp, title
-
-### Community 660 - "Community 660"
-Cohesion: 0.33
-Nodes (6): summer-04-for-her, archived_url, product_count, products, timestamp, title
-
-### Community 661 - "Community 661"
-Cohesion: 0.33
-Nodes (6): the-heritage-collection, archived_url, product_count, products, timestamp, title
-
-### Community 662 - "Community 662"
-Cohesion: 0.33
-Nodes (6): the-v-signature-collection, archived_url, product_count, products, timestamp, title
-
-### Community 663 - "Community 663"
-Cohesion: 0.33
-Nodes (6): wallets, archived_url, product_count, products, timestamp, title
-
-### Community 664 - "Community 664"
-Cohesion: 0.33
-Nodes (6): waxed-canvas, archived_url, product_count, products, timestamp, title
-
-### Community 665 - "Community 665"
-Cohesion: 0.33
-Nodes (6): womens-jackets, archived_url, product_count, products, timestamp, title
-
-### Community 669 - "Community 669"
-Cohesion: 0.50
-Nodes (5): _5(), aQ(), iQ(), lQ(), N0()
-
-### Community 670 - "Community 670"
 Cohesion: 0.40
-Nodes (5): b6(), GQ(), qQ(), VQ(), wT()
-
-### Community 672 - "Community 672"
-Cohesion: 0.50
-Nodes (4): ak(), du(), hj(), kE()
+Nodes (5): EO(), gie(), mie(), qie(), vie()
 
 ## Knowledge Gaps
-- **3810 isolated node(s):** `capture.sh script`, `AnalyticsEvent`, `engines`, `MemoryEntry`, `OrchestratorTask` (+3805 more)
+- **3325 isolated node(s):** `capture.sh script`, `AnalyticsEvent`, `engines`, `MemoryEntry`, `OrchestratorTask` (+3320 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **109 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **110 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `$()` connect `AI Content Evaluation` to `Keyword Research and SEO Analytics`, `Community 145`, `Community 275`, `Community 405`, `Community 539`, `Community 159`, `Community 544`, `Community 546`, `Community 178`, `Community 564`, `Community 576`, `Community 577`, `Community 329`, `Community 585`, `Community 586`, `Community 588`, `Community 598`, `Community 352`, `Community 495`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
-- **Why does `$()` connect `Backend Repositories and Middleware` to `Community 130`, `Community 526`, `Community 535`, `Community 283`, `Community 669`, `Community 548`, `Community 556`, `Community 558`, `Community 307`, `Community 566`, `Community 569`, `Shopify App Context`, `Community 574`, `Community 575`, `Article Creation Scripts`, `Community 467`, `Community 596`, `Community 602`, `Community 349`, `Community 361`, `Community 494`, `Community 244`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
-- **Why does `$()` connect `Content Intelligence and Knowledge Graph` to `Community 258`, `Community 525`, `Community 411`, `Community 670`, `Community 672`, `Community 291`, `Community 549`, `Community 551`, `Community 559`, `Community 568`, `Community 570`, `Community 571`, `Community 578`, `Community 580`, `Community 453`, `Community 583`, `Community 333`, `Community 589`, `Community 592`, `Community 348`, `Community 604`, `Community 110`, `Community 381`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+- **Why does `$()` connect `Backend Repositories and Middleware` to `Community 526`, `Community 535`, `Community 283`, `Community 548`, `Community 423`, `Community 556`, `Community 558`, `Community 307`, `Community 566`, `Community 569`, `Shopify App Context`, `Community 574`, `Community 575`, `Article Creation Scripts`, `Community 467`, `Community 602`, `Community 349`, `Community 361`, `Community 494`, `Community 244`?**
+  _High betweenness centrality (0.064) - this node is a cross-community bridge._
+- **Why does `$()` connect `AI Content Evaluation` to `Keyword Research and SEO Analytics`, `Community 145`, `Community 275`, `Community 539`, `Community 159`, `Community 544`, `Community 546`, `Community 291`, `Community 550`, `Community 561`, `Community 178`, `Community 564`, `Community 576`, `Community 577`, `Community 329`, `Community 585`, `Community 586`, `Community 598`, `Community 604`, `Community 352`, `Community 495`?**
+  _High betweenness centrality (0.062) - this node is a cross-community bridge._
+- **Why does `$()` connect `Content Intelligence and Knowledge Graph` to `Community 258`, `Community 130`, `Community 525`, `Community 411`, `Community 549`, `Community 551`, `Community 559`, `Community 568`, `Community 570`, `Community 571`, `Community 578`, `Community 580`, `Community 453`, `Community 333`, `Community 589`, `Community 592`, `Community 593`, `Community 348`, `Community 110`, `Community 381`?**
+  _High betweenness centrality (0.061) - this node is a cross-community bridge._
 - **Are the 6 inferred relationships involving `__()` (e.g. with `.add_admin_menu()` and `.render_settings()`) actually correct?**
   _`__()` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `capture.sh script`, `AnalyticsEvent`, `engines` to the rest of the system?**
-  _3984 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _3499 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Content and Editorial Data` be split into smaller, more focused modules?**
   _Cohesion score 0.0273972602739726 - nodes in this community are weakly interconnected._
 - **Should `Content and Editorial Comments` be split into smaller, more focused modules?**
-  _Cohesion score 0.022982635342185902 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.023249738766980145 - nodes in this community are weakly interconnected._
