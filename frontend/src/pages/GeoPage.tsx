@@ -311,6 +311,7 @@ export default function GeoPage() {
             {mode === 'content' ? (
               <>
                 <textarea
+                  aria-label="Content to analyze"
                   className="input"
                   style={{ height: 192, resize: 'vertical', fontFamily: 'monospace', fontSize: 'var(--p-font-size-300)' }}
                   value={content}
@@ -331,6 +332,7 @@ export default function GeoPage() {
                   <div className="relative w-full min-w-0 sm:max-w-[500px] sm:flex-1">
                     <Globe size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--p-color-text-secondary)' }} />
                     <input
+                      aria-label="Website URL"
                       className="input"
                       style={{ paddingLeft: 36 }}
                       value={url}

@@ -189,7 +189,7 @@ export default function BacklinksPage() {
         <Card>
           <BlockStack gap="200">
             <Text as="h2" variant="headingSm">Client</Text>
-            <select className="input" value={clientId} onChange={(e) => setClientId(e.target.value)} disabled={discovering || verifying}>
+            <select aria-label="Client" className="input" value={clientId} onChange={(e) => setClientId(e.target.value)} disabled={discovering || verifying}>
               <option value="">Select a client</option>
               {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
             </select>
@@ -206,6 +206,7 @@ export default function BacklinksPage() {
               <div style={{ flex: 1 }}>
                 <Text as="p" variant="bodySm" tone="subdued">Enter a competitor domain to find its backlink sources</Text>
                 <input
+                  aria-label="Competitor domain"
                   className="input"
                   placeholder="e.g. competitor.com"
                   value={targetDomain}
@@ -378,6 +379,7 @@ export default function BacklinksPage() {
                   <div style={{ flex: 1 }}>
                     <Text as="p" variant="bodySm" tone="subdued">Select Prospect</Text>
                     <select
+                      aria-label="Prospect"
                       className="input"
                       value={prospectId}
                       onChange={(e) => setProspectId(e.target.value)}
@@ -392,6 +394,7 @@ export default function BacklinksPage() {
                   <div style={{ flex: 2 }}>
                     <Text as="p" variant="bodySm" tone="subdued">Topic</Text>
                     <input
+                      aria-label="Guest post topic"
                       className="input"
                       placeholder="e.g. Modern HVAC maintenance best practices"
                       value={guestTopic}

@@ -100,7 +100,7 @@ export default function KeywordResearchPage() {
             <InlineStack gap="300" align="start">
               <div style={{ flex: 1 }}>
                 <Text as="p" variant="bodySm" tone="subdued">Client</Text>
-                <select className="input" value={clientId} onChange={(e) => setClientId(e.target.value)} disabled={loading}>
+                <select aria-label="Client" className="input" value={clientId} onChange={(e) => setClientId(e.target.value)} disabled={loading}>
                   <option value="">Select a client</option>
                   {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
                 </select>
@@ -108,6 +108,7 @@ export default function KeywordResearchPage() {
               <div style={{ flex: 1 }}>
                 <Text as="p" variant="bodySm" tone="subdued">Industry / Niche</Text>
                 <input
+                  aria-label="Industry or niche"
                   className="input"
                   placeholder="e.g. HVAC, Solar, Plumbing, Roofing"
                   value={industry}
@@ -120,6 +121,7 @@ export default function KeywordResearchPage() {
               <div style={{ flex: 2 }}>
                 <Text as="p" variant="bodySm" tone="subdued">Seed Keywords (comma-separated, optional)</Text>
                 <input
+                  aria-label="Seed keywords"
                   className="input"
                   placeholder="e.g. furnace repair, ac maintenance, heat pump installation"
                   value={seeds}

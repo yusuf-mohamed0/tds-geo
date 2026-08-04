@@ -25,6 +25,7 @@
     "vault:rotate": "tsx backend/scripts/rotateVaultKey.ts",
     "import:credentials": "tsx backend/scripts/importCredentials.ts",
     "shopify:webhooks:update": "tsx backend/scripts/update-webhooks.ts",
+    "eval:pages": "node scripts/evaluate-frontend-pages.mjs",
     "test": "vitest run",
     "test:py": "python -m pytest backend/services/vectorStore/test_server.py backend/services/localLLM/test_airllm.py -q",
     "test:all": "vitest run && python -m pytest backend/services/vectorStore/test_server.py backend/services/localLLM/test_airllm.py -q",

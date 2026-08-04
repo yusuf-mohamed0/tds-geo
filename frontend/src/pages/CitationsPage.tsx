@@ -68,6 +68,7 @@ export default function CitationsPage() {
               <div className="relative w-full min-w-0 sm:max-w-[400px] sm:flex-1">
                 <Globe size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--p-color-text-secondary)' }} />
                 <input
+                  aria-label="Domain"
                   className="input"
                   style={{ paddingLeft: 36 }}
                   value={domain}

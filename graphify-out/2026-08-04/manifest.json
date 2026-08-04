@@ -3055,8 +3055,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/backend/scripts/update-webhooks.ts": {
-    "mtime": 1783199320.657621,
-    "ast_hash": "0a64025d0aa10c86223d638930d54cb8",
+    "mtime": 1785842358.4766304,
+    "ast_hash": "b1a1cc9565cc900fc95cea0e87f498e7",
     "semantic_hash": ""
   },
   "/root/tds-geo/backend/scripts/vault.ts": {
@@ -3750,8 +3750,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/package.json": {
-    "mtime": 1785835101.2027357,
-    "ast_hash": "f4118f4f529d44bc36d081106dd0166d",
+    "mtime": 1785842358.4446306,
+    "ast_hash": "52d3a2c5a33bd42da8ce79ed96f340d6",
     "semantic_hash": ""
   },
   "/root/tds-geo/scripts/backup-db.sh": {
@@ -5430,8 +5430,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/.github/workflows/ci.yml": {
-    "mtime": 1785764446.8246748,
-    "ast_hash": "075ea4fed4368bd3da7630b053a9e22f",
+    "mtime": 1785842358.3846307,
+    "ast_hash": "dd90a62a1e564b802e05b5cf5e9a8804",
     "semantic_hash": ""
   },
   "/root/tds-geo/.github/workflows/deploy-production.yml": {
@@ -9300,8 +9300,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/.slim/deepwork/shopify-peak.md": {
-    "mtime": 1785840493.2506735,
-    "ast_hash": "e0b1225279a1ac7d6b6e194b5dd05c8d",
+    "mtime": 1785842057.7718525,
+    "ast_hash": "02bf60300c0db2c9bac5b9568a8b2c42",
     "semantic_hash": ""
   }
 }

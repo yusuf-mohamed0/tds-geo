@@ -279,6 +279,7 @@ export default function ArticlesPage() {
                 </div>
                 <Text as="p" variant="bodyMd" tone="subdued">Enter a topic to generate AI-powered content optimized for your store.</Text>
                 <input
+                  aria-label="Article topic"
                   className="input"
                   placeholder="e.g. Spring HVAC maintenance tips"
                   value={keyword}

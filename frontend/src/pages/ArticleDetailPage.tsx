@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Page, Card, Text, Spinner, Banner, BlockStack, InlineStack, InlineGrid, Badge, Button } from '@shopify/polaris';
 import { Calendar, Clock } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { apiFetch } from '../api/client';
 
 interface ArticleDetail {
@@ -109,6 +110,8 @@ export default function ArticleDetailPage() {
     );
   }
 
+  const safeArticleHtml = DOMPurify.sanitize(article.content_html || '<p>No content</p>');
+
   return (
     <Page
       title={article.title}
@@ -131,7 +134,7 @@ export default function ArticleDetailPage() {
               <div
                 className="prose prose-sm max-w-none leading-relaxed"
                 style={{ color: 'var(--p-color-text)', fontSize: 'var(--p-font-size-325)', lineHeight: 1.7 }}
-                dangerouslySetInnerHTML={{ __html: article.content_html || '<p>No content</p>' }}
+                dangerouslySetInnerHTML={{ __html: safeArticleHtml }}
               />
             </BlockStack>
           </Card>
@@ -231,6 +234,7 @@ export default function ArticleDetailPage() {
                 <BlockStack gap="200">
                   <div style={{ display: 'flex', gap: 'var(--p-space-200)' }}>
                     <input
+                      aria-label="Schedule date"
                       type="date"
                       className="input"
                       value={scheduleDate}
@@ -239,6 +243,7 @@ export default function ArticleDetailPage() {
                       min={new Date().toISOString().split('T')[0]}
                     />
                     <input
+                      aria-label="Schedule time"
                       type="time"
                       className="input"
                       value={scheduleTime}

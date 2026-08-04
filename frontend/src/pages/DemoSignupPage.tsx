@@ -96,6 +96,7 @@ export default function DemoSignupPage() {
             <div>
               <label className="block text-sm font-medium text-brand-text mb-1.5">Name</label>
               <input
+                aria-label="Name"
                 type="text"
                 className="input w-full"
                 value={name}
@@ -108,6 +109,7 @@ export default function DemoSignupPage() {
             <div>
               <label className="block text-sm font-medium text-brand-text mb-1.5">Email</label>
               <input
+                aria-label="Email"
                 type="email"
                 className="input w-full"
                 value={email}
@@ -120,6 +122,7 @@ export default function DemoSignupPage() {
             <div>
               <label className="block text-sm font-medium text-brand-text mb-1.5">Password</label>
               <input
+                aria-label="Password"
                 type="password"
                 className="input w-full"
                 value={password}
@@ -135,6 +138,7 @@ export default function DemoSignupPage() {
                 Company <span className="text-brand-muted font-normal">(optional)</span>
               </label>
               <input
+                aria-label="Company"
                 type="text"
                 className="input w-full"
                 value={company}

@@ -2,14 +2,24 @@ import { useState, useEffect } from 'react';
 import { Page, Card, Text, BlockStack, InlineStack, Banner, SkeletonPage, SkeletonBodyText } from '@shopify/polaris';
 import { CheckCircle2 } from 'lucide-react';
 
+interface ShopifyGlobal {
+  idToken?: () => Promise<string>;
+}
+
+declare global {
+  interface Window {
+    shopify?: ShopifyGlobal;
+  }
+}
+
 function getShopifyToken(): Promise<string | null> {
-  const s = (window as any).shopify;
+  const s = window.shopify;
   if (s?.idToken) return s.idToken().catch(() => null);
   const fromUrl = new URLSearchParams(window.location.search).get('id_token');
   if (fromUrl) return Promise.resolve(fromUrl);
   return new Promise(resolve => {
     const check = setInterval(async () => {
-      const shop = (window as any).shopify;
+      const shop = window.shopify;
       if (shop?.idToken) {
         clearInterval(check);
         const t = await shop.idToken().catch(() => null);

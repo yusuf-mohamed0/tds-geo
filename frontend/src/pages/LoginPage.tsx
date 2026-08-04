@@ -45,6 +45,7 @@ export default function LoginPage() {
           <div>
             <label className="block text-sm font-medium text-brand-text mb-1.5">Email</label>
             <input
+              aria-label="Email"
               type="email"
               className="input"
               value={email}
@@ -57,6 +58,7 @@ export default function LoginPage() {
           <div>
             <label className="block text-sm font-medium text-brand-text mb-1.5">Password</label>
             <input
+              aria-label="Password"
               type="password"
               className="input"
               value={password}
