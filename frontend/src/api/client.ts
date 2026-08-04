@@ -1,3 +1,5 @@
+import { isEmbedded } from '../lib/embedded';
+
 const TOKEN_KEY = 'tds_geo_token';
 
 export function getToken(): string | null {
@@ -16,13 +18,14 @@ export async function apiFetch<T>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const embedded = isEmbedded();
   const token = getToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...((options.headers as Record<string, string>) || {}),
   };
 
-  if (token) {
+  if (token && !embedded) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
@@ -30,7 +33,9 @@ export async function apiFetch<T>(
 
   if (response.status === 401) {
     clearToken();
-    window.location.href = '/login';
+    if (!embedded) {
+      window.location.href = '/login';
+    }
     throw new Error('Unauthorized');
   }
 

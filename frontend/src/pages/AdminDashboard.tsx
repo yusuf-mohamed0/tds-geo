@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Page, Card, Text, Spinner, Badge, BlockStack, InlineStack, Banner } from '@shopify/polaris';
+import { Page, Card, Text, Badge, BlockStack, InlineStack, Banner, Button, SkeletonPage, SkeletonBodyText } from '@shopify/polaris';
 import { Users, FileText, Target, DollarSign } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import MetricCard from '../components/MetricCard';
@@ -11,21 +11,43 @@ export default function AdminDashboard() {
   const [dashboard, setDashboard] = useState<AdminDashboard | null>(null);
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true);
+    setError('');
     Promise.all([fetchDashboard(), fetchHealth()])
       .then(([d, h]) => { setDashboard(d); setHealth(h); })
-      .catch(() => {})
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard.');
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { load(); }, [load]);
 
   if (loading) {
     return (
       <Page title="Dashboard">
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
-          <Spinner accessibilityLabel="Loading dashboard" size="large" />
-        </div>
+        <SkeletonPage title="Dashboard">
+          <SkeletonBodyText lines={4} />
+          <div style={{ paddingTop: 'var(--p-space-400)' }} />
+          <SkeletonBodyText lines={8} />
+        </SkeletonPage>
+      </Page>
+    );
+  }
+
+  if (error) {
+    return (
+      <Page title="Dashboard">
+        <Banner tone="critical" title="Could not load the dashboard">
+          <p>{error}</p>
+          <div style={{ paddingTop: 'var(--p-space-200)' }}>
+            <Button onClick={load}>Try again</Button>
+          </div>
+        </Banner>
       </Page>
     );
   }
@@ -33,7 +55,12 @@ export default function AdminDashboard() {
   if (!dashboard) {
     return (
       <Page title="Dashboard">
-        <Banner tone="critical">Failed to load dashboard.</Banner>
+        <Banner tone="critical" title="Dashboard unavailable">
+          <p>No dashboard data was returned. Please try again.</p>
+          <div style={{ paddingTop: 'var(--p-space-200)' }}>
+            <Button onClick={load}>Try again</Button>
+          </div>
+        </Banner>
       </Page>
     );
   }

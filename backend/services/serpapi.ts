@@ -12,8 +12,6 @@ import { logger } from '../utils/logger';
 import { SerpApiResult } from '../types';
 import { getLocaleConfig } from '../utils/locale';
 
-const SERPAPI_API_KEY = process.env.SERPAPI_API_KEY || '';
-
 interface SerpApiKeywordResponse {
   search_volume?: number;
   competition?: string;
@@ -27,22 +25,27 @@ interface SerpApiKeywordResponse {
 class SerpApiService {
   private baseUrl = 'https://serpapi.com';
 
+  private getApiKey(): string {
+    return process.env.SERPAPI_API_KEY || '';
+  }
+
   isConfigured(): boolean {
-    return Boolean(SERPAPI_API_KEY);
+    return Boolean(this.getApiKey());
   }
 
   /**
    * Search for keyword data including volume, competition, and CPC.
    */
   async getKeywordData(keyword: string, locale?: string): Promise<SerpApiResult> {
-    if (!SERPAPI_API_KEY) {
+    const apiKey = this.getApiKey();
+    if (!apiKey) {
       throw new Error('SERPAPI_API_KEY is not configured; keyword metrics cannot be enriched');
     }
 
     try {
       // Google Keyword Planner data via SerpAPI
       const params: Record<string, string> = {
-        api_key: SERPAPI_API_KEY,
+        api_key: apiKey,
         engine: 'google_keyword_planner',
         keyword,
         google_domain: 'google.com',
@@ -111,14 +114,15 @@ class SerpApiService {
    * Get Google Trends data for a keyword.
    */
   async getTrendData(keyword: string): Promise<{ interest: number; related: string[] }> {
-    if (!SERPAPI_API_KEY) {
+    const apiKey = this.getApiKey();
+    if (!apiKey) {
       return { interest: 50, related: [] };
     }
 
     try {
       const response = await axios.get(`${this.baseUrl}/search.json`, {
         params: {
-          api_key: SERPAPI_API_KEY,
+          api_key: apiKey,
           engine: 'google_trends',
           q: keyword,
           data_type: 'TIMESERIES'

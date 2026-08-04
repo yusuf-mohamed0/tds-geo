@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Page, Card, Text, Spinner, BlockStack, InlineStack, Badge, Divider, Select, Button } from '@shopify/polaris';
+import { Page, Card, Text, Spinner, BlockStack, InlineStack, Badge, Divider, Select, Button, SkeletonPage, SkeletonBodyText } from '@shopify/polaris';
 import { ArrowLeft, FileText, DollarSign, Target, Store, Palette, UsersRound, ShieldCheck, Clock3, BookOpen, Link2, Languages } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
 import { Modal } from '../components/Modal';
@@ -70,11 +70,11 @@ export default function ClientDashboard() {
 
   if (loading) {
     return (
-      <Page title="Client Dashboard" backAction={{ content: 'Clients', url: '/admin/clients' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
-          <Spinner accessibilityLabel="Loading client data" size="large" />
-        </div>
-      </Page>
+      <SkeletonPage title="Client Dashboard" backAction>
+        <SkeletonBodyText lines={6} />
+        <div style={{ paddingTop: 'var(--p-space-400)' }} />
+        <SkeletonBodyText lines={10} />
+      </SkeletonPage>
     );
   }
 

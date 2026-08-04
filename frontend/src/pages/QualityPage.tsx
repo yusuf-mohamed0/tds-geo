@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Page, Card, Text, Spinner, Banner, DataTable, BlockStack, InlineStack } from '@shopify/polaris';
+import { Page, Card, Text, Banner, DataTable, BlockStack, InlineStack, SkeletonPage, SkeletonBodyText } from '@shopify/polaris';
 import { CheckSquare, TrendingDown, TrendingUp, AlertTriangle, ClipboardCheck } from 'lucide-react';
 import { apiFetch } from '../api/client';
 
@@ -85,9 +85,9 @@ export default function QualityPage() {
       <BlockStack gap="400">
         {error && <Banner tone="critical" onDismiss={() => setError('')}>{error}</Banner>}
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
-            <Spinner accessibilityLabel="Loading quality scores" size="large" />
-          </div>
+          <SkeletonPage title="Quality Scores">
+            <SkeletonBodyText lines={6} />
+          </SkeletonPage>
         ) : (
           <>
             {summary && (

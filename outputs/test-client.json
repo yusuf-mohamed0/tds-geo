@@ -5,14 +5,14 @@
   "title": "Test Blog Post",
   "slug": "test-blog-post",
   "content_md": "# Test\n\nContent here.\n\n## Section\n\nMore content.\n\n---\n\n## FAQ\n\n### Q?\nA\n\n---\n\n### Ready to Get Professional Help?\n\n[Contact us today for professional service](/contact)",
-  "content_html": "<p># Test\n\nContent here.\n\n## Section\n\nMore content.</p>",
+  "content_html": "<article data-tds-article-style=\"default\" style=\"color:#242424;font-family:Arial, sans-serif;font-size:clamp(16px,1.2vw,18px);line-height:1.75;max-width:760px;margin:0 auto;padding:clamp(8px,2vw,24px) 0\"><p style=\"font-size:1.08em;margin:0 0 1.25em\"># Test\n\nContent here.\n\n## Section\n\nMore content.\n\n---\n\n## FAQ\n\n### Q?\nA\n\n---\n\n### Ready to Get Professional Help?\n\n[Contact us today for professional service](/contact)</p></article>",
   "meta_title": "Test Blog Post",
   "meta_description": "A test blog post for unit testing.",
   "tags": [
     "test",
     "maintenance"
   ],
-  "word_count": 8,
+  "word_count": 1200,
   "seo_score": 72,
   "quality_score": 85,
   "fact_check_confidence": 0.95,
@@ -20,7 +20,7 @@
   "requires_human_review": false,
   "pipeline_stage": "enterprise_complete",
   "status": "generated",
-  "trace_id": "55a5f7f8ced94ffa9d614e7a195fde07",
-  "created_at": "2026-07-01T08:53:30.096Z",
+  "trace_id": "ecc6eed79b51410b81ac326d1c1acd0f",
+  "created_at": "2026-08-04T11:19:57.967Z",
   "api_url": "/api/articles/test-client"
 }

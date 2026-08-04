@@ -4,11 +4,15 @@
 
 import crypto from 'crypto';
 
+// All four compliance topics are delivered to the SAME callback URL that
+// matches the mounted route (backend/index.ts: app.use('/api/webhooks/compliance',
+// createComplianceWebhookRoutes(pool))) — a single POST / handler that routes on
+// the `x-shopify-topic` header.
 export const SHOPIFY_COMPLIANCE_WEBHOOKS = [
-  { topic: 'customers/data_request', path: '/api/webhooks/compliance/customers-data-request' },
-  { topic: 'customers/redact', path: '/api/webhooks/compliance/customers-redact' },
-  { topic: 'shop/redact', path: '/api/webhooks/compliance/shop-redact' },
-  { topic: 'app/uninstalled', path: '/api/webhooks/compliance/app-uninstalled' },
+  { topic: 'customers/data_request', path: '/api/webhooks/compliance' },
+  { topic: 'customers/redact', path: '/api/webhooks/compliance' },
+  { topic: 'shop/redact', path: '/api/webhooks/compliance' },
+  { topic: 'app/uninstalled', path: '/api/webhooks/compliance' },
 ] as const;
 
 export function normalizeWebhookBody(body: unknown, rawBody?: unknown): string {

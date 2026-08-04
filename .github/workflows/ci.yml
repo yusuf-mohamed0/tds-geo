@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "20"
 
 jobs:
   quality:
@@ -79,10 +79,10 @@ jobs:
 
       - name: Security audit
         run: |
-          echo "=== npm audit ==="
-          npm audit --audit-level=high || true
+          echo "=== npm audit (production dependencies) ==="
+          npm audit --omit=dev --audit-level=high
           echo "=== Secrets scan ==="
-          npx @anthropic-ai/cli-scan --path . --no-input 2>/dev/null || true
+          npx @anthropic-ai/cli-scan --path . --no-input 2>/dev/null
 
       - name: Frontend install
         run: npm ci

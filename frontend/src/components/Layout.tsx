@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ErrorBoundary from './ErrorBoundary';
+import { isEmbedded } from '../lib/embedded';
 
 export default function Layout() {
   const { isAuthenticated, loading } = useAuth();
@@ -15,6 +16,13 @@ export default function Layout() {
         <div className="animate-spin w-8 h-8 border-2 border-brand-accent border-t-transparent" />
       </div>
     );
+  }
+
+  if (isEmbedded()) {
+    // Embedded users authenticate through their Shopify idToken, not the JWT
+    // login. The embedded dashboard lives at the app root, so send them there
+    // instead of the JWT login — which is a dead end inside the Shopify admin.
+    return <Navigate to="/" replace />;
   }
 
   if (!isAuthenticated) {

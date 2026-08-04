@@ -14,7 +14,7 @@ export default function DemoUpgradePage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const clientId = user?.role === 'client' ? (user as any).clientId as string | undefined : undefined;
+  const clientId = user?.role === 'client' ? user.clientId : undefined;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

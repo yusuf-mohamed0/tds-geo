@@ -11,6 +11,8 @@ export interface ConnectorConfig {
   capabilities?: ConnectorCapability[];
   /** Default blog ID for publishing content. Used by Shopify connector. */
   defaultBlogId?: number | string;
+  /** Default blog handle for canonical Shopify storefront URLs. */
+  defaultBlogHandle?: string;
 }
 
 export interface ConnectorCapability {
@@ -66,6 +68,8 @@ export interface PublishResult {
   url?: string;
   error?: string;
   provider: string;
+  blogId?: number | string;
+  handle?: string;
 }
 
 export interface Taxonomy {

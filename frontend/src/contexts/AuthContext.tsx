@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import type { User } from '../types';
 import { getToken, setToken, clearToken } from '../api/client';
 import { fetchMe, login as apiLogin } from '../api/auth';
+import { isEmbedded } from '../lib/embedded';
 
 interface AuthContextValue {
   user: User | null;
@@ -19,6 +20,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isEmbedded()) {
+      setLoading(false);
+      return;
+    }
+
     const token = getToken();
     if (!token) {
       setLoading(false);

@@ -25,7 +25,7 @@ export class PublisherEngine {
     logger.info('PublisherEngine initialized');
   }
 
-  async publish(article: any, client: any, blogId?: number | string): Promise<PublishResult> {
+  async publish(article: any, client: any, blogId?: number | string, options?: { publish?: boolean }): Promise<PublishResult> {
     try {
       const minimumArticleWords = getMinimumArticleWords(client);
       const actualWordCount = countArticleWords(article.content_md || article.content_html || article.content);
@@ -61,7 +61,8 @@ export class PublisherEngine {
           metaTitle: article.meta_title,
           metaDescription: article.meta_description,
           tags: article.tags || [],
-        }
+        },
+        options
       );
 
       await eventBus.emit(Events.PUBLISH_SUCCEEDED, {
@@ -70,7 +71,7 @@ export class PublisherEngine {
         url: result.url,
       });
 
-      return { success: true, provider: 'shopify', externalId: String(result.id), url: result.url };
+      return { success: true, provider: 'shopify', externalId: String(result.id), url: result.url, blogId: result.blogId, handle: result.handle };
     } catch (err) {
       await eventBus.emit(Events.PUBLISH_FAILED, {
         articleId: article.id,
@@ -86,7 +87,8 @@ export class PublisherEngine {
     pool: any,
     article: any,
     client: any,
-    blogId?: number | string
+    blogId?: number | string,
+    options?: { publish?: boolean }
   ): Promise<PublishResult> {
     try {
       const minimumArticleWords = getMinimumArticleWords(client);
@@ -159,14 +161,15 @@ export class PublisherEngine {
           metaTitle: article.meta_title,
           metaDescription: article.meta_description,
           tags: article.tags || [],
-        }
+        },
+        options
       );
 
       await eventBus.emit(Events.PUBLISH_SUCCEEDED, {
         articleId: article.id, clientId: client.id, url: result.url,
       });
 
-      return { success: true, provider: 'shopify', externalId: String(result.id), url: result.url };
+      return { success: true, provider: 'shopify', externalId: String(result.id), url: result.url, blogId: result.blogId, handle: result.handle };
     } catch (err) {
       await eventBus.emit(Events.PUBLISH_FAILED, {
         articleId: article.id, clientId: client.id, error: (err as Error).message,

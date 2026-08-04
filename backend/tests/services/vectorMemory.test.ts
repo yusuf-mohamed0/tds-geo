@@ -10,6 +10,22 @@ const mockPool = {
   on: () => {},
 } as any;
 
+const {
+  mockSearch,
+  mockHealthCheck,
+  mockIsHealthy,
+  mockListIndices,
+  mockCreateIndex,
+  mockAddVectors,
+} = vi.hoisted(() => ({
+  mockSearch: vi.fn(),
+  mockHealthCheck: vi.fn(),
+  mockIsHealthy: vi.fn(),
+  mockListIndices: vi.fn(),
+  mockCreateIndex: vi.fn(),
+  mockAddVectors: vi.fn(),
+}));
+
 vi.mock('openai', () => ({
   default: vi.fn().mockImplementation(() => ({
     embeddings: {
@@ -19,13 +35,6 @@ vi.mock('openai', () => ({
     },
   })),
 }));
-
-const mockSearch = vi.fn();
-const mockHealthCheck = vi.fn();
-const mockIsHealthy = vi.fn();
-const mockListIndices = vi.fn();
-const mockCreateIndex = vi.fn();
-const mockAddVectors = vi.fn();
 
 vi.mock('../../services/vectorStoreClient', () => ({
   default: {
@@ -56,6 +65,9 @@ describe('VectorMemoryService', () => {
     mockAddVectors.mockReset();
     process.env.OPENAI_API_KEY = 'sk-test';
     vectorMemory.initialize(mockPool as any);
+    // initialize() creates a real Pool when the arg isn't a Pool instance,
+    // so re-point the pool at the mock for tests that query the DB.
+    (vectorMemory as any).pool = mockPool;
   });
 
   describe('generateEmbedding', () => {
@@ -97,6 +109,7 @@ describe('VectorMemoryService', () => {
       mockListIndices.mockResolvedValue([{ name: 'content_embeddings', dim: 1536, bit_width: 4, use_id_map: true, count: 0 }]);
       mockQuery.mockResolvedValue({ rows: [{ content_chunk: 'similar text' }] });
       mockSearch.mockResolvedValue({ scores: [0.95], indices: [1] });
+      (vectorMemory as any).idMapping.set(1, { articleId: 'article-1', chunkIndex: 0 });
 
       const result = await vectorMemory.isDuplicate('client-1', 'test content');
       expect(result).toBe(true);

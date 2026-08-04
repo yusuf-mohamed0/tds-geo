@@ -17,7 +17,7 @@ const PAGE_PASSWORD = (() => {
   if (!pw && process.env.NODE_ENV === 'production') {
     throw new Error('VAULT_PAGE_PASSWORD environment variable is required in production');
   }
-  return pw || 'TrafficDSgeo@2024';
+  return pw;
 })();
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });

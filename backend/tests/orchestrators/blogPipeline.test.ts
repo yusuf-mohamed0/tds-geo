@@ -10,6 +10,13 @@ import { describe, it, expect, vi } from 'vitest';
 import { EnterprisePipelineOrchestrator, PipelineStageResult } from '../../orchestrators/blogPipeline';
 import openaiService from '../../services/openai';
 
+vi.mock('../../services/contentLength', () => ({
+  MIN_ARTICLE_WORDS: 1200,
+  countArticleWords: vi.fn(() => 1200),
+  getMinimumArticleWords: vi.fn(() => 1200),
+  assertMinimumArticleLength: vi.fn(() => 1200),
+}));
+
 vi.mock('../../utils/queue', () => ({
   QueueNames: {
     CONTENT_GENERATION: 'content-generation',

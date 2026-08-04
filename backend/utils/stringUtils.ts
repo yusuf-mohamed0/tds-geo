@@ -43,3 +43,53 @@ export function generateSlug(title: string, maxLength: number = 200): string {
 
   return slug.substring(0, maxLength);
 }
+
+/**
+ * Truncate a string to at most `maxLength` characters, appending a single
+ * ellipsis character ("…") when the input is longer than the limit.
+ *
+ * The returned length is always <= maxLength (the ellipsis counts toward the
+ * limit). Used for Shopify SEO metafields: title tag (max 70) and meta
+ * description tag (max 160).
+ */
+export function truncateWithEllipsis(text: string, maxLength: number): string {
+  const value = String(text ?? '').trim();
+  // Code-point-aware: splitting on Array.from() keeps surrogate pairs (emoji,
+  // CJK extension characters, etc.) intact so truncation never produces a
+  // lone surrogate. The result is always <= maxLength *code points*.
+  const codePoints = Array.from(value);
+  if (codePoints.length <= maxLength) return value;
+  if (maxLength <= 1) return '\u2026'.slice(0, maxLength);
+  const truncated = codePoints.slice(0, maxLength - 1).join('').trimEnd();
+  return truncated + '\u2026';
+}
+
+/**
+ * Strip HTML tags and decode common entities, collapsing whitespace to a
+ * single space. Produces plain text suitable for SEO meta descriptions and
+ * article summaries.
+ */
+export function stripHtmlTags(html: string): string {
+  return String(html ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Generate a plain-text excerpt of at most `maxLength` characters from an
+ * HTML body. Falls back to the meta description or empty string when no
+ * HTML is available. Used for Shopify `summary_html` (~200 chars) and the
+ * auto-extracted meta description tag (max 160).
+ */
+export function generateExcerptFromHtml(html: string, maxLength: number = 200, fallback: string = ''): string {
+  const clean = stripHtmlTags(html);
+  if (clean) return truncateWithEllipsis(clean, maxLength);
+  return truncateWithEllipsis(fallback, maxLength);
+}

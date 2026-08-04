@@ -15,9 +15,11 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     // Files to exclude from the default test run
-    // E2E pipeline integration tests run separately via npm run test:e2e
+    // E2E pipeline integration tests run separately via npm run test:e2e,
+    // and frontend tests run separately (jsdom env) via the frontend workspace
     exclude: [
       'backend/tests/integration/pipeline-e2e.test.ts',
+      'frontend/**',
       '**/node_modules/**',
       '**/dist/**',
       'understand-anything-plugin/**',

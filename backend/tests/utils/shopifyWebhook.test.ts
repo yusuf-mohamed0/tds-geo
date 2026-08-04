@@ -39,12 +39,12 @@ describe('shopifyWebhook utils', () => {
     expect(verifyShopifyOAuthHmac({ ...query, hmac }, hmac, 'wrong_secret')).toBe(false);
   });
 
-  it('exposes the complete Shopify compliance webhook map', () => {
+  it('exposes the complete Shopify compliance webhook map using a single callback URL', () => {
     expect(SHOPIFY_COMPLIANCE_WEBHOOKS).toEqual([
-      { topic: 'customers/data_request', path: '/api/webhooks/compliance/customers-data-request' },
-      { topic: 'customers/redact', path: '/api/webhooks/compliance/customers-redact' },
-      { topic: 'shop/redact', path: '/api/webhooks/compliance/shop-redact' },
-      { topic: 'app/uninstalled', path: '/api/webhooks/compliance/app-uninstalled' },
+      { topic: 'customers/data_request', path: '/api/webhooks/compliance' },
+      { topic: 'customers/redact', path: '/api/webhooks/compliance' },
+      { topic: 'shop/redact', path: '/api/webhooks/compliance' },
+      { topic: 'app/uninstalled', path: '/api/webhooks/compliance' },
     ]);
   });
 });

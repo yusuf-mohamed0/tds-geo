@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link as ReactRouterLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link as ReactRouterLink, Navigate } from 'react-router-dom';
 import { AppProvider } from '@shopify/polaris';
 import enTranslations from '@shopify/polaris/locales/en.json';
 import { AuthProvider } from './contexts/AuthContext';
@@ -20,6 +20,7 @@ import KeywordResearchPage from './pages/KeywordResearchPage';
 import BacklinksPage from './pages/BacklinksPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ShopifyEmbeddedPage from './pages/ShopifyEmbeddedPage';
+import { isEmbedded } from './lib/embedded';
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/;
 
@@ -38,22 +39,11 @@ function Link({ children, url = '', external, ref: _, ...rest }: { children?: Re
   );
 }
 
-function isShopifyEmbedded(): boolean {
-  try {
-    const url = new URL(window.location.href);
-    if (url.searchParams.has('shop') && url.searchParams.has('host')) return true;
-    if (window.top && window.top !== window.self) return true;
-    if (url.searchParams.has('embedded')) return true;
-    if (document.referrer.includes('myshopify.com') || document.referrer.includes('shopify.com')) return true;
-  } catch {}
-  return false;
-}
-
 function RootPage() {
   const [isShopify, setIsShopify] = useState<boolean | null>(null);
 
   useEffect(() => {
-    setIsShopify(isShopifyEmbedded());
+    setIsShopify(isEmbedded());
   }, []);
 
   if (isShopify === null) {
@@ -65,7 +55,7 @@ function RootPage() {
   }
 
   if (isShopify) return <ShopifyEmbeddedPage />;
-  return <AdminDashboard />;
+  return <Navigate to="/admin" replace />;
 }
 
 export default function App() {

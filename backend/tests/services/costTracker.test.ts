@@ -114,7 +114,7 @@ describe('CostTracker', () => {
         return fresh;
       })();
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      await expect(costTracker.recordCost({
+      await expect(uninitialized.recordCost({
         client_id: 'client-1',
         provider: 'openai',
         cost_usd: 0.01,
@@ -159,7 +159,7 @@ describe('CostTracker', () => {
     it('should throw when not initialized', async () => {
       const fresh = Object.create(costTracker.constructor.prototype);
       fresh.pool = null;
-      await expect(costTracker.getMonthlyUsage('client-1')).rejects.toThrow('not initialized');
+      await expect(fresh.getMonthlyUsage('client-1')).rejects.toThrow('not initialized');
     });
   });
 

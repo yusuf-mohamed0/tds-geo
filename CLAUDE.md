@@ -195,7 +195,7 @@ Cover ALL business lines for each client, especially gaps not yet covered:
 - **PM2 process**: `tds-geo-backend` (auto-restart + systemd startup)
 - **Nginx**: `16.192.29.174.nip.io` → `localhost:3000`
 - **Production server**: AWS EC2, public IP `16.192.29.174`, SSH key `/tmp/tds-prod-key.pem`
-- **DB**: `postgresql://kozmocore:91acf414168a04e995fd6198f74758b8@127.0.0.1:5432/ai_seo_automation`
+- **DB**: `postgresql://kozmocore:<REDACTED>@127.0.0.1:5432/ai_seo_automation` (real password lives in `.env` / secrets — never commit it)
 - **AI**: Ollama (`ministral-3:14b`) via cloud API
 
 ### App Store Reviews

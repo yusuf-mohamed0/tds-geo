@@ -333,7 +333,7 @@ export function createEmbeddedRoutes(pool: Pool): Router {
       const results: { id: string; title: string; success: boolean; error?: string }[] = [];
       for (const article of articles.rows) {
         try {
-          const result = await publisherEngine.publish(article, client, blogId ?? undefined);
+          const result = await publisherEngine.publish(article, client, blogId ?? undefined, { publish: true });
           const shopDomain = client.shopify_shop || '';
           if (shopDomain) {
             await sitesService.recordPublish(shopDomain, 'shopify').catch(() => {});

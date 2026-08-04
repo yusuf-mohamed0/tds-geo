@@ -10,20 +10,21 @@ import ollamaService from '../services/ollama';
 import shopifyService from '../services/shopify';
 
 function extractJSON(text: string): any {
-  try { return JSON.parse(text); } catch {}
+  try { return JSON.parse(text); } catch { /* not valid JSON — try other extraction strategies */ }
   const blockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
   if (blockMatch) {
-    try { return JSON.parse(blockMatch[1].trim()); } catch {}
+    try { return JSON.parse(blockMatch[1].trim()); } catch { /* fenced block not valid JSON — continue */ }
   }
   const objMatch = text.match(/\{[\s\S]*\}/);
   if (objMatch) {
     try {
       const cleaned = objMatch[0]
+        // eslint-disable-next-line no-control-regex -- intentionally strip control characters from model output
         .replace(/[\u0000-\u001F]+/g, ' ')
         .replace(/,\s*([}\]])/g, '$1')
         .replace(/\n\s*/g, ' ');
       return JSON.parse(cleaned);
-    } catch {}
+    } catch { /* cleaned text still not valid JSON — give up */ }
   }
   return null;
 }

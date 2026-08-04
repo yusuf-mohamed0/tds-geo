@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Page, Card, Text, Button, Spinner, Banner, BlockStack, InlineStack } from '@shopify/polaris';
+import { Page, Card, Text, Banner, SkeletonPage, SkeletonBodyText } from '@shopify/polaris';
 import { Store, ArrowRight } from 'lucide-react';
 import { apiFetch } from '../api/client';
 
@@ -27,11 +27,9 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <Page title="Clients" subtitle="Manage your connected clients and stores">
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
-          <Spinner accessibilityLabel="Loading clients" size="large" />
-        </div>
-      </Page>
+      <SkeletonPage title="Clients">
+        <SkeletonBodyText lines={6} />
+      </SkeletonPage>
     );
   }
 

@@ -14,7 +14,7 @@ describe('article safety', () => {
   it('rejects raw HTML, fabricated experience, and unapproved Flaunt products', () => {
     const issues = getArticleSafetyIssues(
       '<p>I have tested 50 product combinations in our studio with Flaunt Cosmetics Precision Liquid Liner.</p>',
-      { name: 'Flaunt Cosmetics Global' },
+      { name: 'Flaunt Cosmetics Global', slug: 'flaunt-cosmetics-global' },
     );
 
     expect(issues).toHaveLength(4);

@@ -5,13 +5,14 @@
 import { logger } from '../../utils/logger';
 import { ShopifyConfig } from '../../types';
 import { refreshIfExpired } from './auth';
-import { buildClient } from './client';
+import { buildClient, getQueue } from './client';
 
 export async function getRateLimitStatus(shopConfig: ShopifyConfig): Promise<{ calls: string | null; remaining: number | null }> {
   const config = await refreshIfExpired(shopConfig);
   const { client, shopName } = buildClient(config);
+  const queue = getQueue(shopName);
   try {
-    const result = await client.get('/shop.json');
+    const result = await queue.schedule(() => client.get('/shop.json'));
     const headers = result.headers;
     return {
       calls: headers['x-shopify-shop-api-call-limit'] as string || null,

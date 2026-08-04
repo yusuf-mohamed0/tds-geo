@@ -1,5 +1,9 @@
 const { Pool } = require("pg");
-const pool = new Pool({ connectionString: "postgresql://kozmocore:91acf414168a04e995fd6198f74758b8@127.0.0.1:5432/ai_seo_automation" });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+if (!process.env.DATABASE_URL) {
+  console.error("DATABASE_URL is required. Usage: DATABASE_URL=postgresql://user:pass@host:5432/db node alamein-seed.cjs");
+  process.exit(1);
+}
 const BLOG_ID = 79774056505;
 const SHOP = "alamein-2022.myshopify.com";
 const API_VERSION = "2025-07";

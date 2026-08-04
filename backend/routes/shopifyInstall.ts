@@ -72,14 +72,17 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
       return;
     }
 
-    // Validate state only when provided (Partner Dashboard flow omits state)
+    // Validate state only when provided (Partner Dashboard flow omits state).
+    // The state row is consumed atomically (DELETE ... RETURNING) so a token can
+    // never be replayed, and it must have been issued for THIS shop and not be
+    // older than 10 minutes.
     if (state) {
       try {
         const result = await pool.query(
           'DELETE FROM shopify_oauth_states WHERE state = $1 AND created_at > NOW() - INTERVAL \'10 minutes\' RETURNING shop',
           [state]
         );
-        if (result.rows.length === 0) {
+        if (result.rows.length === 0 || result.rows[0].shop.toLowerCase() !== shop.toLowerCase()) {
           res.redirect(`${SHOPIFY_APP_URL}/shopify/error?msg=invalid_state`);
           return;
         }
@@ -209,7 +212,9 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
         connection_status: 'connected',
       });
 
-      // Step 5: Subscribe GDPR compliance webhooks (non-fatal)
+      // Step 5: Subscribe GDPR compliance webhooks (non-fatal).
+      // All topics share ONE callback URL (SHOPIFY_COMPLIANCE_WEBHOOKS[].path)
+      // that matches the mounted route /api/webhooks/compliance.
       try {
         for (const { topic, path } of SHOPIFY_COMPLIANCE_WEBHOOKS) {
           const webhookUrl = `${SHOPIFY_APP_URL}${path}`;

@@ -124,12 +124,13 @@ export const mockShopify = {
   publishArticle: async (_shopConfig: any, _blogId: number | string, _article: any) => ({
     id: 99999,
     blogId: typeof _blogId === 'number' ? _blogId : parseInt(_blogId),
-    url: `https://test-shop.myshopify.com/blogs/${_blogId}/test-article`,
+    blogHandle: 'news',
+    url: 'https://test-shop.myshopify.com/blogs/news/test-article',
     handle: 'test-article',
     shopifyArticle: { id: 99999, handle: 'test-article' }
   }),
 
-  uploadImage: async (_shopConfig: any, _articleId: number, _imageUrl: string, _altText: string) => ({
+  uploadImage: async (_shopConfig: any, _blogId: number | string, _articleId: number, _imageUrl: string, _altText: string) => ({
     id: 88888,
     src: _imageUrl,
     alt: _altText

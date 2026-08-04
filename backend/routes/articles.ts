@@ -287,7 +287,7 @@ export function createArticleRoutes(pool: Pool): Router {
             });
           }
 
-          publishResult = await publisherEngine.publishWithTracking(pool, { ...savedArticle, content_html: publishHtml }, client, blogId);
+          publishResult = await publisherEngine.publishWithTracking(pool, { ...savedArticle, content_html: publishHtml }, client, blogId, { publish: true });
 
           // Ping IndexNow
           if (publishResult?.url) {
@@ -791,7 +791,7 @@ export function createArticleRoutes(pool: Pool): Router {
         });
       }
 
-      const publishResult = await publisherEngine.publishWithTracking(pool, article, client, blogId);
+      const publishResult = await publisherEngine.publishWithTracking(pool, article, client, blogId, { publish: true });
 
       // Ping IndexNow with the published article URL
       if (publishResult?.url) {
@@ -806,8 +806,11 @@ export function createArticleRoutes(pool: Pool): Router {
       // Generate and upload image
       try {
         const imageData = await openaiService.generateArticleImage(article.title, article.tags?.[0] || '');
+        const imageBlogId = publishResult.blogId || blogId;
+        if (!imageBlogId) throw new Error('No Shopify blog id found for article image upload');
         const shopifyImage = await shopifyService.uploadImage(
           { shop: client.shopify_shop, accessToken: client.shopify_token },
+          imageBlogId,
           publishResult.externalId || article.id,
           imageData.imageUrl,
           imageData.altText

@@ -114,7 +114,13 @@ export default function ArticleDetailPage() {
       title={article.title}
       backAction={{ content: 'Articles', url: '/admin/articles' }}
       secondaryActions={[
-        { content: 'View SEO Analysis' },
+        {
+          content: 'View SEO Analysis',
+          onAction: () => {
+            const target = document.getElementById('seo-preview') || document.getElementById('article-details');
+            target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+        },
       ]}
     >
       <InlineGrid columns={{ xs: 1, md: '2fr 1fr' }} gap="400">
@@ -123,7 +129,7 @@ export default function ArticleDetailPage() {
             <BlockStack gap="300">
               <Text as="h3" variant="headingSm" tone="subdued">Content</Text>
               <div
-                className="prose prose-invert prose-sm max-w-none text-brand-text/80 leading-relaxed"
+                className="prose prose-sm max-w-none leading-relaxed"
                 style={{ color: 'var(--p-color-text)', fontSize: 'var(--p-font-size-325)', lineHeight: 1.7 }}
                 dangerouslySetInnerHTML={{ __html: article.content_html || '<p>No content</p>' }}
               />
@@ -131,9 +137,10 @@ export default function ArticleDetailPage() {
           </Card>
 
           {article.meta_title && (
-            <Card>
-              <BlockStack gap="200">
-                <Text as="h3" variant="headingSm" tone="subdued">SEO Preview</Text>
+            <div id="seo-preview">
+              <Card>
+                <BlockStack gap="200">
+                  <Text as="h3" variant="headingSm" tone="subdued">SEO Preview</Text>
                 <Text as="p" variant="bodySm">https://example.com/{article.id}</Text>
                 <Text as="p" variant="bodyMd" fontWeight="semibold">{article.meta_title}</Text>
                 <Text as="p" variant="bodySm" tone="subdued">{article.meta_description}</Text>
@@ -145,11 +152,13 @@ export default function ArticleDetailPage() {
                   </div>
                 )}
               </BlockStack>
-            </Card>
+              </Card>
+            </div>
           )}
         </BlockStack>
 
         <BlockStack gap={{ xs: '400', md: '200' }}>
+          <div id="article-details">
           <Card>
             <BlockStack gap="300">
               <Text as="h3" variant="headingSm" tone="subdued">Details</Text>
@@ -192,6 +201,7 @@ export default function ArticleDetailPage() {
               )}
             </BlockStack>
           </Card>
+          </div>
 
           <Card>
             <BlockStack gap="200">

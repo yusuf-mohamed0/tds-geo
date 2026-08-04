@@ -126,7 +126,7 @@ class KaliToolService {
       const output = await execAsync(cmd, 180_000, 5 * 1024 * 1024);
 
       let findings: Record<string, unknown>[] = [];
-      try { findings = JSON.parse(output); } catch {}
+      try { findings = JSON.parse(output); } catch { /* nikto output was not valid JSON — keep empty findings */ }
 
       return {
         tool: 'nikto', target: url, success: true,

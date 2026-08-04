@@ -10,4 +10,4 @@ nohup npx tsx server.ts &>/tmp/vault-ui.log &
 echo $! > /tmp/vault-ui.pid
 sleep 3
 echo "Vault UI: http://localhost:3456"
-echo "Password: TrafficDSgeo@2024"
+echo "Password: set via VAULT_PAGE_PASSWORD env"

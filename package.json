@@ -24,6 +24,7 @@
     "vault": "tsx backend/scripts/vault.ts",
     "vault:rotate": "tsx backend/scripts/rotateVaultKey.ts",
     "import:credentials": "tsx backend/scripts/importCredentials.ts",
+    "shopify:webhooks:update": "tsx backend/scripts/update-webhooks.ts",
     "test": "vitest run",
     "test:py": "python -m pytest backend/services/vectorStore/test_server.py backend/services/localLLM/test_airllm.py -q",
     "test:all": "vitest run && python -m pytest backend/services/vectorStore/test_server.py backend/services/localLLM/test_airllm.py -q",
@@ -48,10 +49,7 @@
   "author": "Yusuf Mohamed — YUSUF KO STA < />",
   "license": "ISC",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0",
     "@rollup/rollup-linux-x64-gnu": "^4.60.4",
-    "@shopify/cli": "^4.3.0",
-    "@shopify/theme": "^3.58.2",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "bullmq": "^5.8.0",
@@ -64,15 +62,14 @@
     "ioredis": "^5.4.1",
     "joi": "^17.13.1",
     "jsonwebtoken": "^9.0.2",
+    "limax": "^4.2.3",
     "marked": "^12.0.2",
-    "n8n": "^2.21.8",
     "nodemailer": "^9.0.1",
     "ollama": "^0.6.3",
     "openai": "^6.42.0",
     "pg": "^8.12.0",
-    "playwright": "^1.60.0",
     "serpapi": "^2.0.3",
-    "uuid": "^9.0.1",
+    "uuid": "^11.1.1",
     "winston": "^3.13.0"
   },
   "devDependencies": {
@@ -93,5 +90,8 @@
     "tsx": "^4.15.1",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

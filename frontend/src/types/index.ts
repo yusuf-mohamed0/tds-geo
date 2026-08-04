@@ -3,6 +3,7 @@ export interface User {
   email: string;
   role: 'admin' | 'editor' | 'client';
   name?: string;
+  clientId?: string;
 }
 
 export interface HealthStatus {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Page, Card, Text, Spinner, Banner, BlockStack } from '@shopify/polaris';
+import { Page, Card, Text, Banner, BlockStack, SkeletonPage, SkeletonBodyText } from '@shopify/polaris';
 import { DollarSign, TrendingUp } from 'lucide-react';
 import { apiFetch } from '../api/client';
 
@@ -41,11 +41,9 @@ export default function CostsPage() {
 
   if (loading) {
     return (
-      <Page title="Cost Tracking" subtitle={clientId ? 'Selected client AI service spending' : 'Monitor your AI service spending'}>
-        <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>
-          <Spinner accessibilityLabel="Loading cost data" size="large" />
-        </div>
-      </Page>
+      <SkeletonPage title="Cost Tracking">
+        <SkeletonBodyText lines={6} />
+      </SkeletonPage>
     );
   }
 

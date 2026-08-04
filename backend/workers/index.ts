@@ -22,6 +22,7 @@ import {
 import openaiService from '../services/openai';
 import serpapiService from '../services/serpapi';
 import shopifyService from '../services/shopify';
+import indexNowService from '../services/indexNowService';
 import { getClientDefaultBlogId } from '../services/shopify/content';
 import { presentArticleHtml } from '../services/articlePresentation';
 import keywordService from '../services/keywords';
@@ -207,6 +208,15 @@ async function handleShopifyPublish(job: Job): Promise<Record<string, unknown>> 
     apiVersion: row.shopify_api_version
   };
 
+  // Honor scheduled_at: never publish before the scheduled time.
+  if (row.scheduled_at && new Date(row.scheduled_at).getTime() > Date.now()) {
+    logger.warn('Worker: Shopify publish skipped — not yet due', {
+      articleId,
+      scheduledAt: row.scheduled_at
+    });
+    return { skipped: true, reason: 'not_due', scheduledAt: row.scheduled_at };
+  }
+
   let targetBlogId = blogId || getClientDefaultBlogId(row);
   if (!targetBlogId) {
     const blogs = await shopifyService.fetchBlogs(shopConfig);
@@ -214,22 +224,53 @@ async function handleShopifyPublish(job: Job): Promise<Record<string, unknown>> 
     if (!targetBlogId) throw new Error('No Shopify blogs found');
   }
 
-  const publishResult = await shopifyService.publishArticle(shopConfig, targetBlogId, {
-    title: row.title,
-    contentHtml: presentArticleHtml(row.content_html, row),
-    metaTitle: row.meta_title,
-    metaDescription: row.meta_description,
-    tags: row.tags
-  });
-
-  // Record publishing history
-  await pool.query(
-    `INSERT INTO publishing_history (article_id, client_id, shopify_article_id, shopify_blog_id, published_url, status)
-     VALUES ($1, $2, $3, $4, $5, 'published')`,
-    [articleId, clientId, publishResult.id, targetBlogId, publishResult.url]
+  // Only flip an existing hidden draft to live — never create a live article.
+  const draftResult = await pool.query(
+    `SELECT shopify_article_id, shopify_blog_id FROM publishing_history
+     WHERE article_id = $1 AND shopify_article_id IS NOT NULL
+     ORDER BY created_at DESC LIMIT 1`,
+    [articleId]
   );
+  const existing = draftResult.rows[0];
 
-  await pool.query(`UPDATE articles SET status = 'published', updated_at = NOW() WHERE id = $1`, [articleId]);
+  let publishResult: { id: number; url: string; handle: string; shopifyArticle: any } | null = null;
+  let shopifyArticleId: number | string | null = existing?.shopify_article_id || null;
+  const effectiveBlogId = existing?.shopify_blog_id || targetBlogId;
+
+  if (shopifyArticleId) {
+    publishResult = await shopifyService.publishArticleLive(shopConfig, effectiveBlogId, shopifyArticleId);
+  } else {
+    // No draft yet → create a hidden draft first, then flip it live.
+    const created = await shopifyService.publishArticle(shopConfig, targetBlogId, {
+      title: row.title,
+      contentHtml: presentArticleHtml(row.content_html, row),
+      metaTitle: row.meta_title,
+      metaDescription: row.meta_description,
+      tags: row.tags
+    });
+    shopifyArticleId = created.id;
+    publishResult = await shopifyService.publishArticleLive(shopConfig, targetBlogId, shopifyArticleId);
+  }
+
+  // Record / update publishing history
+  if (existing) {
+    await pool.query(
+      `UPDATE publishing_history SET status = 'published', published_at = NOW(), published_url = $2, updated_at = NOW()
+       WHERE article_id = $1 AND shopify_article_id = $3`,
+      [articleId, publishResult.url, shopifyArticleId]
+    );
+  } else {
+    await pool.query(
+      `INSERT INTO publishing_history (article_id, client_id, shopify_article_id, shopify_blog_id, published_url, status, published_at)
+       VALUES ($1, $2, $3, $4, $5, 'published', NOW())`,
+      [articleId, clientId, shopifyArticleId, effectiveBlogId, publishResult.url]
+    );
+  }
+
+  await pool.query(
+    `UPDATE articles SET status = 'published', published_at = NOW(), scheduled_at = NULL, updated_at = NOW() WHERE id = $1`,
+    [articleId]
+  );
 
   await logActivity(pool, {
     clientId,
@@ -239,6 +280,38 @@ async function handleShopifyPublish(job: Job): Promise<Record<string, unknown>> 
     level: 'info',
     message: `Article published via worker: ${row.title}`
   });
+
+  // IndexNow notification
+  if (publishResult.url) {
+    indexNowService.pingArticlePublished(publishResult.url).catch(err => {
+      logger.warn('IndexNow ping failed after worker publish', {
+        articleId,
+        error: (err as Error).message
+      });
+    });
+  }
+
+  // Generate and upload image
+  try {
+    const imageData = await openaiService.generateArticleImage(row.title, row.tags?.[0] || '');
+    const shopifyImage = await shopifyService.uploadImage(
+      shopConfig,
+      effectiveBlogId,
+      shopifyArticleId as number,
+      imageData.imageUrl,
+      imageData.altText
+    );
+    await pool.query(
+      `INSERT INTO article_images (article_id, client_id, prompt, image_url, shopify_image_id, alt_text)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [articleId, clientId, imageData.prompt, imageData.imageUrl, shopifyImage.id, imageData.altText]
+    );
+  } catch (imgErr) {
+    logger.warn('Image generation/upload failed after worker publish', {
+      articleId,
+      error: (imgErr as Error).message
+    });
+  }
 
   return {
     shopifyId: publishResult.id,
@@ -281,8 +354,16 @@ async function handleImageGeneration(job: Job): Promise<Record<string, unknown>>
 
     if (pubResult.rows.length > 0) {
       try {
+        const blogResult = await pool.query(
+          'SELECT shopify_blog_id FROM publishing_history WHERE article_id = $1 AND status = $2 LIMIT 1',
+          [articleId, 'published']
+        );
+        const shopifyBlogId = blogResult.rows[0]?.shopify_blog_id || getClientDefaultBlogId(client);
+        if (!shopifyBlogId) throw new Error('No Shopify blog id found for published article image upload');
+
         const shopifyImage = await shopifyService.uploadImage(
           shopConfig,
+          shopifyBlogId,
           pubResult.rows[0].shopify_article_id,
           imageData.imageUrl,
           imageData.altText

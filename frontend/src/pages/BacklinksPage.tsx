@@ -420,7 +420,7 @@ export default function BacklinksPage() {
                     <Text as="h2" variant="headingSm">Generated Guest Post</Text>
                   </InlineStack>
                   <div
-                    className="prose prose-invert prose-sm max-w-none"
+                    className="prose prose-sm max-w-none"
                     style={{ fontSize: 'var(--p-font-size-325)', lineHeight: 1.7, maxHeight: 500, overflowY: 'auto' }}
                   >
                     <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>

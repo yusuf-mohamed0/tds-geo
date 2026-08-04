@@ -94,13 +94,13 @@ class OllamaService {
 
     try {
       return JSON.parse(trimmed);
-    } catch {}
+    } catch { /* not valid JSON — try other extraction strategies */ }
 
     const fenced = trimmed.match(/```(?:json)?\s*\n?([\s\S]*?)```/i);
     if (fenced) {
       try {
         return JSON.parse(fenced[1].trim());
-      } catch {}
+      } catch { /* fenced block not valid JSON — continue */ }
     }
 
     const start = trimmed.indexOf('{');
@@ -130,7 +130,7 @@ class OllamaService {
           if (depth === 0) {
             try {
               return JSON.parse(trimmed.slice(start, i + 1));
-            } catch {}
+            } catch { /* sliced object not valid JSON — break and throw below */ }
             break;
           }
         }

@@ -20,7 +20,7 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  NODE_VERSION: "22"
+  NODE_VERSION: "20"
   CANARY_PERCENT: 20
   CANARY_WAIT_SECONDS: 120
 

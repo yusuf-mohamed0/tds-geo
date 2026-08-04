@@ -17,10 +17,14 @@ function verifyHmac(rawBody: string, hmacHeader: string | undefined): boolean {
   return verifyShopifyWebhookHmac(rawBody, hmacHeader, SHOPIFY_API_SECRET);
 }
 
-function rawBodyCapture(req: Request, _res: Response, next: () => void) {
-  let data = '';
-  req.on('data', (chunk: Buffer) => { data += chunk.toString('utf8'); });
+export function rawBodyCapture(req: Request, _res: Response, next: () => void) {
+  // Concatenate the raw Buffers first and decode utf8 exactly ONCE. Decoding
+  // each chunk independently can corrupt multi-byte characters that are split
+  // across TCP chunks, which would break the raw body used for HMAC verification.
+  const chunks: Buffer[] = [];
+  req.on('data', (chunk: Buffer) => { chunks.push(chunk); });
   req.on('end', () => {
+    const data = Buffer.concat(chunks).toString('utf8');
     (req as any).rawBody = data;
     if (data) {
       try { req.body = JSON.parse(data); } catch { req.body = {}; }
@@ -45,23 +49,60 @@ async function handleAppUninstalled(req: Request, res: Response, pool: Pool) {
   const shop = req.body?.shop || req.headers['x-shopify-shop-domain'] || 'unknown';
   logger.info('APP_UNINSTALLED webhook received', { shop });
   try {
+    // Resolve the internal client id so all related rows can be cleaned up.
+    const clientRes = await pool.query(
+      'SELECT id FROM clients WHERE shopify_shop = $1',
+      [shop]
+    );
+    const clientId = clientRes.rows[0]?.id || null;
+
+    // Deactivate the client — the store no longer has the app installed.
     await pool.query(
       `UPDATE clients SET is_active = false, billing_status = 'cancelled'
        WHERE shopify_shop = $1`,
       [shop]
     );
+
+    // Deactivate Shopify CMS connections (matched by shop config and by client id).
     await pool.query(
       `UPDATE cms_connections SET is_active = false
        WHERE provider = 'shopify' AND config->>'shop' = $1`,
       [shop]
     );
+    if (clientId) {
+      await pool.query(
+        `UPDATE cms_connections SET is_active = false WHERE client_id = $1`,
+        [clientId]
+      );
+    }
+
+    // Mark the connected site as disconnected.
+    await pool.query(
+      `UPDATE connected_sites SET connection_status = 'disconnected', health_status = 'unknown', updated_at = NOW()
+       WHERE domain = $1 AND platform = 'shopify'`,
+      [shop]
+    );
+
+    if (clientId) {
+      // Remove outbound webhook registrations and queued publishing work.
+      await pool.query(
+        `DELETE FROM webhooks WHERE client_id = $1`,
+        [clientId]
+      );
+      await pool.query(
+        `DELETE FROM publishing_queue WHERE client_id = $1`,
+        [clientId]
+      );
+    }
+
+    // Record the uninstall event for billing/audit.
     await pool.query(
       `INSERT INTO billing_events (client_id, event_type, status, metadata)
        SELECT id, 'app_uninstalled', 'cancelled', $2::jsonb
        FROM clients WHERE shopify_shop = $1`,
       [shop, JSON.stringify({ source: 'app/uninstalled webhook' })]
     );
-    logger.info('Shop deactivated after uninstall', { shop });
+    logger.info('Shop deactivated after uninstall', { shop, clientId });
   } catch (err) {
     logger.error('Failed to process app uninstall', { shop, error: (err as Error).message });
   }
@@ -75,7 +116,9 @@ async function handleCustomersDataRequest(req: Request, res: Response, pool: Poo
   logger.info('CUSTOMERS_DATA_REQUEST webhook received', { shop, customerId, requestId });
 
   try {
-    // Query customer data from our system
+    // GDPR scope: only return data belonging to the requesting shop. The app
+    // stores no customer PII — data is scoped to the shop's client and its
+    // articles (id/title/created_at only), which is all we hold about a customer.
     const articles = await pool.query(
       `SELECT id, title, created_at FROM articles
        WHERE client_id IN (SELECT id FROM clients WHERE shopify_shop = $1)
@@ -145,8 +188,35 @@ async function handleShopRedact(req: Request, res: Response, pool: Pool) {
        WHERE shopify_shop = $1`,
       [shop]
     );
+    // Erase all shop-owned rows (articles and everything referencing them).
+    await pool.query(
+      `DELETE FROM article_images WHERE client_id IN (SELECT id FROM clients WHERE shopify_shop = $1)`,
+      [shop]
+    );
+    await pool.query(
+      `DELETE FROM publishing_history WHERE client_id IN (SELECT id FROM clients WHERE shopify_shop = $1)`,
+      [shop]
+    );
+    await pool.query(
+      `DELETE FROM publishing_queue WHERE client_id IN (SELECT id FROM clients WHERE shopify_shop = $1)`,
+      [shop]
+    );
+    await pool.query(
+      `DELETE FROM content_embeddings WHERE client_id IN (SELECT id FROM clients WHERE shopify_shop = $1)`,
+      [shop]
+    );
     await pool.query(
       `DELETE FROM articles WHERE client_id IN (SELECT id FROM clients WHERE shopify_shop = $1)`,
+      [shop]
+    );
+    await pool.query(
+      `UPDATE cms_connections SET is_active = false
+       WHERE provider = 'shopify' AND config->>'shop' = $1`,
+      [shop]
+    );
+    await pool.query(
+      `UPDATE connected_sites SET connection_status = 'disconnected', health_status = 'unknown', updated_at = NOW()
+       WHERE domain = $1 AND platform = 'shopify'`,
       [shop]
     );
     logger.info('Shop data redacted', { shop });

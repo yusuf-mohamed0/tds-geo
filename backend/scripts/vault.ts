@@ -70,9 +70,9 @@ async function get(id: string) {
   if (!rows.length) { console.log('Not found'); return; }
   const r = rows[0];
   let user = r.username, pass = r.password, notes = r.notes;
-  try { if (user) user = decrypt(user); } catch {}
-  try { if (pass) pass = decrypt(pass); } catch {}
-  try { if (notes) notes = decrypt(notes); } catch {}
+  try { if (user) user = decrypt(user); } catch { /* decryption failed — leave masked */ }
+  try { if (pass) pass = decrypt(pass); } catch { /* decryption failed — leave masked */ }
+  try { if (notes) notes = decrypt(notes); } catch { /* decryption failed — leave masked */ }
   console.log(`ID:       ${r.id}`);
   console.log(`Service:  ${r.service}`);
   console.log(`Label:    ${r.label}`);

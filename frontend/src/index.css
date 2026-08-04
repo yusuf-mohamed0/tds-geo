@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 @import '@shopify/polaris/build/esm/styles.css';
 
 @tailwind base;
@@ -6,57 +5,45 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  /* Keep the application visual language consistently sharp. */
-  #root *, #root *::before, #root *::after {
-    border-radius: 0 !important;
-  }
-
+  /* Let Polaris own its own reset and box model — a global margin/padding
+     reset and `border-radius: 0 !important` were flattening every Polaris
+     component (cards, buttons, pills). Removed so Polaris keeps its native
+     rounded, layered look. */
   body {
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Unbounded', sans-serif;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #EEEEEE;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
     background: #D1D5DB;
+    border-radius: 3px;
   }
 }
 
 @layer components {
   .card {
     @apply bg-brand-surface border border-brand-border p-5;
-    transition: transform .2s ease-out, box-shadow .2s ease-out, border-color .2s ease-out;
+    border-radius: var(--p-border-radius-300);
+    transition: box-shadow .15s ease-out, border-color .15s ease-out;
   }
   .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 40px rgba(0,0,0,.1);
-    border-color: rgba(242,176,28,.3);
+    box-shadow: var(--p-shadow-200);
+    border-color: rgba(242,176,28,.4);
   }
 
   .btn {
-    @apply px-4 py-2 font-heading font-medium text-sm uppercase;
-    transition: all .2s ease-out;
-  }
-  .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    @apply px-4 py-2 text-sm font-medium;
+    border-radius: var(--p-border-radius-200);
+    transition: background-color .15s ease-out, box-shadow .15s ease-out;
   }
 
   .btn-primary {
@@ -73,10 +60,12 @@
 
   .input {
     @apply w-full px-3 py-2 bg-brand-bg border border-brand-border text-brand-text placeholder-brand-muted focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent text-sm;
+    border-radius: var(--p-border-radius-200);
   }
 
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium;
+    border-radius: var(--p-border-radius-100);
   }
 
   .badge-green { @apply badge bg-green-100 text-green-800; }
@@ -84,6 +73,110 @@
   .badge-red { @apply badge bg-red-100 text-red-800; }
   .badge-blue { @apply badge bg-blue-100 text-blue-800; }
   .badge-gray { @apply badge bg-gray-100 text-gray-600; }
+
+  .btn-outline {
+    @apply btn-secondary;
+  }
+
+  .btn-sm {
+    padding: var(--p-space-100) var(--p-space-200);
+    font-size: var(--p-font-size-200);
+  }
+
+  /* Modal (used by ClientDashboard keyword list) */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--p-space-400);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal {
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--p-color-bg-surface);
+    border-radius: var(--p-border-radius-300);
+    box-shadow: var(--p-shadow-400);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--p-space-300);
+    padding: var(--p-space-400);
+    border-bottom: 1px solid var(--p-color-border);
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    font-size: var(--p-font-size-400);
+    font-weight: var(--p-font-weight-semibold);
+  }
+
+  .modal-body {
+    padding: var(--p-space-400);
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--p-space-200);
+    padding: var(--p-space-300) var(--p-space-400);
+    border-top: 1px solid var(--p-color-border);
+  }
+}
+
+/*
+ * .polaris-table — lightweight table styling used by Backlinks, GSC and other
+ * data pages. Mirrors Polaris DataTable's visual language (bordered cells,
+ * medium headers, subdued body rows) so it feels native next to IndexTable.
+ */
+@layer components {
+  .polaris-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--p-font-size-300);
+    line-height: var(--p-font-line-height-400);
+  }
+
+  .polaris-table thead th {
+    padding: var(--p-space-300) var(--p-space-400);
+    border-bottom: 1px solid var(--p-color-border);
+    background: var(--p-color-bg-surface-secondary);
+    text-align: left;
+    font-size: var(--p-font-size-200);
+    font-weight: var(--p-font-weight-medium);
+    color: var(--p-color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .polaris-table tbody td {
+    padding: var(--p-space-300) var(--p-space-400);
+    border-bottom: 1px solid var(--p-color-border-secondary);
+    vertical-align: middle;
+    color: var(--p-color-text);
+  }
+
+  .polaris-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .polaris-table tbody tr {
+    transition: background-color .12s ease-out;
+  }
+
+  .polaris-table tbody tr:hover {
+    background: var(--p-color-bg-surface-hover);
+  }
 }
 
 [data-polaris-theme] {

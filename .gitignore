@@ -4,6 +4,10 @@
 .env.production
 .env.staging
 .env.backup
+# Catch-all for env files (with exceptions for committed examples)
+*.env*
+!.env.example
+!frontend/.env.example
 
 # ─── Secrets / Credentials ──────────────────
 *.pem

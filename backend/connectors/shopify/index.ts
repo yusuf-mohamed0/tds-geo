@@ -123,27 +123,174 @@ export class ShopifyConnector implements ConnectorInterface {
   }
 
   async update(id: string, article: Partial<ContentPayload>): Promise<PublishResult> {
-    return { success: false, error: 'Update via connector not yet implemented', provider: 'shopify' };
+    const config = this.getShopConfig();
+    try {
+      const blogId = await this.resolveBlogIdForArticle(Number(id));
+      const updated = await shopifyService.updateArticle(config, blogId, Number(id), {
+        title: article.title,
+        contentHtml: article.content,
+        summaryHtml: article.excerpt,
+        tags: article.tags,
+        author: article.author,
+        metaTitle: article.metaTitle,
+        metaDescription: article.metaDescription,
+      });
+      const blogHandle = await this.resolveBlogHandle(updated.blog_id || blogId);
+
+      return {
+        success: true,
+        externalId: String(updated.id),
+        url: updated.handle
+          ? `https://${config.shop}/blogs/${blogHandle}/${updated.handle}`
+          : undefined,
+        provider: 'shopify',
+      };
+    } catch (err) {
+      logger.error('ShopifyConnector: update failed', { id, error: (err as Error).message });
+      return { success: false, error: (err as Error).message, provider: 'shopify' };
+    }
   }
 
   async delete(id: string): Promise<boolean> {
-    return false;
+    try {
+      const blogId = await this.resolveBlogIdForArticle(Number(id));
+      await shopifyService.deleteArticle(this.getShopConfig(), blogId, Number(id));
+      return true;
+    } catch (err) {
+      logger.error('ShopifyConnector: delete failed', { id, error: (err as Error).message });
+      return false;
+    }
   }
 
   async getContent(id: string): Promise<ContentPayload | null> {
-    return null;
+    try {
+      const blogId = await this.resolveBlogIdForArticle(Number(id));
+      const article = await shopifyService.getArticle(this.getShopConfig(), blogId, Number(id));
+      if (!article) return null;
+
+      return {
+        id: String(article.id),
+        title: article.title || '',
+        content: article.body_html || '',
+        excerpt: article.summary_html || '',
+        slug: article.handle || '',
+        status: article.published ? 'published' : 'draft',
+        categories: [],
+        tags: String(article.tags || '')
+          .split(',')
+          .map((tag: string) => tag.trim())
+          .filter(Boolean),
+        metaTitle: article.metafields_global_title_tag || '',
+        metaDescription: article.metafields_global_description_tag || '',
+        imageUrl: article.image?.src || null,
+        author: article.author || '',
+        publishedAt: article.published_at || null,
+      };
+    } catch (err) {
+      logger.error('ShopifyConnector: getContent failed', { id, error: (err as Error).message });
+      return null;
+    }
   }
 
   async getMedia(id: string): Promise<MediaPayload | null> {
-    return null;
+    try {
+      const blogId = await this.resolveBlogIdForArticle(Number(id));
+      const image = await shopifyService.getArticleImage(this.getShopConfig(), blogId, Number(id));
+      if (!image) return null;
+
+      const filename = image.filename || String(image.src || '').split('/').pop() || '';
+
+      return {
+        id: String(image.id),
+        url: image.src || '',
+        filename,
+        mimeType: this.guessMimeType(filename),
+        alt: image.alt || '',
+      };
+    } catch (err) {
+      logger.error('ShopifyConnector: getMedia failed', { id, error: (err as Error).message });
+      return null;
+    }
   }
 
   async getCategories(): Promise<Taxonomy[]> {
-    return [];
+    try {
+      const collections = await shopifyService.fetchCollections(this.getShopConfig());
+      return collections.map((collection: any) => ({
+        id: collection.id,
+        name: collection.title || '',
+        slug: collection.handle || '',
+        count: typeof collection.products_count === 'number' ? collection.products_count : undefined,
+      }));
+    } catch (err) {
+      logger.error('ShopifyConnector: getCategories failed', { error: (err as Error).message });
+      return [];
+    }
   }
 
   async getTags(): Promise<Taxonomy[]> {
-    return [];
+    try {
+      const tags = await shopifyService.fetchProductTags(this.getShopConfig());
+      return tags.map((tag) => ({
+        id: tag.tag,
+        name: tag.tag,
+        slug: this.slugify(tag.tag),
+        count: tag.count,
+      }));
+    } catch (err) {
+      logger.error('ShopifyConnector: getTags failed', { error: (err as Error).message });
+      return [];
+    }
+  }
+
+  private guessMimeType(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase() || '';
+    const map: Record<string, string> = {
+      png: 'image/png',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      gif: 'image/gif',
+      webp: 'image/webp',
+      svg: 'image/svg+xml',
+      avif: 'image/avif',
+    };
+    return map[ext] || 'application/octet-stream';
+  }
+
+  private slugify(value: string): string {
+    return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  private getDefaultBlogId(): number | string | null {
+    const blogId = this.config?.defaultBlogId;
+    return blogId !== undefined && blogId !== null && blogId !== '' ? blogId : null;
+  }
+
+  private async resolveBlogIdForArticle(articleId: number): Promise<number | string> {
+    const defaultBlogId = this.getDefaultBlogId();
+    if (defaultBlogId) return defaultBlogId;
+
+    const config = this.getShopConfig();
+    const blogs = await shopifyService.fetchBlogs(config);
+    for (const blog of blogs) {
+      const articles = await shopifyService.fetchArticles(config, blog.id, { limit: 250, fields: 'id,blog_id' });
+      if (articles.some((candidate: any) => Number(candidate.id) === articleId)) {
+        return blog.id;
+      }
+    }
+
+    throw new Error(`Unable to resolve Shopify blog for article ${articleId}`);
+  }
+
+  private async resolveBlogHandle(blogId: number | string): Promise<string> {
+    if (this.config?.defaultBlogHandle && String(this.getDefaultBlogId()) === String(blogId)) {
+      return this.config.defaultBlogHandle;
+    }
+
+    const blogs = await shopifyService.fetchBlogs(this.getShopConfig());
+    const blog = blogs.find((candidate: any) => String(candidate.id) === String(blogId));
+    if (blog?.handle) return blog.handle;
+    throw new Error(`Unable to resolve Shopify blog handle for blog ${blogId}`);
   }
 
   async disconnect(): Promise<void> {

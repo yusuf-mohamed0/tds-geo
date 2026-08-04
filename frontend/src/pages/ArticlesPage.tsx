@@ -64,13 +64,16 @@ export default function ArticlesPage() {
 
   const fetchArticles = useCallback(() => {
     setLoading(true);
+    setPageError('');
     const params = new URLSearchParams({ limit: String(limit), offset: String((page - 1) * limit) });
     if (clientId) params.set('clientId', clientId);
     if (statusFilter) params.set('status', statusFilter);
     if (localeFilter) params.set('locale', localeFilter);
     apiFetch<PaginatedResponse<ArticleSummary>>(`/api/articles?${params}`)
       .then(setData)
-      .catch(() => {})
+      .catch((err: unknown) => {
+        setPageError(err instanceof Error ? err.message : 'Failed to load articles.');
+      })
       .finally(() => setLoading(false));
   }, [clientId, page, statusFilter, localeFilter]);
 
@@ -205,6 +208,14 @@ export default function ArticlesPage() {
       }}
     >
       <BlockStack gap="400">
+        {pageError && (
+          <Banner tone="critical" title="Could not load articles" onDismiss={() => setPageError('')}>
+            <p>{pageError}</p>
+            <div style={{ paddingTop: 'var(--p-space-200)' }}>
+              <Button onClick={fetchArticles}>Try again</Button>
+            </div>
+          </Banner>
+        )}
         <Card padding="0">
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--p-space-1600)' }}>

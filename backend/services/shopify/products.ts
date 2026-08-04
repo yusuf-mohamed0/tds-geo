@@ -6,6 +6,7 @@ import { logger } from '../../utils/logger';
 import { ShopifyConfig } from '../../types';
 import { refreshIfExpired } from './auth';
 import { buildClient, getQueue } from './client';
+import { truncateWithEllipsis } from '../../utils/stringUtils';
 
 export interface ShopifyProductUpdate {
   title?: string;
@@ -87,11 +88,12 @@ export async function updateProduct(
     const updated = result.data.product;
 
     // Set SEO metafields via Metafield API (namespace: global, key: title_tag / description_tag)
+    // Title tag is capped at 70 chars, description tag at 160 chars (shared SEO helper).
     if (updates.metaTitle) {
-      await upsertMetafield(client, queue, productId, 'global', 'title_tag', updates.metaTitle);
+      await upsertMetafield(client, queue, productId, 'global', 'title_tag', truncateWithEllipsis(updates.metaTitle, 70));
     }
     if (updates.metaDescription) {
-      await upsertMetafield(client, queue, productId, 'global', 'description_tag', updates.metaDescription);
+      await upsertMetafield(client, queue, productId, 'global', 'description_tag', truncateWithEllipsis(updates.metaDescription, 160));
     }
 
     logger.info('Product updated successfully', { shop: shopName, productId });
@@ -172,6 +174,118 @@ export async function getProduct(
     logger.error('Failed to get Shopify product', {
       shop: shopName,
       productId,
+      error: (err as any).response?.data || (err as Error).message
+    });
+    throw err;
+  }
+}
+
+/**
+ * Fetch EVERY page of a collections endpoint via Link-header pagination
+ * (limit=250, page_info), mirroring the fetchProductTags pattern. Stores with
+ * more than 250 collections would otherwise be silently truncated.
+ */
+async function fetchAllCollectionPages(
+  queue: any,
+  client: any,
+  endpoint: string,
+  dataKey: 'smart_collections' | 'custom_collections',
+  params: Record<string, any>
+): Promise<any[]> {
+  let allCollections: any[] = [];
+  let pageInfo: string | null = null;
+
+  do {
+    const requestParams = { ...params };
+    if (pageInfo) requestParams.page_info = pageInfo;
+
+    const result = await queue.schedule(() => client.get(endpoint, { params: requestParams }));
+    allCollections = allCollections.concat(result.data[dataKey] || []);
+
+    const linkHeader = result.headers.link as string | undefined;
+    pageInfo = null;
+    if (linkHeader && linkHeader.includes('rel="next"')) {
+      const match = linkHeader.match(/page_info=([^&>]+)/);
+      if (match) pageInfo = match[1];
+    }
+  } while (pageInfo);
+
+  return allCollections;
+}
+
+export async function fetchCollections(shopConfig: ShopifyConfig): Promise<any[]> {
+  const config = await refreshIfExpired(shopConfig);
+  const { client, shopName } = buildClient(config);
+  const queue = getQueue(shopName);
+
+  try {
+    const fields = 'id,title,handle,products_count,updated_at';
+    const params = { fields, limit: 250 };
+
+    const [smartCollections, customCollections] = await Promise.all([
+      fetchAllCollectionPages(queue, client, '/smart_collections.json', 'smart_collections', params),
+      fetchAllCollectionPages(queue, client, '/custom_collections.json', 'custom_collections', params),
+    ]);
+
+    const collections = [...smartCollections, ...customCollections];
+
+    logger.info(`Fetched ${collections.length} collections from Shopify`, { shop: shopName });
+    return collections;
+  } catch (err) {
+    logger.error('Failed to fetch Shopify collections', {
+      shop: shopName,
+      error: (err as any).response?.data || (err as Error).message
+    });
+    throw err;
+  }
+}
+
+export interface ProductTag {
+  tag: string;
+  count: number;
+}
+
+export async function fetchProductTags(shopConfig: ShopifyConfig): Promise<ProductTag[]> {
+  const config = await refreshIfExpired(shopConfig);
+  const { client, shopName } = buildClient(config);
+  const queue = getQueue(shopName);
+
+  const tagCounts = new Map<string, number>();
+  let pageInfo: string | null = null;
+
+  try {
+    do {
+      const result = await queue.schedule(() => {
+        const params: Record<string, any> = { fields: 'tags', limit: 250 };
+        if (pageInfo) params.page_info = pageInfo;
+        return client.get('/products.json', { params });
+      });
+
+      const products = result.data.products || [];
+      for (const product of products) {
+        const tags = String(product.tags || '')
+          .split(',')
+          .map((tag: string) => tag.trim())
+          .filter(Boolean);
+        for (const tag of tags) {
+          tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+        }
+      }
+
+      const linkHeader = result.headers.link as string | undefined;
+      pageInfo = null;
+      if (linkHeader && linkHeader.includes('rel="next"')) {
+        const match = linkHeader.match(/page_info=([^&>]+)/);
+        if (match) pageInfo = match[1];
+      }
+    } while (pageInfo);
+
+    const tags = Array.from(tagCounts.entries()).map(([tag, count]) => ({ tag, count }));
+    logger.info(`Aggregated ${tags.length} tags from Shopify products`, { shop: shopName });
+    return tags;
+  } catch (err) {
+    logger.error('Failed to aggregate Shopify product tags', {
+      shop: shopName,
       error: (err as any).response?.data || (err as Error).message
     });
     throw err;

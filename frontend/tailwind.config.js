@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import typography from '@tailwindcss/typography';
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
@@ -14,10 +16,12 @@ export default {
         },
       },
       fontFamily: {
-        heading: ['Unbounded', 'sans-serif'],
-        body: ['DM Sans', 'sans-serif'],
+        // Clean sans stacks. Both fall back to Polaris' system font so any
+        // custom Tailwind components stay visually consistent inside Shopify.
+        heading: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        body: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
       },
     },
   },
-  plugins: [],
+  plugins: [typography],
 };
