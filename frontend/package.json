@@ -12,17 +12,17 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^7.3.0",
-    "@fortawesome/free-solid-svg-icons": "^7.3.0",
-    "@fortawesome/react-fontawesome": "^3.3.1",
-    "@shopify/app-bridge-react": "^4.2.11",
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
+    "@fortawesome/react-fontawesome": "^3.5.0",
+    "@shopify/app-bridge-react": "^4.2.12",
     "@shopify/polaris": "^13.9.5",
     "dompurify": "^3.4.13",
-    "lucide-react": "^0.372.0",
+    "lucide-react": "^1.28.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.18.2",
-    "recharts": "^2.12.7"
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.20",
@@ -30,16 +30,16 @@
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@types/lodash": "^4.17.24",
+    "@types/lodash": "^4.17.25",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.0",
-    "autoprefixer": "^10.4.19",
-    "jsdom": "^29.1.1",
+    "@vitejs/plugin-react": "^6.0.5",
+    "autoprefixer": "^10.5.4",
+    "jsdom": "^30.0.1",
     "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.4",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.4.5",
-    "vite": "^5.2.12",
-    "vitest": "^2.1.9"
+    "vite": "^8.2.0",
+    "vitest": "^4.1.10"
   }
 }
