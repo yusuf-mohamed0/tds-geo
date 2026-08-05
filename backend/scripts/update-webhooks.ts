@@ -64,6 +64,7 @@ async function loadStores(): Promise<ShopifyStore[]> {
        FROM clients
        WHERE is_active = true
          AND shopify_shop IS NOT NULL
+         AND shopify_shop ILIKE '%.myshopify.com'
          AND shopify_token IS NOT NULL
        ORDER BY shopify_shop`
     );
@@ -78,13 +79,14 @@ async function loadStores(): Promise<ShopifyStore[]> {
 }
 
 async function updateStoreWebhooks(store: ShopifyStore): Promise<boolean> {
-  const desired = SHOPIFY_COMPLIANCE_WEBHOOKS.map(({ topic, path }) => ({
+  const desired = SHOPIFY_COMPLIANCE_WEBHOOKS.filter(({ topic }) => topic === 'app/uninstalled').map(({ topic, path }) => ({
     topic,
     address: `${APP_URL}${path}`,
   }));
   const baseUrl = `https://${store.shop}/admin/api/${API_VERSION}`;
 
   console.log(`\n${DRY_RUN ? '[dry-run] ' : ''}Updating compliance webhooks for ${store.shop}`);
+  console.log('  Note: privacy compliance topics are managed by shopify.app*.toml app configuration deploys.');
 
   try {
     const existing = await fetchWebhooks(baseUrl, store.accessToken);

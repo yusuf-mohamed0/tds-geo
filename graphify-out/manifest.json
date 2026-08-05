@@ -3055,8 +3055,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/backend/scripts/update-webhooks.ts": {
-    "mtime": 1785842573.2047758,
-    "ast_hash": "b1a1cc9565cc900fc95cea0e87f498e7",
+    "mtime": 1785925267.45171,
+    "ast_hash": "90c2e0e531a0a03488cc6614133ac3cb",
     "semantic_hash": ""
   },
   "/root/tds-geo/backend/scripts/vault.ts": {
@@ -3590,12 +3590,12 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/components/ErrorBoundary.tsx": {
-    "mtime": 1785923170.383465,
+    "mtime": 1785923669.2366881,
     "ast_hash": "1e0a0ca16526c4ff8749c162b5f5efac",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/components/Header.tsx": {
-    "mtime": 1785923170.3874698,
+    "mtime": 1785923669.2366881,
     "ast_hash": "b3b74bf92faebe4ba38992219fe1cf6b",
     "semantic_hash": ""
   },
@@ -3615,7 +3615,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/components/Modal.tsx": {
-    "mtime": 1785923170.3874698,
+    "mtime": 1785923669.2366881,
     "ast_hash": "e7fcd98b9b3dc3217194055f6c762a92",
     "semantic_hash": ""
   },
@@ -3635,17 +3635,17 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/AdminDashboard.tsx": {
-    "mtime": 1785923170.403488,
+    "mtime": 1785923669.2366881,
     "ast_hash": "b6f3941d6f1196c5e2a61d0caa502b8d",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/ArticleDetailPage.tsx": {
-    "mtime": 1785923259.3393574,
+    "mtime": 1785923669.2366881,
     "ast_hash": "b37023c06316f01fc3c3bab9029c95d5",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/ArticlesPage.tsx": {
-    "mtime": 1785923170.43152,
+    "mtime": 1785923669.2366881,
     "ast_hash": "03b6a1b760b5c640ce2e5981f0a752fa",
     "semantic_hash": ""
   },
@@ -3655,7 +3655,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/CitationsPage.tsx": {
-    "mtime": 1785923259.3433554,
+    "mtime": 1785923669.2366881,
     "ast_hash": "9b5d5324e4b57040167a31a77a88090f",
     "semantic_hash": ""
   },
@@ -3665,7 +3665,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/ClientsPage.tsx": {
-    "mtime": 1785923170.403488,
+    "mtime": 1785923669.2366881,
     "ast_hash": "92d485c61accd3b5abf4c4c1fcb77b4f",
     "semantic_hash": ""
   },
@@ -3675,12 +3675,12 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/GeoPage.tsx": {
-    "mtime": 1785923259.3433554,
+    "mtime": 1785923669.2366881,
     "ast_hash": "533a8a4fdc82bf31c21f974f484d61d4",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/KeywordResearchPage.tsx": {
-    "mtime": 1785923259.3433554,
+    "mtime": 1785923669.2366881,
     "ast_hash": "99edb2820439b63247561d924e2507d7",
     "semantic_hash": ""
   },
@@ -3750,8 +3750,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/package.json": {
-    "mtime": 1785843266.6951263,
-    "ast_hash": "4d17bf3c0c1be5f79b08a0006936fbbb",
+    "mtime": 1785925143.7323265,
+    "ast_hash": "744d1349bb6d87431d5e9b6c00293538",
     "semantic_hash": ""
   },
   "/root/tds-geo/scripts/backup-db.sh": {
@@ -5395,7 +5395,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/vitest.config.ts": {
-    "mtime": 1785923530.2881036,
+    "mtime": 1785923669.2767718,
     "ast_hash": "b19def1d26519af4cfc603dda67e4a5d",
     "semantic_hash": ""
   },
@@ -9305,13 +9305,18 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/scripts/evaluate-frontend-pages.mjs": {
-    "mtime": 1785923318.9178078,
+    "mtime": 1785923669.2767718,
     "ast_hash": "396a28d4ebd0a4dbb73aebbae32416f1",
     "semantic_hash": ""
   },
   "/root/tds-geo/.shopify/deploy-bundle/manifest.json": {
     "mtime": 1785922112.7376437,
     "ast_hash": "1897bbeaf0d91f3783ebe0d654843a5d",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/scripts/audit-clients.mjs": {
+    "mtime": 1785925421.6366708,
+    "ast_hash": "44657b7f71e3cd491f69984a04ef65b7",
     "semantic_hash": ""
   }
 }
