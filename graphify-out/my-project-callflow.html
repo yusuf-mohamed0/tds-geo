@@ -60,7 +60,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
 <div class="container">
 
 <h1>tds-geo — Complete Call Flow &amp; Architecture Documentation</h1>
-<p class="subtitle">Generated from graphify knowledge graph: 11952 nodes, 20788 edges, 671 communities. Commit: 6e906d7</p>
+<p class="subtitle">Generated from graphify knowledge graph: 11952 nodes, 20788 edges, 673 communities. Commit: ddf4705</p>
 
 <div class="nav">
     <a href="#overview">Architecture Overview</a>
@@ -74,8 +74,8 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
     <a href="#security-global">Security &amp; Global Graph</a>
     <a href="#tests-fixtures">Tests &amp; Fixtures</a>
     <a href="#ai-content-evaluation">AI Content Evaluation</a>
-    <a href="#content-intelligence-and-knowledge-graph">Content Intelligence and Knowledge Graph</a>
     <a href="#backend-repositories-and-middleware">Backend Repositories and Middleware</a>
+    <a href="#content-intelligence-and-knowledge-graph">Content Intelligence and Knowledge Graph</a>
     <a href="#authentication-and-authorization">Authentication and Authorization</a>
     <a href="#shopify-authentication-and-store">Shopify Authentication and Store</a>
     <a href="#other">Other</a>
@@ -92,13 +92,13 @@ flowchart LR
     class EXTRACT_PIPELINE_5F350230 module;
     BUILD_GRAPH_321CBB04("Graph Build<br/><small>1640 nodes</small>")
     class BUILD_GRAPH_321CBB04 module;
-    ANALYSIS_CLUSTERING_C79796DA("Analysis &amp; Clustering<br/><small>178 nodes</small>")
+    ANALYSIS_CLUSTERING_C79796DA("Analysis &amp; Clustering<br/><small>175 nodes</small>")
     class ANALYSIS_CLUSTERING_C79796DA module;
     OUTPUTS_DOCS_ED82387C("Outputs &amp; Docs<br/><small>31 nodes</small>")
     class OUTPUTS_DOCS_ED82387C module;
     CLI_SKILLS_9964CBB8("CLI &amp; Skill Installers<br/><small>298 nodes</small>")
     class CLI_SKILLS_9964CBB8 module;
-    INGEST_CACHE_UPDATE_FF457338("Ingestion &amp; Updates<br/><small>159 nodes</small>")
+    INGEST_CACHE_UPDATE_FF457338("Ingestion &amp; Updates<br/><small>162 nodes</small>")
     class INGEST_CACHE_UPDATE_FF457338 module;
     SERVE_API_35EC8E86("Serving API<br/><small>396 nodes</small>")
     class SERVE_API_35EC8E86 module;
@@ -106,21 +106,21 @@ flowchart LR
     class SECURITY_GLOBAL_5B9C6A04 module;
     TESTS_FIXTURES_B84B1DCC("Tests &amp; Fixtures<br/><small>1084 nodes</small>")
     class TESTS_FIXTURES_B84B1DCC module;
-    AI_CONTENT_EVALUATION_3EF35457("AI Content Evaluation<br/><small>416 nodes</small>")
+    AI_CONTENT_EVALUATION_3EF35457("AI Content Evaluation<br/><small>414 nodes</small>")
     class AI_CONTENT_EVALUATION_3EF35457 module;
-    CONTENT_INTELLIGENCE_AND_KNOWLEDGE_GRAPH_09BF96B4("Content Intelligence and Knowledge Graph<br/><small>414 nodes</small>")
-    class CONTENT_INTELLIGENCE_AND_KNOWLEDGE_GRAPH_09BF96B4 module;
-    BACKEND_REPOSITORIES_AND_MIDDLEWARE_3EF99AD0("Backend Repositories and Middleware<br/><small>405 nodes</small>")
+    BACKEND_REPOSITORIES_AND_MIDDLEWARE_3EF99AD0("Backend Repositories and Middleware<br/><small>403 nodes</small>")
     class BACKEND_REPOSITORIES_AND_MIDDLEWARE_3EF99AD0 module;
+    CONTENT_INTELLIGENCE_AND_KNOWLEDGE_GRAPH_09BF96B4("Content Intelligence and Knowledge Graph<br/><small>403 nodes</small>")
+    class CONTENT_INTELLIGENCE_AND_KNOWLEDGE_GRAPH_09BF96B4 module;
     AUTHENTICATION_AND_AUTHORIZATION_9E581436("Authentication and Authorization<br/><small>161 nodes</small>")
     class AUTHENTICATION_AND_AUTHORIZATION_9E581436 module;
     SHOPIFY_AUTHENTICATION_AND_STORE_F5891C9A("Shopify Authentication and Store<br/><small>130 nodes</small>")
     class SHOPIFY_AUTHENTICATION_AND_STORE_F5891C9A module;
-    OTHER_D0941E68("Other<br/><small>5727 nodes</small>")
+    OTHER_D0941E68("Other<br/><small>5742 nodes</small>")
     class OTHER_D0941E68 module;
-    BACKEND_REPOSITORIES_AND_MIDDLEWARE_3EF99AD0 -->|contains x654| OTHER_D0941E68
-    CONTENT_INTELLIGENCE_AND_KNOWLEDGE_GRAPH_09BF96B4 -->|contains x646| OTHER_D0941E68
-    AI_CONTENT_EVALUATION_3EF35457 -->|contains x638| OTHER_D0941E68
+    BACKEND_REPOSITORIES_AND_MIDDLEWARE_3EF99AD0 -->|contains x656| OTHER_D0941E68
+    CONTENT_INTELLIGENCE_AND_KNOWLEDGE_GRAPH_09BF96B4 -->|contains x656| OTHER_D0941E68
+    AI_CONTENT_EVALUATION_3EF35457 -->|contains x640| OTHER_D0941E68
     OTHER_D0941E68 -->|imports x106| SHOPIFY_AUTHENTICATION_AND_STORE_F5891C9A
     SHOPIFY_AUTHENTICATION_AND_STORE_F5891C9A -->|imports x105| OTHER_D0941E68
     TESTS_FIXTURES_B84B1DCC -->|imports x98| SHOPIFY_AUTHENTICATION_AND_STORE_F5891C9A
@@ -146,7 +146,7 @@ flowchart LR
     <h4>Architecture Layers</h4>
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
-      <tr><td>Extraction Pipeline</td><td>797</td><td><code>9, 5, 462, 593, 38, 54, 58, 106, 117, 119, 286, 555, 166, 305, 33, 164, 387, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 525, 604, 606, 666, 674</code></td></tr><tr><td>Graph Build</td><td>1640</td><td><code>10, 255, 43, 55, 16, 60, 77, 108, 19, 147, 148, 15, 155, 160, 30, 18, 230, 118, 122, 135, 137, 138, 35, 276, 282, 287, 288, 295, 53, 156, 150, 308, 151, 330, 331, 334, 163, 165, 336, 342, 346, 347, 175, 543, 562, 572, 172, 375, 52, 530, 210, 394, 407, 413, 414, 579, 613, 614, 615, 616, 626, 627, 415, 432, 438, 439, 611, 612, 618, 619, 620, 621, 622, 623, 624, 625, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 638, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 652, 653, 654, 655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 665, 240, 468, 247, 472, 481, 482, 483, 484, 499, 521, 599, 83</code></td></tr><tr><td>Analysis &amp; Clustering</td><td>178</td><td><code>113, 115, 120, 257, 339, 173, 377, 379, 584, 408, 237, 234, 603</code></td></tr><tr><td>Outputs &amp; Docs</td><td>31</td><td><code>326, 209, 399, 588, 263, 519</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>298</td><td><code>64, 75, 127, 139, 114, 239, 152, 142, 161, 168, 279, 235, 236, 238, 589, 241, 251, 507, 508</code></td></tr><tr><td>Ingestion &amp; Updates</td><td>159</td><td><code>63, 393, 565, 88, 154, 343, 319, 595, 280, 211, 445, 300</code></td></tr><tr><td>Serving API</td><td>396</td><td><code>13, 146, 124, 304, 109, 111, 136, 202, 350, 243, 76, 554, 357, 567, 204, 398, 403, 229, 264, 520</code></td></tr><tr><td>Security &amp; Global Graph</td><td>116</td><td><code>141, 316, 321, 324, 581, 532, 500, 524, 248, 487, 490, 534</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>1084</td><td><code>45, 285, 26, 41, 112, 107, 12, 39, 128, 100, 92, 140, 391, 129, 105, 131, 440, 174, 471, 8, 246, 44, 87, 272, 541, 352, 365, 605, 538, 597, 370, 226, 227, 284, 434, 59, 231, 450, 587, 477, 69, 179, 78, 260, 261, 676, 267, 677</code></td></tr><tr><td>AI Content Evaluation</td><td>416</td><td><code>36</code></td></tr><tr><td>Content Intelligence and Knowledge Graph</td><td>414</td><td><code>7</code></td></tr><tr><td>Backend Repositories and Middleware</td><td>405</td><td><code>3</code></td></tr><tr><td>Authentication and Authorization</td><td>161</td><td><code>2</code></td></tr><tr><td>Shopify Authentication and Store</td><td>130</td><td><code>17</code></td></tr><tr><td>Other</td><td>5727</td><td><code>145, 258, 546, 159, 1, 4, 65, 307, 110, 0, 348, 411, 526, 559, 349, 244, 178, 333, 275, 453, 535, 22, 42, 467, 48, 283, 539, 551, 20, 585, 57, 570, 130, 21, 544, 72, 27, 549, 99, 228, 70, 494, 548, 552, 61, 116, 104, 89, 102, 103, 322, 254, 292, 143, 24, 556, 56, 6, 11, 162, 404, 205, 329, 28, 485, 123, 23, 25, 34, 121, 245, 309, 250, 256, 281, 125, 126, 259, 270, 132, 271, 273, 31, 409, 423, 51, 133, 134, 277, 278, 32, 37, 40, 426, 464, 253, 290, 294, 313, 381, 558, 167, 289, 296, 301, 306, 437, 533, 542, 144, 310, 311, 312, 492, 547, 550, 101, 149, 158, 291, 314, 315, 317, 318, 320, 323, 536, 153, 274, 325, 327, 328, 332, 345, 360, 361, 46, 557, 561, 563, 157, 335, 337, 338, 340, 341, 344, 47, 540, 545, 564, 14, 169, 170, 171, 242, 351, 353, 354, 355, 356, 358, 359, 362, 374, 470, 49, 566, 568, 177, 225, 363, 364, 366, 367, 368, 369, 371, 372, 373, 376, 378, 380, 384, 405, 433, 50, 527, 569, 571, 607, 608, 176, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 382, 383, 385, 386, 388, 389, 390, 392, 449, 486, 203, 206, 207, 208, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 395, 396, 397, 400, 401, 402, 406, 410, 412, 417, 528, 553, 560, 574, 575, 576, 577, 578, 580, 582, 583, 609, 610, 617, 223, 224, 269, 416, 418, 419, 420, 421, 422, 424, 425, 427, 428, 429, 430, 431, 435, 436, 465, 469, 479, 493, 529, 573, 586, 590, 592, 594, 596, 600, 601, 62, 232, 233, 293, 441, 442, 443, 444, 446, 447, 448, 451, 452, 454, 455, 456, 457, 458, 459, 460, 461, 463, 466, 495, 531, 591, 598, 66, 67, 68, 473, 474, 475, 476, 478, 480, 602, 71, 249, 297, 298, 299, 488, 489, 491, 496, 497, 498, 73, 74, 252, 501, 502, 503, 504, 505, 506, 509, 510, 511, 512, 513, 537, 79, 80, 262, 265, 266, 268, 29, 302, 303, 514, 515, 516, 517, 518, 522, 523, 678, 81, 82, 84, 85, 86, 90, 91, 93, 94, 95, 96, 97, 98</code></td></tr>
+      <tr><td>Extraction Pipeline</td><td>797</td><td><code>9, 5, 462, 593, 38, 54, 58, 106, 117, 119, 33, 286, 555, 166, 305, 164, 387, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 525, 606, 666, 674</code></td></tr><tr><td>Graph Build</td><td>1640</td><td><code>10, 255, 43, 55, 16, 60, 77, 108, 19, 147, 148, 15, 155, 160, 30, 18, 230, 118, 122, 135, 137, 138, 35, 276, 282, 287, 288, 346, 295, 53, 156, 150, 308, 151, 330, 331, 334, 163, 165, 336, 342, 347, 413, 175, 543, 562, 172, 375, 52, 530, 210, 394, 407, 414, 579, 613, 614, 615, 616, 626, 635, 415, 432, 438, 439, 611, 612, 618, 619, 620, 621, 622, 623, 624, 625, 627, 628, 629, 630, 631, 632, 633, 634, 636, 637, 638, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 652, 653, 654, 655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 665, 240, 468, 247, 472, 481, 482, 483, 484, 499, 521, 599, 83</code></td></tr><tr><td>Analysis &amp; Clustering</td><td>175</td><td><code>113, 115, 120, 257, 339, 173, 377, 379, 584, 408, 237, 234</code></td></tr><tr><td>Outputs &amp; Docs</td><td>31</td><td><code>326, 209, 399, 588, 263, 519</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>298</td><td><code>64, 75, 127, 139, 114, 239, 152, 142, 161, 168, 279, 235, 236, 238, 589, 241, 251, 507, 508</code></td></tr><tr><td>Ingestion &amp; Updates</td><td>162</td><td><code>63, 393, 565, 88, 154, 319, 343, 595, 280, 211, 445, 300</code></td></tr><tr><td>Serving API</td><td>396</td><td><code>13, 146, 124, 304, 109, 111, 136, 202, 350, 243, 76, 554, 357, 567, 204, 398, 403, 229, 264, 520</code></td></tr><tr><td>Security &amp; Global Graph</td><td>116</td><td><code>141, 316, 321, 324, 581, 532, 500, 524, 248, 487, 490, 534</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>1084</td><td><code>45, 285, 26, 41, 112, 107, 12, 39, 128, 100, 92, 140, 391, 129, 105, 131, 440, 174, 471, 8, 246, 44, 87, 272, 541, 352, 365, 449, 605, 538, 370, 226, 227, 284, 434, 59, 231, 450, 587, 477, 69, 179, 78, 260, 261, 676, 267, 677</code></td></tr><tr><td>AI Content Evaluation</td><td>414</td><td><code>36</code></td></tr><tr><td>Backend Repositories and Middleware</td><td>403</td><td><code>3</code></td></tr><tr><td>Content Intelligence and Knowledge Graph</td><td>403</td><td><code>7</code></td></tr><tr><td>Authentication and Authorization</td><td>161</td><td><code>2</code></td></tr><tr><td>Shopify Authentication and Store</td><td>130</td><td><code>17</code></td></tr><tr><td>Other</td><td>5742</td><td><code>258, 546, 65, 145, 159, 307, 1, 559, 4, 110, 0, 526, 178, 244, 535, 348, 570, 333, 275, 349, 22, 42, 453, 467, 48, 494, 585, 539, 130, 20, 21, 411, 72, 27, 6, 361, 551, 99, 228, 70, 548, 549, 57, 552, 56, 61, 116, 104, 102, 103, 322, 254, 292, 123, 143, 24, 11, 162, 404, 89, 205, 329, 28, 485, 544, 23, 25, 34, 405, 556, 121, 245, 309, 250, 256, 281, 125, 126, 259, 270, 132, 271, 273, 31, 409, 423, 51, 133, 134, 277, 278, 32, 37, 40, 426, 464, 253, 290, 294, 313, 381, 558, 167, 289, 296, 301, 306, 437, 533, 542, 144, 310, 311, 312, 492, 547, 550, 101, 149, 158, 291, 314, 315, 317, 318, 320, 323, 536, 153, 274, 325, 327, 328, 332, 345, 360, 46, 557, 561, 563, 157, 335, 337, 338, 340, 341, 344, 47, 540, 545, 564, 14, 169, 170, 171, 242, 351, 353, 354, 355, 356, 358, 359, 362, 374, 470, 49, 566, 568, 572, 177, 225, 363, 364, 366, 367, 368, 369, 371, 372, 373, 376, 378, 380, 384, 433, 50, 527, 569, 571, 607, 608, 176, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 382, 383, 385, 386, 388, 389, 390, 392, 486, 203, 206, 207, 208, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 395, 396, 397, 400, 401, 402, 406, 410, 412, 417, 528, 553, 560, 574, 575, 576, 577, 578, 580, 582, 583, 597, 609, 610, 617, 223, 224, 269, 283, 416, 418, 419, 420, 421, 422, 424, 425, 427, 428, 429, 430, 431, 435, 436, 465, 469, 479, 493, 529, 573, 586, 590, 592, 594, 596, 598, 600, 601, 603, 62, 232, 233, 293, 441, 442, 443, 444, 446, 447, 448, 451, 452, 454, 455, 456, 457, 458, 459, 460, 461, 463, 466, 495, 531, 591, 604, 66, 667, 67, 68, 473, 474, 475, 476, 478, 480, 602, 668, 71, 249, 297, 298, 299, 488, 489, 491, 496, 497, 498, 73, 74, 252, 501, 502, 503, 504, 505, 506, 509, 510, 511, 512, 513, 537, 79, 80, 262, 265, 266, 268, 29, 302, 303, 514, 515, 516, 517, 518, 522, 523, 678, 81, 82, 84, 85, 86, 90, 91, 93, 94, 95, 96, 97, 98</code></td></tr>
     </table>
   </div>
   <div class="card">
@@ -158,7 +158,7 @@ flowchart LR
   <div class="card">
     <h4>Graph Report Highlights</h4>
     <ul>
-      <li>11952 nodes · 20788 edges · 671 communities (565 shown, 106 thin omitted)</li>
+      <li>11952 nodes · 20788 edges · 673 communities (569 shown, 104 thin omitted)</li>
       <li>Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 276 edges (avg confidence: 0.81)</li>
       <li>Token cost: 0 input · 0 output</li>
       <li>1. `$()` - 1059 edges</li>
@@ -178,6 +178,7 @@ flowchart LR
     %% Section: Extraction Pipeline (797 nodes, 1796 edges)
     subgraph extract_pipeline_scripts_scraper_scrape_client_p_d006bc98["scripts/scraper/scrape_client.py"]
         scraper_scrape_client_clientwebsitescraper_extra_5603f66f("extract_intelligence()<br/><small>scripts/scraper/scrape_client.py</small>")
+        scraper_scrape_client_clientwebsitescraper_analy_94457feb("_analyze_page_structure()<br/><small>scripts/scraper/scrape_client.py</small>")
         scraper_scrape_client_clientwebsitescraper_extra_c123ef03("_extract_common_terms()<br/><small>scripts/scraper/scrape_client.py</small>")
         scraper_scrape_client_clientwebsitescraper_extra_eadde7b1("_extract_contact_info()<br/><small>scripts/scraper/scrape_client.py</small>")
         scraper_scrape_client_clientwebsitescraper_extra_d8b7fb7f("_extract_cta_patterns()<br/><small>scripts/scraper/scrape_client.py</small>")
@@ -185,7 +186,6 @@ flowchart LR
         scraper_scrape_client_clientwebsitescraper_extra_31d74607("_extract_meta_description()<br/><small>scripts/scraper/scrape_client.py</small>")
         scraper_scrape_client_clientwebsitescraper_extra_fdca8dbf("_extract_meta_keywords()<br/><small>scripts/scraper/scrape_client.py</small>")
         scraper_scrape_client_clientwebsitescraper_extra_5b302542("_extract_services()<br/><small>scripts/scraper/scrape_client.py</small>")
-        scraper_scrape_client_clientwebsitescraper_extra_c39a27f6("_extract_site_name()<br/><small>scripts/scraper/scrape_client.py</small>")
         scraper_scrape_client_clientwebsitescraper_extra_8f0163d2("_extract_social_links()<br/><small>scripts/scraper/scrape_client.py</small>")
         scraper_scrape_client_clientwebsitescraper_extra_83d1da34("_extract_target_audience()<br/><small>scripts/scraper/scrape_client.py</small>")
         scraper_scrape_client_clientwebsitescraper_extra_5dc73971("_extract_usp()<br/><small>scripts/scraper/scrape_client.py</small>")
@@ -198,6 +198,7 @@ flowchart LR
     extractors_csharp_extractor_csharpextractor_fc8ad26b("CSharpExtractor<br/><small>plugins/extractors/csharp-extractor.ts</small>")
     understand_extract_import_map_toposix_bf06e010("toPosix()<br/><small>skills/understand/extract-import-map.mjs</small>")
     tests_parsers_test_48c070d3("parsers.test.ts")
+    scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_analy_94457feb
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_c123ef03
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_eadde7b1
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_d8b7fb7f
@@ -205,13 +206,13 @@ flowchart LR
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_31d74607
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_fdca8dbf
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_5b302542
-    scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_c39a27f6
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_8f0163d2
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_83d1da34
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_extra_5dc73971
     scraper_scrape_client_clientwebsitescraper_extra_5603f66f -->|calls| scraper_scrape_client_clientwebsitescraper_sugge_861928f2
     %% Omitted for readability: 779 nodes, 0 edges
     class scraper_scrape_client_clientwebsitescraper_extra_5603f66f function;
+    class scraper_scrape_client_clientwebsitescraper_analy_94457feb function;
     class scraper_scrape_client_clientwebsitescraper_extra_c123ef03 function;
     class scraper_scrape_client_clientwebsitescraper_extra_eadde7b1 function;
     class scraper_scrape_client_clientwebsitescraper_extra_d8b7fb7f function;
@@ -219,7 +220,6 @@ flowchart LR
     class scraper_scrape_client_clientwebsitescraper_extra_31d74607 function;
     class scraper_scrape_client_clientwebsitescraper_extra_fdca8dbf function;
     class scraper_scrape_client_clientwebsitescraper_extra_5b302542 function;
-    class scraper_scrape_client_clientwebsitescraper_extra_c39a27f6 function;
     class scraper_scrape_client_clientwebsitescraper_extra_8f0163d2 function;
     class scraper_scrape_client_clientwebsitescraper_extra_83d1da34 function;
     class scraper_scrape_client_clientwebsitescraper_extra_5dc73971 function;
@@ -868,12 +868,12 @@ flowchart LR
 
 <!-- ====== 4. Analysis & Clustering ====== -->
 <h2 id="analysis-clustering">4. Analysis &amp; Clustering</h2>
-<p>Analysis &amp; Clustering groups implementation around backend, tds, geo, understand, mostly in tds-geo-wp/includes/class-admin-remote.php, services/vectorStore/server.py, understand-anything-plugin/agents/architecture-analyzer.md. This section covers 178 nodes and 257 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<p>Analysis &amp; Clustering groups implementation around backend, tds, geo, serverpy, mostly in tds-geo-wp/includes/class-admin-remote.php, services/vectorStore/server.py, understand-anything-plugin/agents/architecture-analyzer.md. This section covers 175 nodes and 255 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: Analysis &amp; Clustering (178 nodes, 257 edges)
+    %% Section: Analysis &amp; Clustering (175 nodes, 255 edges)
     subgraph analysis_clustering_engines_seo_index_ts_549e948c["engines/seo/index.ts"]
         seo_index_seoengine_f1971b04("SEOEngine<br/><small>engines/seo/index.ts</small>")
         seo_index_seoengine_analyze_b61899f1("analyze()<br/><small>engines/seo/index.ts</small>")
@@ -916,7 +916,7 @@ flowchart LR
     localllm_server_generateresponse_178a4f25 -->|calls| localllm_server_generate_135a7d26
     localllm_server_load_model_e7e8309e -->|calls| localllm_server_generate_135a7d26
     vectorstore_server_get_index_e390a48f -->|calls| vectorstore_server_add_vectors_2f37c99b
-    %% Omitted for readability: 160 nodes, 0 edges
+    %% Omitted for readability: 157 nodes, 0 edges
     class seo_index_seoengine_f1971b04 klass;
     class seo_index_seoengine_analyze_b61899f1 function;
     class seo_index_seoengine_analyzegeo_5717f795 function;
@@ -1209,8 +1209,8 @@ flowchart LR
 <tr><td><code>TDS-GEO-ARCHITECTURE.md</code></td><td>20 nodes</td></tr>
 <tr><td><code>services/localLLM/server.py</code></td><td>15 nodes</td></tr>
 <tr><td><code>doc/AI-SEO-MASTER-KNOWLEDGE-BASE.md</code></td><td>11 nodes</td></tr>
-<tr><td><code>scripts/scraper/scrape_client.py</code></td><td>10 nodes</td></tr>
 <tr><td><code>backend/routes/geoIntelligence.ts</code></td><td>9 nodes</td></tr>
+<tr><td><code>scripts/benchmark-ai-providers.mjs</code></td><td>9 nodes</td></tr>
     </table>
   </div>
   <div class="card">
@@ -1921,12 +1921,12 @@ flowchart LR
 
 <!-- ====== 7. Ingestion & Updates ====== -->
 <h2 id="ingest-cache-update">7. Ingestion &amp; Updates</h2>
-<p>Ingestion &amp; Updates groups implementation around submission, app, scripts, update, mostly in app-store-submission/SUBMISSION_DATA.md, recovery/joes-venture/recover_wayback_products.py, scripts/scraper/scrape_client.py. This section covers 159 nodes and 207 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<p>Ingestion &amp; Updates groups implementation around submission, scripts, app, update, mostly in app-store-submission/SUBMISSION_DATA.md, scripts/scraper/scrape_client.py, recovery/joes-venture/recover_wayback_products.py. This section covers 162 nodes and 210 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: Ingestion &amp; Updates (159 nodes, 207 edges)
+    %% Section: Ingestion &amp; Updates (162 nodes, 210 edges)
     subgraph ingest_cache_update_connectors_webflow_index_ts_8f9d2ddb["connectors/webflow/index.ts"]
         webflow_index_webflowconnector_fba7e6c4("WebflowConnector<br/><small>connectors/webflow/index.ts</small>")
         webflow_index_webflowconnector_authenticate_95b4d61f("authenticate()<br/><small>connectors/webflow/index.ts</small>")
@@ -1963,7 +1963,7 @@ flowchart LR
     scripts_update_webhooks_main_ae92b0bd -->|calls| scripts_update_webhooks_updatestorewebhooks_4cdc2a47
     scripts_update_webhooks_loadstores_47eb0581 -->|calls| scripts_update_webhooks_normalizeshop_d5aae2ea
     scripts_update_webhooks_updatestorewebhooks_4cdc2a47 -->|calls| scripts_update_webhooks_createwebhook_285144a9
-    %% Omitted for readability: 141 nodes, 0 edges
+    %% Omitted for readability: 144 nodes, 0 edges
     class webflow_index_webflowconnector_fba7e6c4 klass;
     class webflow_index_webflowconnector_authenticate_95b4d61f function;
     class webflow_index_webflowconnector_connect_0b6d5e36 function;
@@ -2251,8 +2251,8 @@ flowchart LR
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>File</th><th>Coverage</th></tr>
       <tr><td><code>app-store-submission/SUBMISSION_DATA.md</code></td><td>38 nodes</td></tr>
+<tr><td><code>scripts/scraper/scrape_client.py</code></td><td>24 nodes</td></tr>
 <tr><td><code>recovery/joes-venture/recover_wayback_products.py</code></td><td>21 nodes</td></tr>
-<tr><td><code>scripts/scraper/scrape_client.py</code></td><td>21 nodes</td></tr>
 <tr><td><code>backend/scripts/update-webhooks.ts</code></td><td>15 nodes</td></tr>
 <tr><td><code>understand-anything-plugin/hooks/auto-update-prompt.md</code></td><td>12 nodes</td></tr>
 <tr><td><code>connectors/webflow/index.ts</code></td><td>10 nodes</td></tr>
@@ -2262,7 +2262,7 @@ flowchart LR
   </div>
   <div class="card">
     <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: contains x106, calls x48, references x27, explains x14. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x106, calls x48, references x28, explains x16. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
   </div>
 </div>
 <hr>
@@ -3310,57 +3310,57 @@ flowchart LR
 
 <!-- ====== 11. AI Content Evaluation ====== -->
 <h2 id="ai-content-evaluation">11. AI Content Evaluation</h2>
-<p>AI Content Evaluation groups implementation around backend, public, assets, biur8aujjs, mostly in public/assets/index-BiuR8aUJ.js. This section covers 416 nodes and 512 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<p>AI Content Evaluation groups implementation around backend, public, assets, biur8aujjs, mostly in public/assets/index-BiuR8aUJ.js. This section covers 414 nodes and 509 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: AI Content Evaluation (416 nodes, 512 edges)
+    %% Section: AI Content Evaluation (414 nodes, 509 edges)
     assets_index_biur8auj_cte_43b4cadf("cte()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
+    assets_index_biur8auj_5_85c5e264("_5()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_kee_5a694ed6("kee()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_ru_ae3ac79e("RU()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_te_a51a73eb("tE()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_xte_1e2b9ec6("xte()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
-    assets_index_biur8auj_bm_e48bcd7a("bM<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_ye_9090fea1("yE()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_ak_6dc9501d("ak()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_ui_f818a4ff("Ui()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_qa_4f07f03a("qa()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
-    assets_index_biur8auj_yj_34332738("yj()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
-    assets_index_biur8auj_vj_74bcbf81("vJ()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_kh_b0943e6d("kh()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_i3_a2121117("i3()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_w0_db7ddcb5("w0()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_zne_66b1355f("zne()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_im_d78c84a0("iM()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_ks_45c98e32("Ks()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
+    assets_index_biur8auj_om_e009a54f("oM()<br/><small>public/assets/index-BiuR8aUJ.js</small>")
+    assets_index_biur8auj_bm_e48bcd7a("bM<br/><small>public/assets/index-BiuR8aUJ.js</small>")
     assets_index_biur8auj_ye_9090fea1 -->|calls| assets_index_biur8auj_ak_6dc9501d
     assets_index_biur8auj_ui_f818a4ff -->|calls| assets_index_biur8auj_qa_4f07f03a
-    assets_index_biur8auj_yj_34332738 -->|calls| assets_index_biur8auj_vj_74bcbf81
     assets_index_biur8auj_kh_b0943e6d -->|calls| assets_index_biur8auj_i3_a2121117
     assets_index_biur8auj_qa_4f07f03a -->|calls| assets_index_biur8auj_w0_db7ddcb5
     assets_index_biur8auj_qa_4f07f03a -->|calls| assets_index_biur8auj_zne_66b1355f
     assets_index_biur8auj_im_d78c84a0 -->|calls| assets_index_biur8auj_ks_45c98e32
+    assets_index_biur8auj_im_d78c84a0 -->|calls| assets_index_biur8auj_om_e009a54f
     assets_index_biur8auj_bm_e48bcd7a -->|calls| assets_index_biur8auj_ks_45c98e32
-    %% Omitted for readability: 398 nodes, 0 edges
+    %% Omitted for readability: 396 nodes, 0 edges
     class assets_index_biur8auj_cte_43b4cadf function;
+    class assets_index_biur8auj_5_85c5e264 function;
     class assets_index_biur8auj_kee_5a694ed6 function;
     class assets_index_biur8auj_ru_ae3ac79e function;
     class assets_index_biur8auj_te_a51a73eb function;
     class assets_index_biur8auj_xte_1e2b9ec6 function;
-    class assets_index_biur8auj_bm_e48bcd7a function;
     class assets_index_biur8auj_ye_9090fea1 function;
     class assets_index_biur8auj_ak_6dc9501d function;
     class assets_index_biur8auj_ui_f818a4ff function;
     class assets_index_biur8auj_qa_4f07f03a function;
-    class assets_index_biur8auj_yj_34332738 function;
-    class assets_index_biur8auj_vj_74bcbf81 function;
     class assets_index_biur8auj_kh_b0943e6d function;
     class assets_index_biur8auj_i3_a2121117 function;
     class assets_index_biur8auj_w0_db7ddcb5 function;
     class assets_index_biur8auj_zne_66b1355f function;
     class assets_index_biur8auj_im_d78c84a0 function;
     class assets_index_biur8auj_ks_45c98e32 function;
+    class assets_index_biur8auj_om_e009a54f function;
+    class assets_index_biur8auj_bm_e48bcd7a function;
     classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
     classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
     classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
@@ -3472,14 +3472,6 @@ flowchart LR
 </tr>
 <tr>
   <td>12</td>
-  <td><code>yj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>vJ()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>yj() node in public/assets/index-BiuR8aUJ.js.</td>
-</tr>
-<tr>
-  <td>13</td>
   <td><code>xj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3487,7 +3479,7 @@ flowchart LR
   <td>xj() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>14</td>
+  <td>13</td>
   <td><code>Oj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3495,7 +3487,7 @@ flowchart LR
   <td>Oj() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>15</td>
+  <td>14</td>
   <td><code>kh()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3503,7 +3495,7 @@ flowchart LR
   <td>kh() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>16</td>
+  <td>15</td>
   <td><code>x1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3511,7 +3503,7 @@ flowchart LR
   <td>x1() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>17</td>
+  <td>16</td>
   <td><code>Mr()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3519,7 +3511,7 @@ flowchart LR
   <td>Mr() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>18</td>
+  <td>17</td>
   <td><code>Zj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3527,7 +3519,7 @@ flowchart LR
   <td>Zj() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>19</td>
+  <td>18</td>
   <td><code>p4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3535,7 +3527,7 @@ flowchart LR
   <td>p4() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>20</td>
+  <td>19</td>
   <td><code>y4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3543,7 +3535,7 @@ flowchart LR
   <td>y4() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>21</td>
+  <td>20</td>
   <td><code>vu()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3551,7 +3543,7 @@ flowchart LR
   <td>vu() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>22</td>
+  <td>21</td>
   <td><code>Qf()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3559,7 +3551,7 @@ flowchart LR
   <td>Qf() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>23</td>
+  <td>22</td>
   <td><code>qa()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td><code>Ui()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
@@ -3567,7 +3559,7 @@ flowchart LR
   <td>qa() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>24</td>
+  <td>23</td>
   <td><code>n3()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3575,7 +3567,7 @@ flowchart LR
   <td>n3() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>25</td>
+  <td>24</td>
   <td><code>i3()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td><code>kh()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
@@ -3583,7 +3575,7 @@ flowchart LR
   <td>i3() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>26</td>
+  <td>25</td>
   <td><code>l3()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3591,7 +3583,7 @@ flowchart LR
   <td>l3() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>27</td>
+  <td>26</td>
   <td><code>cy()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3599,7 +3591,7 @@ flowchart LR
   <td>cy() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>28</td>
+  <td>27</td>
   <td><code>uy()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3607,7 +3599,7 @@ flowchart LR
   <td>uy() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>29</td>
+  <td>28</td>
   <td><code>xC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
@@ -3615,341 +3607,20 @@ flowchart LR
   <td>xC() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 <tr>
-  <td>30</td>
+  <td>29</td>
   <td><code>Tu</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-class">Class</span></td>
   <td>External entry / no inbound edge</td>
   <td>No direct outbound edge</td>
   <td>Tu node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
-</table>
-
-<div class="grid">
-  <div class="card">
-    <h4>Key Files</h4>
-    <table style="width:100%;font-size:0.85rem;">
-      <tr><th>File</th><th>Coverage</th></tr>
-      <tr><td><code>public/assets/index-BiuR8aUJ.js</code></td><td>416 nodes</td></tr>
-    </table>
-  </div>
-  <div class="card">
-    <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: contains x416, calls x96. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
-  </div>
-</div>
-<hr>
-
-<!-- ====== 12. Content Intelligence and Knowledge Graph ====== -->
-<h2 id="content-intelligence-and-knowledge-graph">12. Content Intelligence and Knowledge Graph</h2>
-<p>Content Intelligence and Knowledge Graph groups implementation around backend, public, assets, qfjsmfjs, mostly in public/assets/index-D_qfjSMf.js. This section covers 414 nodes and 504 internal edges; the diagram shows only representative relationships to stay readable.</p>
-
-<div class="mermaid">
-%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
-flowchart LR
-    %% Section: Content Intelligence and Knowledge Graph (414 nodes, 504 edges)
-    assets_index_d_qfjsmf_cte_0349d398("cte()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_gee_a9660e27("gee()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_te_972c805b("tE()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_5_9db973d5("_5()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_cf_444a9de9("cF()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_kee_a105159c("kee()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_1_e2fc8eee("_1()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_p4_1e2d59b7("p4()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_nm_8fcd9b05("nM()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_fie_2e0635b7("fie()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_am_e9920e9f("aM()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_im_ecd221a0("iM()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_xt_8e3d45a2("xT<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_aie_f3742940("aie()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_bn_d2533de8("bN()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_fw_bd1b3470("fw()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_ry_38993887("Ry<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_ty_608aa8eb("tY()<br/><small>public/assets/index-D_qfjSMf.js</small>")
-    assets_index_d_qfjsmf_1_e2fc8eee -->|calls| assets_index_d_qfjsmf_p4_1e2d59b7
-    assets_index_d_qfjsmf_nm_8fcd9b05 -->|calls| assets_index_d_qfjsmf_fie_2e0635b7
-    assets_index_d_qfjsmf_am_e9920e9f -->|calls| assets_index_d_qfjsmf_im_ecd221a0
-    assets_index_d_qfjsmf_xt_8e3d45a2 -->|calls| assets_index_d_qfjsmf_aie_f3742940
-    assets_index_d_qfjsmf_bn_d2533de8 -->|calls| assets_index_d_qfjsmf_fw_bd1b3470
-    assets_index_d_qfjsmf_ry_38993887 -->|calls| assets_index_d_qfjsmf_ty_608aa8eb
-    %% Omitted for readability: 396 nodes, 0 edges
-    class assets_index_d_qfjsmf_cte_0349d398 function;
-    class assets_index_d_qfjsmf_gee_a9660e27 function;
-    class assets_index_d_qfjsmf_te_972c805b function;
-    class assets_index_d_qfjsmf_5_9db973d5 function;
-    class assets_index_d_qfjsmf_cf_444a9de9 function;
-    class assets_index_d_qfjsmf_kee_a105159c function;
-    class assets_index_d_qfjsmf_1_e2fc8eee function;
-    class assets_index_d_qfjsmf_p4_1e2d59b7 function;
-    class assets_index_d_qfjsmf_nm_8fcd9b05 function;
-    class assets_index_d_qfjsmf_fie_2e0635b7 function;
-    class assets_index_d_qfjsmf_am_e9920e9f function;
-    class assets_index_d_qfjsmf_im_ecd221a0 function;
-    class assets_index_d_qfjsmf_xt_8e3d45a2 function;
-    class assets_index_d_qfjsmf_aie_f3742940 function;
-    class assets_index_d_qfjsmf_bn_d2533de8 function;
-    class assets_index_d_qfjsmf_fw_bd1b3470 function;
-    class assets_index_d_qfjsmf_ry_38993887 klass;
-    class assets_index_d_qfjsmf_ty_608aa8eb function;
-    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
-    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
-    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
-    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
-    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
-    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
-    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
-    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
-    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
-</div>
-
-<h3>Call Details</h3>
-<table class="call-table">
-<tr>
-  <th style="width:5%">#</th>
-  <th style="width:28%">Node</th>
-  <th style="width:10%">Type</th>
-  <th style="width:17%">Caller</th>
-  <th style="width:20%">Callees</th>
-  <th style="width:20%">Description</th>
-</tr>
-<tr>
-  <td>1</td>
-  <td><code>$()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>$() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>2</td>
-  <td><code>BO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>BO() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>3</td>
-  <td><code>hl()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>hl() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>4</td>
-  <td><code>hE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>hE() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>5</td>
-  <td><code>vE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>vE() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>6</td>
-  <td><code>yE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>yE() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>7</td>
-  <td><code>bE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>bE() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>8</td>
-  <td><code>sr()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>sr() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>9</td>
-  <td><code>Sv()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>Sv() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>10</td>
-  <td><code>Dl()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>Dl() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>11</td>
-  <td><code>Aj()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>Aj() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>12</td>
-  <td><code>x1()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>x1() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>13</td>
-  <td><code>Mr()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>Mr() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>14</td>
-  <td><code>Kj()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>Kj() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>15</td>
-  <td><code>f4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>f4() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>16</td>
-  <td><code>_1()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>p4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td>_1() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>17</td>
-  <td><code>p4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>_1()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td>No direct outbound edge</td>
-  <td>p4() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>18</td>
-  <td><code>v4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>v4() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>19</td>
-  <td><code>vu()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>vu() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>20</td>
-  <td><code>Qf()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>Qf() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>21</td>
-  <td><code>r3()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>r3() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>22</td>
-  <td><code>i3()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>i3() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>23</td>
-  <td><code>o3()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>o3() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>24</td>
-  <td><code>cy()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>cy() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>25</td>
-  <td><code>uy()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>uy() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>26</td>
-  <td><code>xC()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>xC() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>27</td>
-  <td><code>Tu</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-class">Class</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>Tu node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>28</td>
-  <td><code>mx()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>mx() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
-<tr>
-  <td>29</td>
-  <td><code>vx()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>vx() node in public/assets/index-D_qfjSMf.js.</td>
-</tr>
 <tr>
   <td>30</td>
-  <td><code>S3()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>mx()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
   <td>No direct outbound edge</td>
-  <td>S3() node in public/assets/index-D_qfjSMf.js.</td>
+  <td>mx() node in public/assets/index-BiuR8aUJ.js.</td>
 </tr>
 </table>
 
@@ -3958,30 +3629,30 @@ flowchart LR
     <h4>Key Files</h4>
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>File</th><th>Coverage</th></tr>
-      <tr><td><code>public/assets/index-D_qfjSMf.js</code></td><td>414 nodes</td></tr>
+      <tr><td><code>public/assets/index-BiuR8aUJ.js</code></td><td>414 nodes</td></tr>
     </table>
   </div>
   <div class="card">
     <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: contains x414, calls x90. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x414, calls x95. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
   </div>
 </div>
 <hr>
 
-<!-- ====== 13. Backend Repositories and Middleware ====== -->
-<h2 id="backend-repositories-and-middleware">13. Backend Repositories and Middleware</h2>
-<p>Backend Repositories and Middleware groups implementation around backend, public, assets, badyqiwpjs, mostly in public/assets/index-BAdyQiwp.js. This section covers 405 nodes and 488 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<!-- ====== 12. Backend Repositories and Middleware ====== -->
+<h2 id="backend-repositories-and-middleware">12. Backend Repositories and Middleware</h2>
+<p>Backend Repositories and Middleware groups implementation around backend, public, assets, badyqiwpjs, mostly in public/assets/index-BAdyQiwp.js. This section covers 403 nodes and 483 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: Backend Repositories and Middleware (405 nodes, 488 edges)
+    %% Section: Backend Repositories and Middleware (403 nodes, 483 edges)
     assets_index_badyqiwp_cte_e5edb919("cte()<br/><small>public/assets/index-BAdyQiwp.js</small>")
+    assets_index_badyqiwp_gee_7b646844("gee()<br/><small>public/assets/index-BAdyQiwp.js</small>")
     assets_index_badyqiwp_te_8e3fe05b("tE()<br/><small>public/assets/index-BAdyQiwp.js</small>")
-    assets_index_badyqiwp_5_2f66ff9f("_5()<br/><small>public/assets/index-BAdyQiwp.js</small>")
-    assets_index_badyqiwp_cf_d5614b74("cF()<br/><small>public/assets/index-BAdyQiwp.js</small>")
     assets_index_badyqiwp_kee_b3786f54("kee()<br/><small>public/assets/index-BAdyQiwp.js</small>")
     assets_index_badyqiwp_ru_a6253c22("RU()<br/><small>public/assets/index-BAdyQiwp.js</small>")
+    assets_index_badyqiwp_xte_38bf0fdb("xte()<br/><small>public/assets/index-BAdyQiwp.js</small>")
     assets_index_badyqiwp_1_d78bc4a8("_1()<br/><small>public/assets/index-BAdyQiwp.js</small>")
     assets_index_badyqiwp_p4_e7c38688("p4()<br/><small>public/assets/index-BAdyQiwp.js</small>")
     assets_index_badyqiwp_nm_1c37bafb("nM()<br/><small>public/assets/index-BAdyQiwp.js</small>")
@@ -4000,13 +3671,13 @@ flowchart LR
     assets_index_badyqiwp_xt_92f786d6 -->|calls| assets_index_badyqiwp_aie_252af8cd
     assets_index_badyqiwp_bn_8fa4d95b -->|calls| assets_index_badyqiwp_fw_6364cc84
     assets_index_badyqiwp_ry_47c02de7 -->|calls| assets_index_badyqiwp_ty_f4267c8c
-    %% Omitted for readability: 387 nodes, 0 edges
+    %% Omitted for readability: 385 nodes, 0 edges
     class assets_index_badyqiwp_cte_e5edb919 function;
+    class assets_index_badyqiwp_gee_7b646844 function;
     class assets_index_badyqiwp_te_8e3fe05b function;
-    class assets_index_badyqiwp_5_2f66ff9f function;
-    class assets_index_badyqiwp_cf_d5614b74 function;
     class assets_index_badyqiwp_kee_b3786f54 function;
     class assets_index_badyqiwp_ru_a6253c22 function;
+    class assets_index_badyqiwp_xte_38bf0fdb function;
     class assets_index_badyqiwp_1_d78bc4a8 function;
     class assets_index_badyqiwp_p4_e7c38688 function;
     class assets_index_badyqiwp_nm_1c37bafb function;
@@ -4287,12 +3958,341 @@ flowchart LR
     <h4>Key Files</h4>
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>File</th><th>Coverage</th></tr>
-      <tr><td><code>public/assets/index-BAdyQiwp.js</code></td><td>405 nodes</td></tr>
+      <tr><td><code>public/assets/index-BAdyQiwp.js</code></td><td>403 nodes</td></tr>
     </table>
   </div>
   <div class="card">
     <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: contains x405, calls x83. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x403, calls x80. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 13. Content Intelligence and Knowledge Graph ====== -->
+<h2 id="content-intelligence-and-knowledge-graph">13. Content Intelligence and Knowledge Graph</h2>
+<p>Content Intelligence and Knowledge Graph groups implementation around backend, public, assets, qfjsmfjs, mostly in public/assets/index-D_qfjSMf.js. This section covers 403 nodes and 483 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Content Intelligence and Knowledge Graph (403 nodes, 483 edges)
+    assets_index_d_qfjsmf_cte_0349d398("cte()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_gee_a9660e27("gee()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_te_972c805b("tE()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_kee_a105159c("kee()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_ru_319c27b3("RU()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_xte_95c96f21("xte()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_1_e2fc8eee("_1()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_p4_1e2d59b7("p4()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_nm_8fcd9b05("nM()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_fie_2e0635b7("fie()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_am_e9920e9f("aM()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_im_ecd221a0("iM()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_xt_8e3d45a2("xT<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_aie_f3742940("aie()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_bn_d2533de8("bN()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_fw_bd1b3470("fw()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_ry_38993887("Ry<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_ty_608aa8eb("tY()<br/><small>public/assets/index-D_qfjSMf.js</small>")
+    assets_index_d_qfjsmf_1_e2fc8eee -->|calls| assets_index_d_qfjsmf_p4_1e2d59b7
+    assets_index_d_qfjsmf_nm_8fcd9b05 -->|calls| assets_index_d_qfjsmf_fie_2e0635b7
+    assets_index_d_qfjsmf_am_e9920e9f -->|calls| assets_index_d_qfjsmf_im_ecd221a0
+    assets_index_d_qfjsmf_xt_8e3d45a2 -->|calls| assets_index_d_qfjsmf_aie_f3742940
+    assets_index_d_qfjsmf_bn_d2533de8 -->|calls| assets_index_d_qfjsmf_fw_bd1b3470
+    assets_index_d_qfjsmf_ry_38993887 -->|calls| assets_index_d_qfjsmf_ty_608aa8eb
+    %% Omitted for readability: 385 nodes, 0 edges
+    class assets_index_d_qfjsmf_cte_0349d398 function;
+    class assets_index_d_qfjsmf_gee_a9660e27 function;
+    class assets_index_d_qfjsmf_te_972c805b function;
+    class assets_index_d_qfjsmf_kee_a105159c function;
+    class assets_index_d_qfjsmf_ru_319c27b3 function;
+    class assets_index_d_qfjsmf_xte_95c96f21 function;
+    class assets_index_d_qfjsmf_1_e2fc8eee function;
+    class assets_index_d_qfjsmf_p4_1e2d59b7 function;
+    class assets_index_d_qfjsmf_nm_8fcd9b05 function;
+    class assets_index_d_qfjsmf_fie_2e0635b7 function;
+    class assets_index_d_qfjsmf_am_e9920e9f function;
+    class assets_index_d_qfjsmf_im_ecd221a0 function;
+    class assets_index_d_qfjsmf_xt_8e3d45a2 function;
+    class assets_index_d_qfjsmf_aie_f3742940 function;
+    class assets_index_d_qfjsmf_bn_d2533de8 function;
+    class assets_index_d_qfjsmf_fw_bd1b3470 function;
+    class assets_index_d_qfjsmf_ry_38993887 klass;
+    class assets_index_d_qfjsmf_ty_608aa8eb function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>$()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>$() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>BO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>BO() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>hl()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>hl() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>hE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>hE() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>vE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>vE() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>yE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>yE() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>bE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>bE() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>sr()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>sr() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>Sv()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Sv() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>Dl()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Dl() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>Aj()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Aj() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>x1()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>x1() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>Mr()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Mr() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>Kj()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Kj() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>f4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>f4() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>_1()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>p4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>_1() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>p4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>_1()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>p4() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>v4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>v4() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>vu()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>vu() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>Qf()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Qf() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>r3()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>r3() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>i3()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>i3() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>o3()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>o3() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>cy()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>cy() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>uy()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>uy() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>xC()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>xC() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>Tu</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Tu node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>mx()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mx() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>vx()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>vx() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>S3()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>S3() node in public/assets/index-D_qfjSMf.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>public/assets/index-D_qfjSMf.js</code></td><td>403 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x403, calls x80. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
   </div>
 </div>
 <hr>
@@ -4959,7 +4959,7 @@ flowchart LR
   <td>28</td>
   <td><code>events.ts</code><br><small style="color:var(--muted)">backend/event-bus/events.ts</small></td>
   <td><span class="tag tag-class">Module</span></td>
-  <td><code>index.ts</code><br><small style="color:var(--muted)">engines/seo/index.ts</small><br><code>index.ts</code><br><small style="color:var(--muted)">engines/memory/index.ts</small><br><code>index.ts</code><br><small style="color:var(--muted)">engines/analytics/index.ts</small><br>+5 more</td>
+  <td><code>index.ts</code><br><small style="color:var(--muted)">engines/learning/index.ts</small><br><code>index.ts</code><br><small style="color:var(--muted)">engines/analytics/index.ts</small><br><code>index.ts</code><br><small style="color:var(--muted)">engines/research/index.ts</small><br>+5 more</td>
   <td>No direct outbound edge</td>
   <td>Module file in backend/event-bus/events.ts.</td>
 </tr>
@@ -4967,7 +4967,7 @@ flowchart LR
   <td>29</td>
   <td><code>Events</code><br><small style="color:var(--muted)">backend/event-bus/events.ts</small></td>
   <td><span class="tag tag-class">Class</span></td>
-  <td><code>index.ts</code><br><small style="color:var(--muted)">engines/seo/index.ts</small><br><code>index.ts</code><br><small style="color:var(--muted)">engines/memory/index.ts</small><br><code>index.ts</code><br><small style="color:var(--muted)">engines/analytics/index.ts</small><br>+5 more</td>
+  <td><code>index.ts</code><br><small style="color:var(--muted)">engines/learning/index.ts</small><br><code>index.ts</code><br><small style="color:var(--muted)">engines/analytics/index.ts</small><br><code>index.ts</code><br><small style="color:var(--muted)">engines/research/index.ts</small><br>+5 more</td>
   <td>No direct outbound edge</td>
   <td>Events node in backend/event-bus/events.ts.</td>
 </tr>
@@ -5005,12 +5005,12 @@ flowchart LR
 
 <!-- ====== 16. Other ====== -->
 <h2 id="other">16. Other</h2>
-<p>Other groups implementation around backend, assets, public, doc, mostly in public/assets/index-BAdyQiwp.js, public/assets/index-D_qfjSMf.js, public/assets/index-BiuR8aUJ.js. This section covers 5727 nodes and 8514 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<p>Other groups implementation around backend, assets, public, doc, mostly in public/assets/index-D_qfjSMf.js, public/assets/index-BAdyQiwp.js, public/assets/index-BiuR8aUJ.js. This section covers 5742 nodes and 8529 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: Other (5727 nodes, 8514 edges)
+    %% Section: Other (5742 nodes, 8529 edges)
     subgraph other_backend_connector_manager_index_ts_f89e2b4c["backend/connector-manager/index.ts"]
         connector_manager_index_connectormanager_6a7a2105("ConnectorManager<br/><small>backend/connector-manager/index.ts</small>")
         connector_manager_index_connectormanager_count_d9b74395("count()<br/><small>backend/connector-manager/index.ts</small>")
@@ -5054,7 +5054,7 @@ flowchart LR
     connector_manager_index_connectormanager_get_69ccf9c5 -->|calls| connector_manager_index_connectormanager_healthc_2ed7783d
     connector_manager_index_connectormanager_getconf_f606bc6f -->|calls| connector_manager_index_connectormanager_healthc_2ed7783d
     connector_manager_index_connectormanager_healthc_2ed7783d -->|calls| connector_manager_index_connectormanager_healthc_ae712f77
-    %% Omitted for readability: 5709 nodes, 0 edges
+    %% Omitted for readability: 5724 nodes, 0 edges
     class connector_manager_index_connectormanager_6a7a2105 klass;
     class connector_manager_index_connectormanager_count_d9b74395 function;
     class connector_manager_index_connectormanager_get_69ccf9c5 function;
@@ -5096,243 +5096,243 @@ flowchart LR
 </tr>
 <tr>
   <td>1</td>
-  <td><code>vv()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
-  <td><code>qm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>Ue()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>vv() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>aB()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>bx</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>C()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+37 more</td>
+  <td>r() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>2</td>
-  <td><code>q()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>n()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>D()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>_P()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>bi()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>bu()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br>+41 more</td>
-  <td>q() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>a()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>ar()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>componentDidUpdate()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+23 more</td>
+  <td>n() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>3</td>
-  <td><code>uj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>XO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
-  <td><code>Ev()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>uj() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>Ku()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>XO() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>4</td>
-  <td><code>dj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>YO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
   <td>External entry / no inbound edge</td>
-  <td><code>fj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>dj() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>C()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>E()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>Ku()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>YO() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>5</td>
-  <td><code>fj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>xv()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>dj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>Ev()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>fj() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td>External entry / no inbound edge</td>
+  <td><code>Ku()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>xv() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>6</td>
-  <td><code>Ev()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>KO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>fj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>uj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>AE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>lC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>Ev() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td>External entry / no inbound edge</td>
+  <td><code>Sh()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>KO() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>7</td>
-  <td><code>Wm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>Sh()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>hj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>Wm() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>KO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>Ku()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>toString()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>Sh() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>8</td>
-  <td><code>hj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>Ku()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>Wm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>vP()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>hj() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>Sh()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>XO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>xv()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+1 more</td>
+  <td><code>a()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>cu()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>Ku() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>9</td>
-  <td><code>Ha()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>cu()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>d1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>OE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>p1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br>+3 more</td>
-  <td>Ha() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>Ku()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>cu() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>10</td>
-  <td><code>kE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>ZO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>E()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>mj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>kE() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td>External entry / no inbound edge</td>
+  <td><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>ZO() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>11</td>
-  <td><code>mj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>kE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>du()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>jj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>mj() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>n()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>ZO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>_P()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>a()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>Bne()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+50 more</td>
+  <td>t() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>12</td>
-  <td><code>du()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>a()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>mj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>du() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>Ku()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>n()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>$i()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>cW()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>DW()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+8 more</td>
+  <td>a() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>13</td>
-  <td><code>Hm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>S()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>RC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>Hm() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>n()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>C()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>d2()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>E()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+2 more</td>
+  <td>S() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>14</td>
-  <td><code>d1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>C()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>Ha()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>q()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>Ue()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>vP()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>d1() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>S()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>YO()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>D()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>C() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>15</td>
-  <td><code>AE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>E()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>Ev()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>Aae()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>jae()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>lC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br>+3 more</td>
-  <td>AE() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>n()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>S()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+1 more</td>
+  <td><code>Bh()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>D()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>kE()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+6 more</td>
+  <td>E() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>16</td>
-  <td><code>Um()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>M()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>AE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>Ha()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>has()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>lC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>Vm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br>+1 more</td>
-  <td>Um() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>E()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>M() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>17</td>
-  <td><code>To()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>Nv()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>Ha()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>lC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>To() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>n()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>Nv() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>18</td>
-  <td><code>Gm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>T1()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>q()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>at()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>Gm() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td>External entry / no inbound edge</td>
+  <td><code>Bh()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>eie()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>lie()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+4 more</td>
+  <td>T1() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>19</td>
-  <td><code>p1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>Xa()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>Ha()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>q()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>p1() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td>External entry / no inbound edge</td>
+  <td><code>lte()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>Xa() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>20</td>
-  <td><code>OE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>W1()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>Ha()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>lC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>OE() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>W1() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>21</td>
-  <td><code>h1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>Vs()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>h1() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>nh()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>US()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>Vs() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>22</td>
-  <td><code>jE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>I4()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>qm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>jE() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>I4() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>23</td>
-  <td><code>qm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>bx</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>jE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>vv()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>TP()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>qm() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>bx node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>24</td>
-  <td><code>Ms()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>oM</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>gn()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>lC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>Ms() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>oM node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>25</td>
-  <td><code>IE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>eI()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>dk()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>lC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>NE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>IE() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>t()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>dee()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>fee()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>pee()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br>+3 more</td>
+  <td>eI() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>26</td>
-  <td><code>NE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>wI()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>IE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>lC()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>NE() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>eI()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>wI() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>27</td>
-  <td><code>Xm()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>qx()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>q()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>u4()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>Xm() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>n()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small><br><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td><code>k0()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>qx() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>28</td>
-  <td><code>Is()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>d2()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>q()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>Bh()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>Jf()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>N1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br>+1 more</td>
-  <td>Is() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>S()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>d2() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>29</td>
-  <td><code>wj()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>ek()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td><code>q()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td><code>I1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
-  <td>wj() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>ek() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 <tr>
   <td>30</td>
-  <td><code>Vi()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small></td>
+  <td><code>tk()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
   <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>Bh()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>g1()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br><code>qE()</code><br><small style="color:var(--muted)">public/assets/index-BiuR8aUJ.js</small><br>+3 more</td>
-  <td>Vi() node in public/assets/index-BiuR8aUJ.js.</td>
+  <td><code>r()</code><br><small style="color:var(--muted)">public/assets/index-D_qfjSMf.js</small></td>
+  <td>No direct outbound edge</td>
+  <td>tk() node in public/assets/index-D_qfjSMf.js.</td>
 </tr>
 </table>
 
@@ -5341,9 +5341,9 @@ flowchart LR
     <h4>Key Files</h4>
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>File</th><th>Coverage</th></tr>
-      <tr><td><code>public/assets/index-BAdyQiwp.js</code></td><td>745 nodes</td></tr>
-<tr><td><code>public/assets/index-D_qfjSMf.js</code></td><td>736 nodes</td></tr>
-<tr><td><code>public/assets/index-BiuR8aUJ.js</code></td><td>731 nodes</td></tr>
+      <tr><td><code>public/assets/index-BAdyQiwp.js</code></td><td>747 nodes</td></tr>
+<tr><td><code>public/assets/index-D_qfjSMf.js</code></td><td>747 nodes</td></tr>
+<tr><td><code>public/assets/index-BiuR8aUJ.js</code></td><td>733 nodes</td></tr>
 <tr><td><code>backend/types/index.ts</code></td><td>155 nodes</td></tr>
 <tr><td><code>project-blueprint.md</code></td><td>74 nodes</td></tr>
 <tr><td><code>src/types/index.ts</code></td><td>73 nodes</td></tr>
@@ -5353,7 +5353,7 @@ flowchart LR
   </div>
   <div class="card">
     <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: calls x4186, contains x2399, method x1074, references x335. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+    <p>This section comes from graphify community clustering. Relationship summary: calls x4201, contains x2399, method x1074, references x335. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
   </div>
 </div>
 <hr>
@@ -5367,7 +5367,7 @@ flowchart LR
       <tr><td>Nodes</td><td>11952</td></tr>
       <tr><td>Edges</td><td>20788</td></tr>
       <tr><td>Hyperedges</td><td>0</td></tr>
-      <tr><td>Communities</td><td>671</td></tr>
+      <tr><td>Communities</td><td>673</td></tr>
       <tr><td>Documented Sections</td><td>15</td></tr>
     </table>
   </div>
@@ -5383,7 +5383,7 @@ flowchart LR
 
 <div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
   <p>tds-geo — Architecture Documentation</p>
-  <p>Generated: 2026-08-04 11:32 UTC · graphify callflow-html</p>
+  <p>Generated: 2026-08-05 08:45 UTC · graphify callflow-html</p>
 </div>
 
 </div><!-- .container -->

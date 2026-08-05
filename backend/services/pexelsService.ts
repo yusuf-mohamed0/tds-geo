@@ -14,9 +14,6 @@ import openaiService from './openai';
 import { PexelsImage, PexelsCacheEntry } from '../types';
 
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY || '';
-if (!PEXELS_API_KEY && process.env.NODE_ENV === 'production') {
-  throw new Error('PEXELS_API_KEY environment variable is required in production');
-}
 
 interface PexelsSearchResponse {
   photos: Array<{
@@ -75,6 +72,10 @@ class PexelsService {
       color?: string;
     } = {}
   ): Promise<PexelsSearchResponse> {
+    if (!PEXELS_API_KEY || PEXELS_API_KEY === 'placeholder') {
+      return { photos: [], total_results: 0, page: 1, per_page: options.perPage || 5 };
+    }
+
     const params = new URLSearchParams({
       query,
       per_page: String(options.perPage || 5),
