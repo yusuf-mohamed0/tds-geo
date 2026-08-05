@@ -11,8 +11,8 @@ Latest operational update (2026-08-05): production is running release `3c49067`;
 Current production blockers:
 
 - `boston-vet`: WordPress REST returns HTTP 403 from production EC2; allowlist `16.192.29.174` in Cloudflare/WAF before live publishing.
-- `caravanserai`: active client with `billing_status = cancelled`; correct billing state before scaling automation.
-- `flaunt-cosmetics-global`: single SKU is out of stock; content should use education/trust/waitlist CTAs, not hard conversion CTAs.
+- `caravanserai`: Shopify Admin token returns 401 and client has `billing_status = cancelled`; repair OAuth/token and billing before scaling automation.
+- `flaunt-cosmetics-global`: Shopify Admin token returns 401 and single SKU is out of stock; repair OAuth/token and use education/trust/waitlist CTAs, not hard conversion CTAs.
 
 ```mermaid
 gantt
@@ -161,10 +161,10 @@ gantt
 | Client | Platform | Products | Progress | Next Action |
 |--------|----------|----------|----------|-------------|
 | Alamein Outdoor Furniture | 🛒 Shopify | Multiple lines | ███████████░░░░ 75% | Follow `alamein-2022/app-process.md`; confirm public blog listing quality |
-| Caravanserai | 🛒 Shopify | 229 | ██████████░░░░░ 68% | Fix cancelled billing state; follow `caravanserai/app-process.md` |
+| Caravanserai | 🛒 Shopify | 229 | ██████████░░░░░ 68% | Repair Shopify OAuth/token and billing; follow `caravanserai/app-process.md` |
 | Boston Pharma | 📝 WordPress | ~550 | ████████████████ 100% | Confirm write API credentials; follow `boston-pharma/app-process.md` |
 | Boston Vet | 📝 WordPress | Unknown | ██████████░░░░░ 45% | Allowlist EC2 IP; follow `boston-vet/app-process.md` |
-| Flaunt Cosmetics Global | 🛒 Shopify | 1 SKU | ███████████░░░░ 75% | Review Beauty Tips drafts; follow `flaunt-cosmetics-global/app-process.md` |
+| Flaunt Cosmetics Global | 🛒 Shopify | 1 SKU | ███████████░░░░ 75% | Repair Shopify OAuth/token; review Beauty Tips drafts; follow `flaunt-cosmetics-global/app-process.md` |
 
 **Infrastructure:**
 - ✅ **WordPress sync route** built — `POST /api/cms/sync/:clientId` pulls WP posts into local DB

@@ -11,8 +11,8 @@ This file is the operating index for the production client process layer. Each a
 | Alamein Outdoor Furniture | `alamein-2022` | Shopify | `alamein-2022/app-process.md` | Active, Shopify connected |
 | Boston Pharmaceutical Industries | `boston-pharma` | WordPress | `boston-pharma/app-process.md` | Active, WordPress REST readable |
 | Boston Veterinary Pharmaceutical | `boston-vet` | WordPress | `boston-vet/app-process.md` | Active, blocked from EC2 by WAF/403 |
-| Caravanserai | `caravanserai` | Shopify | `caravanserai/app-process.md` | Active, billing status needs correction |
-| Flaunt Cosmetics Global | `flaunt-cosmetics-global` | Shopify | `flaunt-cosmetics-global/app-process.md` | Active, Shopify connected |
+| Caravanserai | `caravanserai` | Shopify | `caravanserai/app-process.md` | Active, Shopify token returns 401; billing status needs correction |
+| Flaunt Cosmetics Global | `flaunt-cosmetics-global` | Shopify | `flaunt-cosmetics-global/app-process.md` | Active, Shopify token returns 401 |
 
 ## Non-Production / Not Active
 
