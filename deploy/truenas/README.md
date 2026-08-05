@@ -29,6 +29,10 @@ TrueNAS SCALE
 
 | File | Purpose |
 |---|---|
+| `ARCHITECTURE.md` | Complete target architecture, deployment flow, runtime topology, storage, cutover, and rollback design. |
+| `SECURITY.md` | Security baseline for public exposure, secrets, firewalling, runner access, database safety, backups, and incident response. |
+| `REQUIREMENTS.md` | Hardware, TrueNAS, VM, GitHub, environment, network, migration, validation, and operations requirements. |
+| `LAUNCH-CHECKLIST.md` | Final go/no-go checklist before moving production traffic from AWS to TrueNAS. |
 | `compose.yml` | Main TrueNAS production stack. |
 | `.env.example` | Environment template. Real `.env` lives only on the VM. |
 | `Caddyfile` | Reverse proxy for direct HTTPS mode. |
@@ -40,6 +44,16 @@ TrueNAS SCALE
 | `scripts/migrate-from-aws.sh` | Pull final/current AWS DB dump and restore locally. |
 | `scripts/healthcheck.sh` | Verify containers, DB, Redis, and `/health`. |
 | `RUNBOOK.md` | Full migration and operations runbook. |
+| `KNOWLEDGE-BASE.md` | Saved TrueNAS and local-server operating knowledge. |
+| `OPERATING-ROLES.md` | Role responsibilities for migration and operations. |
+
+## Read This First
+
+1. `REQUIREMENTS.md` tells you what hardware, VM, network, secrets, GitHub runner, and validation evidence are required.
+2. `ARCHITECTURE.md` shows the complete target design and traffic/deploy/data flow.
+3. `SECURITY.md` defines what can be public, what must stay private, and how secrets/backups/runners are protected.
+4. `RUNBOOK.md` is the step-by-step migration procedure.
+5. `LAUNCH-CHECKLIST.md` is the final go/no-go checklist before cutover.
 
 ## GitHub Actions
 
