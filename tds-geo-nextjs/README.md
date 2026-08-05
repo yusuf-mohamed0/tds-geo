@@ -44,12 +44,12 @@ TDS_GEO_API_KEY=your-tds-geo-api-key-here
 ```typescript
 import { createTdsGeoServer } from '@tds-geo/nextjs-integration/server';
 
-const tds-geo = createTdsGeoServer({
+const tdsGeo = createTdsGeoServer({
   apiKey: process.env.TDS_GEO_API_KEY!,
 });
 
-export const GET = tds-geo.handlers.posts.GET;
-export const POST = tds-geo.handlers.posts.POST;
+export const GET = tdsGeo.handlers.posts.GET;
+export const POST = tdsGeo.handlers.posts.POST;
 ```
 
 **`app/api/tds-geo/posts/[id]/route.ts`** — Get, update, delete a single post:
@@ -57,13 +57,13 @@ export const POST = tds-geo.handlers.posts.POST;
 ```typescript
 import { createTdsGeoServer } from '@tds-geo/nextjs-integration/server';
 
-const tds-geo = createTdsGeoServer({
+const tdsGeo = createTdsGeoServer({
   apiKey: process.env.TDS_GEO_API_KEY!,
 });
 
-export const GET = tds-geo.handlers.post.GET;
-export const PUT = tds-geo.handlers.post.PUT;
-export const DELETE = tds-geo.handlers.post.DELETE;
+export const GET = tdsGeo.handlers.post.GET;
+export const PUT = tdsGeo.handlers.post.PUT;
+export const DELETE = tdsGeo.handlers.post.DELETE;
 ```
 
 **`app/api/tds-geo/webhook/route.ts`** — Receive real-time events from TDS Geo:
@@ -71,11 +71,11 @@ export const DELETE = tds-geo.handlers.post.DELETE;
 ```typescript
 import { createTdsGeoServer } from '@tds-geo/nextjs-integration/server';
 
-const tds-geo = createTdsGeoServer({
+const tdsGeo = createTdsGeoServer({
   apiKey: process.env.TDS_GEO_API_KEY!,
 });
 
-export const POST = tds-geo.handlers.webhook.POST;
+export const POST = tdsGeo.handlers.webhook.POST;
 ```
 
 ### 3. Build your blog pages
@@ -243,7 +243,7 @@ class PrismaStorage implements StorageProvider {
   // ... implement other methods
 }
 
-const tds-geo = createTdsGeoServer({
+const tdsGeo = createTdsGeoServer({
   apiKey: process.env.TDS_GEO_API_KEY!,
   storage: new PrismaStorage(),
 });
@@ -252,7 +252,7 @@ const tds-geo = createTdsGeoServer({
 ### Debug logging
 
 ```typescript
-const tds-geo = createTdsGeoServer({
+const tdsGeo = createTdsGeoServer({
   apiKey: process.env.TDS_GEO_API_KEY!,
   debug: true,
 });

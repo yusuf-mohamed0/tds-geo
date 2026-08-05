@@ -16,6 +16,22 @@ export class WordPressConnector implements ConnectorInterface {
   private config: ConnectorConfig | null = null;
   private connectedAt: Date | null = null;
 
+  private unwrapResponse<T = any>(value: any): T {
+    if (value && typeof value === 'object' && 'success' in value && 'data' in value) {
+      return value.data as T;
+    }
+    return value as T;
+  }
+
+  private unwrapList(value: any, keys: string[]): any[] {
+    const data = this.unwrapResponse<any>(value);
+    if (Array.isArray(data)) return data;
+    for (const key of keys) {
+      if (Array.isArray(data?.[key])) return data[key];
+    }
+    return [];
+  }
+
   async connect(config: ConnectorConfig): Promise<boolean> {
     if (!config.endpointUrl || !config.apiKey) {
       logger.error('WordPressConnector: endpointUrl and apiKey required');
@@ -52,10 +68,12 @@ export class WordPressConnector implements ConnectorInterface {
 
     try {
       const response = await this.client.get('/status');
-      const data = response.data;
+      const data = this.unwrapResponse<any>(response.data);
+      const activeKeys = data.active_keys;
+      const active = data.status === 'active' || data.status === 'ok' || (typeof activeKeys === 'number' && activeKeys > 0);
 
       return {
-        status: data.status === 'active' ? 'healthy' : 'degraded',
+        status: active ? 'healthy' : 'degraded',
         version: data.version || this.version,
         lastSync: data.last_sync || null,
         uptime: data.uptime || 0,
@@ -96,18 +114,18 @@ export class WordPressConnector implements ConnectorInterface {
       if (article.id) payload.agent_article_id = article.id;
 
       const response = await this.client.post('/posts', payload);
-      const result = response.data;
+      const result = this.unwrapResponse<any>(response.data);
 
       logger.info('WordPressConnector: article published', {
-        id: result.id,
+        id: result.post_id || result.id,
         title: article.title,
         status: result.status,
       });
 
       return {
         success: true,
-        externalId: String(result.id),
-        url: result.link || result.url || null,
+        externalId: String(result.post_id || result.id || ''),
+        url: result.post_url || result.link || result.url || null,
         provider: 'wordpress',
       };
     } catch (err: any) {
@@ -137,12 +155,12 @@ export class WordPressConnector implements ConnectorInterface {
       if (article.excerpt) payload.excerpt = article.excerpt;
 
       const response = await this.client.put(`/posts/${id}`, payload);
-      const result = response.data;
+      const result = this.unwrapResponse<any>(response.data);
 
       return {
         success: true,
-        externalId: String(result.id),
-        url: result.link || result.url || null,
+        externalId: String(result.post_id || result.id || ''),
+        url: result.post_url || result.link || result.url || null,
         provider: 'wordpress',
       };
     } catch (err: any) {
@@ -172,7 +190,7 @@ export class WordPressConnector implements ConnectorInterface {
 
     try {
       const response = await this.client.get('/posts', { params: { limit: 250 } });
-      const posts = response.data.posts || response.data || [];
+      const posts = this.unwrapList(response.data, ['posts']);
 
       return {
         synced: Array.isArray(posts) ? posts.length : 0,
@@ -193,7 +211,7 @@ export class WordPressConnector implements ConnectorInterface {
 
     try {
       const response = await this.client.get(`/posts/${id}`);
-      const post = response.data;
+      const post = this.unwrapResponse<any>(response.data);
 
       return {
         id: String(post.id),
@@ -221,7 +239,7 @@ export class WordPressConnector implements ConnectorInterface {
 
     try {
       const response = await this.client.get(`/media?id=${id}`);
-      const media = response.data;
+      const media = this.unwrapResponse<any>(response.data);
 
       return {
         id: String(media.id),
@@ -241,7 +259,7 @@ export class WordPressConnector implements ConnectorInterface {
 
     try {
       const response = await this.client.get('/categories');
-      const items = response.data.categories || response.data || [];
+      const items = this.unwrapList(response.data, ['categories']);
       return items.map((item: any) => ({
         id: item.id || item.term_id,
         name: item.name || '',
@@ -260,7 +278,7 @@ export class WordPressConnector implements ConnectorInterface {
 
     try {
       const response = await this.client.get('/tags');
-      const items = response.data.tags || response.data || [];
+      const items = this.unwrapList(response.data, ['tags']);
       return items.map((item: any) => ({
         id: item.id || item.term_id,
         name: item.name || '',

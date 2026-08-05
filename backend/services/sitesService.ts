@@ -109,7 +109,7 @@ class SitesService {
   async recordPublish(domain: string, platform: SitePlatform): Promise<void> {
     const pool = this.getPool();
     await pool.query(
-      `UPDATE connected_sites SET total_articles_published = total_articles_published + 1, last_publish_at = NOW(), updated_at = NOW() WHERE domain = $2 AND platform = $3`,
+      `UPDATE connected_sites SET total_articles_published = total_articles_published + 1, last_publish_at = NOW(), updated_at = NOW() WHERE domain = $1 AND platform = $2`,
       [domain, platform]
     );
   }

@@ -18,6 +18,12 @@ const statusOptions = [
   { value: 'rejected', label: 'Rejected' },
 ];
 
+export function buildGenerateArticlePayload(keyword: string, clientId: string | null): { keyword: string; clientId?: string } {
+  const payload: { keyword: string; clientId?: string } = { keyword: keyword.trim() };
+  if (clientId) payload.clientId = clientId;
+  return payload;
+}
+
 export default function ArticlesPage() {
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get('clientId');
@@ -44,7 +50,7 @@ export default function ArticlesPage() {
     try {
       const res = await apiFetch<{ success: boolean; article?: Record<string, unknown>; error?: string }>('/api/articles/generate', {
         method: 'POST',
-        body: JSON.stringify({ keyword: keyword.trim() }),
+        body: JSON.stringify(buildGenerateArticlePayload(keyword, clientId)),
       });
       if (res.success) {
         setGenerateResult('Article generated successfully!');

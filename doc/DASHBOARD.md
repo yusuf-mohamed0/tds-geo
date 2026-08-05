@@ -6,13 +6,13 @@
 
 ## Overview
 
-Latest operational update (2026-08-05): production is running release `3c49067`; client app process runbooks were added under `doc/clients/*/app-process.md` and indexed in `doc/clients/APP-PROCESSES.md`. Shared content roles, GEO/AEO plans, and local draft articles were added in `doc/clients/CONTENT-OPERATING-ROLES.md`, `doc/clients/*/geo-aeo-plan.md`, and `doc/clients/DRAFT-ARTICLE-QUEUE.md`.
+Latest operational update (2026-08-05): production is running release `repair-20260805-0925`. Backend/frontend connector fixes are deployed, and production DB compatibility repairs were applied for `publishing_history`, active CMS connection uniqueness, and stale Shopify CMS tokens.
 
 Current production blockers:
 
-- `boston-vet`: WordPress REST returns HTTP 403 from production EC2; allowlist `16.192.29.174` in Cloudflare/WAF before live publishing.
-- `caravanserai`: Shopify Admin token returns 401 and client has `billing_status = cancelled`; repair OAuth/token and billing before scaling automation.
-- `flaunt-cosmetics-global`: Shopify Admin token returns 401 and single SKU is out of stock; repair OAuth/token and use education/trust/waitlist CTAs, not hard conversion CTAs.
+- `alamein-2022`: Shopify client token and CMS connection token both validate; hidden draft `577305575481` exists.
+- `caravanserai`: Shopify client and CMS tokens validate; billing is active; 7 items remain pending for review/publishing workflow.
+- `flaunt-cosmetics-global`: Shopify client and CMS tokens both validate; single SKU is out of stock, so use education/trust/waitlist CTAs, not hard conversion CTAs.
 
 ```mermaid
 gantt
@@ -33,12 +33,6 @@ gantt
     Write Descriptions           :done, 2026-07-08, 1d
     Fix Wrong Article            :done, 2026-07-08, 1d
     WordPress → DB Sync          :done, 2026-07-08, 1d
-
-    section Boston Vet
-    Brand Profile                :done, 2026-07-07, 1d
-    Cloudflare Bypass            :crit, active, 2026-07-08, 3d
-    Audit (Wayback Machine)      :done, 2026-07-21, 1d
-    2 Articles Written           :done, 2026-07-21, 1d
 
     section Flaunt Cosmetics Global
     Short Draft Remediation      :done, 2026-07-13, 1d
@@ -75,8 +69,9 @@ gantt
 | SEO Content Guide | ✅ Complete | 5 content pillars, keyword strategy |
 | Articles Written | ✅ **6 articles** | Pass quality gate (70-96/100) |
 | Liquid Files | ✅ 6 `.liquid` | Shopify-ready with brand CSS |
-| App Install | ✅ **APPROVED & PUBLISHED** | `apps.shopify.com/tds-geo` |
-| Meta Descriptions | 🔴 Not applied | Waiting for app access |
+| App Listing | ✅ **APPROVED & PUBLISHED** | `apps.shopify.com/tds-geo` |
+| Store Connection | ✅ Connected | Shopify client/CMS tokens validate; billing active |
+| Meta Descriptions | ⏳ Pending | Waiting for review/approval workflow |
 | Product Descriptions | ✅ **10 pilot descriptions** | Documented at `product-descriptions-pilot.md` |
 
 **Progress:** ██████████░░░░░ 68%
@@ -112,7 +107,7 @@ gantt
 
 ---
 
-### Boston Veterinary `boston-vet`
+### Boston Veterinary `boston-vet` (Archived)
 
 | Dimension | Score | Status |
 |-----------|-------|--------|
@@ -122,7 +117,7 @@ gantt
 | Full Audit | ✅ **Wayback Machine audit** | Created from 2026-05-13 snapshot |
 | Audit (Blocked Direct) | 🔴 Cloudflare WAF | Challenge mode — all automated access blocked |
 | Articles Written | ✅ **2 article drafts** | Pet Care Cairo + Vet Clinics Egypt (~1,500 words each) |
-| Product Publishing | ⏳ Waiting | Cloudflare must be unblocked |
+| Production Status | Archived | Removed from active clients on 2026-08-05; CMS connection disabled |
 
 **Progress:** ██████████░░░░░ 45%
 
@@ -133,7 +128,7 @@ gantt
 | Dimension | Status | Detail |
 |-----------|--------|--------|
 | Brand Profile | Complete | UAE/Egypt beauty audience and product positioning documented |
-| Shopify Connection | Active | Beauty Tips is the enforced TDS publishing default |
+| Shopify Connection | Connected | Production Shopify client/CMS tokens validate; Beauty Tips remains the enforced TDS publishing default |
 | Short Draft Repair | Complete | 4 placeholders replaced with 1,770–2,191-word fact-constrained drafts |
 | Content Safety Guard | Complete | Markdown-only generation rejects unsafe HTML, fabricated evidence, and unapproved Flaunt products |
 | Publishing State | Safe | All corrected Shopify drafts are hidden, unscheduled, and require manual approval |
@@ -160,17 +155,19 @@ gantt
 
 | Client | Platform | Products | Progress | Next Action |
 |--------|----------|----------|----------|-------------|
-| Alamein Outdoor Furniture | 🛒 Shopify | Multiple lines | ███████████░░░░ 75% | Follow `alamein-2022/app-process.md`; confirm public blog listing quality |
-| Caravanserai | 🛒 Shopify | 229 | ██████████░░░░░ 68% | Repair Shopify OAuth/token and billing; follow `caravanserai/app-process.md` |
+| Alamein Outdoor Furniture | 🛒 Shopify | Multiple lines | ███████████░░░░ 75% | Shopify connector repaired in production DB; deploy route fixes before further automation |
+| Caravanserai | 🛒 Shopify | 229 | ████████████░░░ 80% | Billing active; review 7 pending items and follow `caravanserai/app-process.md` |
 | Boston Pharma | 📝 WordPress | ~550 | ████████████████ 100% | Confirm write API credentials; follow `boston-pharma/app-process.md` |
-| Boston Vet | 📝 WordPress | Unknown | ██████████░░░░░ 45% | Allowlist EC2 IP; follow `boston-vet/app-process.md` |
-| Flaunt Cosmetics Global | 🛒 Shopify | 1 SKU | ███████████░░░░ 75% | Repair Shopify OAuth/token; review Beauty Tips drafts; follow `flaunt-cosmetics-global/app-process.md` |
+| Flaunt Cosmetics Global | 🛒 Shopify | 1 SKU | ███████████░░░░ 75% | Shopify token repaired; review Beauty Tips drafts; follow `flaunt-cosmetics-global/app-process.md` |
 
 **Infrastructure:**
 - ✅ **WordPress sync route** built — `POST /api/cms/sync/:clientId` pulls WP posts into local DB
 - ✅ **Client validation guard** — DB trigger + middleware prevent articles for inactive clients
-- ❌ **No WordPress API keys** configured for Boston Pharma or Boston Vet (cms_connections.api_key_encrypted is null)
-- ❌ **No Shopify sessions** for client stores (only test stores have tokens)
+- ✅ **Publishing history compatibility columns** applied in production DB for Shopify and generic CMS history writes
+- ✅ **Active CMS unique index** applied in production DB for one active provider connection per client
+- ✅ **Shopify CMS tokens** synchronized from valid client tokens for Alamein, Caravanserai, and Flaunt; all verified against Shopify `shop.json`
+- ❌ **WordPress write keys still not confirmed** for Boston Pharma publishing workflows
+- ✅ **Boston Vet removed** from active production clients; CMS connection disabled and historical docs retained
 - ✅ **Test clients marked inactive** (traffic-test, test-client, e2e-pipeline-test-client)
 - ✅ **Client app process runbooks** created for all active production clients in `doc/clients/APP-PROCESSES.md`
 
@@ -182,7 +179,7 @@ gantt
 |--------|----------|--------------|-----------|-------|-----------|
 | Caravanserai | 6 written | — | — | 10 issues documented | 0 (blocked) |
 | Boston Pharma | 14 published + 56 synced + 2 expanded | 550+ auto | 550+ auto | Wrong article, post_type bug | ~500 batch calls |
-| Boston Vet | 2 article drafts | — | — | Audit created from Wayback Machine | 0 (blocked) |
+| Boston Vet | Archived | — | — | Removed from active clients | 0 |
 | Flaunt Cosmetics Global | 4 corrected hidden drafts | — | 4 refreshed | Length, factual-safety, and manual-approval guards | 4 generation calls |
 | Acme Maintenance | — | — | — | Full brand profile, audit, SEO guide created | 0 |
 | **Total** | **84 articles** | **550+ descriptions** | **550+ meta tags** | **16+ fixes** | **~504 API calls** |
@@ -200,7 +197,7 @@ gantt
       "products": 229,
       "articles": 6,
       "product_descriptions": 10,
-      "status": "blocked"
+      "status": "active_connected"
     },
     "boston-pharma": {
       "overall": 65,
@@ -221,14 +218,14 @@ gantt
       "audit_source": "wayback_machine",
       "cloudflare_blocked": true,
       "articles_written": 2,
-      "status": "blocked"
+      "status": "archived_removed"
     },
     "flaunt-cosmetics-global": {
       "overall": 75,
       "progress": 75,
       "products": 1,
       "articles": 4,
-      "status": "active",
+      "status": "active_token_repaired",
       "drafts_pending_review": 4,
       "minimum_article_words": 1200
     },

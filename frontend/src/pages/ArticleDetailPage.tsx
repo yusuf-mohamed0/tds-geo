@@ -5,6 +5,71 @@ import { Calendar, Clock } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { apiFetch } from '../api/client';
 
+const CAIRO_TIME_ZONE = 'Africa/Cairo';
+
+type CairoInputParts = {
+  date: string;
+  time: string;
+};
+
+function getDateTimeParts(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+
+  const valueFor = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value || '';
+
+  return {
+    year: valueFor('year'),
+    month: valueFor('month'),
+    day: valueFor('day'),
+    hour: valueFor('hour'),
+    minute: valueFor('minute'),
+    second: valueFor('second'),
+  };
+}
+
+function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
+  const parts = getDateTimeParts(date, timeZone);
+  const asUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour),
+    Number(parts.minute),
+    Number(parts.second),
+  );
+  return asUtc - date.getTime();
+}
+
+export function formatCairoDateTimeForInputs(isoString: string): CairoInputParts {
+  const parts = getDateTimeParts(new Date(isoString), CAIRO_TIME_ZONE);
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    time: `${parts.hour}:${parts.minute}`,
+  };
+}
+
+export function getTodayDateInCairo(): string {
+  return formatCairoDateTimeForInputs(new Date().toISOString()).date;
+}
+
+export function cairoDateTimeToIso(dateInput: string, timeInput: string): string {
+  const [year, month, day] = dateInput.split('-').map(Number);
+  const [hour, minute] = timeInput.split(':').map(Number);
+  const cairoWallTimeAsUtc = Date.UTC(year, month - 1, day, hour, minute, 0);
+  let utcMs = cairoWallTimeAsUtc - getTimeZoneOffsetMs(new Date(cairoWallTimeAsUtc), CAIRO_TIME_ZONE);
+  utcMs = cairoWallTimeAsUtc - getTimeZoneOffsetMs(new Date(utcMs), CAIRO_TIME_ZONE);
+  return new Date(utcMs).toISOString();
+}
+
 interface ArticleDetail {
   id: string;
   title: string;
@@ -38,9 +103,9 @@ export default function ArticleDetailPage() {
       .then((data) => {
         setArticle(data);
         if (data.scheduled_at) {
-          const d = new Date(data.scheduled_at);
-          setScheduleDate(d.toISOString().split('T')[0]);
-          setScheduleTime(d.toTimeString().slice(0, 5));
+          const scheduled = formatCairoDateTimeForInputs(data.scheduled_at);
+          setScheduleDate(scheduled.date);
+          setScheduleTime(scheduled.time);
         }
       })
       .catch(() => setError('Failed to load article'))
@@ -52,7 +117,7 @@ export default function ArticleDetailPage() {
     setScheduling(true);
     setScheduleError('');
     try {
-      const scheduledAt = new Date(`${scheduleDate}T${scheduleTime}:00Z`).toISOString();
+      const scheduledAt = cairoDateTimeToIso(scheduleDate, scheduleTime);
       const updated = await apiFetch<ArticleDetail>(`/api/articles/${id}/schedule`, {
         method: 'POST',
         body: JSON.stringify({ scheduledAt }),
@@ -219,7 +284,7 @@ export default function ArticleDetailPage() {
                     <Text as="p" variant="bodyMd">
                       {new Date(article.scheduled_at).toLocaleDateString(undefined, {
                         weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-                        hour: '2-digit', minute: '2-digit',
+                        hour: '2-digit', minute: '2-digit', timeZone: CAIRO_TIME_ZONE, timeZoneName: 'short',
                       })}
                     </Text>
                   </InlineStack>
@@ -241,7 +306,7 @@ export default function ArticleDetailPage() {
                       value={scheduleDate}
                       onChange={(e) => setScheduleDate(e.target.value)}
                       style={{ flex: 1 }}
-                      min={new Date().toISOString().split('T')[0]}
+                      min={getTodayDateInCairo()}
                     />
                     <input
                       aria-label="Schedule time"

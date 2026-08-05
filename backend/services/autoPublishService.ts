@@ -166,7 +166,7 @@ export class AutoPublishService {
       if (existing) {
         await this.pool!.query(
           `UPDATE publishing_history
-           SET status = 'published', published_at = NOW(), published_url = $2, updated_at = NOW()
+           SET status = 'published', published_at = NOW(), published_url = $2
            WHERE article_id = $1 AND shopify_article_id = $3`,
           [article.id, publishResult.url, shopifyArticleId]
         );

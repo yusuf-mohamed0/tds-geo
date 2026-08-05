@@ -8,7 +8,6 @@ This directory contains brand profiles for every client in the TDS Geo system.
 |---|---|---|---|
 | Alamein Outdoor Furniture | `alamein-2022` | `alamein-2022/` | Outdoor furniture, playgrounds, fitness, commercial furniture |
 | Boston Pharmaceutical Industries | `boston-pharma` | `boston-pharma/` | Pharmaceutical |
-| Boston Veterinary Pharmaceutical | `boston-vet` | `boston-vet/` | Veterinary |
 | Caravanserai | `caravanserai` | `caravanserai/` | Home decor, gifts, Egyptian craftsmanship |
 | Flaunt Cosmetics Global | `flaunt-cosmetics-global` | `flaunt-cosmetics-global/` | Cosmetics / beauty |
 
@@ -19,6 +18,7 @@ See `APP-PROCESSES.md` for the production app process index and per-client opera
 | Client | Slug | Directory | Rule |
 |---|---|---|---|
 | Traffic Test | `traffic-test` | `traffic-test/` | Inactive/cancelled; do not publish. |
+| Boston Veterinary Pharmaceutical | `boston-vet` | `boston-vet/` | Removed from active clients on 2026-08-05; historical docs only. |
 | Joe's Venture | `joes-venture` | `joes-venture/` | Documented only; OAuth/client row pending. |
 | Acme Maintenance Co. | `acme-maintenance` | `acme-maintenance/` | Historical docs; production DB row was corrected away from this client. |
 

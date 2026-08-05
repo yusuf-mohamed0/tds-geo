@@ -145,9 +145,9 @@ export class PublisherEngine {
             [article.id]
           );
           await pool.query(
-            `INSERT INTO publishing_history (article_id, client_id, provider, external_id, url, status)
-             VALUES ($1, $2, $3, $4, $5, 'success')`,
-            [article.id, client.id, connection.provider, result.externalId, result.url]
+            `INSERT INTO publishing_history (article_id, client_id, cms_connection_id, provider, external_id, external_url, published_url, status, published_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $6, 'published', NOW())`,
+            [article.id, client.id, connection.id, connection.provider, result.externalId, result.url]
           );
         }
         return result;

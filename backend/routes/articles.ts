@@ -36,6 +36,27 @@ import { countArticleWords, getMinimumArticleWords } from '../services/contentLe
 import { getArticleSafetyIssues } from '../services/articleSafety';
 import { presentArticleHtml } from '../services/articlePresentation';
 
+function getPublishFailureStatus(error?: string): number {
+  const message = (error || '').toLowerCase();
+  if (
+    message.includes('publication blocked') ||
+    message.includes('minimum required') ||
+    message.includes('unsafe') ||
+    message.includes('safety')
+  ) {
+    return 422;
+  }
+  if (
+    message.includes('no shopify blogs') ||
+    message.includes('blog') ||
+    message.includes('not found') ||
+    message.includes('required')
+  ) {
+    return 400;
+  }
+  return 502;
+}
+
 export function createArticleRoutes(pool: Pool): Router {
   const router = Router();
 
@@ -289,8 +310,8 @@ export function createArticleRoutes(pool: Pool): Router {
 
           publishResult = await publisherEngine.publishWithTracking(pool, { ...savedArticle, content_html: publishHtml }, client, blogId, { publish: true });
 
-          // Ping IndexNow
-          if (publishResult?.url) {
+          // Ping IndexNow only after a confirmed publish.
+          if (publishResult?.success && publishResult?.url) {
             indexNowService.pingArticlePublished(publishResult.url).catch(err => {
               logger.warn('IndexNow ping failed after auto-publish', {
                 articleId: savedArticle.id,
@@ -321,8 +342,9 @@ export function createArticleRoutes(pool: Pool): Router {
         seoAnalysis,
         validation,
         linkOpportunities,
-        published: !!publishResult,
+        published: publishResult?.success === true,
         publishResult,
+        publishError: publishResult && publishResult.success === false ? (publishResult.error || 'Publisher returned unsuccessful result') : undefined,
         approvalRequired: client.approval_mode === 'manual',
         qualityGate: qualityGateResult,
         qualityReport,
@@ -792,6 +814,17 @@ export function createArticleRoutes(pool: Pool): Router {
       }
 
       const publishResult = await publisherEngine.publishWithTracking(pool, article, client, blogId, { publish: true });
+
+      if (!publishResult.success) {
+        const error = publishResult.error || 'Publisher returned unsuccessful result';
+        res.status(getPublishFailureStatus(error)).json({
+          success: false,
+          error: 'Article publish failed',
+          details: error,
+          provider: publishResult.provider || 'shopify',
+        });
+        return;
+      }
 
       // Ping IndexNow with the published article URL
       if (publishResult?.url) {

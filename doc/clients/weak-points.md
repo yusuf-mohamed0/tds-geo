@@ -3,7 +3,6 @@
 | Client | Type | Critical | High | Medium | Low |
 |---|---|---|---|---|---|
 | Boston Pharma | WordPress | 2 | 4 | 3 | 2 |
-| Boston Vet | WordPress | 2 | 3 | 1 | 1 |
 | Traffic Test | Shopify | 1 | 3 | 2 | 1 |
 | Infrastructure | System | 2 | 3 | 2 | 1 |
 
@@ -44,7 +43,9 @@
 
 ---
 
-## 2. Boston Veterinary Pharmaceutical
+## 2. Boston Veterinary Pharmaceutical (Archived)
+
+Removed from active production clients on 2026-08-05. Historical findings below are retained for reference only; do not run client workflows unless the client is reactivated.
 
 ### 🔴 Critical (Fix Immediately)
 
@@ -114,6 +115,7 @@
 |---|---|---|---|
 | SYS-1 | **Disk at 67% — 26G/38G used** | Growing at ~2-3% per week. At current rate, disk full in 2-3 months. Docker images, logs, and DB bloat are main consumers. | `docker system prune -af` (clean unused images), rotate logs (`logrotate`), `vacuumdb` on Postgres. Add 20GB EBS volume. |
 | SYS-2 | **Backend restarted 4 times** | PM2 logged 4 restarts on the backend, likely from the `ReferenceError: n is not defined` bug. Fix was deployed but root cause may still lurk under edge cases. | Monitor PM2 logs for recurring crashes. Set `max_restarts=10` in ecosystem.config to prevent restart loops. |
+| SYS-10 | **Connector code fixes deployed** | WordPress response parsing, CMS connection testing, truthful publish failures, GSC routing, Cairo scheduling, DB compatibility fields, Shopify CMS token repairs, Boston Vet removal, and Caravanserai billing activation are deployed to production release `repair-20260805-0925`. | Monitor production logs and rerun `npm run audit:clients` after each client status change. |
 
 ### 🟠 High Priority
 
@@ -143,7 +145,6 @@
 
 | Fix | Effort | Impact | Client | Suggested Timeline |
 |---|---|---|---|---|
-| Whitelist IP in Cloudflare (BV-1) | 5 min | ✅ Unlocks entire Boston Vet | Boston Vet | Before next content cycle |
 | Add product prices (WP-1) | 2-4 hrs | ✅ Enables WooCommerce sales | Boston Pharma | This week |
 | Clean disk space (SYS-1) | 30 min | ✅ Prevents crash | System | This week |
 | Add product descriptions (WP-2) | 3-5 hrs | ✅ SEO + conversion boost | Boston Pharma | This week |

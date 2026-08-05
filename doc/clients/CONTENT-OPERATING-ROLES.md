@@ -32,6 +32,4 @@ Every client article uses this shared role stack plus the client's own `writer-r
 
 | Client | Blocker | Publishing Rule |
 |---|---|---|
-| `boston-vet` | Production EC2 receives HTTP 403 from WordPress REST | Draft only until WAF allows `16.192.29.174` |
-| `caravanserai` | Shopify Admin token returns HTTP 401 and billing is cancelled | Draft only until OAuth and billing are corrected |
-| `flaunt-cosmetics-global` | Shopify Admin token returns HTTP 401 | Draft only until OAuth is corrected |
+| `boston-vet` | Removed from active clients | Do not generate, schedule, or publish |

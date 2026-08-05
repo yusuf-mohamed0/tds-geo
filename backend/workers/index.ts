@@ -255,7 +255,7 @@ async function handleShopifyPublish(job: Job): Promise<Record<string, unknown>> 
   // Record / update publishing history
   if (existing) {
     await pool.query(
-      `UPDATE publishing_history SET status = 'published', published_at = NOW(), published_url = $2, updated_at = NOW()
+      `UPDATE publishing_history SET status = 'published', published_at = NOW(), published_url = $2
        WHERE article_id = $1 AND shopify_article_id = $3`,
       [articleId, publishResult.url, shopifyArticleId]
     );
@@ -579,10 +579,10 @@ async function handleMultiCmsPublish(job: Job): Promise<Record<string, unknown>>
 
   // Record in publishing_history table directly
   await pool.query(
-    `INSERT INTO publishing_history (article_id, client_id, shopify_article_id, published_url, status)
-     VALUES ($1, $2, $3, $4, 'published')
+    `INSERT INTO publishing_history (article_id, client_id, provider, external_id, external_url, published_url, status, published_at)
+     VALUES ($1, $2, $3, $4, $5, $5, 'published', NOW())
      ON CONFLICT DO NOTHING`,
-    [articleId, clientId, result.id, result.url]
+    [articleId, clientId, targetProvider || 'shopify', result.id, result.url]
   );
 
   await pool.query(`UPDATE articles SET status = 'published', updated_at = NOW() WHERE id = $1`, [articleId]);

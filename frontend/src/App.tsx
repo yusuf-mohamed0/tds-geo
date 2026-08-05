@@ -13,6 +13,7 @@ import ClientDashboard from './pages/ClientDashboard';
 import ArticlesPage from './pages/ArticlesPage';
 import ArticleDetailPage from './pages/ArticleDetailPage';
 import GeoPage from './pages/GeoPage';
+import GscPage from './pages/GscPage';
 import CitationsPage from './pages/CitationsPage';
 import CostsPage from './pages/CostsPage';
 import QualityPage from './pages/QualityPage';
@@ -77,6 +78,7 @@ export default function App() {
               <Route path="articles" element={<ArticlesPage />} />
               <Route path="articles/:id" element={<ArticleDetailPage />} />
               <Route path="geo" element={<GeoPage />} />
+              <Route path="gsc" element={<GscPage />} />
               <Route path="citations" element={<CitationsPage />} />
               <Route path="costs" element={<CostsPage />} />
               <Route path="quality" element={<QualityPage />} />

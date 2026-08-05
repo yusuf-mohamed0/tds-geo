@@ -7,6 +7,80 @@ import { Pool } from "pg";
 import { authenticate, authorize } from "../middleware/auth";
 import { clientRateLimit } from "../middleware/rateLimiter";
 import multiCmsPublisher from "../services/multiCmsPublisher";
+import { WordPressConnector } from "../connectors/wordpress";
+import { CmsConnection } from "../types";
+
+function parseConnectionConfig(connection: CmsConnection): Record<string, any> {
+  const rawConfig = (connection as any).config;
+  if (!rawConfig) return {};
+  if (typeof rawConfig === 'string') {
+    try {
+      return JSON.parse(rawConfig);
+    } catch {
+      return {};
+    }
+  }
+  return rawConfig as Record<string, any>;
+}
+
+function buildConnectorConfig(connection: CmsConnection) {
+  const config = parseConnectionConfig(connection);
+  return {
+    provider: connection.provider,
+    endpointUrl: connection.endpoint_url || config.endpointUrl || config.endpoint_url || config.siteUrl || config.site_url || config.url || '',
+    apiKey: config.apiKey || config.api_key || config.tdsGeoApiKey || config.tds_geo_api_key || config.accessToken || config.access_token || '',
+    defaultBlogId: config.defaultBlogId || config.default_blog_id,
+    defaultBlogHandle: config.defaultBlogHandle || config.default_blog_handle,
+  };
+}
+
+async function testCustomRestConnection(connection: CmsConnection): Promise<boolean> {
+  const connectorConfig = buildConnectorConfig(connection);
+  if (!connectorConfig.endpointUrl || !connectorConfig.apiKey) return false;
+
+  try {
+    const baseUrl = connectorConfig.endpointUrl.replace(/\/+$/, '');
+    const response = await fetch(`${baseUrl}/api/tds-geo/posts?limit=1`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-TDS-GEO-Key': connectorConfig.apiKey,
+        'User-Agent': 'TDS-Geo-Backend/3.0',
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function testStoredConnection(connection: CmsConnection): Promise<boolean> {
+  if (connection.provider === 'custom_rest') {
+    return testCustomRestConnection(connection);
+  }
+
+  const connectorConfig = buildConnectorConfig(connection);
+  if (!connectorConfig.endpointUrl || !connectorConfig.apiKey) return false;
+
+  if (connection.provider === 'wordpress') {
+    const connector = new WordPressConnector();
+    try {
+      return await connector.connect(connectorConfig);
+    } finally {
+      await connector.disconnect();
+    }
+  }
+
+  const adapter = multiCmsPublisher.getAdapter(connection.provider) as any;
+  if (adapter?.connect && adapter?.health) {
+    const connected = await adapter.connect(connectorConfig);
+    if (!connected) return false;
+    const health = await adapter.health();
+    return health.status === 'healthy';
+  }
+
+  return adapter?.testConnection ? adapter.testConnection() : false;
+}
 
 export function createCmsRoutes(pool: Pool): Router {
   const router = Router();
@@ -85,8 +159,7 @@ export function createCmsRoutes(pool: Pool): Router {
       const connection = connections.find((c: any) => c.id === req.params.connectionId);
       if (!connection) return res.status(404).json({ success: false, error: "Connection not found" });
 
-      const adapter = multiCmsPublisher.getAdapter(connection.provider);
-      const result = adapter ? await adapter.testConnection() : false;
+      const result = await testStoredConnection(connection);
       res.json({ success: true, data: { connected: result } });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });

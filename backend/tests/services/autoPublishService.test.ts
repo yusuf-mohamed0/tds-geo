@@ -160,6 +160,7 @@ describe('autoPublishService — scheduled draft-flip', () => {
     // Tracking row is updated to published (no duplicate insert).
     const updateHistory = mockQuery.mock.calls.find(([sql]: [string]) => sql.includes('UPDATE publishing_history'));
     expect(updateHistory).toBeTruthy();
+    expect(updateHistory?.[0]).not.toContain('updated_at');
 
     const updateArticle = mockQuery.mock.calls.find(([sql]: [string]) => sql.includes('UPDATE articles SET status'));
     expect(updateArticle).toBeTruthy();

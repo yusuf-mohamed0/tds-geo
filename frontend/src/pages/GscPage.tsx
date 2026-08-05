@@ -3,8 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { Page, Card, Text, Button, Spinner, Banner, BlockStack, InlineStack, Badge } from '@shopify/polaris';
 import { Search, MousePointerClick, TrendingUp, BarChart3, Globe, Clock, Hash, ExternalLink } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { apiFetch } from '../api/client';
 import { fetchGscOverview, fetchGscStatus } from '../api/googleSearchConsole';
 import type { GscOverview } from '../types';
+
+interface GscAuthResponse {
+  url: string;
+}
 
 function formatCtr(value: number): string {
   return `${(value * 100).toFixed(2)}%`;
@@ -37,6 +42,8 @@ export default function GscPage() {
   const [connected, setConnected] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [connecting, setConnecting] = useState(false);
+  const [connectError, setConnectError] = useState('');
 
   useEffect(() => {
     if (!clientId) {
@@ -50,12 +57,16 @@ export default function GscPage() {
       setLoading(true);
       setError('');
       try {
-        const [status, overviewData] = await Promise.all([
-          fetchGscStatus(clientId),
-          fetchGscOverview(clientId),
-        ]);
+        const status = await fetchGscStatus(clientId);
         if (!active) return;
         setConnected(status.connected);
+        if (!status.connected) {
+          setOverview(null);
+          return;
+        }
+
+        const overviewData = await fetchGscOverview(clientId);
+        if (!active) return;
         setOverview(overviewData);
       } catch (err) {
         if (!active) return;
@@ -68,6 +79,22 @@ export default function GscPage() {
     void load();
     return () => { active = false; };
   }, [clientId]);
+
+  const handleConnect = async () => {
+    if (!clientId) return;
+    setConnecting(true);
+    setConnectError('');
+    try {
+      const params = new URLSearchParams({ clientId });
+      const { url } = await apiFetch<GscAuthResponse>(`/api/gsc/auth?${params}`);
+      if (!url) throw new Error('Google Search Console auth URL was not returned.');
+      window.location.assign(url);
+    } catch (err: unknown) {
+      setConnectError(err instanceof Error ? err.message : 'Failed to start Google Search Console connection.');
+    } finally {
+      setConnecting(false);
+    }
+  };
 
   // --- Loading State ---
   if (loading) {
@@ -91,11 +118,10 @@ export default function GscPage() {
 
   // --- Not Connected State ---
   if (connected === false) {
-    const authUrl = clientId ? `/api/gsc/auth?clientId=${encodeURIComponent(clientId)}` : '#';
-
     return (
       <Page title="Google Search Console" subtitle="Search analytics & performance">
         <BlockStack gap="400">
+          {connectError && <Banner tone="critical">{connectError}</Banner>}
           <Card>
             <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
               <Search size={48} style={{ margin: '0 auto', opacity: 0.4 }} />
@@ -110,8 +136,9 @@ export default function GscPage() {
               <div style={{ marginTop: 'var(--p-space-400)' }}>
                 <Button
                   variant="primary"
-                  url={authUrl}
-                  external
+                  onClick={handleConnect}
+                  loading={connecting}
+                  disabled={connecting || !clientId}
                   icon={ExternalLink}
                 >
                   Connect Google Search Console

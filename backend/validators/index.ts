@@ -93,7 +93,7 @@ export const updateArticleSchema = Joi.object({
 });
 
 export const publishArticleSchema = Joi.object({
-  blogId: Joi.alternatives().try(Joi.number(), Joi.string()).required()
+  blogId: Joi.alternatives().try(Joi.number(), Joi.string()).optional()
 });
 
 // ─── Webhooks ─────────────────────────────────

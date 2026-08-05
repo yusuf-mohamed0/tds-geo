@@ -15,7 +15,6 @@ Site Audit & Optimization Agent — runs monthly for every client.
 |---|---|---|---|---|
 | Caravanserai | caravanserai | Shopify | 229 | App pending |
 | Boston Pharmaceutical | boston-pharma | WordPress/WooCommerce | ~270 | Active |
-| Boston Veterinary | boston-vet | WordPress/WooCommerce | Unknown | Cloudflare blocked |
 | Acme Maintenance | acme-maintenance | Shopify (dev) | Test | Active |
 | Traffic Test | traffic-test | Shopify (dev) | Test | Active |
 
@@ -38,11 +37,6 @@ Site Audit & Optimization Agent — runs monthly for every client.
 4. Publish or archive 20 unpublished drafts
 5. Generate product schema markup
 6. Set up weekly content pipeline
-
-### Boston Veterinary (Week 3)
-1. Investigate Cloudflare bypass
-2. If blocked: use Google Cache / Wayback Machine for audit
-3. Generate content for when access is restored
 
 ### Infrastructure (Week 4)
 1. Create automated audit script

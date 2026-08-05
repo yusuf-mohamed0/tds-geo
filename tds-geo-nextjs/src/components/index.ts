@@ -9,12 +9,12 @@
  * TDS Geo blog content in your Next.js App Router site.
  *
  * @example
- *   import { TdsGeoBlogList, TdsGeoBlogPost } from '@tds-geo/nextjs-integration/components';
+ *   import { KozmoCoreBlogList, KozmoCoreBlogPost } from '@tds-geo/nextjs-integration/components';
  */
 
-export { TdsGeoBlogList } from './TdsGeoBlogList';
-export { TdsGeoBlogPost } from './TdsGeoBlogPost';
-export { TdsGeoContent } from './TdsGeoContent';
+export { TdsGeoBlogList, TdsGeoBlogList as KozmoCoreBlogList } from './KozmoCoreBlogList';
+export { TdsGeoBlogPost, TdsGeoBlogPost as KozmoCoreBlogPost } from './KozmoCoreBlogPost';
+export { TdsGeoContent, TdsGeoContent as KozmoCoreContent } from './KozmoCoreContent';
 
 export type {
   TdsGeoBlogListProps,
