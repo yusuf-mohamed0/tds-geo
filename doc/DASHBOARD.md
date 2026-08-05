@@ -6,6 +6,14 @@
 
 ## Overview
 
+Latest operational update (2026-08-05): production is running release `3c49067`; client app process runbooks were added under `doc/clients/*/app-process.md` and indexed in `doc/clients/APP-PROCESSES.md`.
+
+Current production blockers:
+
+- `boston-vet`: WordPress REST returns HTTP 403 from production EC2; allowlist `16.192.29.174` in Cloudflare/WAF before live publishing.
+- `caravanserai`: active client with `billing_status = cancelled`; correct billing state before scaling automation.
+- `flaunt-cosmetics-global`: single SKU is out of stock; content should use education/trust/waitlist CTAs, not hard conversion CTAs.
+
 ```mermaid
 gantt
     title Client Engagement Timeline
@@ -38,6 +46,7 @@ gantt
     section Infrastructure
     Client Validation Guard      :done, 2026-07-08, 1d
     Sync Route (API)             :done, 2026-07-08, 1d
+    Client App Processes         :done, 2026-08-05, 1d
 
     section Caravanserai
     Added to DB                  :done, 2026-07-08, 1d
@@ -151,11 +160,11 @@ gantt
 
 | Client | Platform | Products | Progress | Next Action |
 |--------|----------|----------|----------|-------------|
-| Caravanserai | 🛒 Shopify | 229 | ██████████░░░░░ 68% | ✅ App approved — install on store |
-| Boston Pharma | 📝 WordPress | ~550 | ████████████████ 100% | 16 drafts + 2 articles pending, no WP API key |
-| Boston Vet | 📝 WordPress | Unknown | ██████████░░░░░ 45% | Cloudflare block — audit via Wayback, 2 articles ready |
-| Flaunt Cosmetics Global | 🛒 Shopify | 1 SKU | ███████████░░░░ 75% | Review 4 corrected hidden drafts |
-| Acme Maintenance | 📝 WordPress (real) | Brochure | ██████████░░░░░ 50% | **Real site** — acme-maintenance.com, industrial supplies |
+| Alamein Outdoor Furniture | 🛒 Shopify | Multiple lines | ███████████░░░░ 75% | Follow `alamein-2022/app-process.md`; confirm public blog listing quality |
+| Caravanserai | 🛒 Shopify | 229 | ██████████░░░░░ 68% | Fix cancelled billing state; follow `caravanserai/app-process.md` |
+| Boston Pharma | 📝 WordPress | ~550 | ████████████████ 100% | Confirm write API credentials; follow `boston-pharma/app-process.md` |
+| Boston Vet | 📝 WordPress | Unknown | ██████████░░░░░ 45% | Allowlist EC2 IP; follow `boston-vet/app-process.md` |
+| Flaunt Cosmetics Global | 🛒 Shopify | 1 SKU | ███████████░░░░ 75% | Review Beauty Tips drafts; follow `flaunt-cosmetics-global/app-process.md` |
 
 **Infrastructure:**
 - ✅ **WordPress sync route** built — `POST /api/cms/sync/:clientId` pulls WP posts into local DB
@@ -163,6 +172,7 @@ gantt
 - ❌ **No WordPress API keys** configured for Boston Pharma or Boston Vet (cms_connections.api_key_encrypted is null)
 - ❌ **No Shopify sessions** for client stores (only test stores have tokens)
 - ✅ **Test clients marked inactive** (traffic-test, test-client, e2e-pipeline-test-client)
+- ✅ **Client app process runbooks** created for all active production clients in `doc/clients/APP-PROCESSES.md`
 
 ---
 
