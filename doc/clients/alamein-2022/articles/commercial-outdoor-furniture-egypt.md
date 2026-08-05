@@ -1,8 +1,9 @@
 ---
 client: alamein-2022
 title: "Commercial Outdoor Furniture in Egypt: A Practical Buying Guide"
-status: local_draft
-publication_state: not_published
+status: shopify_hidden_draft
+publication_state: hidden_draft_not_published
+shopify_article_id: 577305575481
 target_blog: "Shopify Posts blog, ID 79774056505"
 primary_keyword: "commercial outdoor furniture Egypt"
 roles:
