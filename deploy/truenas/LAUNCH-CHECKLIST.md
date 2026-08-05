@@ -46,6 +46,8 @@ Use this as the final checklist before moving production traffic from AWS to Tru
 - Cloudflare Tunnel is connected, or Caddy direct HTTPS is working.
 - Public hostname resolves to the intended ingress.
 - Only allowed public ports are exposed.
+- If using Cloudflare Tunnel, inbound internet ports are not required.
+- If using direct HTTPS, only ports `80` and `443` are forwarded to the VM.
 - TrueNAS UI is not public.
 - PostgreSQL is not public.
 - Redis is not public.
@@ -62,6 +64,7 @@ Use this as the final checklist before moving production traffic from AWS to Tru
 - PostgreSQL healthcheck passes.
 - Redis healthcheck passes.
 - Backup container is running.
+- `PRE_DEPLOY_BACKUP_REQUIRED=true` for production deploys.
 
 ## 7. Data Migration
 

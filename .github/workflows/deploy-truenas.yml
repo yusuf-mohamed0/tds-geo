@@ -66,6 +66,8 @@ jobs:
             --exclude 'node_modules' \
             --exclude 'frontend/node_modules' \
             --exclude 'tds-geo-nextjs/node_modules' \
+            --exclude 'deploy/truenas/.env' \
+            --exclude 'deploy/truenas/.previous-image' \
             ./ /opt/tds-geo/
 
       - name: Deploy Compose stack

@@ -97,6 +97,7 @@ Recommended mode: Cloudflare Tunnel.
 - VM makes outbound connections to Cloudflare.
 - Shopify and users reach the app over HTTPS.
 - Admin-only hostnames can be protected with Cloudflare Access.
+- `ENABLE_CLOUDFLARED=true` supports config-file tunnel mode without using `CLOUDFLARED_TOKEN`.
 
 Fallback mode: direct HTTPS.
 

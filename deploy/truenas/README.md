@@ -33,6 +33,12 @@ TrueNAS SCALE
 | `SECURITY.md` | Security baseline for public exposure, secrets, firewalling, runner access, database safety, backups, and incident response. |
 | `REQUIREMENTS.md` | Hardware, TrueNAS, VM, GitHub, environment, network, migration, validation, and operations requirements. |
 | `LAUNCH-CHECKLIST.md` | Final go/no-go checklist before moving production traffic from AWS to TrueNAS. |
+| `PRODUCTION-READINESS.md` | Manager-level readiness gates, acceptance criteria, non-negotiables, and definition of done. |
+| `OPERATIONS.md` | Daily, weekly, monthly, deploy, backup, restore, logging, and change-management runbook. |
+| `MONITORING.md` | Health, backup, disk, runner, tunnel, and Shopify monitoring and alerting expectations. |
+| `DISASTER-RECOVERY.md` | RTO/RPO targets and recovery procedures for deploy, DB, VM, host, internet, and secret failures. |
+| `DEVELOPER-HANDOFF.md` | Developer workflow, validation, safe-change rules, and emergency commands. |
+| `RISK-REGISTER.md` | Main migration and local-server production risks with owners and mitigations. |
 | `compose.yml` | Main TrueNAS production stack. |
 | `.env.example` | Environment template. Real `.env` lives only on the VM. |
 | `Caddyfile` | Reverse proxy for direct HTTPS mode. |
@@ -52,8 +58,10 @@ TrueNAS SCALE
 1. `REQUIREMENTS.md` tells you what hardware, VM, network, secrets, GitHub runner, and validation evidence are required.
 2. `ARCHITECTURE.md` shows the complete target design and traffic/deploy/data flow.
 3. `SECURITY.md` defines what can be public, what must stay private, and how secrets/backups/runners are protected.
-4. `RUNBOOK.md` is the step-by-step migration procedure.
-5. `LAUNCH-CHECKLIST.md` is the final go/no-go checklist before cutover.
+4. `PRODUCTION-READINESS.md` defines manager-level acceptance gates and non-negotiables.
+5. `RUNBOOK.md` is the step-by-step migration procedure.
+6. `OPERATIONS.md`, `MONITORING.md`, and `DISASTER-RECOVERY.md` define steady-state production operation.
+7. `LAUNCH-CHECKLIST.md` is the final go/no-go checklist before cutover.
 
 ## GitHub Actions
 

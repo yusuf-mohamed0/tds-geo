@@ -23,17 +23,26 @@ if [[ -n "$CURRENT_IMAGE" ]]; then
   echo "$CURRENT_IMAGE" > .previous-image
 fi
 
-./scripts/backup-db.sh || echo "Backup failed or database is not initialized yet; continuing."
+if ! ./scripts/backup-db.sh; then
+  if [[ "${PRE_DEPLOY_BACKUP_REQUIRED:-true}" == "true" ]]; then
+    echo "Pre-deploy backup failed. Set PRE_DEPLOY_BACKUP_REQUIRED=false only for a documented first initialization."
+    exit 1
+  fi
+  echo "Pre-deploy backup failed, but PRE_DEPLOY_BACKUP_REQUIRED=false; continuing."
+fi
 
-docker compose --env-file .env -f compose.yml pull api worker caddy cloudflared || true
+docker compose --env-file .env -f compose.yml pull api worker
+docker compose --env-file .env -f compose.yml pull caddy || true
 docker compose --env-file .env -f compose.yml up -d postgres redis
 docker compose --env-file .env -f compose.yml up -d api worker caddy db-backup
 
-if [[ -n "${CLOUDFLARED_TOKEN:-}" ]]; then
+if [[ -n "${CLOUDFLARED_TOKEN:-}" || "${ENABLE_CLOUDFLARED:-false}" == "true" ]]; then
+  docker compose --env-file .env -f compose.yml --profile tunnel pull cloudflared || true
   docker compose --env-file .env -f compose.yml --profile tunnel up -d cloudflared
 fi
 
 if [[ "${ENABLE_SIDECARS:-false}" == "true" ]]; then
+  docker compose --env-file .env -f compose.yml --profile sidecars pull freellmapi crawl4ai headroom openseo || true
   docker compose --env-file .env -f compose.yml --profile sidecars up -d freellmapi crawl4ai headroom openseo
 fi
 

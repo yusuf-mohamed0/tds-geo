@@ -52,6 +52,7 @@ Packages and services:
 - `curl`, `jq`, `rsync`, `bash`, `ca-certificates`, and `gnupg`.
 - UFW or equivalent firewall.
 - Optional QEMU guest agent.
+- `ENABLE_DIRECT_HTTPS=true` during bootstrap only when direct Caddy HTTPS is required.
 
 Bootstrap script:
 
@@ -129,6 +130,9 @@ Integration values, as needed:
 - `GOOGLE_CLIENT_ID`.
 - `GOOGLE_CLIENT_SECRET`.
 - `CLOUDFLARED_TOKEN`.
+- `ENABLE_CLOUDFLARED` for config-file tunnel mode without a token.
+- `ENABLE_DIRECT_HTTPS` for direct Caddy HTTPS mode.
+- `PRE_DEPLOY_BACKUP_REQUIRED`; keep `true` for production.
 
 Storage path values:
 

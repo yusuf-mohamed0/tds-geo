@@ -44,6 +44,7 @@ Direct HTTPS fallback:
 - Forward only ports `80` and `443` to the Ubuntu VM.
 - Use Caddy for TLS and reverse proxying.
 - Keep all internal services on the Compose network.
+- Set `ENABLE_DIRECT_HTTPS=true` only when this mode is intentionally used.
 
 ## Identity And Access
 
@@ -69,6 +70,7 @@ GitHub runner:
 - Keep runner work directory private.
 - Do not run public pull-request code on the self-hosted production runner.
 - Rotate runner registration token during setup or reinstallation.
+- Exclude VM-local `.env` from repository sync so deploys do not delete or overwrite secrets.
 
 ## Secrets
 

@@ -21,8 +21,12 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo usermod -aG docker "$USER"
 
 sudo ufw allow OpenSSH
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
+if [[ "${ENABLE_DIRECT_HTTPS:-false}" == "true" ]]; then
+  sudo ufw allow 80/tcp
+  sudo ufw allow 443/tcp
+else
+  echo "Leaving 80/443 closed. Set ENABLE_DIRECT_HTTPS=true when using direct Caddy HTTPS instead of Cloudflare Tunnel."
+fi
 sudo ufw --force enable
 
 sudo mkdir -p /mnt/tds-geo/{postgres,redis,backups,logs,cloudflared}
