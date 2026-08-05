@@ -133,6 +133,7 @@ export default function CitationsPage() {
                   <Monitor size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
                   <Text as="h3" variant="headingSm">Engine Results</Text>
                 </InlineStack>
+                {data.engines.length > 0 ? (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {data.engines.map((engine) => (
                     <div
@@ -156,6 +157,11 @@ export default function CitationsPage() {
                     </div>
                   ))}
                 </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+                    <Text as="p" variant="bodyMd" tone="subdued">No engine results were returned for this domain.</Text>
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: 'var(--p-space-400)', paddingTop: 'var(--p-space-300)', borderTop: '1px solid var(--p-color-border)', fontSize: 'var(--p-font-size-200)' }}>
                   <InlineStack gap="100" blockAlign="center">
                     <Clock size={12} />

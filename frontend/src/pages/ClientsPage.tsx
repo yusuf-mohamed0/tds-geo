@@ -47,6 +47,7 @@ export default function ClientsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {clients.map((client) => (
             <button
+              type="button"
               key={client.id}
               onClick={() => navigate(`/admin/clients/${client.id}`)}
               className="card text-left hover:border-brand-accent/40 transition-all duration-200 group relative overflow-hidden"

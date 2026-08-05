@@ -228,6 +228,7 @@ export default function ArticleDetailPage() {
                     tone="critical"
                     onClick={handleCancelSchedule}
                     loading={scheduling}
+                    disabled={scheduling}
                   >Cancel Schedule</Button>
                 </BlockStack>
               ) : (
@@ -258,7 +259,7 @@ export default function ArticleDetailPage() {
                     variant="primary"
                     onClick={handleSchedule}
                     loading={scheduling}
-                    disabled={!scheduleDate || !scheduleTime}
+                    disabled={scheduling || !scheduleDate || !scheduleTime}
                   >Schedule</Button>
                 </BlockStack>
               )}

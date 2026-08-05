@@ -269,8 +269,8 @@ export default function ArticlesPage() {
       </BlockStack>
 
       {showGenerate && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowGenerate(false)}>
-          <div style={{ width: '100%', maxWidth: 480, margin: '0 var(--p-space-400)' }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowGenerate(false)} role="presentation">
+          <div style={{ width: '100%', maxWidth: 480, margin: '0 var(--p-space-400)' }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Generate article">
             <Card>
               <BlockStack gap="400">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -148,6 +148,7 @@ export default function AdminDashboard() {
                 const a = article as Record<string, unknown>;
                 return (
                   <button
+                    type="button"
                     key={String(a.id)}
                     onClick={() => navigate(`/admin/articles/${a.id}`)}
                     style={{ width: '100%', textAlign: 'left', padding: 'var(--p-space-300)', borderRadius: 'var(--p-space-200)', background: 'transparent', border: 'none', cursor: 'pointer', transition: 'background 0.15s' }}
@@ -170,7 +171,7 @@ export default function AdminDashboard() {
                 );
               })}
               {recentArticles.length > 0 && (
-                <button onClick={() => navigate('/admin/articles')} style={{ width: '100%', textAlign: 'left', padding: 'var(--p-space-200)', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--p-color-text-link)', fontSize: 'var(--p-font-size-300)' }}>
+                <button type="button" onClick={() => navigate('/admin/articles')} style={{ width: '100%', textAlign: 'left', padding: 'var(--p-space-200)', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--p-color-text-link)', fontSize: 'var(--p-font-size-300)' }}>
                   View all articles →
                 </button>
               )}

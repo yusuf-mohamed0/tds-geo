@@ -32,7 +32,7 @@ export default function Header({ onOpenSidebar }: HeaderProps) {
           >
             {initials}
           </div>
-          <button onClick={logout} className="btn-ghost p-1.5" title="Sign out">
+          <button type="button" onClick={logout} className="btn-ghost p-1.5" title="Sign out">
             <LogOut size={16} />
           </button>
         </div>

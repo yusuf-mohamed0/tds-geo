@@ -3285,8 +3285,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/backend/services/pexelsService.ts": {
-    "mtime": 1785409508.6070194,
-    "ast_hash": "feb41b1e695f85e989d4b778f932e9d2",
+    "mtime": 1785919408.351422,
+    "ast_hash": "808cd1f48158f9680491846e4be56089",
     "semantic_hash": ""
   },
   "/root/tds-geo/backend/services/pipelineService.ts": {
@@ -3560,7 +3560,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/package.json": {
-    "mtime": 1785842966.2539556,
+    "mtime": 1785843266.6591265,
     "ast_hash": "261b40dd88a93a4568594960583e61a8",
     "semantic_hash": ""
   },
@@ -3640,22 +3640,22 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/ArticleDetailPage.tsx": {
-    "mtime": 1785842952.2303214,
+    "mtime": 1785843266.6591265,
     "ast_hash": "dc8dc3571d7c7cb40ed9afb1d1c34005",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/ArticlesPage.tsx": {
-    "mtime": 1785842952.2703185,
+    "mtime": 1785843266.6591265,
     "ast_hash": "517678db32e1956023a64a3fa2b3148e",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/BacklinksPage.tsx": {
-    "mtime": 1785842952.2823176,
+    "mtime": 1785843266.6591265,
     "ast_hash": "c8a5d7fee22aeae86c5586f272413dd5",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/CitationsPage.tsx": {
-    "mtime": 1785842952.278318,
+    "mtime": 1785843266.6591265,
     "ast_hash": "0e087bf143628740fb28a97be42e5fdf",
     "semantic_hash": ""
   },
@@ -3675,22 +3675,22 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/GeoPage.tsx": {
-    "mtime": 1785842952.278318,
+    "mtime": 1785843266.6591265,
     "ast_hash": "94053365c8c76bb1a3c8e8847b79966d",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/KeywordResearchPage.tsx": {
-    "mtime": 1785842952.278318,
+    "mtime": 1785843266.6591265,
     "ast_hash": "b966742ac2e3e16c24919ba02328f248",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/LoginPage.tsx": {
-    "mtime": 1785842952.2303214,
+    "mtime": 1785843266.6591265,
     "ast_hash": "65f37222b9247e1eacce5135452fbdf9",
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/NotFoundPage.tsx": {
-    "mtime": 1785842999.6308606,
+    "mtime": 1785843266.6591265,
     "ast_hash": "bf6ee2cd3c1d44be8467d44d4a2c30f7",
     "semantic_hash": ""
   },
@@ -3700,7 +3700,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/ShopifyEmbeddedPage.tsx": {
-    "mtime": 1785842952.2303214,
+    "mtime": 1785843266.6591265,
     "ast_hash": "b27b6bc73f5a4885eb4f9c041772ee0d",
     "semantic_hash": ""
   },
@@ -3750,7 +3750,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/package.json": {
-    "mtime": 1785842952.2023237,
+    "mtime": 1785843266.6951263,
     "ast_hash": "4d17bf3c0c1be5f79b08a0006936fbbb",
     "semantic_hash": ""
   },
@@ -9140,7 +9140,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/frontend/src/pages/DemoSignupPage.tsx": {
-    "mtime": 1785842952.2703185,
+    "mtime": 1785843266.6591265,
     "ast_hash": "009224634b7551fca7cd9f3b343083ac",
     "semantic_hash": ""
   },
@@ -9305,7 +9305,7 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/scripts/evaluate-frontend-pages.mjs": {
-    "mtime": 1785842952.2223222,
+    "mtime": 1785843266.6991265,
     "ast_hash": "9d5f974d0b3c756434f943b79aac619c",
     "semantic_hash": ""
   }

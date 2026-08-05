@@ -129,9 +129,15 @@ function AnalysisSummary({ analysis }: { analysis: GeoAnalysis }) {
             <Target size={16} style={{ color: 'var(--p-color-bg-fill-brand)' }} />
             <Text as="h3" variant="headingSm">Engine Scores</Text>
           </InlineStack>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {analysis.engines.map((engine) => <EngineCard key={engine.engine} engine={engine} />)}
-          </div>
+          {analysis.engines.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {analysis.engines.map((engine) => <EngineCard key={engine.engine} engine={engine} />)}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+              <Text as="p" variant="bodyMd" tone="subdued">No engine scores were returned for this analysis.</Text>
+            </div>
+          )}
         </BlockStack>
       </Card>
     </BlockStack>

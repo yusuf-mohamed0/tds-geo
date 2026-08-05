@@ -23,15 +23,18 @@ export function Modal({ open, onClose, title, children, footer, maxWidth = 600 }
   if (!open) return null
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose} role="presentation">
       <div
         className="modal"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         style={{ maxWidth }}
       >
         <div className="modal-header">
           <h3>{title}</h3>
-          <button className="btn btn-outline btn-sm" onClick={onClose} aria-label="Close">
+          <button type="button" className="btn btn-outline btn-sm" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </div>

@@ -214,7 +214,7 @@ export default function KeywordResearchPage() {
             )}
 
             {/* Clusters */}
-            {result.clusters.map((cluster, i) => (
+            {result.clusters.length > 0 ? result.clusters.map((cluster, i) => (
               <Card key={i}>
                 <BlockStack gap="300">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -284,7 +284,16 @@ export default function KeywordResearchPage() {
                   )}
                 </BlockStack>
               </Card>
-            ))}
+            )) : (
+              <Card>
+                <div style={{ textAlign: 'center', padding: 'var(--p-space-800)' }}>
+                  <Text as="p" variant="headingMd">No keyword clusters found</Text>
+                  <div style={{ marginTop: 'var(--p-space-100)' }}>
+                    <Text as="p" variant="bodySm" tone="subdued">Try a more specific industry, add seed keywords, or select a different client.</Text>
+                  </div>
+                </div>
+              </Card>
+            )}
           </>
         )}
       </BlockStack>
