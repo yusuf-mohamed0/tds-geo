@@ -5675,8 +5675,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/doc/DASHBOARD.md": {
-    "mtime": 1785931825.2346642,
-    "ast_hash": "f13f00ae895e51fe2f630fce2f5bb517",
+    "mtime": 1785932577.6192992,
+    "ast_hash": "ee3e9ba75f386fd0dada5f89922519cf",
     "semantic_hash": ""
   },
   "/root/tds-geo/doc/EEAT-content-framework.md": {
@@ -5695,8 +5695,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/doc/clients/CONTEXT.md": {
-    "mtime": 1785931607.034665,
-    "ast_hash": "70859a9df9665b4848b9467099fa61dd",
+    "mtime": 1785932577.6192992,
+    "ast_hash": "7de85a0465a1ba096bbc81fdbb8a3da9",
     "semantic_hash": ""
   },
   "/root/tds-geo/doc/clients/MONTHLY-AUDIT-PLAN.md": {
@@ -9320,8 +9320,8 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/doc/clients/APP-PROCESSES.md": {
-    "mtime": 1785931825.2106662,
-    "ast_hash": "624f9b46804d2649fd5b323105a82a28",
+    "mtime": 1785932577.6192992,
+    "ast_hash": "aaba1093d417927e770cee2530567003",
     "semantic_hash": ""
   },
   "/root/tds-geo/doc/clients/alamein-2022/app-process.md": {
@@ -9340,13 +9340,83 @@
     "semantic_hash": ""
   },
   "/root/tds-geo/doc/clients/caravanserai/app-process.md": {
-    "mtime": 1785931825.2106662,
+    "mtime": 1785931879.8564951,
     "ast_hash": "df5b97936a8949cd0a4535e80aaee549",
     "semantic_hash": ""
   },
   "/root/tds-geo/doc/clients/flaunt-cosmetics-global/app-process.md": {
-    "mtime": 1785931825.2266648,
+    "mtime": 1785931879.8564951,
     "ast_hash": "c6d1a0de0367122a114a33ba919d6e39",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/CONTENT-OPERATING-ROLES.md": {
+    "mtime": 1785932407.0974748,
+    "ast_hash": "2917bdfdf22534ca3d1614f196b6c198",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/DRAFT-ARTICLE-QUEUE.md": {
+    "mtime": 1785932577.615285,
+    "ast_hash": "0a2107310b756d368a8c7c558058de58",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/alamein-2022/articles/commercial-outdoor-furniture-egypt.md": {
+    "mtime": 1785932541.587881,
+    "ast_hash": "20458ace004eefc5a36eb3374c8f8eed",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/alamein-2022/geo-aeo-plan.md": {
+    "mtime": 1785932407.0974748,
+    "ast_hash": "72fb402287e485f70a2069d29206880a",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/alamein-2022/writer-role.md": {
+    "mtime": 1785932407.0974748,
+    "ast_hash": "1fd51ab63b9ab573beaf046be40ca1c4",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/boston-pharma/articles/pharmaceutical-storage-quality-egypt.md": {
+    "mtime": 1785932541.587881,
+    "ast_hash": "6b4049bc2993883b3f2d693c34212249",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/boston-pharma/geo-aeo-plan.md": {
+    "mtime": 1785932407.0974748,
+    "ast_hash": "6373703613604406dfee61913afaf55f",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/boston-vet/articles/poultry-health-program-egypt.md": {
+    "mtime": 1785932541.591878,
+    "ast_hash": "f9573910cd52ababb5341c2632bac5c5",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/boston-vet/geo-aeo-plan.md": {
+    "mtime": 1785932407.1014738,
+    "ast_hash": "08fcb9c417ba3fc6e9bfc4af382ef306",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/caravanserai/articles/layering-brass-wood-textiles-egyptian-home.md": {
+    "mtime": 1785932541.591878,
+    "ast_hash": "304b1b0fa006b6da7e2f1dad0192e5ce",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/caravanserai/geo-aeo-plan.md": {
+    "mtime": 1785932407.1014738,
+    "ast_hash": "17b496bad6ddb42e43c0c10f9ee4c79b",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/flaunt-cosmetics-global/articles/eyeliner-stamp-beginner-guide-uae-egypt.md": {
+    "mtime": 1785932541.591878,
+    "ast_hash": "ed21bfa849a993223f81829cb3ec1d9e",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/flaunt-cosmetics-global/geo-aeo-plan.md": {
+    "mtime": 1785932407.1014738,
+    "ast_hash": "e45623af25a3e6db2a7b2c7e98e05a5d",
+    "semantic_hash": ""
+  },
+  "/root/tds-geo/doc/clients/flaunt-cosmetics-global/writer-role.md": {
+    "mtime": 1785932407.0974748,
+    "ast_hash": "5465631d78af75769d9a6e3577b969db",
     "semantic_hash": ""
   }
 }

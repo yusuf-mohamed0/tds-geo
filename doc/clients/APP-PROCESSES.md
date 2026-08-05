@@ -4,6 +4,8 @@ Last updated: 2026-08-05
 
 This file is the operating index for the production client process layer. Each active client has a dedicated `app-process.md` that defines how TDS Geo should onboard, verify, generate, review, publish, monitor, and recover that client.
 
+Shared operating roles are in `CONTENT-OPERATING-ROLES.md`. New local drafts are indexed in `DRAFT-ARTICLE-QUEUE.md`. GEO/AEO plans live at `doc/clients/{slug}/geo-aeo-plan.md`.
+
 ## Production Clients
 
 | Client | Slug | Platform | Process | Production Status |
@@ -26,8 +28,8 @@ This file is the operating index for the production client process layer. Each a
 
 1. Verify client state with `npm run audit:clients` on `/opt/tds-geo/current`.
 2. Confirm the client is active in DB and the platform connector is reachable from production.
-3. Read the client `full-profile.md`, `brand-profile.md`, `seo-content-guide.md`, and `technical-reference.md` before content work.
-4. Generate only EEAT-compliant, original, source-safe content following `doc/EEAT-content-framework.md`.
+3. Read the client `full-profile.md`, `brand-profile.md`, `seo-content-guide.md`, `technical-reference.md`, `writer-role.md`, `geo-aeo-plan.md`, and `app-process.md` before content work.
+4. Generate only EEAT-compliant, original, source-safe content following `doc/EEAT-content-framework.md` and `CONTENT-OPERATING-ROLES.md`.
 5. Keep Shopify content as hidden drafts first. TDS controls scheduling and later visibility.
 6. Keep WordPress content in draft/pending review unless publishing credentials and client approval are confirmed.
 7. Publish on Thursday 1:00 PM Cairo time unless the client process says otherwise.

@@ -6,7 +6,7 @@
 
 ## Overview
 
-Latest operational update (2026-08-05): production is running release `3c49067`; client app process runbooks were added under `doc/clients/*/app-process.md` and indexed in `doc/clients/APP-PROCESSES.md`.
+Latest operational update (2026-08-05): production is running release `3c49067`; client app process runbooks were added under `doc/clients/*/app-process.md` and indexed in `doc/clients/APP-PROCESSES.md`. Shared content roles, GEO/AEO plans, and local draft articles were added in `doc/clients/CONTENT-OPERATING-ROLES.md`, `doc/clients/*/geo-aeo-plan.md`, and `doc/clients/DRAFT-ARTICLE-QUEUE.md`.
 
 Current production blockers:
 

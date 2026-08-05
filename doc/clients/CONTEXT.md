@@ -12,7 +12,7 @@ This directory contains brand profiles for every client in the TDS Geo system.
 | Caravanserai | `caravanserai` | `caravanserai/` | Home decor, gifts, Egyptian craftsmanship |
 | Flaunt Cosmetics Global | `flaunt-cosmetics-global` | `flaunt-cosmetics-global/` | Cosmetics / beauty |
 
-See `APP-PROCESSES.md` for the production app process index and per-client operating runbooks.
+See `APP-PROCESSES.md` for the production app process index and per-client operating runbooks. See `CONTENT-OPERATING-ROLES.md` for shared TDS content roles, `DRAFT-ARTICLE-QUEUE.md` for local draft articles, and each client `geo-aeo-plan.md` for GEO/AEO execution.
 
 ## Non-Production / Historical Profiles
 
