@@ -86,7 +86,7 @@ These datasets were created through the TrueNAS API as the dedicated storage tre
 These must be fixed before production cutover:
 
 - `https://nas.trafficdigitalsolutions.com/` redirects to `/ui/`, which appears to expose the TrueNAS web UI publicly.
-- Nginx Proxy Manager admin port `81` is bound on all interfaces. It should not be public.
+- Nginx Proxy Manager admin port `81` is bound on all interfaces and is publicly reachable over HTTP. It should not be public.
 - VM display/VNC devices are bound broadly. VNC should be LAN/VPN-only or disabled after installation.
 - The API key originally pasted in chat was exposed and must be revoked.
 - A later key attempt was also exposed in chat and must be revoked.
@@ -114,7 +114,7 @@ Blocked:
 ## Next Best Actions
 
 1. Lock down public TrueNAS UI exposure through Nginx Proxy Manager and/or Cloudflare.
-2. Restrict Nginx Proxy Manager admin UI and VM VNC to LAN/VPN/Cloudflare Access only.
+2. Restrict Nginx Proxy Manager admin UI port `81` and VM VNC to LAN/VPN/Cloudflare Access only.
 3. Confirm whether `tdsGEO` has Ubuntu installed or is still at the installer.
 4. Get SSH into `tdsGEO` or install/configure Ubuntu through the VM console.
 5. Mount or map the `Traffic/tds-geo/*` datasets into the runtime path, or document that the VM disk is the primary runtime disk and host datasets are backup/support storage.
