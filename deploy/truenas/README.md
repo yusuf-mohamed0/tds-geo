@@ -40,6 +40,7 @@ TrueNAS SCALE
 | `DEVELOPER-HANDOFF.md` | Developer workflow, validation, safe-change rules, and emergency commands. |
 | `RISK-REGISTER.md` | Main migration and local-server production risks with owners and mitigations. |
 | `NEXTCLOUD-WORKSPACE.md` | Nextcloud workspace architecture, recommended apps, groups, folders, security, and backup-copy workflow. |
+| `TRUENAS-LIVE-INVENTORY.md` | Live NAS inventory, created datasets, current apps/VMs/services, security findings, and deployment blockers. |
 | `compose.yml` | Main TrueNAS production stack. |
 | `.env.example` | Environment template. Real `.env` lives only on the VM. |
 | `Caddyfile` | Reverse proxy for direct HTTPS mode. |
