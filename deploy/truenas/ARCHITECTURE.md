@@ -48,6 +48,7 @@ Internet
 - Snapshots and replication.
 - Ubuntu VM lifecycle.
 - Local console access for emergency VM recovery.
+- Optional Nextcloud app for collaboration workspace only.
 
 ## Ubuntu VM Responsibilities
 
@@ -58,6 +59,12 @@ Internet
 - Local `.env` secrets file.
 - Backup and restore scripts.
 - Operational healthchecks.
+
+## Nextcloud Workspace Role
+
+Nextcloud may run on TrueNAS as a separate collaboration app for files, client docs, reports, approvals, calendars, tasks, and selected backup copies.
+
+Nextcloud must not replace the Ubuntu VM production runtime. Do not run the TDS Geo API, worker, PostgreSQL, Redis, GitHub runner, `.env`, or live deployment repo from Nextcloud.
 
 ## Application Services
 

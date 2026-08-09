@@ -27,6 +27,8 @@ Never expose publicly:
 - SSH unless restricted by keys and firewall policy.
 - Admin dashboards without authentication or Cloudflare Access.
 
+If `nas.trafficdigitalsolutions.com` reaches the TrueNAS UI, remove that public exposure before production cutover.
+
 ## Recommended Ingress
 
 Use Cloudflare Tunnel as the default ingress.
@@ -149,6 +151,18 @@ Direct HTTPS mode:
 - Do not publish live content during infrastructure validation unless explicitly approved.
 - Ensure `/health` does not expose secrets, tokens, stack traces, or DB credentials.
 - Keep admin routes authenticated.
+
+## Nextcloud Security
+
+- Nextcloud can be public only if intentionally configured and hardened.
+- Configure `trusted_domains` for all Nextcloud URLs.
+- Configure reverse proxy settings when TLS terminates before Nextcloud.
+- Use cron background jobs for production.
+- Restrict app installation to administrators.
+- Enable apps by group when possible.
+- Do not allow user-managed external storage unless explicitly needed.
+- Do not store production `.env` files or private keys in Nextcloud.
+- Treat ExApps/AppAPI Docker daemon access as sensitive infrastructure.
 
 ## Backup Security
 

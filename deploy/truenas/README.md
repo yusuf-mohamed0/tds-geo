@@ -39,6 +39,7 @@ TrueNAS SCALE
 | `DISASTER-RECOVERY.md` | RTO/RPO targets and recovery procedures for deploy, DB, VM, host, internet, and secret failures. |
 | `DEVELOPER-HANDOFF.md` | Developer workflow, validation, safe-change rules, and emergency commands. |
 | `RISK-REGISTER.md` | Main migration and local-server production risks with owners and mitigations. |
+| `NEXTCLOUD-WORKSPACE.md` | Nextcloud workspace architecture, recommended apps, groups, folders, security, and backup-copy workflow. |
 | `compose.yml` | Main TrueNAS production stack. |
 | `.env.example` | Environment template. Real `.env` lives only on the VM. |
 | `Caddyfile` | Reverse proxy for direct HTTPS mode. |
@@ -62,6 +63,7 @@ TrueNAS SCALE
 5. `RUNBOOK.md` is the step-by-step migration procedure.
 6. `OPERATIONS.md`, `MONITORING.md`, and `DISASTER-RECOVERY.md` define steady-state production operation.
 7. `LAUNCH-CHECKLIST.md` is the final go/no-go checklist before cutover.
+8. `NEXTCLOUD-WORKSPACE.md` defines how Nextcloud supports files, approvals, reports, and backup copies without replacing the production runtime.
 
 ## GitHub Actions
 
@@ -85,6 +87,8 @@ Do not expose publicly:
 - Docker socket
 - VNC/RDP
 - GitHub runner work directory
+
+If `nas.trafficdigitalsolutions.com` points to the TrueNAS UI, lock it down before production cutover. Use LAN-only access, VPN, Tailscale, or Cloudflare Access.
 
 ## Rollback
 

@@ -53,6 +53,7 @@ Run these once per month during a maintenance window.
 - Review active clients and billing state.
 - Confirm offsite backup freshness.
 - Run a restore test and record the result.
+- Review Nextcloud users, groups, public shares, app updates, and backup-copy evidence if Nextcloud is enabled.
 
 ## Deployment Procedure
 

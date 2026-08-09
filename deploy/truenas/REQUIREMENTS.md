@@ -31,6 +31,7 @@ RAM planning:
 - TrueNAS datasets or VM disks prepared for persistent data.
 - Snapshots configured for application datasets.
 - Offsite backup destination identified.
+- Nextcloud app planned only as a collaboration workspace, not as the TDS Geo production runtime.
 
 ## Ubuntu VM Requirements
 
@@ -158,6 +159,15 @@ Direct HTTPS mode:
 - Router forwards only `80` and `443` to the Ubuntu VM.
 - Caddy can issue TLS certificates.
 - No database, Redis, Docker, TrueNAS, VNC, or RDP ports are forwarded.
+
+Nextcloud workspace requirements:
+
+- Dedicated Nextcloud URL if exposed publicly.
+- `trusted_domains` includes the final Nextcloud domain.
+- Reverse proxy settings match the final ingress.
+- TrueNAS admin UI is not exposed publicly at the Nextcloud or NAS domain.
+- Admin users have MFA.
+- Production background jobs use cron.
 
 Shopify requirements:
 
