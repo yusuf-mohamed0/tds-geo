@@ -1,0 +1,23 @@
+{
+  "exportedAt": "2026-08-12T14:30:39.609Z",
+  "source": "database.sqlite",
+  "workflowCount": 2,
+  "workflows": [
+    {
+      "id": "aee35695-01d9-4a0f-ade5-6af800059cf3",
+      "name": "AI SEO Complete Pipeline",
+      "active": true,
+      "file": "ai-seo-complete-pipeline-aee35695.json",
+      "sha256": "60a75ca2553f8b0196a735aea55a9fe6ebcc1e23b87f95f950edd9ecafca6ca9",
+      "updatedAt": "2026-06-08 12:37:36.491"
+    },
+    {
+      "id": "fe6d6e24-8afa-4d72-a127-4aeec5a687bc",
+      "name": "AI SEO Shopify Agent",
+      "active": false,
+      "file": "ai-seo-shopify-agent-fe6d6e24.json",
+      "sha256": "07879a7ce1c42fe92ac9996db9d1a5c5ac880dfd2b8c4c3b789897527dac277c",
+      "updatedAt": "2026-06-08 11:43:55"
+    }
+  ]
+}

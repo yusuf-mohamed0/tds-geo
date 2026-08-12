@@ -1,0 +1,318 @@
+{
+  "id": "fe6d6e24-8afa-4d72-a127-4aeec5a687bc",
+  "name": "AI SEO Shopify Agent",
+  "active": false,
+  "description": "",
+  "versionId": "f1dbbd55-3c7b-48fb-aec1-9c7df40e0ba4",
+  "triggerCount": 1,
+  "createdAt": "2026-06-07 09:40:00.000",
+  "updatedAt": "2026-06-08 11:43:55",
+  "nodes": [
+    {
+      "id": "cron-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        96
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        },
+        "scheduleType": "interval",
+        "scheduleInterval": {
+          "item": [
+            {
+              "name": "Days",
+              "value": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "set-client-id",
+      "name": "Set Client ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        80
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "clientId",
+              "value": "38e6e8da-b1c7-436c-809d-03bb46b42a1d"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "login",
+      "name": "Login to Vireon",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        32
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/login",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "admin@example.com"
+            },
+            {
+              "name": "password",
+              "value": "[REDACTED]"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      }
+    },
+    {
+      "id": "http-keywords",
+      "name": "Discover Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        64
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/keywords/discover",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "industry",
+              "value": "maintenance"
+            },
+            {
+              "name": "seedKeywords",
+              "value": "[\"home maintenance\", \"property care\", \"preventative maintenance\", \"home repair tips\"]"
+            },
+            {
+              "name": "count",
+              "value": 20
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "message-model",
+      "name": "Message a model",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        32
+      ],
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o"
+        },
+        "options": {}
+      },
+      "credentials": "[REDACTED]"
+    },
+    {
+      "id": "wait-30s",
+      "name": "Wait 30s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.2,
+      "position": [
+        750,
+        400
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 30,
+        "unit": "seconds",
+        "options": {}
+      }
+    },
+    {
+      "id": "http-generate",
+      "name": "Generate Article",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        304
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "count",
+              "value": 1
+            },
+            {
+              "name": "publish",
+              "value": true
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "http-logs",
+      "name": "Fetch Latest Articles",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1088,
+        304
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/clients/{{ $('Set Client ID').item.json.clientId }}/articles?status=published&limit=1",
+        "authentication": "none",
+        "options": {
+          "timeout": 15000,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ $('Login to Vireon').item.json.token }}"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Client ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Client ID": {
+      "main": [
+        [
+          {
+            "node": "Login to Vireon",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Login to Vireon": {
+      "main": [
+        [
+          {
+            "node": "Discover Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discover Keywords": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Wait 30s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 30s": {
+      "main": [
+        [
+          {
+            "node": "Generate Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Article": {
+      "main": [
+        [
+          {
+            "node": "Fetch Latest Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "staticData": {},
+  "meta": {}
+}

@@ -25,6 +25,7 @@
     "vault:rotate": "tsx backend/scripts/rotateVaultKey.ts",
     "import:credentials": "tsx backend/scripts/importCredentials.ts",
     "shopify:webhooks:update": "tsx backend/scripts/update-webhooks.ts",
+    "n8n:export": "node scripts/export-n8n-workflows.mjs",
     "audit:clients": "node scripts/audit-clients.mjs",
     "eval:pages": "node scripts/evaluate-frontend-pages.mjs",
     "test": "vitest run",

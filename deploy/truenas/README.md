@@ -51,6 +51,9 @@ TrueNAS SCALE
 | `scripts/restore-db.sh` | Restore a dump into TrueNAS Postgres. |
 | `scripts/migrate-from-aws.sh` | Pull final/current AWS DB dump and restore locally. |
 | `scripts/healthcheck.sh` | Verify containers, DB, Redis, and `/health`. |
+| `scripts/sync-intelligence.sh` | Export n8n workflows, refresh GitNexus, and verify source/workflow/index/health pairing. |
+| `scripts/refresh-gitnexus.sh` | Refresh the GitNexus graph via Docker for the clean source checkout. |
+| `scripts/check-pairing.sh` | Verify source cleanliness, exported workflows, GitNexus commit, and production health. |
 | `RUNBOOK.md` | Full migration and operations runbook. |
 | `KNOWLEDGE-BASE.md` | Saved TrueNAS and local-server operating knowledge. |
 | `OPERATING-ROLES.md` | Role responsibilities for migration and operations. |
@@ -94,3 +97,21 @@ If `nas.trafficdigitalsolutions.com` points to the TrueNAS UI, lock it down befo
 ## Rollback
 
 The deploy script stores the previous API image ID in `.previous-image`. Keep AWS online for 1-2 weeks after cutover as an external rollback target.
+
+## Intelligence Pairing
+
+TrueNAS keeps a clean, non-production source checkout at `/opt/tds-geo/kivo-source` for analysis. Do not use two-way destructive sync between runtime directories and GitHub. The safe flow is:
+
+```text
+GitHub/main -> clean source checkout -> n8n workflow export -> GitNexus analyze -> pairing check
+```
+
+Run:
+
+```bash
+/opt/tds-geo/kivo-source/deploy/truenas/scripts/sync-intelligence.sh
+```
+
+This exports redacted n8n workflows into `n8n/workflows/exported/`, refreshes GitNexus through the official Docker image, and verifies the GitNexus index commit matches the source commit while production `/health` is healthy.
+
+The `.github/workflows/sync-truenas-intelligence.yml` workflow keeps this paired on every `main` push through the TrueNAS self-hosted runner. If GitHub runner access is unavailable, transfer a fresh source bundle manually and then run `sync-intelligence.sh`.
