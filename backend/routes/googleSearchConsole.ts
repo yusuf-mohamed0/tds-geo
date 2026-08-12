@@ -41,7 +41,7 @@ export function createGscRoutes(pool: Pool): Router {
       if (!gscService.isConfigured()) {
         res.status(503).json({
           error: 'Google Search Console not configured',
-          message: 'Set GSC_CLIENT_ID, GSC_CLIENT_SECRET, and GSC_REDIRECT_URI in environment',
+          message: 'Set GSC_CLIENT_ID, GSC_CLIENT_SECRET, and GSC_REDIRECT_URI, or the GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI aliases.',
         });
         return;
       }

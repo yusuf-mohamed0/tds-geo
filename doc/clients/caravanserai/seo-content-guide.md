@@ -64,4 +64,4 @@
 - Zamalek/Cairo boutique home stores
 
 ---
-*Generated for TDS Geo — July 8, 2026*
+*Generated for Kivo Geo — July 8, 2026*

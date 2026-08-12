@@ -19,7 +19,7 @@ This file defines what must be watched so the local production server does not f
 | PostgreSQL health | `pg_isready` | Database unavailable |
 | Redis health | `redis-cli ping` | Queue/cache unavailable |
 | Backup freshness | Latest dump age | Recovery point is too old |
-| Disk usage | `/mnt/tds-geo` and pool usage | Risk of DB/write failure |
+| Disk usage | `/mnt/kivo` and pool usage | Risk of DB/write failure |
 | GitHub runner status | Runner online in GitHub | Deploys cannot reach TrueNAS |
 | Cloudflare Tunnel status | Tunnel connected | Public ingress failure |
 | Shopify embedded app | App opens in admin | App URL, auth, or iframe failure |
@@ -54,7 +54,7 @@ Optional later:
 ## Manual Health Command
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
+cd /opt/kivo/deploy/truenas
 ./scripts/healthcheck.sh
 ```
 
@@ -63,8 +63,8 @@ cd /opt/tds-geo/deploy/truenas
 Use this logic in whichever monitoring tool is available:
 
 ```bash
-test -f /mnt/tds-geo/backups/tds-geo_latest.dump
-find /mnt/tds-geo/backups/tds-geo_latest.dump -mtime -1
+test -f /mnt/kivo/backups/kivo_latest.dump
+find /mnt/kivo/backups/kivo_latest.dump -mtime -1
 ```
 
 Expected result:

@@ -3,7 +3,7 @@
 # © 2026 Yusuf Mohamed. All rights reserved.
 # Licensed under the ISC License.
 """
-Vireon Client Website Intelligence Scraper
+SNEFERU OS Client Website Intelligence Scraper
 ===========================================
 Uses Scrapling to scan client websites and extract deep contextual data
 for creating perfectly tailored articles.

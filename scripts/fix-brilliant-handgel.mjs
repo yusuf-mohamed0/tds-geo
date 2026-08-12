@@ -48,9 +48,9 @@ if (!parsed) {
 console.log('Description:', parsed.description.slice(0, 100), '...');
 console.log('Short desc:', (parsed.shortDescription || '').slice(0, 100));
 
-const update = await fetch('https://boston-pharma.com/wp-json/tds-geo/v1/posts/4792', {
+const update = await fetch('https://boston-pharma.com/wp-json/kivo/v1/posts/4792', {
   method: 'PUT',
-  headers: { 'X-TDS-GEO-Key': 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1', 'Content-Type': 'application/json' },
+  headers: { 'X-Kivo-Key': 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1', 'Content-Type': 'application/json' },
   body: JSON.stringify({ post_type: 'product', content: parsed.description, excerpt: parsed.shortDescription }),
 });
 const result = await update.json();

@@ -237,4 +237,4 @@ Before output, verify:
 
 ---
 
-*Generated for TDS Geo content system — July 2026*
+*Generated for Kivo Geo content system — July 2026*

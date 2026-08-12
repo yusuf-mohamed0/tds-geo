@@ -17,7 +17,7 @@ scrape_configs:
     static_configs:
       - targets: ["api:3000"]
         labels:
-          service: "tds-geo-api"
+          service: "kivo-api"
           environment: "production"
 
   - job_name: "node"

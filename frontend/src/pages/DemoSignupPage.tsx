@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { signupDemo } from '../api/demo';
+import { KIVO_BRAND } from '../brand/kivo';
 
 export default function DemoSignupPage() {
   const [name, setName] = useState('');
@@ -40,18 +41,18 @@ export default function DemoSignupPage() {
         <main className="flex flex-1 items-center justify-center px-4 py-12">
           <div className="w-full max-w-sm text-center">
             <div className="mb-8 flex flex-col items-center">
-              <img src="/assets/White%20Swype.png" alt="Swype" className="h-10 w-auto object-contain" />
-              <h1 className="text-2xl font-bold text-brand-text mt-3">TDS Geo</h1>
+              <img src={KIVO_BRAND.assets.markWhite} alt={KIVO_BRAND.company} className="h-10 w-auto object-contain" />
+              <h1 className="text-2xl font-bold text-brand-text mt-3">{KIVO_BRAND.os}</h1>
             </div>
             <div className="card p-8 space-y-4">
-              <div className="w-14 h-14 mx-auto rounded-full bg-[#FCB900]/20 flex items-center justify-center">
-                <svg className="w-7 h-7 text-[#FCB900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-14 h-14 mx-auto rounded-full bg-brand-accent/20 flex items-center justify-center">
+                <svg className="w-7 h-7 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <h2 className="text-xl font-bold text-brand-text">Demo account created!</h2>
               <p className="text-brand-muted text-sm leading-relaxed">
-                Your free trial is ready. Sign in to start exploring TDS Geo with your demo dashboard.
+                Your free trial is ready. Sign in to start exploring {KIVO_BRAND.os} with your demo command center.
               </p>
               <Link
                 to="/login"
@@ -63,7 +64,7 @@ export default function DemoSignupPage() {
           </div>
         </main>
         <footer className="border-t border-brand-border bg-white px-4 py-3 text-xs text-brand-muted flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <span>TDS Geo</span>
+          <span>{KIVO_BRAND.company}</span>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
             <a href="/documentation" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Docs</a>
             <a href="/tutorial" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Tutorial</a>
@@ -81,8 +82,8 @@ export default function DemoSignupPage() {
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8 flex flex-col items-center">
-            <img src="/assets/White%20Swype.png" alt="Swype" className="h-10 w-auto object-contain" />
-            <h1 className="text-2xl font-bold text-brand-text mt-3">TDS Geo</h1>
+            <img src={KIVO_BRAND.assets.markWhite} alt={KIVO_BRAND.company} className="h-10 w-auto object-contain" />
+            <h1 className="text-2xl font-bold text-brand-text mt-3">{KIVO_BRAND.os}</h1>
             <p className="text-brand-muted mt-1">Start your free 14-day trial</p>
           </div>
 
@@ -153,7 +154,7 @@ export default function DemoSignupPage() {
 
             <p className="text-xs text-brand-muted text-center pt-1">
               Already have an account?{' '}
-              <Link to="/login" className="text-[#FCB900] hover:underline">
+              <Link to="/login" className="text-brand-accent hover:underline">
                 Sign in
               </Link>
             </p>
@@ -161,7 +162,7 @@ export default function DemoSignupPage() {
         </div>
       </main>
       <footer className="border-t border-brand-border bg-white px-4 py-3 text-xs text-brand-muted flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <span>TDS Geo</span>
+        <span>{KIVO_BRAND.company}</span>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
           <a href="/documentation" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Docs</a>
           <a href="/tutorial" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Tutorial</a>

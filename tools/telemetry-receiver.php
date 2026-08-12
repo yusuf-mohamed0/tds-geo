@@ -3,10 +3,10 @@
 // © 2026 Yusuf Mohamed. All rights reserved.
 // Licensed under the ISC License.
 /**
- * Traffic Digital Solutions GEO Telemetry Receiver
+ * Kivo Geo Telemetry Receiver
  *
  * Host this file on any server to receive daily pings from all sites running
- * the Traffic Digital Solutions GEO plugin. Data is logged as JSONL (one JSON object per line).
+ * the Kivo Geo plugin. Data is logged as JSONL (one JSON object per line).
  *
  * Usage:
  *   1. Upload this file to your server (e.g., https://your-server.com/telemetry.php)

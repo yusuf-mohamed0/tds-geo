@@ -1,4 +1,4 @@
-# robots.txt — TDS Geo AI SEO Automation
+# robots.txt - SNEFERU Geo AI crawler access
 # Generated: 2026-07-04
 #
 # AI crawler access control — allow all AI bots to index content

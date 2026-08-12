@@ -4,6 +4,7 @@ import { Page, Card, Text, Banner, Spinner, BlockStack, InlineStack, Button, Tex
 import { Store, ArrowUpCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { upgradeDemo } from '../api/demo';
+import { KIVO_BRAND } from '../brand/kivo';
 
 export default function DemoUpgradePage() {
   const { user } = useAuth();
@@ -40,10 +41,10 @@ export default function DemoUpgradePage() {
         <Card>
           <BlockStack gap="400" inlineAlign="center">
             <div style={{ textAlign: 'center', padding: 'var(--p-space-800) 0' }}>
-              <Store size={48} style={{ color: '#22C55E' }} />
+              <Store size={48} style={{ color: KIVO_BRAND.colors.gold }} />
               <Text as="h2" variant="headingXl" fontWeight="bold">Welcome aboard!</Text>
               <Text as="p" variant="bodyMd" tone="subdued">
-                Your demo account has been upgraded to a full TDS Geo account connected to your Shopify store.
+                Your demo account has been upgraded to a full {KIVO_BRAND.geo} account connected to your Shopify store.
               </Text>
               <div style={{ marginTop: 'var(--p-space-400)' }}>
                 <Button variant="primary" onClick={() => navigate('/admin')}>
@@ -82,7 +83,7 @@ export default function DemoUpgradePage() {
         <Card>
           <BlockStack gap="400">
             <InlineStack gap="200" blockAlign="center">
-              <ArrowUpCircle size={24} color="#FCB900" />
+              <ArrowUpCircle size={24} color={KIVO_BRAND.colors.gold} />
               <Text as="h2" variant="headingMd">Shopify Connection</Text>
             </InlineStack>
 

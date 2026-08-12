@@ -19,15 +19,15 @@ Use this as the final checklist before moving production traffic from AWS to Tru
 - Password SSH login is disabled.
 - Docker and Compose are installed.
 - GitHub runner is installed and online.
-- Runner labels are `self-hosted,truenas,tds-geo`.
+- Runner labels are `self-hosted,truenas,kivo`.
 
 ## 3. Storage
 
-- `/mnt/tds-geo/postgres` exists.
-- `/mnt/tds-geo/redis` exists.
-- `/mnt/tds-geo/backups` exists.
-- `/mnt/tds-geo/logs` exists.
-- `/mnt/tds-geo/cloudflared` exists if needed.
+- `/mnt/kivo/postgres` exists.
+- `/mnt/kivo/redis` exists.
+- `/mnt/kivo/backups` exists.
+- `/mnt/kivo/logs` exists.
+- `/mnt/kivo/cloudflared` exists if needed.
 - Permissions allow the deploy user and containers to use the paths.
 
 ## 4. Secrets

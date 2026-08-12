@@ -3,7 +3,7 @@
 // Licensed under the ISC License.
 
 // ══════════════════════════════════════════════════════════════════
-// TDS Geo — Product SEO Optimizer
+// Kivo Geo — Product SEO Optimizer
 // Generates SEO-optimized meta titles and descriptions for products
 // ══════════════════════════════════════════════════════════════════
 
@@ -92,15 +92,15 @@ function extractJSON(text) {
 
 const WP_BASE = 'https://boston-pharma.com/wp-json';
 const WP_KEY = process.env.BOSTON_PHARMA_API_KEY || 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
-const WP_HEADERS = { 'X-TDS-GEO-Key': WP_KEY, 'Content-Type': 'application/json' };
+const WP_HEADERS = { 'X-Kivo-Key': WP_KEY, 'Content-Type': 'application/json' };
 
 async function getProducts() {
-  log('info', 'Fetching products via TDS Geo plugin');
+  log('info', 'Fetching products via Kivo Geo plugin');
   const all = [];
   let offset = 0;
   while (true) {
     const res = await fetch(
-      `${WP_BASE}/tds-geo/v1/posts?post_type=product&limit=50&offset=${offset}`,
+      `${WP_BASE}/kivo/v1/posts?post_type=product&limit=50&offset=${offset}`,
       { headers: WP_HEADERS }
     );
     if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
@@ -117,7 +117,7 @@ async function getProducts() {
 
 async function updateProductMeta(id, metaTitle, metaDescription) {
   const body = { post_type: 'product', meta_title: metaTitle, meta_description: metaDescription };
-  const res = await fetch(`${WP_BASE}/tds-geo/v1/posts/${id}`, {
+  const res = await fetch(`${WP_BASE}/kivo/v1/posts/${id}`, {
     method: 'PUT', headers: WP_HEADERS, body: JSON.stringify(body),
   });
   if (!res.ok) {

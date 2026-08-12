@@ -1,6 +1,6 @@
 # Caravanserai — Technical Reference
 
-## TDS Geo Integration
+## Kivo Geo Integration
 
 | Parameter | Value |
 |---|---|
@@ -24,7 +24,7 @@
 | **Locale** | English (primary) |
 | **Timezone Offset** | UTC+3 (Egypt) |
 | **Theme** | Caravanserai V2.3 (Release 2.0.4+listings, Store ID 2698) |
-| **App Status** | Pending installation — TDS Geo app is in Shopify review (Reference #121207). Will install once approved. |
+| **App Status** | Pending installation — Kivo Geo app is in Shopify review (Reference #121207). Will install once approved. |
 
 ## API Setup
 
@@ -74,4 +74,4 @@ All 6 locations in Cairo, Egypt:
 - **Diplo**: Diplo Strip
 
 ---
-*Generated for TDS Geo — July 8, 2026*
+*Generated for Kivo Geo — July 8, 2026*

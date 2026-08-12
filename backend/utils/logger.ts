@@ -43,7 +43,7 @@ const consoleFormat = winston.format.combine(
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: logFormat,
-  defaultMeta: { service: 'ai-seo-automation' },
+  defaultMeta: { service: 'kivo-os' },
   transports: [
     new winston.transports.File({
       filename: process.env.LOG_FILE_PATH || 'logs/automation.log',

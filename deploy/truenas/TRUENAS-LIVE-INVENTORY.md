@@ -30,18 +30,18 @@ This file records the live TrueNAS state discovered during deployment preparatio
 | Spare | 1 spare disk |
 | Scrub errors | 0 in latest reported scrub |
 
-## TDS Geo Datasets Created
+## Kivo Geo Datasets Created
 
 These datasets were created through the TrueNAS API as the dedicated storage tree for the migration target:
 
 | Dataset | Purpose |
 |---|---|
-| `Traffic/tds-geo` | Parent dataset for TDS Geo production support data. |
-| `Traffic/tds-geo/postgres` | Intended PostgreSQL persistent data location if mounted into the VM/runtime. |
-| `Traffic/tds-geo/redis` | Intended Redis persistent data location if mounted into the VM/runtime. |
-| `Traffic/tds-geo/backups` | Database dumps, restore-test dumps, and migration dumps. |
-| `Traffic/tds-geo/logs` | Application and deploy logs. |
-| `Traffic/tds-geo/cloudflared` | Cloudflare Tunnel config/state if config-file mode is used. |
+| `Traffic/kivo` | Parent dataset for Kivo Geo production support data. |
+| `Traffic/kivo/postgres` | Intended PostgreSQL persistent data location if mounted into the VM/runtime. |
+| `Traffic/kivo/redis` | Intended Redis persistent data location if mounted into the VM/runtime. |
+| `Traffic/kivo/backups` | Database dumps, restore-test dumps, and migration dumps. |
+| `Traffic/kivo/logs` | Application and deploy logs. |
+| `Traffic/kivo/cloudflared` | Cloudflare Tunnel config/state if config-file mode is used. |
 
 ## Network
 
@@ -71,7 +71,7 @@ These datasets were created through the TrueNAS API as the dedicated storage tre
 |---|---|---|
 | Nextcloud | Running | App version `34.0.2`; TrueNAS app version `2.3.50`; image updates available; web portal reported on LAN port `30027`. |
 | Nginx Proxy Manager | Running | Host ports `80`, `443`, and `81` are bound on all interfaces. This likely controls public ingress. |
-| cxperts WordPress | Running | LAN port `30040`; likely unrelated to TDS Geo production migration. |
+| cxperts WordPress | Running | LAN port `30040`; likely unrelated to Kivo Geo production migration. |
 | hik-odoo-sync | Running | Custom app; upgrade available. |
 
 ## Virtual Machines
@@ -79,7 +79,7 @@ These datasets were created through the TrueNAS API as the dedicated storage tre
 | VM | State | Notes |
 |---|---|---|
 | `tdsGEO` | Running | Autostart enabled; 2 vCPU; about 4.6 GiB RAM; bridge `br0`; Ubuntu ISO still attached; display/VNC configured. |
-| `Windows11` | Stopped | Not part of TDS Geo deployment. |
+| `Windows11` | Stopped | Not part of Kivo Geo deployment. |
 
 ## Security Findings
 
@@ -99,7 +99,7 @@ Completed:
 
 - TrueNAS API access established through local `/tmp/opencode/truenas.env`.
 - Read-only system, storage, app, VM, service, and network discovery completed.
-- Dedicated `Traffic/tds-geo/*` datasets created.
+- Dedicated `Traffic/kivo/*` datasets created.
 - Repo already contains complete TrueNAS deployment kit, production-readiness docs, and Nextcloud workspace plan.
 
 Blocked:
@@ -117,9 +117,9 @@ Blocked:
 2. Restrict Nginx Proxy Manager admin UI port `81` and VM VNC to LAN/VPN/Cloudflare Access only.
 3. Confirm whether `tdsGEO` has Ubuntu installed or is still at the installer.
 4. Get SSH into `tdsGEO` or install/configure Ubuntu through the VM console.
-5. Mount or map the `Traffic/tds-geo/*` datasets into the runtime path, or document that the VM disk is the primary runtime disk and host datasets are backup/support storage.
+5. Mount or map the `Traffic/kivo/*` datasets into the runtime path, or document that the VM disk is the primary runtime disk and host datasets are backup/support storage.
 6. Bootstrap the VM with `deploy/truenas/scripts/bootstrap-vm.sh`.
-7. Clone repo to `/opt/tds-geo` in the VM.
-8. Configure VM-local `/opt/tds-geo/deploy/truenas/.env`.
+7. Clone repo to `/opt/kivo` in the VM.
+8. Configure VM-local `/opt/kivo/deploy/truenas/.env`.
 9. Install GitHub self-hosted runner.
 10. Deploy Compose stack and run healthchecks.

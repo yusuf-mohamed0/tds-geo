@@ -41,7 +41,7 @@ export default function Layout() {
           </ErrorBoundary>
         </main>
         <footer className="border-t border-brand-border px-4 py-3 text-xs text-brand-muted flex flex-col items-start gap-2 shrink-0 bg-white sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-2">
-          <span>TDS Geo</span>
+          <span>Kivo</span>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
             <a href="/documentation" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Docs</a>
             <a href="/tutorial" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Tutorial</a>

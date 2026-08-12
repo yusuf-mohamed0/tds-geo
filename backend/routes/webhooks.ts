@@ -180,7 +180,7 @@ export function createWebhookRoutes(pool: Pool): Router {
       const payload = {
         event: 'test',
         timestamp: new Date().toISOString(),
-        data: { message: 'This is a test webhook from AI SEO Automation' }
+        data: { message: 'This is a test webhook from Kivo OS' }
       };
 
       const signature = webhook.secret

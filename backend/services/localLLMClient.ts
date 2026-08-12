@@ -11,6 +11,7 @@
 import { logger } from '../utils/logger';
 
 const AIRLLM_BASE_URL = process.env.AIRLLM_URL || 'http://127.0.0.1:8531';
+const AIRLLM_HEALTH_TIMEOUT_MS = Number.parseInt(process.env.AIRLLM_HEALTH_TIMEOUT_MS || '1000', 10) || 1000;
 
 export interface GenerateResponse {
   text: string;
@@ -36,7 +37,7 @@ class LocalLLMClient {
 
   async healthCheck(): Promise<LocalLLMHealth> {
     try {
-      const res = await fetch(`${this.baseUrl}/health`, { signal: AbortSignal.timeout(5000) });
+      const res = await fetch(`${this.baseUrl}/health`, { signal: AbortSignal.timeout(AIRLLM_HEALTH_TIMEOUT_MS) });
       if (res.ok) {
         this.healthy = true;
         const data = await res.json() as {

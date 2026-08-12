@@ -112,7 +112,7 @@
 - Product-specific information (Bost Active, Bost C 100%, Firodical, Tilmiheimia)
 - Livestock health and productivity
 
-## TDS Geo Backend
+## Kivo Geo Backend
 
 | Field | Value |
 |---|---|

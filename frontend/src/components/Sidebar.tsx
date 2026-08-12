@@ -27,7 +27,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   return (
     <aside className={`fixed inset-y-0 left-0 z-40 flex h-screen w-60 flex-col overflow-y-auto border-r border-brand-border bg-brand-surface transition-transform duration-200 md:static md:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="flex items-center justify-between border-b border-brand-border p-5">
-        <Logo />
+        <Logo showText={false} />
         <button type="button" className="btn-ghost p-1.5 md:hidden" onClick={onClose} aria-label="Close navigation">
           <X size={18} />
         </button>

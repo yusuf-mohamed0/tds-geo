@@ -1,6 +1,6 @@
 # Boston Vet — Technical Reference
 
-## TDS Geo Integration
+## Kivo Geo Integration
 
 | Parameter | Value |
 |---|---|

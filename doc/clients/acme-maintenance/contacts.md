@@ -27,7 +27,7 @@
 | HUB — Historically Underutilized Business | Certified |
 | HMSDC — Houston Minority Supplier Development Council | Member |
 
-## TDS Geo Internal Users
+## Kivo Geo Internal Users
 
 | Email | Role |
 |---|---|

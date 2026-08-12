@@ -61,4 +61,4 @@
 ## SEO & Content Notes
 
 ---
-*Generated for TDS Geo — {Date}*
+*Generated for Kivo Geo — {Date}*

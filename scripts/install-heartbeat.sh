@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ══════════════════════════════════════════════════════════════════
-# TDS Geo — Install Heartbeat Cron Job
+# SNEFERU Geo — Install Heartbeat Cron Job
 #
 # Adds a crontab entry that runs the heartbeat monitor every 5 minutes.
 #

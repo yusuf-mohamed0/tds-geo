@@ -9,7 +9,7 @@ import { createWordPressClient } from './client';
 
 export class WordPressConnector implements ConnectorInterface {
   readonly provider = 'wordpress';
-  readonly name = 'TDS Geo WordPress';
+  readonly name = 'Kivo Geo WordPress';
   readonly version = '1.0.0';
 
   private client: AxiosInstance | null = null;

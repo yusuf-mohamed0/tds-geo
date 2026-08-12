@@ -3,7 +3,7 @@
 // Licensed under the ISC License.
 
 // ──────────────────────────────────────────────
-// AI SEO Automation System - TypeScript Types
+// Kivo OS - TypeScript Types
 // ──────────────────────────────────────────────
 
 // ─── Client ──────────────────────────────────

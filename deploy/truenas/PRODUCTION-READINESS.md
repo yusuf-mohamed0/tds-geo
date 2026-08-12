@@ -4,7 +4,7 @@ This is the manager-level plan for deciding when the TrueNAS/local-server migrat
 
 ## Success Definition
 
-The migration is successful when TDS Geo runs from the TrueNAS Ubuntu VM with no critical production regressions, no private services exposed publicly, verified backups, working Shopify integrations, and a documented rollback path to AWS.
+The migration is successful when Kivo Geo runs from the TrueNAS Ubuntu VM with no critical production regressions, no private services exposed publicly, verified backups, working Shopify integrations, and a documented rollback path to AWS.
 
 ## Production Readiness Gates
 

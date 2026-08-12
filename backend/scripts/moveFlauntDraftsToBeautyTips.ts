@@ -57,7 +57,7 @@ async function main(): Promise<void> {
           body_html: source.body_html,
           summary_html: source.summary_html || '',
           tags: source.tags || '',
-          author: source.author || 'TDS Geo',
+          author: source.author || 'Kivo Geo',
           published: false,
           published_at: null,
           metafields_global_title_tag: titleTag,

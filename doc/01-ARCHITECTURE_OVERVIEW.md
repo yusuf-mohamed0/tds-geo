@@ -1,8 +1,8 @@
-# TDS Geo — Architecture Overview
+# Kivo Geo — Architecture Overview
 
-## What TDS Geo Is
+## What Kivo Geo Is
 
-TDS Geo is a multi-tenant SaaS platform that automates AI-powered SEO content generation and publishing for e-commerce stores (primarily Shopify). Built and operated by Traffic Digital Solutions.
+Kivo Geo is a multi-tenant SaaS platform that automates AI-powered SEO content generation and publishing for e-commerce stores (primarily Shopify). Built and operated by Kivo.
 
 **Core value proposition:** Enter a keyword → system runs 24+ AI stages → article published to your store automatically.
 
@@ -11,7 +11,7 @@ TDS Geo is a multi-tenant SaaS platform that automates AI-powered SEO content ge
 ```
 ┌──────────────────────────────────────────────┐
 │              GITHUB (source of truth)          │
-│  github.com/yusuf-mohamed0/tds-geo           │
+│  github.com/yusuf-mohamed0/kivo           │
 │  All code, config, and infrastructure files   │
 └──────────────────┬───────────────────────────┘
                    │ git push/pull
@@ -23,7 +23,7 @@ TDS Geo is a multi-tenant SaaS platform that automates AI-powered SEO content ge
 │                                               │
 │  ┌────────────────────────────────────────┐  │
 │  │  PM2 (Process Manager)                 │  │
-│  │  └─ tds-geo-backend (Express API)      │  │
+│  │  └─ kivo-backend (Express API)      │  │
 │  │     TypeScript, Node 22, Port 3000     │  │
 │  ├────────────────────────────────────────┤  │
 │  │  PostgreSQL 16 (main database)         │  │
@@ -53,7 +53,7 @@ TDS Geo is a multi-tenant SaaS platform that automates AI-powered SEO content ge
 |---|---|---|
 | Browser → App | HTTPS via Nginx | JWT Bearer token |
 | App → Shopify | Shopify Admin REST API | OAuth access token |
-| App → WordPress | REST API to WordPress plugin | X-TDS-GEO-Key header |
+| App → WordPress | REST API to WordPress plugin | X-Kivo-Key header |
 | App → OpenAI | OpenAI REST API | OpenAI API key |
 | Workers → App | BullMQ (Redis) | Internal |
 | App → Database | PostgreSQL client | Database URL |
@@ -80,7 +80,7 @@ TDS Geo is a multi-tenant SaaS platform that automates AI-powered SEO content ge
 | `backend/types/` | 1492 lines of TypeScript types |
 | `backend/workers/` | BullMQ background job processors |
 | `frontend/` | Pre-built React SPA |
-| `tds-geo-wp/` | WordPress plugin (thin connector) |
-| `tds-geo-nextjs/` | Next.js integration package |
+| `kivo-wp/` | WordPress plugin (thin connector) |
+| `kivo-nextjs/` | Next.js integration package |
 | `scripts/` | Deployment, data, and utility scripts |
 | `doc/` | Documentation |

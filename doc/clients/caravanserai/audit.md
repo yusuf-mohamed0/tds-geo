@@ -1,4 +1,4 @@
-> Dashboard: [TDS Geo Dashboard](../../DASHBOARD.md)
+> Dashboard: [Kivo Geo Dashboard](../../DASHBOARD.md)
 >
 # Caravanserai Design — Site Audit
 

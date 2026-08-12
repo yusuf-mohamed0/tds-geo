@@ -49,8 +49,8 @@ You are expected to be familiar with:
 Articles you write for Caravanserai:
 1. Are generated from the keyword and content strategy in `seo-content-guide.md`
 2. Pass through the Content Quality Gate (minimum score 65/100)
-3. Are saved as draft — ready for scheduling once the TDS Geo app is installed on Caravanserai's Shopify store
+3. Are saved as draft — ready for scheduling once the Kivo Geo app is installed on Caravanserai's Shopify store
 4. Will be published automatically on their scheduled date via the AutoPublishScheduler
 
 ---
-*Generated for TDS Geo — July 8, 2026*
+*Generated for Kivo Geo — July 8, 2026*

@@ -3,6 +3,16 @@ import { Pool } from 'pg';
 import { authenticate } from '../middleware/auth';
 import backlinkAutomation from '../services/backlinkAutomation';
 
+function normalizeDomain(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  try {
+    return new URL(trimmed.includes('://') ? trimmed : `https://${trimmed}`).hostname.replace(/^www\./, '');
+  } catch {
+    return trimmed.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0];
+  }
+}
+
 export function createBacklinkRoutes(_pool: Pool): Router {
   const router = Router({ mergeParams: true });
   router.use(authenticate);
@@ -31,11 +41,12 @@ export function createBacklinkRoutes(_pool: Pool): Router {
     try {
       const clientId = (req as any).clientId;
       const { targetDomain, limit } = req.body;
-      if (!targetDomain) {
+      const normalizedDomain = typeof targetDomain === 'string' ? normalizeDomain(targetDomain) : '';
+      if (!normalizedDomain) {
         res.status(400).json({ error: 'targetDomain is required' });
         return;
       }
-      const prospects = await backlinkAutomation.discoverProspects(clientId, targetDomain, limit || 20);
+      const prospects = await backlinkAutomation.discoverProspects(clientId, normalizedDomain, limit || 20);
       res.json({ prospects, count: prospects.length });
     } catch (err) {
       next(err);

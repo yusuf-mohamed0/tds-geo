@@ -244,7 +244,7 @@ export function createAdminRoutes(pool: Pool): Router {
 
       const ExcelJS = require('exceljs');
       const workbook = new ExcelJS.Workbook();
-      workbook.creator = 'TDS Geo';
+      workbook.creator = 'Kivo OS';
       workbook.created = new Date();
 
       const sheet = workbook.addWorksheet('Connected Sites');

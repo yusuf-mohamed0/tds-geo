@@ -1,15 +1,15 @@
 {
-  "name": "ai-seo-automation",
+  "name": "kivo-os",
   "version": "2.0.1",
-  "description": "AI SEO automation — multi-tenant content pipeline, Shopify publishing, and product engine. <YKS /> Code. Build. Ship.™",
+  "description": "Kivo OS — technical visibility infrastructure for AI search, commerce content, telemetry, and automated recovery. <YKS /> Code. Build. Ship.™",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yusuf-mohamed0/tds-geo.git"
+    "url": "git+https://github.com/yusuf-mohamed0/kivo.git"
   },
   "bugs": {
-    "url": "https://github.com/yusuf-mohamed0/tds-geo/issues"
+    "url": "https://github.com/yusuf-mohamed0/kivo/issues"
   },
-  "homepage": "https://github.com/yusuf-mohamed0/tds-geo#readme",
+  "homepage": "https://github.com/yusuf-mohamed0/kivo#readme",
   "main": "dist/backend/index.js",
   "scripts": {
     "build": "tsc",

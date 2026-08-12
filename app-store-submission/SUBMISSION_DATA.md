@@ -1,4 +1,4 @@
-# Shopify App Store Submission — TDS Geo
+# Shopify App Store Submission - Kivo Geo
 
 > Fill every field below into the Partner Dashboard at https://partners.shopify.com
 
@@ -8,11 +8,11 @@
 
 ### App Name
 ```
-TDS Geo
+Kivo Geo
 ```
 
 ### App Icon
-Upload `screenshots/app-icon-square.png` (Swype logo on white — 1024×1024px)
+Upload `screenshots/app-icon-square.png` (Kivo mark on white - 1024x1024px)
 > Also available: `app-icon-square-dark.png` (white logo on dark background)
 
 ### Primary Category
@@ -62,7 +62,7 @@ Optimize your Store content for AI-powered search engines like ChatGPT, Perplexi
 
 ### App Details (397/500 chars)
 ```
-TDS Geo helps Shopify merchants optimize their content for Generative Engine Optimization (GEO) , the practice of structuring content so AI search engines naturally cite your store as a source.
+Kivo Geo helps Shopify merchants optimize their content for Generative Engine Optimization (GEO), the practice of structuring content so AI search engines naturally cite your store as a source.
 
 AI-powered search engines are changing how customers discover products online. If your content isn't structured for how AI models extract and cite information, you're invisible to this growing audience.
 ```
@@ -101,9 +101,9 @@ https://admin.shopify.com/store/traffic-test
 
 | # | File | Alt text |
 |---|---|---|
-| 1 | `screenshots/02-dashboard.png` | TDS Geo embedded dashboard showing article generation statistics |
-| 2 | `screenshots/04-articles-list.png` | TDS Geo articles management view with list of generated content |
-| 3 | `screenshots/06-geo-analysis.png` | TDS Geo GEO analysis page showing content scoring across AI engines |
+| 1 | `screenshots/02-dashboard.png` | Kivo Geo embedded dashboard showing article generation statistics |
+| 2 | `screenshots/04-articles-list.png` | Kivo Geo articles management view with list of generated content |
+| 3 | `screenshots/06-geo-analysis.png` | Kivo Geo GEO analysis page showing content scoring across AI engines |
 
 ### Integrations
 None required.
@@ -124,7 +124,7 @@ web.development@trafficdigitalsolutions.com
 
 ### Privacy Policy URL
 ```
-https://traffic.16.192.29.174.nip.io/privacy
+https://ai.trafficdigitalsolutions.com/privacy
 ```
 > ✓ Verified — live and serving content.
 
@@ -170,12 +170,12 @@ content marketing
 
 **Title Tag** (60/60):
 ```
-TDS Geo - AI Content Generation & GEO Optimization for Shopi
+Kivo Geo - AI Content Generation & GEO Optimization for Shopify
 ```
 
 **Meta Description** (158/160):
 ```
-TDS Geo automatically generates and optimizes Shopify content for AI search engines like ChatGPT and Perplexity. Improve your store's GEO score and get cited.
+Kivo Geo automatically generates and optimizes Shopify content for AI search engines like ChatGPT and Perplexity. Improve your store's GEO score and get cited.
 ```
 
 ---
@@ -219,11 +219,11 @@ None — worldwide.
 
 | Field | Value |
 |---|---|
-| **Username** | `admin@tds-geo.internal` |
+| **Username** | `admin@kivo.internal` |
 | **Password** | `<set via env>` |
-| **Account description** | Shopify store admin account for traffic-test.myshopify.com, provides full access to embedded TDS Geo app and all features |
+| **Account description** | Shopify store admin account for traffic-test.myshopify.com, provides full access to embedded Kivo Geo app and all features |
 
-> User exists in DB (role: admin, id: f6d7fa9a...). Also tested with `admin@tds-geo.internal` / `<REDACTED_PASSWORD>`.
+> User exists in DB (role: admin, id: f6d7fa9a...). Also tested with `admin@kivo.internal` / `<REDACTED_PASSWORD>`.
 
 ### Screencast URL
 ```
@@ -233,7 +233,7 @@ https://youtu.be/GvqorasmfGU
 ### Testing Instructions (900/2800 chars)
 ```
 1. Visit https://traffic-test.myshopify.com/admin and log in with the test account
-2. In the left sidebar, click "Apps" → "TDS Geo" to open the embedded app
+2. In the left sidebar, click "Apps" → "Kivo Geo" to open the embedded app
 3. Dashboard tab — verify 4 metric cards load (Total Clients, Articles, Avg Keyword Relevance, MTD Costs)
 4. Click "Articles" tab — verify the list of generated articles appears with status badges
 5. Click any article to view its full content, status, and SEO metadata
@@ -252,9 +252,9 @@ https://youtu.be/GvqorasmfGU
 
 | Task | Value |
 |---|---|
-| **Allowed redirection URL** | `https://traffic.16.192.29.174.nip.io/api/shopify/callback` |
+| **Allowed redirection URL** | `https://ai.trafficdigitalsolutions.com/api/shopify/callback` |
 | **OAuth scopes** | `write_products,read_products,write_content,read_content,write_script_tags,read_script_tags,write_themes,read_themes` |
 | **Webhook compliance topics** | `customers/data_request`, `customers/redact`, `shop/redact`, `app/uninstalled` |
-| **App URL** | `https://traffic.16.192.29.174.nip.io` |
+| **App URL** | `https://ai.trafficdigitalsolutions.com` |
 | **API key** | `a178c8740049e04eec663378b6e30ad8` |
 | **API secret** | ✅ Server `.env` has `<REDACTED_APP_SECRET>` — verify this matches Partner Dashboard |

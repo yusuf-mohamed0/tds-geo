@@ -50,36 +50,36 @@ class MetricsService {
     const lines: string[] = [];
     const now = Date.now();
 
-    lines.push('# HELP tds_geo_up Server uptime status');
-    lines.push('# TYPE tds_geo_up gauge');
-    lines.push(`tds_geo_up 1`);
+    lines.push('# HELP kivo_up Server uptime status');
+    lines.push('# TYPE kivo_up gauge');
+    lines.push(`kivo_up 1`);
 
     const uptime = Math.floor((now - this.startTime) / 1000);
-    lines.push('# HELP tds_geo_uptime_seconds Server uptime in seconds');
-    lines.push('# TYPE tds_geo_uptime_seconds gauge');
-    lines.push(`tds_geo_uptime_seconds ${uptime}`);
+    lines.push('# HELP kivo_uptime_seconds Server uptime in seconds');
+    lines.push('# TYPE kivo_uptime_seconds gauge');
+    lines.push(`kivo_uptime_seconds ${uptime}`);
 
-    lines.push('# HELP tds_geo_build_info Build metadata');
-    lines.push('# TYPE tds_geo_build_info gauge');
-    lines.push(`tds_geo_build_info{version="${process.env.npm_package_version || 'unknown'}",node="${process.version}"} 1`);
+    lines.push('# HELP kivo_build_info Build metadata');
+    lines.push('# TYPE kivo_build_info gauge');
+    lines.push(`kivo_build_info{version="${process.env.npm_package_version || 'unknown'}",node="${process.version}"} 1`);
 
     if (this.pool) {
       try {
         const poolStatus = await this.pool.query('SELECT COUNT(*) as count FROM pg_stat_activity WHERE state = $1', ['active']);
         const activeConn = parseInt(poolStatus.rows[0]?.count || '0', 10);
-        lines.push('# HELP tds_geo_db_active_connections Active database connections');
-        lines.push('# TYPE tds_geo_db_active_connections gauge');
-        lines.push(`tds_geo_db_active_connections ${activeConn}`);
+        lines.push('# HELP kivo_db_active_connections Active database connections');
+        lines.push('# TYPE kivo_db_active_connections gauge');
+        lines.push(`kivo_db_active_connections ${activeConn}`);
 
         const totalResult = await this.pool.query('SELECT COUNT(*) as count FROM pg_stat_activity');
         const totalConn = parseInt(totalResult.rows[0]?.count || '0', 10);
-        lines.push('# HELP tds_geo_db_total_connections Total database connections');
-        lines.push('# TYPE tds_geo_db_total_connections gauge');
-        lines.push(`tds_geo_db_total_connections ${totalConn}`);
+        lines.push('# HELP kivo_db_total_connections Total database connections');
+        lines.push('# TYPE kivo_db_total_connections gauge');
+        lines.push(`kivo_db_total_connections ${totalConn}`);
       } catch {
-        lines.push('# HELP tds_geo_db_up Database connectivity');
-        lines.push('# TYPE tds_geo_db_up gauge');
-        lines.push(`tds_geo_db_up 0`);
+        lines.push('# HELP kivo_db_up Database connectivity');
+        lines.push('# TYPE kivo_db_up gauge');
+        lines.push(`kivo_db_up 0`);
       }
     }
 
@@ -134,16 +134,16 @@ class MetricsService {
     }
 
     const mem = process.memoryUsage();
-    lines.push('# HELP tds_geo_memory_bytes Process memory usage');
-    lines.push('# TYPE tds_geo_memory_bytes gauge');
-    lines.push(`tds_geo_memory_bytes{type="rss"} ${mem.rss}`);
-    lines.push(`tds_geo_memory_bytes{type="heapTotal"} ${mem.heapTotal}`);
-    lines.push(`tds_geo_memory_bytes{type="heapUsed"} ${mem.heapUsed}`);
-    lines.push(`tds_geo_memory_bytes{type="external"} ${mem.external}`);
+    lines.push('# HELP kivo_memory_bytes Process memory usage');
+    lines.push('# TYPE kivo_memory_bytes gauge');
+    lines.push(`kivo_memory_bytes{type="rss"} ${mem.rss}`);
+    lines.push(`kivo_memory_bytes{type="heapTotal"} ${mem.heapTotal}`);
+    lines.push(`kivo_memory_bytes{type="heapUsed"} ${mem.heapUsed}`);
+    lines.push(`kivo_memory_bytes{type="external"} ${mem.external}`);
 
-    lines.push('# HELP tds_geo_event_loop_lag Event loop lag');
-    lines.push('# TYPE tds_geo_event_loop_lag gauge');
-    lines.push(`tds_geo_event_loop_lag 0`);
+    lines.push('# HELP kivo_event_loop_lag Event loop lag');
+    lines.push('# TYPE kivo_event_loop_lag gauge');
+    lines.push(`kivo_event_loop_lag 0`);
 
     if (this.pool) {
       try {
@@ -151,9 +151,9 @@ class MetricsService {
           "SELECT COUNT(*) as count FROM activity_logs WHERE level = 'error' AND created_at >= NOW() - INTERVAL '24 hours'"
         );
         const errs = parseInt(errCount.rows[0]?.count || '0', 10);
-        lines.push('# HELP tds_geo_errors_24h Error count in last 24 hours');
-        lines.push('# TYPE tds_geo_errors_24h gauge');
-        lines.push(`tds_geo_errors_24h ${errs}`);
+        lines.push('# HELP kivo_errors_24h Error count in last 24 hours');
+        lines.push('# TYPE kivo_errors_24h gauge');
+        lines.push(`kivo_errors_24h ${errs}`);
       } catch {
         //
       }
@@ -165,19 +165,19 @@ class MetricsService {
             (SELECT COUNT(*)::int FROM articles WHERE status = 'published') as published
         `);
         const row = articleStats.rows[0];
-        lines.push('# HELP tds_geo_articles_total Article counts');
-        lines.push('# TYPE tds_geo_articles_total gauge');
-        lines.push(`tds_geo_articles_total{status="pending"} ${row?.pending || 0}`);
-        lines.push(`tds_geo_articles_total{status="published"} ${row?.published || 0}`);
+        lines.push('# HELP kivo_articles_total Article counts');
+        lines.push('# TYPE kivo_articles_total gauge');
+        lines.push(`kivo_articles_total{status="pending"} ${row?.pending || 0}`);
+        lines.push(`kivo_articles_total{status="published"} ${row?.published || 0}`);
       } catch {
         //
       }
 
       try {
         const sitesResult = await this.pool.query('SELECT COUNT(*)::int as count FROM connected_sites');
-        lines.push('# HELP tds_geo_connected_sites_total Total connected sites');
-        lines.push('# TYPE tds_geo_connected_sites_total gauge');
-        lines.push(`tds_geo_connected_sites_total ${sitesResult.rows[0]?.count || 0}`);
+        lines.push('# HELP kivo_connected_sites_total Total connected sites');
+        lines.push('# TYPE kivo_connected_sites_total gauge');
+        lines.push(`kivo_connected_sites_total ${sitesResult.rows[0]?.count || 0}`);
       } catch {
         //
       }

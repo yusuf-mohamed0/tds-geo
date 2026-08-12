@@ -28,7 +28,7 @@ function buildConnectorConfig(connection: CmsConnection) {
   return {
     provider: connection.provider,
     endpointUrl: connection.endpoint_url || config.endpointUrl || config.endpoint_url || config.siteUrl || config.site_url || config.url || '',
-    apiKey: config.apiKey || config.api_key || config.tdsGeoApiKey || config.tds_geo_api_key || config.accessToken || config.access_token || '',
+    apiKey: config.apiKey || config.api_key || config.tdsGeoApiKey || config.kivo_api_key || config.accessToken || config.access_token || '',
     defaultBlogId: config.defaultBlogId || config.default_blog_id,
     defaultBlogHandle: config.defaultBlogHandle || config.default_blog_handle,
   };
@@ -40,10 +40,10 @@ async function testCustomRestConnection(connection: CmsConnection): Promise<bool
 
   try {
     const baseUrl = connectorConfig.endpointUrl.replace(/\/+$/, '');
-    const response = await fetch(`${baseUrl}/api/tds-geo/posts?limit=1`, {
+    const response = await fetch(`${baseUrl}/api/kivo/posts?limit=1`, {
       headers: {
         'Content-Type': 'application/json',
-        'X-TDS-GEO-Key': connectorConfig.apiKey,
+        'X-Kivo-Key': connectorConfig.apiKey,
         'User-Agent': 'TDS-Geo-Backend/3.0',
       },
       signal: AbortSignal.timeout(8000),

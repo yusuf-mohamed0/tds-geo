@@ -2,12 +2,12 @@
 
 ## Overview
 
-n8n is a workflow automation tool. TDS Geo integrates with it **lightly** — via webhooks.
+n8n is a workflow automation tool. Kivo Geo integrates with it **lightly** — via webhooks.
 
 ## Architecture
 
 ```
-TDS Geo Backend
+Kivo Geo Backend
   │
   ├── Outbound: POST to n8n webhook URL (optional)
   │     → Triggers n8n workflows

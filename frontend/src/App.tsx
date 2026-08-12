@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link as ReactRouterLink, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link as ReactRouterLink, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider } from '@shopify/polaris';
 import enTranslations from '@shopify/polaris/locales/en.json';
 import { AuthProvider } from './contexts/AuthContext';
@@ -22,6 +22,7 @@ import BacklinksPage from './pages/BacklinksPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ShopifyEmbeddedPage from './pages/ShopifyEmbeddedPage';
 import { isEmbedded } from './lib/embedded';
+import { track } from './lib/telemetry';
 
 const IS_EXTERNAL_LINK_REGEX = /^(?:[a-z][a-z\d+.-]*:|\/\/)/;
 
@@ -59,9 +60,18 @@ function RootPage() {
   return <Navigate to="/admin" replace />;
 }
 
+function PageViewTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    track('page.view', { route: location.pathname });
+  }, [location.pathname]);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <PageViewTracker />
       <AppProvider
         i18n={enTranslations}
         linkComponent={Link}

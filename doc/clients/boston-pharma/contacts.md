@@ -21,4 +21,4 @@
 ## Notes
 - Admin email `t.murad@bostongroup-eg.com` — likely the owner/webmaster
 - Boston Group parent: `bostongroup-eg.com`
-- Developed by Traffic Digital Solutions (footer credit: "Made with love by Traffic")
+- Developed by Kivo (footer credit: "Made with love by Traffic")

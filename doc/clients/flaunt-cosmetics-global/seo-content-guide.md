@@ -1,7 +1,7 @@
 # Flaunt Cosmetics Global — SEO & Content Guide
 
 ## Article Structure
-Every article must follow TDS Geo conventions:
+Every article must follow Kivo Geo conventions:
 - **Title tag** ≤ 70 chars
 - **Meta description** ≤ 160 chars (auto-extracted from content)
 - **Excerpt/summary** (first ~200 chars)

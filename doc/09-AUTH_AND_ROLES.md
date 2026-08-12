@@ -68,7 +68,7 @@ Optional device-bound auth for employees:
 
 For server-to-server (WordPress plugin, webhooks):
 
-- `X-TDS-GEO-Key` header for WordPress API keys
+- `X-Kivo-Key` header for WordPress API keys
 - `x-api-key` header for master API key (from env)
 - Timing-safe comparison via `crypto.timingSafeEqual`
 

@@ -1,4 +1,4 @@
-# TDS GEO — Architecture & Security Audit
+# Kivo Geo — Architecture & Security Audit
 
 Generated: 2026-06-25
 
@@ -56,8 +56,8 @@ Generated: 2026-06-25
 ### CRITICAL
 
 **C1: GitHub PAT Token Removed from Git Remote URL**
-- Was: `https://yusuf-mohamed0:<REDACTED_PAT>@github.com/yusuf-mohamed0/tds-geo.git`
-- Fixed to: `https://github.com/yusuf-mohamed0/tds-geo.git` (token removed)
+- Was: `https://yusuf-mohamed0:<REDACTED_PAT>@github.com/yusuf-mohamed0/kivo.git`
+- Fixed to: `https://github.com/yusuf-mohamed0/kivo.git` (token removed)
 - **ACTION REQUIRED**: User must rotate this PAT on GitHub.com immediately
 
 **C2: Hardcoded Shopify Access Token — Removed from `.env.example`**

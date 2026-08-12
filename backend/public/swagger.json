@@ -1,11 +1,11 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "TDS GEO — AI SEO Automation API",
+    "title": "Kivo OS - GEO Intelligence API",
     "version": "2.0.0",
-    "description": "Multi-CMS content generation and SEO optimization platform for Shopify and WordPress stores.",
+    "description": "Multi-CMS GEO intelligence, content generation, and commerce optimization platform for Shopify and WordPress stores.",
     "contact": {
-      "name": "Traffic Digital Solutions",
+      "name": "Kivo",
       "email": "web.development@trafficdigitalsolutions.com"
     }
   },

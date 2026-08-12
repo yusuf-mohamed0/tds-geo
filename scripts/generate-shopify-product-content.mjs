@@ -3,7 +3,7 @@
 // Licensed under the ISC License.
 
 // ══════════════════════════════════════════════════════════════════
-// TDS Geo — Shopify Product Content Generator
+// Kivo Geo — Shopify Product Content Generator
 // Generates SEO product descriptions + meta for Shopify stores
 // ══════════════════════════════════════════════════════════════════
 

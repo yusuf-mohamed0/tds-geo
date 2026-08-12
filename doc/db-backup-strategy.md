@@ -33,24 +33,24 @@ The Docker backup service only runs when the compose stack is up. For production
 sudo crontab -e
 
 # Add:
-0 2 * * * /home/ubuntu/tds-geo/scripts/backup-db.sh
-0 4 * * * /usr/local/bin/aws s3 sync /var/backups/tds-geo/ s3://tds-geo-backups/ --storage-class STANDARD_IA
+0 2 * * * /home/ubuntu/kivo/scripts/backup-db.sh
+0 4 * * * /usr/local/bin/aws s3 sync /var/backups/kivo/ s3://kivo-backups/ --storage-class STANDARD_IA
 ```
 
 ## Restore Procedure
 
 ```bash
 # List contents of a backup
-pg_restore --list /var/backups/tds-geo/tds-geo_latest.dump
+pg_restore --list /var/backups/kivo/kivo_latest.dump
 
 # Full restore (drops existing DB first)
 dropdb -U postgres ai_seo_automation
 createdb -U postgres ai_seo_automation
-pg_restore -U postgres -d ai_seo_automation --clean --if-exists /var/backups/tds-geo/tds-geo_latest.dump
+pg_restore -U postgres -d ai_seo_automation --clean --if-exists /var/backups/kivo/kivo_latest.dump
 
 # Restore to a different DB name (safer)
 createdb -U postgres ai_seo_automation_restore
-pg_restore -U postgres -d ai_seo_automation_restore /var/backups/tds-geo/tds-geo_latest.dump
+pg_restore -U postgres -d ai_seo_automation_restore /var/backups/kivo/kivo_latest.dump
 ```
 
 ## WAL Archiving (Optional — for point-in-time recovery)
@@ -86,12 +86,12 @@ BACKUP_RETENTION_DAYS=7
 # S3 (optional — for offsite backups)
 AWS_ACCESS_KEY_ID=your-access-key
 AWS_SECRET_ACCESS_KEY=your-secret-key
-S3_BUCKET=s3://tds-geo-backups
+S3_BUCKET=s3://kivo-backups
 ```
 
 ## Monitoring
 
-- Check `/var/backups/tds-geo/backup.log` for success/failure
-- Prometheus metric: `tds_geo_db_active_connections` (from `/metrics`)
+- Check `/var/backups/kivo/backup.log` for success/failure
+- Prometheus metric: `kivo_db_active_connections` (from `/metrics`)
 - Heartbeat email alerts include error counts
 - If S3 is configured, verify uploads at the S3 console

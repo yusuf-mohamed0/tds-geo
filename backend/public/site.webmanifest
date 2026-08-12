@@ -1,0 +1,29 @@
+{
+  "name": "Kivo OS",
+  "short_name": "Kivo",
+  "description": "Kivo OS - technical visibility infrastructure for AI search, commerce content, telemetry, and automated recovery.",
+  "start_url": "/admin",
+  "display": "standalone",
+  "background_color": "#071013",
+  "theme_color": "#22E6A8",
+  "icons": [
+    {
+      "src": "/assets/kivo-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/kivo-mark.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/kivo-mark.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

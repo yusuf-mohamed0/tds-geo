@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Page, Card, Text, Banner, SkeletonPage, SkeletonBodyText } from '@shopify/polaris';
 import { Store, ArrowRight } from 'lucide-react';
 import { apiFetch } from '../api/client';
+import { KIVO_BRAND } from '../brand/kivo';
 
 interface Client {
   id: string;
@@ -53,7 +54,7 @@ export default function ClientsPage() {
               className="card text-left hover:border-brand-accent/40 transition-all duration-200 group relative overflow-hidden"
               style={{ cursor: 'pointer', border: '1px solid var(--p-color-border)', borderRadius: 'var(--p-space-300)', background: 'var(--p-color-bg-surface)', padding: 'var(--p-space-500)', width: '100%' }}
             >
-              <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.1)', color: '#a78bfa', width: 'fit-content' }}>
+              <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(252, 185, 0, 0.12)', color: KIVO_BRAND.colors.gold, width: 'fit-content' }}>
                 <Store size={20} />
               </div>
               <div style={{ marginTop: 'var(--p-space-400)' }}><Text as="h3" variant="headingMd" fontWeight="semibold">{client.name}</Text></div>

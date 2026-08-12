@@ -22,7 +22,7 @@
 |---|---|
 | **Shop** | caravanserai-gift-store.myshopify.com |
 | **Admin URL** | https://admin.shopify.com/store/caravanserai-gift-store |
-| **TDS Geo App** | Pending installation (app in Shopify review #121207) |
+| **Kivo Geo App** | Pending installation (app in Shopify review #121207) |
 
 ## TDS Backend Access
 
@@ -31,10 +31,10 @@
 | *(to be assigned)* | | |
 
 ## Notes
-- Store built by Traffic Digital Solutions (footer credit: "Made with love by Traffic")
+- Store built by Kivo (footer credit: "Made with love by Traffic")
 - Instagram is primary social channel
 - 6 physical locations across Cairo (Zamalek, Arkan, UVenues, Diplo)
 - Email domain: caravanseraifurniture.com (website domain: caravanserai-design.com)
 
 ---
-*Generated for TDS Geo — July 8, 2026*
+*Generated for Kivo Geo — July 8, 2026*

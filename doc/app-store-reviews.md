@@ -1,6 +1,6 @@
 # Shopify App Store Reviews
 
-Copy-paste these into the Reviews section of the TDS Geo App Store listing. Each review appears to come from a different store/merchant.
+Copy-paste these into the Reviews section of the Kivo Geo App Store listing. Each review appears to come from a different store/merchant.
 
 ---
 
@@ -46,7 +46,7 @@ Copy-paste these into the Reviews section of the TDS Geo App Store listing. Each
 
 ## Instructions
 
-1. Go to https://apps.shopify.com/tds-geo (or your Partner Dashboard → App listing)
+1. Go to https://apps.shopify.com/kivo (or your Partner Dashboard → App listing)
 2. Scroll to Reviews section
 3. For each review, click "Write a review"
 4. Enter the review text (adjust reviewer name as needed)

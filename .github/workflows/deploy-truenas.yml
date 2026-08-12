@@ -2,16 +2,6 @@ name: Deploy TrueNAS
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - "deploy/truenas/**"
-      - "Dockerfile"
-      - "package.json"
-      - "package-lock.json"
-      - "tsconfig.json"
 
 concurrency:
   group: truenas-production
@@ -54,23 +44,24 @@ jobs:
   deploy:
     name: Deploy On TrueNAS Runner
     needs: build
-    runs-on: [self-hosted, truenas, tds-geo]
+    runs-on: [self-hosted, truenas, kivo]
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Sync repository to /opt/tds-geo
+      - name: Sync repository to /opt/kivo
         run: |
-          sudo mkdir -p /opt/tds-geo
+          sudo mkdir -p /opt/kivo
           sudo rsync -a --delete \
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude 'frontend/node_modules' \
-            --exclude 'tds-geo-nextjs/node_modules' \
+            --exclude 'kivo-nextjs/node_modules' \
             --exclude 'deploy/truenas/.env' \
             --exclude 'deploy/truenas/.previous-image' \
-            ./ /opt/tds-geo/
+            ./ /opt/kivo/
 
       - name: Deploy Compose stack
         run: |
-          cd /opt/tds-geo/deploy/truenas
+          cd /opt/kivo/deploy/truenas
           TDS_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:truenas" ./scripts/deploy.sh

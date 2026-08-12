@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ══════════════════════════════════════════════════════════════════
-# TDS Geo — Duck DNS Auto-Updater
+# SNEFERU Geo — Duck DNS Auto-Updater
 #
 # Keeps your free Duck DNS subdomain pointed at your server IP.
 # Runs every 5 minutes via cron.
@@ -21,7 +21,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_FILE="/var/log/tdsgeo-duckdns.log"
 
 echo "════════════════════════════════════════════════"
-echo "  TDS Geo — Duck DNS Installer"
+echo "  SNEFERU Geo — Duck DNS Installer"
 echo "════════════════════════════════════════════════"
 echo ""
 

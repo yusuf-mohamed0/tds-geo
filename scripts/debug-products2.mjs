@@ -5,14 +5,14 @@
 import 'dotenv/config';
 
 const WP_KEY = 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
-const HEADERS = { 'X-TDS-GEO-Key': WP_KEY, 'Content-Type': 'application/json' };
+const HEADERS = { 'X-Kivo-Key': WP_KEY, 'Content-Type': 'application/json' };
 
 async function main() {
-  // Use TDS Geo plugin with pagination
+  // Use Kivo Geo plugin with pagination
   let all = [];
   for (let offset = 0; ; offset += 50) {
     const res = await fetch(
-      `https://boston-pharma.com/wp-json/tds-geo/v1/posts?post_type=product&limit=50&offset=${offset}`,
+      `https://boston-pharma.com/wp-json/kivo/v1/posts?post_type=product&limit=50&offset=${offset}`,
       { headers: HEADERS }
     );
     const d = await res.json();

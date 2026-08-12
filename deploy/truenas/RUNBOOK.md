@@ -2,11 +2,11 @@
 
 ## Goal
 
-Move all TDS Geo runtime pieces from AWS to a TrueNAS-hosted Ubuntu VM while preserving the GitHub-driven workflow.
+Move all Kivo Geo runtime pieces from AWS to a TrueNAS-hosted Ubuntu VM while preserving the GitHub-driven workflow.
 
 ## Current AWS Pieces To Move
 
-- PM2 backend release currently under `/opt/tds-geo/current`.
+- PM2 backend release currently under `/opt/kivo/current`.
 - PostgreSQL database.
 - Redis.
 - Nginx public reverse proxy.
@@ -22,11 +22,11 @@ Move all TDS Geo runtime pieces from AWS to a TrueNAS-hosted Ubuntu VM while pre
 1. Create an Ubuntu Server VM on TrueNAS SCALE.
 2. Give it a static LAN IP.
 3. Mount TrueNAS-backed datasets for:
-   - `/mnt/tds-geo/postgres`
-   - `/mnt/tds-geo/redis`
-   - `/mnt/tds-geo/backups`
-   - `/mnt/tds-geo/logs`
-   - `/mnt/tds-geo/cloudflared`
+   - `/mnt/kivo/postgres`
+   - `/mnt/kivo/redis`
+   - `/mnt/kivo/backups`
+   - `/mnt/kivo/logs`
+   - `/mnt/kivo/cloudflared`
 4. Run:
 
 ```bash
@@ -36,10 +36,10 @@ deploy/truenas/scripts/bootstrap-vm.sh
 ## Phase 2: Clone Repo And Configure
 
 ```bash
-sudo mkdir -p /opt/tds-geo
-sudo chown "$USER:$USER" /opt/tds-geo
-git clone git@github.com:yusuf-mohamed0/tds-geo.git /opt/tds-geo
-cd /opt/tds-geo/deploy/truenas
+sudo mkdir -p /opt/kivo
+sudo chown "$USER:$USER" /opt/kivo
+git clone git@github.com:yusuf-mohamed0/kivo.git /opt/kivo
+cd /opt/kivo/deploy/truenas
 cp .env.example .env
 ```
 
@@ -50,7 +50,7 @@ Fill `.env` on the VM only. Never commit it.
 Install the GitHub self-hosted runner in the VM and label it:
 
 ```text
-self-hosted,truenas,tds-geo
+self-hosted,truenas,kivo
 ```
 
 Run the runner as a normal deploy user that is in the `docker` group.
@@ -60,7 +60,7 @@ Run the runner as a normal deploy user that is in the `docker` group.
 From the TrueNAS VM:
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
+cd /opt/kivo/deploy/truenas
 AWS_SSH_HOST=16.192.29.174 AWS_SSH_USER=ubuntu AWS_SSH_KEY_PATH=/path/to/key ./scripts/migrate-from-aws.sh
 ```
 

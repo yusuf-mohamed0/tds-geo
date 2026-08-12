@@ -65,6 +65,8 @@ export const config = {
   openseo: {
     url: env('OPENSEO_URL', 'http://localhost:3001'),
     dataforseoApiKey: env('DATAFORSEO_API_KEY', ''),
+    dataforseoLogin: env('DATAFORSEO_LOGIN', ''),
+    dataforseoPassword: env('DATAFORSEO_PASSWORD', ''),
   },
 
   smtp: {

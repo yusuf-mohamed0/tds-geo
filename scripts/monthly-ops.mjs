@@ -3,7 +3,7 @@
 // Licensed under the ISC License.
 
 // ══════════════════════════════════════════════════════════════════
-// TDS Geo — Monthly Operations System
+// Kivo Geo — Monthly Operations System
 // Automated content generation, publishing, improvement, maintenance
 // ══════════════════════════════════════════════════════════════════
 
@@ -321,7 +321,7 @@ async function checkSiteHealth() {
 
   const checks = [
     { name: 'Backend API', url: `${BASE_URL}/health` },
-    { name: 'Boston Pharma', url: 'https://boston-pharma.com/wp-json/tds-geo/v1/status', type: 'wordpress' },
+    { name: 'Boston Pharma', url: 'https://boston-pharma.com/wp-json/kivo/v1/status', type: 'wordpress' },
   ];
 
   let allOk = true;
@@ -353,10 +353,10 @@ async function checkDiskAndMemory() {
 }
 
 async function verifyPluginHealth() {
-  log('info', 'Checking TDS Geo plugin health on WordPress sites');
+  log('info', 'Checking Kivo Geo plugin health on WordPress sites');
   const apiKey = process.env.BOSTON_PHARMA_API_KEY || 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
   try {
-    const res = await fetch('https://boston-pharma.com/wp-json/tds-geo/v1/status', {
+    const res = await fetch('https://boston-pharma.com/wp-json/kivo/v1/status', {
       headers: { 'X-TDS-Geo-Key': apiKey },
       signal: AbortSignal.timeout(10000),
     });
@@ -776,7 +776,7 @@ async function checkEntityConsistency(clientId, clientName) {
     ],
     'traffic-test': [
       { name: 'Traffic Test', variants: ['traffic-test', 'traffic test store'] },
-      { name: 'TDS Geo', variants: ['tds-geo', 'tds geo plugin', 'tds geo app'] },
+      { name: 'Kivo Geo', variants: ['kivo', 'tds geo plugin', 'tds geo app'] },
     ],
     'boston-vet': [
       { name: 'Boston Veterinary Pharmaceutical', variants: ['boston vet', 'boston veterinary', 'boston-vet'] },

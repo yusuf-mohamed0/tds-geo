@@ -3,7 +3,7 @@
 // Licensed under the ISC License.
 
 // ══════════════════════════════════════════════════════════════════
-// TDS Geo — Product Content Generator
+// Kivo Geo — Product Content Generator
 // Generates SEO product descriptions + meta for WooCommerce/Shopify
 // ══════════════════════════════════════════════════════════════════
 
@@ -108,7 +108,7 @@ async function getWooProducts() {
 
   while (true) {
     const res = await fetch(
-      `${WP_BASE}/tds-geo/v1/posts?post_type=product&limit=50&offset=${offset}`,
+      `${WP_BASE}/kivo/v1/posts?post_type=product&limit=50&offset=${offset}`,
       { headers: WP_HEADERS }
     );
     if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -141,7 +141,7 @@ async function getWooProducts() {
 async function updateWooProduct(productId, data) {
   log('info', 'Updating product in WooCommerce', { id: productId });
 
-  // Use TDS Geo plugin API which bypasses WP user capability checks
+  // Use Kivo Geo plugin API which bypasses WP user capability checks
   const body = {
     post_type: 'product',
     content: data.description,
@@ -150,7 +150,7 @@ async function updateWooProduct(productId, data) {
     meta_description: data.metaDescription,
   };
 
-  const res = await fetch(`${WP_BASE}/tds-geo/v1/posts/${productId}`, {
+  const res = await fetch(`${WP_BASE}/kivo/v1/posts/${productId}`, {
     method: 'PUT',
     headers: WP_HEADERS,
     body: JSON.stringify(body),

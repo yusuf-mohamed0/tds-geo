@@ -3,7 +3,7 @@
 // Licensed under the ISC License.
 
 // ──────────────────────────────────────────────
-// AI SEO Automation System - Express Server
+// Kivo OS - Express Server
 // ──────────────────────────────────────────────
 
 import 'dotenv/config';
@@ -90,6 +90,10 @@ import { backlinkAutomation } from './services/backlinkAutomation';
 import { createCmsRoutes } from './routes/cms';
 import { createCostRoutes } from './routes/cost';
 import { createObservabilityRoutes } from './routes/observability';
+import { createActivityRoutes } from './routes/activity';
+import activityTracker from './services/activityTracker';
+import autoFixService from './services/autoFixService';
+import { activityMiddleware } from './middleware/activity';
 import { createSecurityRoutes } from './routes/security';
 import { createContentIntelRoutes } from './routes/contentIntelligence';
 import { createEvaluationRoutes } from './routes/evaluation';
@@ -127,7 +131,7 @@ import { csrfTokenHandler, csrfProtection } from './middleware/csrf';
 // ═══ Kali Security Tools Routes ══════════════════
 import { createSecurityScanRoutes } from './routes/securityScan';
 
-// ═══ TDS GEO Core Engine Imports ════════════════
+// ═══ Kivo Core Engine Imports ════════════════
 import { initializeEngines, analyticsEngine } from './engines';
 import { eventBus } from './event-bus';
 import { connectorManager } from './connector-manager';
@@ -157,6 +161,10 @@ import { createDemoRoutes } from './routes/demo';
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const SHOPIFY_APP_URL = process.env.SHOPIFY_APP_URL || 'https://16.192.29.174.nip.io';
+
+// Required behind Cloudflare/Nginx/Caddy so rate limiting and CSRF use the
+// real client IP instead of failing on X-Forwarded-For headers.
+app.set('trust proxy', 1);
 
 // ─── Security Middleware ──────────────────────
 app.use(helmet({
@@ -189,7 +197,7 @@ app.use(cors({
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
   credentials: true,
   maxAge: 86400
 }));
@@ -299,6 +307,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// ─── Kivo Activity Tracking Middleware ────
+// Records who did what, when, and whether it succeeded for every API request.
+app.use(activityMiddleware);
+
 // ══════════════════════════════════════════════
 // Routes
 // ══════════════════════════════════════════════
@@ -307,12 +319,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 if (process.env.NODE_ENV !== 'production') {
   app.get('/', (_req: Request, res: Response) => {
     res.json({
-      name: 'TDS Geo — AI SEO Automation System',
+      name: 'Kivo OS — Technical Visibility Infrastructure',
       version: process.env.npm_package_version || '2.0.0',
       status: 'running',
       api: '/api',
       health: '/health',
-      docs: 'https://github.com/yusuf-mohamed0/tds-geo'
+      docs: 'https://github.com/yusuf-mohamed0/kivo'
     });
   });
 }
@@ -337,7 +349,7 @@ app.get('/health', async (_req: Request, res: Response) => {
             (SELECT COUNT(*)::int FROM activity_logs WHERE level = 'error' AND created_at >= NOW() - INTERVAL '24 hours') as errors_24h,
             (SELECT COUNT(*)::int FROM activity_logs WHERE level = 'warn' AND created_at >= NOW() - INTERVAL '24 hours') as warnings_24h,
             (SELECT COUNT(*)::int FROM jobs WHERE status = 'queued' OR status = 'running') as queued_jobs,
-            (SELECT COUNT(*)::int FROM jobs WHERE status = 'failed' AND created_at >= NOW() - INTERVAL '24 hours') as failed_jobs_24h,
+            (SELECT COUNT(*)::int FROM jobs WHERE status = 'failed' AND queued_at >= NOW() - INTERVAL '24 hours') as failed_jobs_24h,
             (SELECT COUNT(*)::int FROM activity_logs WHERE created_at >= NOW() - INTERVAL '24 hours') as total_actions_24h,
             (SELECT COUNT(*)::int FROM clients WHERE is_active = true) as active_clients,
             (SELECT COALESCE(SUM(cost_usd)::decimal(10,2), 0) FROM cost_tracking WHERE created_at >= DATE_TRUNC('month', NOW())) as costs_mtd,
@@ -352,21 +364,24 @@ app.get('/health', async (_req: Request, res: Response) => {
     // Redis check (shared client)
     const redisPromise = checkRedisHealth();
 
-    // Live pings to Python microservices (skip if not configured)
+    const healthProbeTimeoutMs = Number.parseInt(process.env.HEALTH_PROBE_TIMEOUT_MS || '1000', 10) || 1000;
+    const sidecarsEnabled = process.env.ENABLE_SIDECARS === 'true';
+
+    // Live pings to optional services (skip if not configured)
     const turbovecPromise = process.env.TVEC_URL
       ? vectorStore.healthCheck().then(ok => ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
       : Promise.resolve('not_configured');
-    const airllmPromise = localLLMClient.healthCheck()
-      .then(s => s.healthy ? 'healthy' : 'unreachable')
-      .catch(() => 'unreachable');
+    const airllmPromise = process.env.AIRLLM_URL
+      ? localLLMClient.healthCheck().then(s => s.healthy ? 'healthy' : 'unreachable').catch(() => 'unreachable')
+      : Promise.resolve('not_configured');
 
     // Live pings to Docker sidecars (skip if not configured)
-    const headroomPromise = process.env.HEADROOM_BASE_URL
-      ? fetch(`${process.env.HEADROOM_BASE_URL}/health`, { signal: AbortSignal.timeout(3000) })
+    const headroomPromise = sidecarsEnabled && process.env.HEADROOM_BASE_URL
+      ? fetch(`${process.env.HEADROOM_BASE_URL}/health`, { signal: AbortSignal.timeout(healthProbeTimeoutMs) })
           .then(r => r.ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
       : Promise.resolve('not_configured');
-    const openseoPromise = process.env.OPENSEO_URL
-      ? fetch(`${process.env.OPENSEO_URL}/`, { signal: AbortSignal.timeout(5000) })
+    const openseoPromise = sidecarsEnabled && process.env.OPENSEO_URL
+      ? fetch(`${process.env.OPENSEO_URL}/`, { signal: AbortSignal.timeout(healthProbeTimeoutMs) })
           .then(r => r.ok ? 'healthy' : 'unreachable').catch(() => 'unreachable')
       : Promise.resolve('not_configured');
 
@@ -510,6 +525,10 @@ app.use('/api/cost', createCostRoutes(pool));
 
 // Observability & monitoring routes
 app.use('/api/observability', createObservabilityRoutes(pool));
+
+// ─── Kivo Activity Tracking & Auto-Fix Routes ───
+// Telemetry beacon (unauthenticated ingest) + admin activity/auto-fix API
+app.use('/api', createActivityRoutes(pool));
 
 // Security routes (audit, permissions, rate limiting)
 app.use('/api/security', createSecurityRoutes(pool));
@@ -790,7 +809,7 @@ app.get('/shopify/success', (_req: Request, res: Response) => {
   appUrl.searchParams.set('connected', '1');
   appUrl.searchParams.set('name', name);
 
-  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connected - TDS Geo</title><meta http-equiv="refresh" content="1;url=${appUrl.toString()}"><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#171414;color:#FCF6F2;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#FCB900;font-size:24px;margin:0 0 8px}p{color:#838081;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#FCB900;color:#171414;border-radius:8px;text-decoration:none;font-weight:600;margin:0 6px}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✓</div><h1>Connected!</h1><p><strong>${name}</strong><br>${shop} — opening the app.</p><a class="btn" href="${appUrl.toString()}">Open App</a><a class="btn" href="https://${shop}/admin">Return to Admin</a><script>setTimeout(function(){window.location.replace(${JSON.stringify(appUrl.toString())});},500);</script></div></body></html>`);
+  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connected - Kivo Geo</title><meta http-equiv="refresh" content="1;url=${appUrl.toString()}"><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#071013;color:#F4FBF8;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#22E6A8;font-size:24px;margin:0 0 8px}p{color:#6D7E86;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#22E6A8;color:#071013;border-radius:8px;text-decoration:none;font-weight:600;margin:0 6px}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✓</div><h1>Connected!</h1><p><strong>${name}</strong><br>${shop} — opening the app.</p><a class="btn" href="${appUrl.toString()}">Open App</a><a class="btn" href="https://${shop}/admin">Return to Admin</a><script>setTimeout(function(){window.location.replace(${JSON.stringify(appUrl.toString())});},500);</script></div></body></html>`);
 });
 
 app.get('/shopify/error', (_req: Request, res: Response) => {
@@ -804,7 +823,7 @@ app.get('/shopify/error', (_req: Request, res: Response) => {
   };
   const msg = String(_req.query.msg || 'unknown');
   const errorText = errors[msg] || 'Something went wrong. Please try again.';
-  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Error - TDS Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#171414;color:#FCF6F2;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#ff6b6b;font-size:24px;margin:0 0 8px}p{color:#FCF6F2;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#FCB900;color:#171414;border-radius:8px;text-decoration:none;font-weight:600}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✕</div><h1>Connection Failed</h1><p>${errorText}</p></div></body></html>`);
+  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Error - Kivo Geo</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#071013;color:#F4FBF8;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}div{text-align:center;max-width:500px;padding:0 20px}h1{color:#ff6b6b;font-size:24px;margin:0 0 8px}p{color:#F4FBF8;font-size:14px;margin-bottom:24px}.btn{display:inline-block;padding:10px 24px;background:#22E6A8;color:#071013;border-radius:8px;text-decoration:none;font-weight:600}</style></head><body><div><div style="font-size:64px;margin-bottom:16px">✕</div><h1>Connection Failed</h1><p>${errorText}</p></div></body></html>`);
 });
 
 // ─── Handle App Store Install Redirect ──────
@@ -932,9 +951,19 @@ async function start(): Promise<void> {
 
     // ═══════ Backlink Automation ════════════════════
     try {
-      backlinkAutomation.initialize(pool);
+      await backlinkAutomation.initialize(pool);
     } catch (e) {
       logger.warn('Backlink automation init failed', { error: (e as Error).message });
+    }
+
+    // ═══════ Activity Tracking & Auto-Fix ══════════════
+    try {
+      await activityTracker.initialize(pool);
+      await autoFixService.initialize(pool);
+      autoFixService.start();
+      logger.info('Kivo activity tracking + auto-fix engine initialized');
+    } catch (e) {
+      logger.warn('Activity tracking init failed', { error: (e as Error).message });
     }
 
     // ═══════ Connectors ═════════════════════════════
@@ -957,7 +986,7 @@ async function start(): Promise<void> {
           const apiKey = cfg.accessToken
             || cfg.apiKey
             || cfg.tdsGeoApiKey
-            || cfg.tds_geo_api_key
+            || cfg.kivo_api_key
             || cfg.wpAppPassword;
           const connector = connectorManager.get(row.provider);
           if (connector && endpointUrl && apiKey) {
@@ -1054,14 +1083,14 @@ async function start(): Promise<void> {
     }
 
     // ════════════════════════════════════════════
-    // TDS GEO CORE ENGINE INITIALIZATION
+    // KIVO CORE ENGINE INITIALIZATION
     // ════════════════════════════════════════════
     await initializeEngines(pool);
 
     logger.info('All enterprise services initialized successfully');
 
     app.listen(PORT, () => {
-      logger.info('AI SEO Automation server started', {
+      logger.info('Kivo OS server started', {
         port: PORT,
         environment: process.env.NODE_ENV || 'development',
         apiBase: `http://localhost:${PORT}/api`,
@@ -1088,6 +1117,7 @@ async function shutdown(signal: string): Promise<void> {
 
   // Enterprise service cleanup
   await observability.close().catch(() => {});
+  await autoFixService.close().catch(() => {});
   await enterpriseSecurity.close().catch(() => {});
   await resilience.close().catch(() => {});
   await closeRedis().catch(() => {});
@@ -1105,7 +1135,7 @@ async function shutdown(signal: string): Promise<void> {
     clearInterval((global as any).__demoExpiryTimer);
   }
 
-  // TDS GEO Core engine cleanup
+  // Kivo Core engine cleanup
   connectorManager.stopPeriodicHealthChecks();
   eventBus.clear(false);
 

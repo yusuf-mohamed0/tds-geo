@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ══════════════════════════════════════════════════════════════════
-# TDS Geo — AWS Deployment Script
+# SNEFERU Geo — AWS Deployment Script
 #
 # Run this ON the AWS server after SSH-ing in.
 # It installs everything and starts the app.
@@ -22,7 +22,7 @@ SERVER_IP=$(curl -s http://checkip.amazonaws.com)
 DOMAIN="${SERVER_IP}.nip.io"
 
 echo "════════════════════════════════════════════════"
-echo "  TDS Geo — AWS Deploy"
+echo "  SNEFERU Geo — AWS Deploy"
 echo "  IP: $SERVER_IP"
 echo "  Domain: $DOMAIN"
 echo "════════════════════════════════════════════════"
@@ -43,7 +43,7 @@ sudo -u postgres psql -c "CREATE USER tdsgeo WITH PASSWORD 'tdsgeo_pass' CREATED
 sudo -u postgres psql -c "CREATE DATABASE ai_seo_automation OWNER tdsgeo;" 2>/dev/null || true
 
 # ─── 4. Application Setup ────────────────────────
-echo ">>> Setting up TDS Geo..."
+echo ">>> Setting up SNEFERU Geo..."
 mkdir -p /home/ubuntu/tdsgeo
 cd /home/ubuntu/tdsgeo
 
@@ -74,7 +74,7 @@ echo ">>> Running database migrations..."
 psql "$DATABASE_URL" -f backend/database/schema.sql 2>/dev/null || echo "Schema may already exist"
 
 # ─── 6. Start Application ────────────────────────
-echo ">>> Starting TDS Geo..."
+echo ">>> Starting SNEFERU Geo..."
 sudo npm install -g pm2 2>&1 | tail -1
 pm2 delete tds-geo 2>/dev/null || true
 pm2 start backend/index.ts --name tds-geo --interpreter tsx 2>&1 | tail -3
@@ -130,7 +130,7 @@ CRON_LINE="*/5 * * * * SMTP_USER='$SMTP_USER' SMTP_PASS='$SMTP_PASS' HEARTBEAT_E
 # ─── 10. Test ───────────────────────────────────
 echo ""
 echo "════════════════════════════════════════════════"
-echo "  ✅ TDS Geo Deployed!"
+echo "  ✅ SNEFERU Geo Deployed!"
 echo "  🌐 http://$DOMAIN"
 echo "  🔒 https://$DOMAIN (after SSL)"
 echo "  📊 Heartbeat: every 5 min → ${HEARTBEAT_EMAIL_TO:-configured email}"

@@ -74,7 +74,7 @@
     },
     {
       "id": "login",
-      "name": "Login to TDS Geo",
+      "name": "Login to Kivo Geo",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [600, 300],
@@ -113,7 +113,7 @@
         "options": {
           "timeout": 30000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Kivo Geo').item.json.token }}"}]
           }
         }
       }
@@ -157,7 +157,7 @@
         "options": {
           "timeout": 10000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Kivo Geo').item.json.token }}"}]
           }
         }
       }
@@ -184,7 +184,7 @@
         "options": {
           "timeout": 180000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Kivo Geo').item.json.token }}"}]
           }
         }
       }
@@ -215,7 +215,7 @@
         "options": {
           "timeout": 15000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Kivo Geo').item.json.token }}"}]
           }
         }
       }
@@ -259,7 +259,7 @@
         "options": {
           "timeout": 10000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Kivo Geo').item.json.token }}"}]
           }
         }
       }
@@ -285,7 +285,7 @@
         "options": {
           "timeout": 10000,
           "headerParameters": {
-            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to TDS Geo').item.json.token }}"}]
+            "parameters": [{"name": "Authorization", "value": "Bearer {{ $('Login to Kivo Geo').item.json.token }}"}]
           }
         }
       }
@@ -305,9 +305,9 @@
       ]
     },
     "Set Client ID": {
-      "main": [[{"node": "Login to TDS Geo", "type": "main", "index": 0}]]
+      "main": [[{"node": "Login to Kivo Geo", "type": "main", "index": 0}]]
     },
-    "Login to TDS Geo": {
+    "Login to Kivo Geo": {
       "main": [[{"node": "Discover Keywords", "type": "main", "index": 0}]]
     },
     "Discover Keywords": {

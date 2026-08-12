@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Page, Card, Text, Button, Spinner, Banner, BlockStack, InlineStack, Badge } from '@shopify/polaris';
 import { Globe, Search, CheckCircle, XCircle, Lightbulb, Clock, Monitor } from 'lucide-react';
 import { apiFetch } from '../api/client';
+import { KIVO_BRAND } from '../brand/kivo';
 
 interface Engine {
   name: string;
@@ -25,14 +26,14 @@ interface CitationResponse {
 }
 
 const engineColors: Record<string, string> = {
-  ChatGPT: '#14b8a6',
-  Perplexity: '#3b82f6',
-  'Google AI Overviews': '#eab308',
-  Gemini: '#ec4899',
-  Claude: '#f97316',
-  Copilot: '#22c55e',
-  Grok: '#a855f7',
-  DeepSeek: '#06b6d4',
+  ChatGPT: KIVO_BRAND.colors.gold,
+  Perplexity: KIVO_BRAND.colors.sky,
+  'Google AI Overviews': KIVO_BRAND.colors.amber,
+  Gemini: KIVO_BRAND.colors.peach,
+  Claude: KIVO_BRAND.colors.navy,
+  Copilot: KIVO_BRAND.colors.graphite,
+  Grok: KIVO_BRAND.colors.muted,
+  DeepSeek: KIVO_BRAND.colors.obsidian,
 };
 
 export default function CitationsPage() {

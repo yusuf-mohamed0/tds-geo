@@ -1,4 +1,4 @@
-# TDS Geo — Client Progress Dashboard
+# Kivo Geo — Client Progress Dashboard
 
 > Auto-generated scorecard for all clients. Update this file after each client session.
 
@@ -69,7 +69,7 @@ gantt
 | SEO Content Guide | ✅ Complete | 5 content pillars, keyword strategy |
 | Articles Written | ✅ **6 articles** | Pass quality gate (70-96/100) |
 | Liquid Files | ✅ 6 `.liquid` | Shopify-ready with brand CSS |
-| App Listing | ✅ **APPROVED & PUBLISHED** | `apps.shopify.com/tds-geo` |
+| App Listing | ✅ **APPROVED & PUBLISHED** | `apps.shopify.com/kivo` |
 | Store Connection | ✅ Connected | Shopify client/CMS tokens validate; billing active |
 | Meta Descriptions | ⏳ Pending | Waiting for review/approval workflow |
 | Product Descriptions | ✅ **10 pilot descriptions** | Documented at `product-descriptions-pilot.md` |

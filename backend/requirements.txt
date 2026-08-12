@@ -1,5 +1,5 @@
 # ════════════════════════════════════════════════════════════════
-# Python Dependencies — AI SEO Automation
+# Python Dependencies - SNEFERU OS
 # ════════════════════════════════════════════════════════════════
 # Install all deps:
 #   pip install -r backend/requirements.txt

@@ -7,7 +7,7 @@ Connectors follow a standard `ConnectorInterface` and are registered at startup.
 ```
 ConnectorManager (in-memory registry)
   ├── shopify    → Shopify Admin API
-  ├── wordpress  → WordPress REST API + TDS Geo plugin
+  ├── wordpress  → WordPress REST API + Kivo Geo plugin
   ├── webflow    → Stub (not implemented)
   ├── ghost      → Stub (not implemented)
   └── woocommerce → Extends WordPress connector
@@ -53,7 +53,7 @@ Every connector implements:
 - Connects to WordPress site via REST API
 - **Three auth modes:**
   1. Application Password (WordPress built-in)
-  2. TDS Geo plugin API key (X-TDS-GEO-Key header)
+  2. Kivo Geo plugin API key (X-Kivo-Key header)
   3. JWT (custom plugin)
 - Creates posts via WordPress REST API
 - Uploads featured images as media attachments

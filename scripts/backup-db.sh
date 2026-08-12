@@ -3,7 +3,7 @@
 # © 2026 Yusuf Mohamed. All rights reserved.
 # Licensed under the ISC License.
 # ══════════════════════════════════════════════════════════════════
-# TDS Geo — Database Backup Script
+# SNEFERU Geo — Database Backup Script
 #
 # Creates PostgreSQL dumps with rotation.
 # Supports local storage and optional S3 upload.

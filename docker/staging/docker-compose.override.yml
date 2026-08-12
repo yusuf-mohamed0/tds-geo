@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/tds-geo/ai-seo-automation:staging
+    image: ghcr.io/kivo/ai-seo-automation:staging
     environment:
       NODE_ENV: staging
       LOG_LEVEL: debug
@@ -13,7 +13,7 @@ services:
       - "traefik.http.routers.api-staging.rule=Host(`api-staging.tdsgeo.com`)"
 
   worker:
-    image: ghcr.io/tds-geo/ai-seo-automation:staging
+    image: ghcr.io/kivo/ai-seo-automation:staging
     environment:
       NODE_ENV: staging
       LOG_LEVEL: debug

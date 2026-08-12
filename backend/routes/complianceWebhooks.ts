@@ -162,7 +162,7 @@ async function handleCustomersRedact(req: Request, res: Response, pool: Pool) {
   logger.info('CUSTOMERS_REDACT webhook received', { shop, customerId });
 
   try {
-    // TDS Geo does not store individual customer PII — articles are linked
+    // Kivo OS does not store individual customer PII; articles are linked
     // to the shop (client), not the customer. Acknowledge and log redact request.
     await pool.query(
       `INSERT INTO activity_logs (client_id, action, entity_type, level, message, metadata)

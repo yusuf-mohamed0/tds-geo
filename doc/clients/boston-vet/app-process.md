@@ -49,6 +49,6 @@ Prepare and operate a veterinary pharmaceutical content process that can start i
 ## Blockers To Clear
 
 1. Allowlist `16.192.29.174` in Cloudflare/WAF.
-2. Verify TDS Geo plugin status and WordPress write credentials.
+2. Verify Kivo Geo plugin status and WordPress write credentials.
 3. Check WooCommerce prices and placeholder content.
 4. Establish a named Boston Vet contact or shared Boston Group approval owner.

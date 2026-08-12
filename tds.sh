@@ -24,7 +24,7 @@ case "$1" in
     bash "$TDS_ROOT/start-vault-ui.sh"
     ;;
   *)
-    echo "TDS Geo — Password Vault & CLI Tools"
+    echo "SNEFERU Geo — Password Vault & CLI Tools"
     echo ""
     echo "Commands:"
     echo "  vault list [cat] [svc]   List credentials"

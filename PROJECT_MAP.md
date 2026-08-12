@@ -1,4 +1,4 @@
-# AI SEO Automation System — PROJECT_MAP
+# Kivo OS System — PROJECT_MAP
 
 ## [TECH_STACK]
 

@@ -1,4 +1,4 @@
-{$TDS_PUBLIC_HOSTNAME} {
+:80 {
   encode gzip zstd
 
   header {

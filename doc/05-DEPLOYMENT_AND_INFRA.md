@@ -22,7 +22,7 @@ Managed by **PM2** (process manager):
 
 | Property | Value |
 |---|---|
-| Process name | `tds-geo-backend` |
+| Process name | `kivo-backend` |
 | Mode | `fork` (single process) |
 | Port | `3000` |
 | Version | `2.0.1` |
@@ -48,7 +48,7 @@ Managed by **PM2** (process manager):
 Local development
   → git push origin main
   → server: git pull origin main
-  → pm2 restart tds-geo-backend
+  → pm2 restart kivo-backend
   → verify: curl https://16.192.29.174.nip.io/api/health
 ```
 
@@ -66,11 +66,11 @@ The app runs on **source TypeScript via tsx** (no build step needed). PM2 uses `
 The `shopify.app.toml` file must be deployed separately via Shopify CLI:
 
 ```bash
-cd /home/ubuntu/tds-geo
-npx @shopify/cli@latest app deploy --config shopify.app.tds-geo.toml --allow-updates
+cd /home/ubuntu/kivo
+npx @shopify/cli@latest app deploy --config shopify.app.kivo.toml --allow-updates
 ```
 
-This pushes the app configuration (webhooks, scopes, URLs) to Shopify's platform. The TOML file and the linked copy (`shopify.app.tds-geo.toml`) must be kept in sync.
+This pushes the app configuration (webhooks, scopes, URLs) to Shopify's platform. The TOML file and the linked copy (`shopify.app.kivo.toml`) must be kept in sync.
 
 ## App Restart Safety
 
@@ -100,8 +100,8 @@ Located in `scripts/` directory:
 
 ## Monitoring
 
-- **App logs:** `/home/ubuntu/.pm2/logs/tds-geo-backend-*.log`
-- **PM2 status:** `pm2 status` or `pm2 show tds-geo-backend`
+- **App logs:** `/home/ubuntu/.pm2/logs/kivo-backend-*.log`
+- **PM2 status:** `pm2 status` or `pm2 show kivo-backend`
 - **Health:** `curl http://localhost:3000/health`
 - **Database:** `psql "$DATABASE_URL" -c "SELECT 1;"`
 
@@ -109,5 +109,5 @@ Located in `scripts/` directory:
 
 1. **Swagger.json crash on startup** — File `dist/backend/public/swagger.json` may not exist. Fix: `cp backend/swagger.json dist/backend/public/`
 2. **Redis not running** — Non-fatal. Queue operations degrade gracefully.
-3. **PM2 max restarts exceeded** — Check error log, fix the crash, then `pm2 reset tds-geo-backend && pm2 restart tds-geo-backend`
+3. **PM2 max restarts exceeded** — Check error log, fix the crash, then `pm2 reset kivo-backend && pm2 restart kivo-backend`
 4. **Disk space** — 67% used (26/38GB). Monitor and clean logs if needed.

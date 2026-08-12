@@ -1,6 +1,6 @@
 # Client Profiles — Context
 
-This directory contains brand profiles for every client in the TDS Geo system.
+This directory contains brand profiles for every client in the Kivo Geo system.
 
 ## Current Clients
 

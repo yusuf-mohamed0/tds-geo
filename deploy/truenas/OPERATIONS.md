@@ -1,16 +1,16 @@
 # TrueNAS Operations Runbook
 
-This file defines steady-state operations after TDS Geo is running on the TrueNAS Ubuntu VM.
+This file defines steady-state operations after Kivo Geo is running on the TrueNAS Ubuntu VM.
 
 ## Daily Checks
 
 Run these once per day.
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
+cd /opt/kivo/deploy/truenas
 ./scripts/healthcheck.sh
 docker compose --env-file .env -f compose.yml ps
-ls -lh /mnt/tds-geo/backups
+ls -lh /mnt/kivo/backups
 ```
 
 Expected result:
@@ -27,10 +27,10 @@ Expected result:
 Run these once per week.
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
+cd /opt/kivo/deploy/truenas
 docker compose --env-file .env -f compose.yml logs --tail=300 api worker
-df -h /mnt/tds-geo
-du -sh /mnt/tds-geo/backups /mnt/tds-geo/logs
+df -h /mnt/kivo
+du -sh /mnt/kivo/backups /mnt/kivo/logs
 ```
 
 Weekly requirements:
@@ -66,7 +66,7 @@ git push origin main -> GitHub Actions -> GHCR -> self-hosted runner -> deploy.s
 Manual deploy from the VM:
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
+cd /opt/kivo/deploy/truenas
 ./scripts/deploy.sh
 ```
 
@@ -82,14 +82,14 @@ Deploy requirements:
 Manual backup:
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
+cd /opt/kivo/deploy/truenas
 ./scripts/backup-db.sh
 ```
 
 Expected result:
 
-- A new `tds-geo_YYYYMMDD_HHMMSS.dump` file appears in `BACKUP_DIR`.
-- `tds-geo_latest.dump` points to the newest dump.
+- A new `kivo_YYYYMMDD_HHMMSS.dump` file appears in `BACKUP_DIR`.
+- `kivo_latest.dump` points to the newest dump.
 - `pg_restore --list` succeeds during backup validation.
 
 ## Restore Procedure
@@ -97,8 +97,8 @@ Expected result:
 Restore replaces the configured database. Use only during migration, rollback, or a controlled recovery window.
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
-./scripts/restore-db.sh /mnt/tds-geo/backups/tds-geo_latest.dump
+cd /opt/kivo/deploy/truenas
+./scripts/restore-db.sh /mnt/kivo/backups/kivo_latest.dump
 ./scripts/healthcheck.sh
 ```
 
@@ -107,8 +107,8 @@ cd /opt/tds-geo/deploy/truenas
 | Source | Command Or Path |
 |---|---|
 | Compose services | `docker compose --env-file .env -f compose.yml logs api worker` |
-| App log mount | `/mnt/tds-geo/logs` |
-| Backup log | `/mnt/tds-geo/backups/backup.log` |
+| App log mount | `/mnt/kivo/logs` |
+| Backup log | `/mnt/kivo/backups/backup.log` |
 | GitHub deploy logs | GitHub Actions run for `Deploy TrueNAS` |
 | Cloudflare Tunnel logs | `docker compose --env-file .env -f compose.yml logs cloudflared` |
 

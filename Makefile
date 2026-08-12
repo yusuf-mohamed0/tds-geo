@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────
-# TDS Geo — DevOps Makefile
+# SNEFERU Geo — DevOps Makefile
 # Bottom-to-top: DB → Backend → Frontend → Infra → Deploy
 # ──────────────────────────────────────────────────────────
 

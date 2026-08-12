@@ -14,12 +14,12 @@
 | Public Website | https://alameinegypt.com |
 | Store Email | (via Shopify: alamein-2022.myshopify.com) |
 
-## TDS Geo
+## Kivo Geo
 
 | Detail | Value |
 |---|---|
 | Client Slug | alamein-2022 |
-| Production DB | Managed via TDS Geo |
+| Production DB | Managed via Kivo Geo |
 | Shopify Token | Stored in production |
 | Status | Connected & Active |
 
@@ -34,4 +34,4 @@
 - **Analytics**: Replay / Better Replay
 
 ---
-*Generated for TDS Geo — July 12, 2026*
+*Generated for Kivo Geo — July 12, 2026*

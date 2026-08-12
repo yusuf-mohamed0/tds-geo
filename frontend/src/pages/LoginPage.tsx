@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { KIVO_BRAND } from '../brand/kivo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -30,9 +31,9 @@ export default function LoginPage() {
       <main className="flex flex-1 items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8 flex flex-col items-center">
-          <img src="/assets/White%20Swype.png" alt="Swype" className="h-10 w-auto object-contain" />
-          <h1 className="text-2xl font-bold text-brand-text mt-3">TDS Geo</h1>
-          <p className="text-brand-muted mt-1">Sign in to your dashboard</p>
+          <img src={KIVO_BRAND.assets.markWhite} alt={KIVO_BRAND.company} className="h-10 w-auto object-contain" />
+          <h1 className="text-2xl font-bold text-brand-text mt-3">{KIVO_BRAND.os}</h1>
+          <p className="text-brand-muted mt-1">Sign in to your command center</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card space-y-4">
@@ -77,7 +78,7 @@ export default function LoginPage() {
       </div>
       </main>
       <footer className="border-t border-brand-border bg-white px-4 py-3 text-xs text-brand-muted flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <span>TDS Geo</span>
+        <span>{KIVO_BRAND.company}</span>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
           <a href="/documentation" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Docs</a>
           <a href="/tutorial" className="inline-block transition-all hover:-translate-y-0.5 hover:text-brand-accent" target="_blank" rel="noopener noreferrer">Tutorial</a>

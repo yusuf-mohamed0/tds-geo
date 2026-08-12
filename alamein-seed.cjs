@@ -39,7 +39,7 @@ const articles = [
     const dt = new Date(start + i * 7 * 86400000);
     const x = await shopify(`/blogs/${BLOG_ID}/articles.json`, {
       method: "POST", token: c.shopify_token,
-      body: JSON.stringify({ article: { title: a.title, body_html: a.content, tags: a.tags.join(", "), author: "TDS Geo", published: false, published_at: null } })
+      body: JSON.stringify({ article: { title: a.title, body_html: a.content, tags: a.tags.join(", "), author: "Kivo Geo", published: false, published_at: null } })
     });
     const sa = x.article;
     console.log(`#${i+1} Shopify id=${sa.id} ${a.title.substring(0,50)}`);

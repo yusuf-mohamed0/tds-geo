@@ -12,6 +12,8 @@ const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 const EMAIL_TO = process.env.HEARTBEAT_EMAIL_TO || '';
 const HEARTBEAT_INTERVAL = parseInt(process.env.HEARTBEAT_INTERVAL || '300000', 10); // 5 min default
+const HEARTBEAT_DB_DEGRADED_MS = parseInt(process.env.HEARTBEAT_DB_DEGRADED_MS || '5000', 10);
+const KIVO_PUBLIC_URL = process.env.TDS_PUBLIC_URL || process.env.SHOPIFY_APP_URL || 'https://ai.trafficdigitalsolutions.com';
 
 interface HeartbeatReport {
   timestamp: string;
@@ -123,7 +125,7 @@ class HeartbeatService {
   async sendTestEmail(): Promise<void> {
     const report = await this.run();
     await this.sendEmail({
-      subject: `🟢 [TDS GEO] Test Heartbeat — ${report.status.toUpperCase()} — ${new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
+      subject: `🟢 [Kivo Pulse] Test Heartbeat — ${report.status.toUpperCase()} — ${new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
       html: this.createEmailHtml(report),
     });
   }
@@ -185,7 +187,7 @@ class HeartbeatService {
       await pool.query('SELECT 1');
       const ms = Date.now() - start;
       return {
-        status: ms < 1000 ? 'healthy' : 'degraded',
+        status: ms < HEARTBEAT_DB_DEGRADED_MS ? 'healthy' : 'degraded',
         message: `Query ok (${ms}ms)`,
       };
     } catch (err) {
@@ -381,75 +383,77 @@ class HeartbeatService {
       'server (high load)': ['top -bn1 | head -20', 'ps aux --sort=-%mem | head -10', 'free -m', 'df -h /'],
       'OpenAI': ['curl -s https://api.openai.com/v1/models -H "Authorization: Bearer $OPENAI_API_KEY" | head -5', 'Check .env for OPENAI_API_KEY validity'],
       'Ollama': ['sudo systemctl status ollama', 'ollama list', 'curl -s http://localhost:11434/api/tags'],
-      'connectors': ['Check platform API credentials in .env', 'curl -s https://platform-api.com/health', 'Review connector logs: pm2 logs tds-geo-backend --lines 50'],
+      'connectors': ['Check platform API credentials in .env', 'curl -s https://platform-api.com/health', 'Review connector logs: pm2 logs kivo-backend --lines 50'],
       'connected sites': ['psql -c "SELECT domain, platform, health_status, connection_status FROM connected_sites;"', 'POST /api/connector/:provider/test to verify connection'],
-      'error flood': ['pm2 logs tds-geo-backend --lines 100 | grep error', 'journalctl -u tds-geo --since "10 min ago"', 'Check recent activity_logs in database'],
+      'error flood': ['pm2 logs kivo-backend --lines 100 | grep error', 'journalctl -u kivo --since "10 min ago"', 'Check recent activity_logs in database'],
     };
 
     const uniqueFailures = [...new Set(failedChecks)];
     const causesHtml = uniqueFailures.length > 0
       ? `<div class="section-title">Possible Causes</div>
-${uniqueFailures.map(f => `<div style="background:#FFF8E7;border-radius:10px;padding:12px 16px;margin:8px 0;font-size:13px;border-left:3px solid #FCB900">
-  <strong style="color:#171414;display:block;margin-bottom:6px;text-transform:capitalize">${f.replace(/_/g, ' ')}</strong>
-  ${(causes[f] || ['Unknown issue']).map(c => `<div style="padding:2px 0;color:#3D3B3B">• ${c}</div>`).join('')}
+${uniqueFailures.map(f => `<div style="background:#F4FBF8;border-radius:10px;padding:12px 16px;margin:8px 0;font-size:13px;border-left:3px solid #22E6A8">
+  <strong style="color:#071013;display:block;margin-bottom:6px;text-transform:capitalize">${f.replace(/_/g, ' ')}</strong>
+  ${(causes[f] || ['Unknown issue']).map(c => `<div style="padding:2px 0;color:#263B37">• ${c}</div>`).join('')}
 </div>`).join('')}`
       : '';
 
     const actionsHtml = uniqueFailures.length > 0
       ? `<div class="section-title">Recommended Actions</div>
-${uniqueFailures.map(f => `<div style="background:#FCF6F2;border-radius:10px;padding:12px 16px;margin:8px 0;font-size:13px;border-left:3px solid #769ACC">
-  <strong style="color:#142444;display:block;margin-bottom:6px;text-transform:capitalize">${f.replace(/_/g, ' ')}</strong>
-  ${(actions[f] || ['Investigate server logs']).map(a => `<code style="display:block;padding:5px 10px;margin:3px 0;background:#fff;border:1px solid #FCF6F2;border-radius:6px;color:#142444;font-size:12px">${a}</code>`).join('')}
+${uniqueFailures.map(f => `<div style="background:#F4FBF8;border-radius:10px;padding:12px 16px;margin:8px 0;font-size:13px;border-left:3px solid #3BB5FF">
+  <strong style="color:#071013;display:block;margin-bottom:6px;text-transform:capitalize">${f.replace(/_/g, ' ')}</strong>
+  ${(actions[f] || ['Investigate server logs']).map(a => `<code style="display:block;padding:5px 10px;margin:3px 0;background:#fff;border:1px solid #D9E8E2;border-radius:6px;color:#071013;font-size:12px">${a}</code>`).join('')}
 </div>`).join('')}`
       : '';
 
     return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="color-scheme" content="light"><style>
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#FCF6F2;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F4FBF8;margin:0;padding:0}
   .container{max-width:600px;margin:24px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)}
-  .header{background:#171414;padding:0}
+  .header{background:#071013;padding:0}
   .header-top{padding:24px 32px 14px}
   .header-logo{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px}
-  .header-logo-gold{color:#FCB900}
+  .header-logo-accent{color:#22E6A8}
+  .header-mark{display:inline-block;width:28px;height:28px;border-radius:8px;background:#071013;border:1px solid #22E6A8;vertical-align:middle;margin-right:10px;position:relative}
+  .header-mark span{display:inline-block;color:#22E6A8;font-weight:800;font-size:18px;line-height:28px;text-align:center;width:28px}
   .header-top-row{display:table;width:100%}
   .header-top-left{display:table-cell;vertical-align:middle}
   .header-top-right{display:table-cell;vertical-align:middle;text-align:right}
   .header-status-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
-  .header-status-badge.critical{background:#c0392b;color:#fff}
-  .header-status-badge.degraded{background:#F89D4B;color:#171414}
-  .header-status-badge.healthy{background:#27ae60;color:#fff}
+  .header-status-badge.critical{background:#EF4444;color:#fff}
+  .header-status-badge.degraded{background:#B7FF4A;color:#071013}
+  .header-status-badge.healthy{background:#22E6A8;color:#071013}
   .header-bar{height:4px;margin-top:14px}
-  .header-bar.critical{background:#c0392b}
-  .header-bar.degraded{background:#FCB900}
-  .header-bar.healthy{background:#27ae60}
-  .header-meta{padding:10px 32px 16px;font-size:12px;color:#838081}
+  .header-bar.critical{background:#EF4444}
+  .header-bar.degraded{background:#B7FF4A}
+  .header-bar.healthy{background:#22E6A8}
+  .header-meta{padding:10px 32px 16px;font-size:12px;color:#D9E8E2}
   .header-meta span{margin-right:14px;white-space:nowrap}
   .body{padding:20px 32px 28px}
   .summary{font-size:14px;padding:14px 18px;border-radius:10px;margin-bottom:24px;line-height:1.5}
-  .summary.critical{background:#fdedec;color:#922b21;border-left:4px solid #c0392b}
-  .summary.degraded{background:#FFF8E7;color:#8B6914;border-left:4px solid #FCB900}
-  .summary.healthy{background:#eafaf1;color:#1e8449;border-left:4px solid #27ae60}
-  .section-title{font-size:11px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.8px;margin:24px 0 10px;padding-bottom:8px;border-bottom:2px solid #FCB900}
+  .summary.critical{background:#FEF2F2;color:#991B1B;border-left:4px solid #EF4444}
+  .summary.degraded{background:#F7FFE8;color:#34410E;border-left:4px solid #B7FF4A}
+  .summary.healthy{background:#E9FFF7;color:#064E3B;border-left:4px solid #22E6A8}
+  .section-title{font-size:11px;font-weight:700;color:#617A72;text-transform:uppercase;letter-spacing:.8px;margin:24px 0 10px;padding-bottom:8px;border-bottom:2px solid #22E6A8}
   .section-title:first-of-type{margin-top:0}
   table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px}
-  th{text-align:left;padding:8px 12px;background:#FCF6F2;color:#142444;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
-  td{padding:7px 12px;border-top:1px solid #FCF6F2;color:#3D3B3B}
-  td code{font-size:12px;background:#FCF6F2;padding:1px 6px;border-radius:3px;color:#3D3B3B}
-  .ai-table{width:100%;border-collapse:collapse;font-size:13px;background:#FCF6F2;border-radius:10px;overflow:hidden;border:1px solid #FCF6F2}
-  .ai-table td{padding:8px 12px;border-top:1px solid #e8ddd5}
+  th{text-align:left;padding:8px 12px;background:#F4FBF8;color:#071013;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+  td{padding:7px 12px;border-top:1px solid #D9E8E2;color:#263B37}
+  td code{font-size:12px;background:#F4FBF8;padding:1px 6px;border-radius:3px;color:#071013}
+  .ai-table{width:100%;border-collapse:collapse;font-size:13px;background:#F4FBF8;border-radius:10px;overflow:hidden;border:1px solid #D9E8E2}
+  .ai-table td{padding:8px 12px;border-top:1px solid #D9E8E2}
   .ai-table tr:first-child td{border-top:none}
-  .ai-table .name{font-weight:600;color:#171414}
+  .ai-table .name{font-weight:600;color:#071013}
   .ai-table .status{text-align:right}
-  .footnote{padding:0 32px 24px;font-size:11px;color:#838081;text-align:center;line-height:1.6}
-  .footnote a{color:#769ACC;text-decoration:none}
-  hr{border:none;border-top:1px solid #FCF6F2;margin:20px 0}
+  .footnote{padding:0 32px 24px;font-size:11px;color:#617A72;text-align:center;line-height:1.6}
+  .footnote a{color:#3BB5FF;text-decoration:none}
+  hr{border:none;border-top:1px solid #D9E8E2;margin:20px 0}
 </style></head><body>
 <div class="container">
   <div class="header">
     <div class="header-top">
       <div class="header-top-row">
         <div class="header-top-left">
-          <div class="header-logo">TDS <span class="header-logo-gold">GEO</span></div>
+          <div class="header-logo"><span class="header-mark"><span>K</span></span>Kivo <span class="header-logo-accent">Pulse</span></div>
         </div>
         <div class="header-top-right">
           <div class="header-status-badge ${report.status}">${report.status.toUpperCase()}</div>
@@ -469,35 +473,35 @@ ${uniqueFailures.map(f => `<div style="background:#FCF6F2;border-radius:10px;pad
     <div class="section-title">Server</div>
     <table style="width:100%;border-collapse:separate;border-spacing:0 6px;font-size:13px">
       <tr>
-        <td style="width:50%;background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
-          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">CPU</div>
-          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.cpu || 'n/a'}</div>
+        <td style="width:50%;background:#F4FBF8;border-radius:8px;padding:10px 14px;border:1px solid #D9E8E2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#617A72;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">CPU</div>
+          <div style="font-size:15px;font-weight:600;color:#071013">${report.checks.server.cpu || 'n/a'}</div>
         </td>
-        <td style="width:50%;background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
-          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Memory</div>
-          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.memory || 'n/a'}</div>
-          <div style="font-size:11px;color:#838081;margin-top:2px">Heap used</div>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
-          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Disk</div>
-          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.disk || 'n/a'}</div>
-        </td>
-        <td style="background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
-          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Uptime</div>
-          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.uptime || 'n/a'}</div>
+        <td style="width:50%;background:#F4FBF8;border-radius:8px;padding:10px 14px;border:1px solid #D9E8E2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#617A72;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Memory</div>
+          <div style="font-size:15px;font-weight:600;color:#071013">${report.checks.server.memory || 'n/a'}</div>
+          <div style="font-size:11px;color:#617A72;margin-top:2px">Heap used</div>
         </td>
       </tr>
       <tr>
-        <td style="background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
-          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Node</div>
-          <div style="font-size:15px;font-weight:600;color:#171414">${report.checks.server.nodeVersion || 'n/a'}</div>
+        <td style="background:#F4FBF8;border-radius:8px;padding:10px 14px;border:1px solid #D9E8E2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#617A72;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Disk</div>
+          <div style="font-size:15px;font-weight:600;color:#071013">${report.checks.server.disk || 'n/a'}</div>
         </td>
-        <td style="background:#FCF6F2;border-radius:8px;padding:10px 14px;border:1px solid #FCF6F2;vertical-align:top">
-          <div style="font-size:10px;font-weight:700;color:#838081;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Database</div>
-          <div style="font-size:15px;font-weight:600;color:#171414">${statusIcon(report.checks.database.status)} ${report.checks.database.status}</div>
-          <div style="font-size:11px;color:#838081;margin-top:2px">${report.checks.database.message}</div>
+        <td style="background:#F4FBF8;border-radius:8px;padding:10px 14px;border:1px solid #D9E8E2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#617A72;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Uptime</div>
+          <div style="font-size:15px;font-weight:600;color:#071013">${report.checks.server.uptime || 'n/a'}</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#F4FBF8;border-radius:8px;padding:10px 14px;border:1px solid #D9E8E2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#617A72;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Node</div>
+          <div style="font-size:15px;font-weight:600;color:#071013">${report.checks.server.nodeVersion || 'n/a'}</div>
+        </td>
+        <td style="background:#F4FBF8;border-radius:8px;padding:10px 14px;border:1px solid #D9E8E2;vertical-align:top">
+          <div style="font-size:10px;font-weight:700;color:#617A72;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Database</div>
+          <div style="font-size:15px;font-weight:600;color:#071013">${statusIcon(report.checks.database.status)} ${report.checks.database.status}</div>
+          <div style="font-size:11px;color:#617A72;margin-top:2px">${report.checks.database.message}</div>
         </td>
       </tr>
     </table>
@@ -509,20 +513,20 @@ ${uniqueFailures.map(f => `<div style="background:#FCF6F2;border-radius:10px;pad
     </table>
 
     <div class="section-title">Connectors</div>
-    <table style="width:100%;border-collapse:collapse;font-size:13px;background:#FCF6F2;border-radius:10px;overflow:hidden;border:1px solid #FCF6F2">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;background:#F4FBF8;border-radius:10px;overflow:hidden;border:1px solid #D9E8E2">
       <tr><th></th><th>Provider</th><th>ID</th><th>Status</th></tr>
-      ${connectorRows || '<tr><td colspan="4" style="text-align:center;padding:16px;color:#838081">No connectors registered</td></tr>'}
+      ${connectorRows || '<tr><td colspan="4" style="text-align:center;padding:16px;color:#617A72">No connectors registered</td></tr>'}
     </table>
 
     <div class="section-title">Connected Sites</div>
-    <table style="width:100%;border-collapse:collapse;font-size:13px;background:#FCF6F2;border-radius:10px;overflow:hidden;border:1px solid #FCF6F2">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;background:#F4FBF8;border-radius:10px;overflow:hidden;border:1px solid #D9E8E2">
       <tr><th></th><th>Platform</th><th>Domain</th><th>Connection</th><th>Health</th></tr>
-      ${siteRows || '<tr><td colspan="5" style="text-align:center;padding:16px;color:#838081">No sites connected</td></tr>'}
+      ${siteRows || '<tr><td colspan="5" style="text-align:center;padding:16px;color:#617A72">No sites connected</td></tr>'}
     </table>
 
     <div class="section-title">Recent Errors</div>
-    <table style="width:100%;font-size:13px;background:#FCF6F2;border-radius:10px;overflow:hidden;border:1px solid #FCF6F2">
-      <tr><td style="padding:10px 14px;color:#3D3B3B">${statusIcon(report.checks.recentErrors.status)} ${report.checks.recentErrors.message}</td></tr>
+    <table style="width:100%;font-size:13px;background:#F4FBF8;border-radius:10px;overflow:hidden;border:1px solid #D9E8E2">
+      <tr><td style="padding:10px 14px;color:#263B37">${statusIcon(report.checks.recentErrors.status)} ${report.checks.recentErrors.message}</td></tr>
     </table>
 
     ${causesHtml}
@@ -530,12 +534,12 @@ ${uniqueFailures.map(f => `<div style="background:#FCF6F2;border-radius:10px;pad
     ${actionsHtml}
 
     <hr>
-    <div style="text-align:center;font-size:11px;color:#838081">
-      <span style="background:#FCF6F2;padding:4px 12px;border-radius:20px">Every ${HEARTBEAT_INTERVAL / 60000} min &middot; <a href="https://16.192.29.174.nip.io/api/heartbeat/status" style="color:#769ACC;text-decoration:none">Live Status</a></span>
+    <div style="text-align:center;font-size:11px;color:#617A72">
+      <span style="background:#F4FBF8;padding:4px 12px;border-radius:20px">Every ${HEARTBEAT_INTERVAL / 60000} min &middot; <a href="${KIVO_PUBLIC_URL}/api/heartbeat/status" style="color:#3BB5FF;text-decoration:none">Live Status</a></span>
     </div>
   </div>
   <div class="footnote">
-    TDS GEO Heartbeat &middot; Automated system alert &middot; Do not reply<br>
+    Kivo Pulse &middot; Automated system alert &middot; Do not reply<br>
     Generated ${new Date(report.timestamp).toLocaleString('en-US', { timeZone: 'UTC', dateStyle: 'short', timeStyle: 'short' })} UTC
   </div>
 </div></body></html>`;
@@ -550,14 +554,14 @@ ${uniqueFailures.map(f => `<div style="background:#FCF6F2;border-radius:10px;pad
     ].filter(Boolean).join(', ') || report.status;
 
     await this.sendEmail({
-      subject: `🔴 [TDS GEO] ${report.status.toUpperCase()} — ${failed}`,
+      subject: `🔴 [Kivo Pulse] ${report.status.toUpperCase()} — ${failed}`,
       html: this.createEmailHtml(report),
     });
   }
 
   private async sendRecoveryEmail(report: HeartbeatReport): Promise<void> {
     await this.sendEmail({
-      subject: `🟢 [TDS GEO] All systems recovered — ${new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
+      subject: `🟢 [Kivo Pulse] All systems recovered — ${new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
       html: this.createEmailHtml(report),
     });
   }

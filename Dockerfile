@@ -34,42 +34,6 @@ COPY frontend/ ./
 # Build the SPA
 RUN npm run build
 
-# ─── Backend Production Stage ──────────────────
-FROM node:20-alpine AS production
-
-WORKDIR /app
-
-# Create non-root user for security
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -S appuser -u 1001 -G appgroup
-
-# Install only production dependencies
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev --legacy-peer-deps --ignore-scripts && \
-    npm cache clean --force
-
-# Copy compiled output from backend builder
-COPY --from=backend-builder /app/dist ./dist
-COPY --from=backend-builder /app/backend/database ./dist/backend/database
-COPY --from=backend-builder /app/backend/prompts ./dist/backend/prompts
-
-# Create log directory
-RUN mkdir -p /app/logs && \
-    chown -R appuser:appgroup /app
-
-# Switch to non-root user
-USER appuser
-
-# Expose API port
-EXPOSE 3000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/health', r => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
-
-# Start the application
-CMD ["node", "dist/backend/index.js"]
-
 # ─── Frontend (Nginx) Stage ────────────────────
 FROM nginx:1.26-alpine AS frontend
 
@@ -88,3 +52,41 @@ EXPOSE 80
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
+
+# ─── Backend Production Stage ──────────────────
+# Keep this stage last so plain `docker build` produces the API image used by Compose.
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -S appuser -u 1001 -G appgroup
+
+# Install only production dependencies
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --legacy-peer-deps --ignore-scripts && \
+    npm cache clean --force
+
+# Copy compiled output from builders
+COPY --chown=appuser:appgroup --from=backend-builder /app/dist ./dist
+COPY --chown=appuser:appgroup --from=backend-builder /app/backend/database ./dist/backend/database
+COPY --chown=appuser:appgroup --from=backend-builder /app/backend/prompts ./dist/backend/prompts
+COPY --chown=appuser:appgroup --from=backend-builder /app/backend/public ./dist/backend/public
+COPY --chown=appuser:appgroup --from=frontend-builder /app/frontend/dist ./frontend/dist
+
+# Create writable runtime directories
+RUN mkdir -p /app/logs /app/outputs && chown appuser:appgroup /app/logs /app/outputs
+
+# Switch to non-root user
+USER appuser
+
+# Expose API port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', r => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
+
+# Start the application
+CMD ["node", "dist/backend/index.js"]

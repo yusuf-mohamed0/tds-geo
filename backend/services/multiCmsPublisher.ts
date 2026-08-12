@@ -25,7 +25,7 @@ class MultiCmsPublisherService {
   private adapters: Map<CmsProvider, PublisherAdapter> = new Map();
   private pool: Pool | null = null;
 
-  // Config store for Custom REST (Next.js TDS Geo Plugin) adapter update/delete operations
+  // Config store for Custom REST (Kivo Geo Next.js connector) adapter update/delete operations
   // Keyed by articleId → connection config
   private customRestConnectionConfigs: Map<string, Record<string, unknown>> = new Map();
 
@@ -48,13 +48,13 @@ class MultiCmsPublisherService {
     // Ghost adapter — standalone connector from backend/connectors/
     this.adapters.set('ghost', ghostConnector);
 
-    // ── Custom REST (Next.js TDS Geo Plugin) adapter ──
-    // Publishes articles to any site running @tds-geo/nextjs-integration
-    // via its /api/tds-geo/* REST endpoints.
-    // Auth: X-TDS-GEO-Key header
+    // -- Custom REST (Kivo Geo Next.js connector) adapter --
+    // Publishes articles to any site running @tds/nextjs-integration
+    // via its /api/kivo/* REST endpoints.
+    // Auth: X-Kivo-Key header
     this.adapters.set('custom_rest', {
       provider: 'custom_rest',
-      name: 'TDS Geo Next.js Integration (Custom REST)',
+      name: 'Kivo Geo Next.js Integration (Custom REST)',
       capabilities: {
         supportsMedia: true,
         supportsTags: true,
@@ -203,49 +203,49 @@ class MultiCmsPublisherService {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // CUSTOM REST (Next.js TDS Geo Plugin) ADAPTER
+  // CUSTOM REST (Kivo Geo Next.js CONNECTOR) ADAPTER
   // ══════════════════════════════════════════════════════════════
 
   /**
-   * TDS Geo API base path on the Next.js site.
-   * The @tds-geo/nextjs-integration package registers routes under /api/tds-geo.
+   * Kivo Geo API base path on the Next.js site.
+   * The @tds/nextjs-integration package registers routes under /api/kivo.
    */
-  private static readonly TDS_GEO_NEXTJS_API_PATH = '/api/tds-geo';
+  private static readonly KIVO_NEXTJS_API_PATH = '/api/kivo';
 
   /**
-   * Build the request config for the Next.js TDS Geo Plugin API.
+   * Build the request config for the Kivo Geo Next.js connector API.
    * Config is read from the CMS connection's config object.
    *
    * Required config keys:
    *   endpoint_url (or siteUrl): The base URL of the Next.js site (e.g. https://example.com)
-   *   apiKey (or tds_geo_api_key): The shared API key
+   *   apiKey (or kivo_api_key): The shared API key
    */
   private buildCustomRestRequest(
     config: Record<string, unknown>
   ): { baseUrl: string; headers: Record<string, string> } {
     const siteUrl = (config.endpoint_url as string) || (config.siteUrl as string) || '';
-    const apiKey = (config.apiKey as string) || (config.tds_geo_api_key as string) || '';
+    const apiKey = (config.apiKey as string) || (config.kivo_api_key as string) || '';
 
     const baseUrl = siteUrl.replace(/\/$/, '');
 
     return {
-      baseUrl: `${baseUrl}${MultiCmsPublisherService.TDS_GEO_NEXTJS_API_PATH}`,
+      baseUrl: `${baseUrl}${MultiCmsPublisherService.KIVO_NEXTJS_API_PATH}`,
       headers: {
         'Content-Type': 'application/json',
-        'X-TDS-GEO-Key': apiKey,
+        'X-Kivo-Key': apiKey,
         'User-Agent': 'TDS-Geo-Backend/3.0',
       },
     };
   }
 
   /**
-   * Test connection to the Next.js TDS Geo Plugin.
-   * Pings the /api/tds-geo/posts endpoint to verify credentials.
+   * Test connection to the Kivo Geo Next.js connector.
+   * Pings the /api/kivo/posts endpoint to verify credentials.
    */
   private async testCustomRestConnection(): Promise<boolean> {
     // Try env-var-based approach first (legacy single-site)
-    const envUrl = process.env.TDS_GEO_NEXTJS_URL;
-    const envKey = process.env.TDS_GEO_NEXTJS_API_KEY;
+    const envUrl = process.env.KIVO_NEXTJS_URL;
+    const envKey = process.env.KIVO_NEXTJS_API_KEY;
 
     if (envUrl && envKey) {
       try {
@@ -263,13 +263,13 @@ class MultiCmsPublisherService {
     // If no env vars set, the connection config will be provided per-client
     // This is fine — testConnection is also called with per-connection config
     // via the adapter's testConnection wrapper in the routes.
-    logger.warn('Custom REST (Next.js) not configured globally. Set TDS_GEO_NEXTJS_URL + TDS_GEO_NEXTJS_API_KEY for global connection testing.');
+    logger.warn('Custom REST (Next.js) not configured globally. Set KIVO_NEXTJS_URL + KIVO_NEXTJS_API_KEY for global connection testing.');
     return false;
   }
 
   /**
-   * Publish an article to the Next.js TDS Geo Plugin.
-   * POST /api/tds-geo/posts
+   * Publish an article to the Kivo Geo Next.js connector.
+   * POST /api/kivo/posts
    */
   private async publishToCustomRest(
     article: Article,
@@ -278,7 +278,7 @@ class MultiCmsPublisherService {
     const req = this.buildCustomRestRequest(config);
     const endpoint = `${req.baseUrl}/posts`;
 
-    // Build the payload matching the @tds-geo/nextjs-integration TdsGeoArticle schema
+    // Build the payload matching the @tds/nextjs-integration TdsGeoArticle schema
     const body: Record<string, unknown> = {
       title: article.title,
       content: article.content_md,
@@ -314,18 +314,18 @@ class MultiCmsPublisherService {
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error('Custom REST publish failed (Next.js TDS Geo Plugin)', {
+      logger.error('Custom REST publish failed (Kivo Geo Next.js connector)', {
         status: response.status,
         error: errorText.slice(0, 500),
         title: article.title,
         siteUrl: config.endpoint_url as string || 'env',
       });
-      throw new Error(`Next.js TDS Geo Plugin publish failed: ${response.status} ${errorText.slice(0, 200)}`);
+      throw new Error(`Kivo Geo Next.js connector publish failed: ${response.status} ${errorText.slice(0, 200)}`);
     }
 
     const data: any = await response.json();
 
-    // TDS Geo plugin returns { success, data: { localId, slug, url } }
+    // Kivo Geo connector returns { success, data: { localId, slug, url } }
     // localId is a UUID string (not a number), so PublishResult.id is set to 0.
     // The localId is stored in the connection config map for update/delete operations.
     if (data.data) {
@@ -335,7 +335,7 @@ class MultiCmsPublisherService {
 
       // Store the localId in a way that update/delete can retrieve it.
       // The connection config was already stored in customRestConnectionConfigs
-      // keyed by article.id (TDS Geo UUID) in publishViaConnection().
+      // keyed by article.id (Kivo Geo UUID) in publishViaConnection().
       // We also store the localId/slug for the API call.
       // Note: publishViaConnection already stored the config under article.id
       // before calling this method, so we can look it up and augment it.
@@ -357,7 +357,7 @@ class MultiCmsPublisherService {
       };
     }
 
-    throw new Error('Next.js TDS Geo Plugin returned unexpected response format: missing data');
+    throw new Error('Kivo Geo Next.js connector returned unexpected response format: missing data');
   }
 
   /**
@@ -373,12 +373,12 @@ class MultiCmsPublisherService {
   }
 
   /**
-   * Update an article on the Next.js TDS Geo Plugin.
-   * PUT /api/tds-geo/posts/{postId}
+   * Update an article on the Kivo Geo Next.js connector.
+   * PUT /api/kivo/posts/{postId}
    *
    * The postId is resolved from:
    *   1. _postLocalId stored in the connection config (UUID from initial publish)
-   *   2. Fallback to the articleId parameter (works if it's a slug or TDS Geo UUID)
+   *   2. Fallback to the articleId parameter (works if it's a slug or Kivo Geo UUID)
    */
   private async updateCustomRestPost(
     articleId: string,
@@ -412,7 +412,7 @@ class MultiCmsPublisherService {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Next.js TDS Geo Plugin update failed: ${response.status} ${errorText.slice(0, 200)}`);
+      throw new Error(`Kivo Geo Next.js connector update failed: ${response.status} ${errorText.slice(0, 200)}`);
     }
 
     // Clean up stored config on success
@@ -433,8 +433,8 @@ class MultiCmsPublisherService {
   }
 
   /**
-   * Delete an article from the Next.js TDS Geo Plugin.
-   * DELETE /api/tds-geo/posts/{postId}
+   * Delete an article from the Kivo Geo Next.js connector.
+   * DELETE /api/kivo/posts/{postId}
    */
   private async deleteCustomRestPost(articleId: string): Promise<boolean> {
     const { postId, config } = this.getCustomRestPostId(articleId);
@@ -464,8 +464,8 @@ class MultiCmsPublisherService {
     }
 
     // Try env vars as fallback (legacy single-site support)
-    const envUrl = process.env.TDS_GEO_NEXTJS_URL;
-    const envKey = process.env.TDS_GEO_NEXTJS_API_KEY;
+    const envUrl = process.env.KIVO_NEXTJS_URL;
+    const envKey = process.env.KIVO_NEXTJS_API_KEY;
 
     if (envUrl && envKey) {
       try {
@@ -481,7 +481,7 @@ class MultiCmsPublisherService {
       }
     }
 
-    logger.warn('Custom REST credentials not configured for delete — set TDS_GEO_NEXTJS_URL + TDS_GEO_NEXTJS_API_KEY or configure per-client CMS connection');
+    logger.warn('Custom REST credentials not configured for delete — set KIVO_NEXTJS_URL + KIVO_NEXTJS_API_KEY or configure per-client CMS connection');
     return false;
   }
 
@@ -556,12 +556,12 @@ class MultiCmsPublisherService {
   private async wpFetch(
     endpointUrl: string, apiKey: string, path: string, params: Record<string, any> = {}
   ): Promise<any> {
-    const baseUrl = `${endpointUrl.replace(/\/+$/, '')}/wp-json/tds-geo/v1`;
+    const baseUrl = `${endpointUrl.replace(/\/+$/, '')}/wp-json/kivo/v1`;
     const url = new URL(`${baseUrl}${path}`);
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
 
     const response = await fetch(url.toString(), {
-      headers: { 'X-TDS-GEO-Key': apiKey, 'Content-Type': 'application/json' },
+      headers: { 'X-Kivo-Key': apiKey, 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(30000),
     });
     if (!response.ok) {

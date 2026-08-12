@@ -1,3 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 61">
-  <image href="/assets/Black Swype.png" width="170" height="61"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Kivo mark</title>
+  <desc id="desc">A technical K monogram built from signal nodes and routing paths.</desc>
+  <rect width="512" height="512" rx="108" fill="#071013"/>
+  <path d="M146 118v276" fill="none" stroke="#22E6A8" stroke-width="42" stroke-linecap="round"/>
+  <path d="M176 258 355 126" fill="none" stroke="#3BB5FF" stroke-width="42" stroke-linecap="round"/>
+  <path d="M178 258 368 390" fill="none" stroke="#B7FF4A" stroke-width="42" stroke-linecap="round"/>
+  <circle cx="146" cy="118" r="28" fill="#F4FBF8"/>
+  <circle cx="356" cy="126" r="28" fill="#F4FBF8"/>
+  <circle cx="368" cy="390" r="28" fill="#F4FBF8"/>
+  <circle cx="178" cy="258" r="34" fill="#22E6A8" stroke="#071013" stroke-width="14"/>
 </svg>

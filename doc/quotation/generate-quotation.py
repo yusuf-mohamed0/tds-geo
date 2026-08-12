@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Traffic Digital Solutions - Odoo Implementation Quotation
+SNEFERU - Odoo Implementation Quotation
 Professional Services Agreement Template
 """
 
@@ -148,7 +148,7 @@ def create_document():
 
     c0 = hdr.cell(0, 0); c0.width = Cm(4.5)
     lp = c0.paragraphs[0]; lp.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    r = lp.add_run("Traffic Digital Solutions")
+    r = lp.add_run("SNEFERU")
     r.bold = True; r.font.size = Pt(18); r.font.color.rgb = BLACK
 
     c1 = hdr.cell(0, 1); c1.width = Cm(11.5)
@@ -210,7 +210,7 @@ def create_document():
     heading(doc, 2, "WHY TRAFFIC DIGITAL SOLUTIONS")
 
     body(doc, (
-        "Traffic Digital Solutions is a full-service digital agency founded in 2019 with over 100 successful projects delivered. "
+        "SNEFERU is a full-service digital agency founded in 2019 with over 100 successful projects delivered. "
         "We combine deep technical expertise in Odoo ERP with a proven track record across web development, branding, and digital marketing. "
         "Our team has delivered Odoo implementations for enterprises across Egypt, the UAE, and internationally, serving industries "
         "including retail, healthcare, manufacturing, and professional services."
@@ -625,7 +625,7 @@ def create_document():
     ))
     styled_table(doc, ["Step", "Action", "Output"], [
         ("1", "Client submits written change request", "Logged change request"),
-        ("2", "Traffic Digital Solutions reviews business and technical impact", "Impact analysis"),
+        ("2", "SNEFERU reviews business and technical impact", "Impact analysis"),
         ("3", "Cost, timeline, and dependency impact are estimated", "Change quotation"),
         ("4", "Client approves or rejects the change in writing", "Signed approval or rejection"),
         ("5", "Approved change is scheduled for delivery", "Updated project plan"),
@@ -673,7 +673,7 @@ def create_document():
         ("4. Intellectual Property",
          "4.1 Client-Specific Work: Upon full payment of all amounts due, you own the custom code, configurations, "
          "reports, workflows, documents, and deliverables created specifically and exclusively for this project. "
-         "4.2 Traffic Digital Solutions Materials: We retain ownership of our pre-existing methods, templates, tools, "
+         "4.2 SNEFERU Materials: We retain ownership of our pre-existing methods, templates, tools, "
          "libraries, reusable components, know-how, implementation accelerators, and generic Odoo modules that were not "
          "created exclusively for you. Where such materials are used in your project, we grant you a non-exclusive, "
          "perpetual license to use them as part of your implemented Odoo system. "
@@ -716,7 +716,7 @@ def create_document():
          "10.2 If you terminate without cause before the project is complete, you will pay for all work "
          "satisfactorily completed up to the termination date, plus any non-cancellable commitments made on your behalf. "
          "10.3 Client delays exceeding 30 calendar days may require project rescheduling and revised delivery dates, "
-         "subject to Traffic Digital Solutions resource availability. "
+         "subject to SNEFERU resource availability. "
          "10.4 Upon termination for any reason, you must pay all amounts due for work completed."),
         ("11. Force Majeure",
          "Neither party shall be liable for delays or failures caused by events beyond its reasonable control, "
@@ -794,7 +794,7 @@ def create_document():
     ft = doc.add_paragraph()
     ft.alignment = WD_ALIGN_PARAGRAPH.CENTER
     ft.paragraph_format.space_before = Pt(6)
-    r = ft.add_run("Traffic Digital Solutions  •  Villa 125, Axis 80, 5th Settlement, Cairo, Egypt\n")
+    r = ft.add_run("SNEFERU  •  Villa 125, Axis 80, 5th Settlement, Cairo, Egypt\n")
     r.font.size = Pt(7); r.font.color.rgb = GRAY
     r = ft.add_run("webdevelopment@trafficdigitalsolutions.com  •  trafficdigitalsolutions.com  •  +201271112396\n")
     r.font.size = Pt(7); r.font.color.rgb = GRAY

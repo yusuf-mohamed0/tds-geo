@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════
-   Traffic Digital Solutions — Brand Design Tokens
+   Kivo - Brand Design Tokens
    Based on official brand book (2026)
    ══════════════════════════════════════════════════ */
 
@@ -11,17 +11,26 @@
 
 :root {
   /* ── Primary Colors ──────────────────────────── */
-  --tds-black:        #171414;
-  --tds-orange:       #FCB900;
-  --tds-cream:        #FCF6F2;
+  --kivo-obsidian: #071013;
+  --kivo-gold:     #22E6A8;
+  --kivo-cream:    #F4FBF8;
+  --tds-black:        var(--kivo-obsidian);
+  --tds-orange:       var(--kivo-gold);
+  --tds-cream:        var(--kivo-cream);
 
   /* ── Secondary Colors ────────────────────────── */
-  --tds-navy:         #142444;
-  --tds-blue:         #769ACC;
-  --tds-gray-dark:    #3D3B3B;
-  --tds-peach:        #FFD498;
-  --tds-orange-deep:  #F89D4B;
-  --tds-gray-mid:     #838081;
+  --kivo-navy:     #0B1F3A;
+  --kivo-sky:      #3BB5FF;
+  --kivo-graphite: #25343A;
+  --kivo-peach:    #C7B8FF;
+  --kivo-amber:    #B7FF4A;
+  --kivo-muted:    #6D7E86;
+  --tds-navy:         var(--kivo-navy);
+  --tds-blue:         var(--kivo-sky);
+  --tds-gray-dark:    var(--kivo-graphite);
+  --tds-peach:        var(--kivo-peach);
+  --tds-orange-deep:  var(--kivo-amber);
+  --tds-gray-mid:     var(--kivo-muted);
 
   /* ── Font Families ───────────────────────────── */
   --tds-font-primary: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

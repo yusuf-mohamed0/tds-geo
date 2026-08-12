@@ -75,9 +75,9 @@ class GoogleSearchConsoleService {
 
   initialize(pool: Pool): void {
     this.pool = pool;
-    this.clientId = process.env.GSC_CLIENT_ID || '';
-    this.clientSecret = process.env.GSC_CLIENT_SECRET || '';
-    this.redirectUri = process.env.GSC_REDIRECT_URI || '';
+    this.clientId = process.env.GSC_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '';
+    this.clientSecret = process.env.GSC_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || '';
+    this.redirectUri = process.env.GSC_REDIRECT_URI || process.env.GOOGLE_REDIRECT_URI || '';
     logger.info('GoogleSearchConsoleService initialized', {
       configured: this.isConfigured(),
     });

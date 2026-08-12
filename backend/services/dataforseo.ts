@@ -77,13 +77,32 @@ class DataForSeoService {
   private enabled: boolean;
 
   constructor() {
-    const raw = config.openseo.dataforseoApiKey;
+    const raw = this.resolveCredentials();
     this.enabled = !!raw;
     if (this.enabled) {
-      this.authHeader = 'Basic ' + Buffer.from(raw).toString('base64');
+      this.authHeader = 'Basic ' + raw;
     } else {
       this.authHeader = '';
     }
+  }
+
+  private resolveCredentials(): string {
+    if (config.openseo.dataforseoLogin && config.openseo.dataforseoPassword) {
+      return Buffer.from(`${config.openseo.dataforseoLogin}:${config.openseo.dataforseoPassword}`).toString('base64');
+    }
+
+    const raw = config.openseo.dataforseoApiKey.trim();
+    if (!raw) return '';
+    if (raw.includes(':')) return Buffer.from(raw).toString('base64');
+
+    try {
+      const decoded = Buffer.from(raw, 'base64').toString('utf8');
+      if (decoded.includes(':')) return raw;
+    } catch {
+      // Fall through and encode the supplied value for compatibility.
+    }
+
+    return Buffer.from(raw).toString('base64');
   }
 
   private async request<T>(

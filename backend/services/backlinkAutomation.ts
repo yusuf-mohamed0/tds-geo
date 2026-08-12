@@ -32,11 +32,105 @@ interface GuestPostResult {
   wordCount: number;
 }
 
+const BACKLINK_SCHEMA_SQL = `
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TABLE IF NOT EXISTS backlink_prospects (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  domain VARCHAR(500) NOT NULL,
+  domain_rating INTEGER DEFAULT 0,
+  relevance_score DECIMAL(5,2) DEFAULT 0,
+  estimated_traffic INTEGER DEFAULT 0,
+  niche VARCHAR(255),
+  contact_email VARCHAR(255),
+  contact_page TEXT,
+  guest_post_guidelines TEXT,
+  notes TEXT,
+  source VARCHAR(100) DEFAULT 'manual',
+  status VARCHAR(50) DEFAULT 'prospect' CHECK (status IN ('prospect', 'pitched', 'linked', 'rejected', 'ignored')),
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(client_id, domain)
+);
+
+CREATE INDEX IF NOT EXISTS idx_backlink_prospects_client ON backlink_prospects(client_id);
+CREATE INDEX IF NOT EXISTS idx_backlink_prospects_status ON backlink_prospects(status);
+CREATE INDEX IF NOT EXISTS idx_backlink_prospects_scores ON backlink_prospects(relevance_score DESC, domain_rating DESC);
+
+CREATE TABLE IF NOT EXISTS backlink_outreach (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  prospect_id UUID NOT NULL REFERENCES backlink_prospects(id) ON DELETE CASCADE,
+  article_id UUID REFERENCES articles(id) ON DELETE SET NULL,
+  email_subject TEXT NOT NULL,
+  email_body TEXT NOT NULL,
+  pitch_type VARCHAR(100) DEFAULT 'guest_post',
+  status VARCHAR(50) DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'replied', 'rejected', 'accepted')),
+  sent_at TIMESTAMPTZ,
+  replied_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_backlink_outreach_client ON backlink_outreach(client_id);
+CREATE INDEX IF NOT EXISTS idx_backlink_outreach_prospect ON backlink_outreach(prospect_id);
+CREATE INDEX IF NOT EXISTS idx_backlink_outreach_status ON backlink_outreach(status);
+
+CREATE TABLE IF NOT EXISTS backlinks (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  prospect_id UUID REFERENCES backlink_prospects(id) ON DELETE SET NULL,
+  outreach_id UUID REFERENCES backlink_outreach(id) ON DELETE SET NULL,
+  article_id UUID REFERENCES articles(id) ON DELETE SET NULL,
+  source_url TEXT NOT NULL,
+  target_url TEXT NOT NULL,
+  anchor_text TEXT NOT NULL,
+  link_type VARCHAR(50) DEFAULT 'editorial',
+  status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'lost', 'pending', 'nofollow')),
+  domain_rating INTEGER DEFAULT 0,
+  estimated_traffic INTEGER DEFAULT 0,
+  verified_at TIMESTAMPTZ,
+  lost_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(client_id, source_url, target_url)
+);
+
+CREATE INDEX IF NOT EXISTS idx_backlinks_client ON backlinks(client_id);
+CREATE INDEX IF NOT EXISTS idx_backlinks_status ON backlinks(status);
+CREATE INDEX IF NOT EXISTS idx_backlinks_prospect ON backlinks(prospect_id);
+
+DROP TRIGGER IF EXISTS trg_backlink_prospects_updated_at ON backlink_prospects;
+CREATE TRIGGER trg_backlink_prospects_updated_at
+  BEFORE UPDATE ON backlink_prospects FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS trg_backlink_outreach_updated_at ON backlink_outreach;
+CREATE TRIGGER trg_backlink_outreach_updated_at
+  BEFORE UPDATE ON backlink_outreach FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS trg_backlinks_updated_at ON backlinks;
+CREATE TRIGGER trg_backlinks_updated_at
+  BEFORE UPDATE ON backlinks FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+`;
+
 class BacklinkAutomationService {
   private pool: Pool | null = null;
+  private schemaInitialized = false;
+  private schemaReady: Promise<void> | null = null;
 
-  initialize(pool: Pool): void {
+  async initialize(pool: Pool): Promise<void> {
     this.pool = pool;
+    await this.ensureSchemaReady();
   }
 
   private getPool(): Pool {
@@ -44,16 +138,44 @@ class BacklinkAutomationService {
     return this.pool;
   }
 
+  private isMissingBacklinkTable(err: unknown): boolean {
+    const pgError = err as { code?: string; message?: string };
+    return pgError.code === '42P01' && /backlink_|backlinks/.test(pgError.message || '');
+  }
+
+  private unavailable(message: string): Error & { statusCode: number } {
+    const err = new Error(message) as Error & { statusCode: number };
+    err.statusCode = 503;
+    return err;
+  }
+
+  private async ensureSchemaReady(): Promise<void> {
+    if (this.schemaInitialized) return;
+    if (!this.schemaReady) {
+      this.schemaReady = this.getPool().query(BACKLINK_SCHEMA_SQL)
+        .then(() => {
+          this.schemaInitialized = true;
+          logger.info('Backlink automation storage ready');
+        })
+        .catch((err) => {
+          this.schemaReady = null;
+          throw err;
+        });
+    }
+    await this.schemaReady;
+  }
+
   async discoverProspects(
     clientId: string,
     targetDomain: string,
     limit: number = 20
   ): Promise<BacklinkProspect[]> {
+    await this.ensureSchemaReady();
     const pool = this.getPool();
     const results: BacklinkProspect[] = [];
 
     if (!dataforseo.isEnabled()) {
-      throw new Error('Backlink discovery requires DataForSEO. No prospect data is available until it is configured.');
+      throw this.unavailable('Backlink discovery requires DataForSEO credentials before prospect data can be discovered.');
     }
 
     try {
@@ -64,7 +186,7 @@ class BacklinkAutomationService {
         if (!bl.url || bl.url.includes('facebook.com') || bl.url.includes('twitter.com') || bl.url.includes('linkedin.com')) continue;
 
         const existing = await pool.query(
-          'SELECT id, status FROM backlink_prospects WHERE client_id = $1 AND domain = $2',
+          'SELECT * FROM backlink_prospects WHERE client_id = $1 AND domain = $2',
           [clientId, bl.url]
         );
 
@@ -114,6 +236,9 @@ class BacklinkAutomationService {
       logger.info(`Discovered ${results.length} backlink prospects`, { clientId, targetDomain });
     } catch (err: any) {
       logger.error('Backlink prospect discovery failed', { clientId, targetDomain, error: err.message });
+      if (this.isMissingBacklinkTable(err)) {
+        throw this.unavailable('Backlink Automation storage is not initialized yet. Apply the backlink database migration, then try again.');
+      }
       throw err;
     }
 
@@ -121,6 +246,7 @@ class BacklinkAutomationService {
   }
 
   async getProspects(clientId: string, status?: string): Promise<BacklinkProspect[]> {
+    await this.ensureSchemaReady();
     const pool = this.getPool();
     let query = 'SELECT * FROM backlink_prospects WHERE client_id = $1';
     const params: any[] = [clientId];
@@ -129,8 +255,13 @@ class BacklinkAutomationService {
       params.push(status);
     }
     query += ' ORDER BY relevance_score DESC, domain_rating DESC';
-    const result = await pool.query(query, params);
-    return result.rows.map(this.mapProspect);
+    try {
+      const result = await pool.query(query, params);
+      return result.rows.map(this.mapProspect);
+    } catch (err) {
+      if (this.isMissingBacklinkTable(err)) return [];
+      throw err;
+    }
   }
 
   async createOutreach(
@@ -139,11 +270,20 @@ class BacklinkAutomationService {
     pitchType: string = 'guest_post',
     articleId?: string
   ): Promise<any> {
+    await this.ensureSchemaReady();
     const pool = this.getPool();
-    const prospect = await pool.query(
-      'SELECT * FROM backlink_prospects WHERE id = $1 AND client_id = $2',
-      [prospectId, clientId]
-    );
+    let prospect;
+    try {
+      prospect = await pool.query(
+        'SELECT * FROM backlink_prospects WHERE id = $1 AND client_id = $2',
+        [prospectId, clientId]
+      );
+    } catch (err) {
+      if (this.isMissingBacklinkTable(err)) {
+        throw this.unavailable('Backlink Automation storage is not initialized yet. Apply the backlink database migration, then try again.');
+      }
+      throw err;
+    }
     if (prospect.rows.length === 0) throw new Error('Prospect not found');
 
     const article = articleId
@@ -168,6 +308,7 @@ class BacklinkAutomationService {
   }
 
   async markSent(outreachId: string, clientId: string): Promise<void> {
+    await this.ensureSchemaReady();
     await this.getPool().query(
       `UPDATE backlink_outreach SET status = 'sent', sent_at = NOW() WHERE id = $1 AND client_id = $2`,
       [outreachId, clientId]
@@ -175,6 +316,7 @@ class BacklinkAutomationService {
   }
 
   async getOutreach(clientId: string, status?: string): Promise<any[]> {
+    await this.ensureSchemaReady();
     const pool = this.getPool();
     let query = `SELECT bo.*, bp.domain, bp.domain_rating
                  FROM backlink_outreach bo
@@ -186,8 +328,13 @@ class BacklinkAutomationService {
       params.push(status);
     }
     query += ' ORDER BY bo.created_at DESC';
-    const result = await pool.query(query, params);
-    return result.rows;
+    try {
+      const result = await pool.query(query, params);
+      return result.rows;
+    } catch (err) {
+      if (this.isMissingBacklinkTable(err)) return [];
+      throw err;
+    }
   }
 
   async generateGuestPost(
@@ -196,11 +343,20 @@ class BacklinkAutomationService {
     topic: string,
     tone: string = 'educational'
   ): Promise<GuestPostResult> {
+    await this.ensureSchemaReady();
     const pool = this.getPool();
-    const prospect = await pool.query(
-      'SELECT * FROM backlink_prospects WHERE id = $1 AND client_id = $2',
-      [prospectId, clientId]
-    );
+    let prospect;
+    try {
+      prospect = await pool.query(
+        'SELECT * FROM backlink_prospects WHERE id = $1 AND client_id = $2',
+        [prospectId, clientId]
+      );
+    } catch (err) {
+      if (this.isMissingBacklinkTable(err)) {
+        throw this.unavailable('Backlink Automation storage is not initialized yet. Apply the backlink database migration, then try again.');
+      }
+      throw err;
+    }
     if (prospect.rows.length === 0) throw new Error('Prospect not found');
     const p = prospect.rows[0];
 
@@ -257,6 +413,7 @@ Return JSON: { "title": string, "content": string, "wordCount": number, "backlin
     outreachId?: string,
     articleId?: string
   ): Promise<any> {
+    await this.ensureSchemaReady();
     const pool = this.getPool();
 
     let dr = 0;
@@ -270,14 +427,22 @@ Return JSON: { "title": string, "content": string, "wordCount": number, "backlin
       logger.warn('Backlink domain metrics unavailable', { sourceUrl, error: (err as Error).message });
     }
 
-    const result = await pool.query(
-      `INSERT INTO backlinks
-       (client_id, prospect_id, outreach_id, article_id, source_url, target_url, anchor_text, status,
-        domain_rating, estimated_traffic, verified_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', $8, $9, NOW())
-       RETURNING *`,
-      [clientId, prospectId || null, outreachId || null, articleId || null, sourceUrl, targetUrl, anchorText, dr, traffic]
-    );
+    let result;
+    try {
+      result = await pool.query(
+        `INSERT INTO backlinks
+         (client_id, prospect_id, outreach_id, article_id, source_url, target_url, anchor_text, status,
+          domain_rating, estimated_traffic, verified_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', $8, $9, NOW())
+         RETURNING *`,
+        [clientId, prospectId || null, outreachId || null, articleId || null, sourceUrl, targetUrl, anchorText, dr, traffic]
+      );
+    } catch (err) {
+      if (this.isMissingBacklinkTable(err)) {
+        throw this.unavailable('Backlink Automation storage is not initialized yet. Apply the backlink database migration, then try again.');
+      }
+      throw err;
+    }
 
     // Update prospect status
     if (prospectId) {
@@ -291,6 +456,7 @@ Return JSON: { "title": string, "content": string, "wordCount": number, "backlin
   }
 
   async getBacklinks(clientId: string, status?: string): Promise<any[]> {
+    await this.ensureSchemaReady();
     const pool = this.getPool();
     let query = `SELECT b.*, bp.domain as prospect_domain
                  FROM backlinks b
@@ -302,11 +468,17 @@ Return JSON: { "title": string, "content": string, "wordCount": number, "backlin
       params.push(status);
     }
     query += ' ORDER BY b.created_at DESC';
-    const result = await pool.query(query, params);
-    return result.rows;
+    try {
+      const result = await pool.query(query, params);
+      return result.rows;
+    } catch (err) {
+      if (this.isMissingBacklinkTable(err)) return [];
+      throw err;
+    }
   }
 
   async verifyBacklinks(clientId?: string): Promise<{ checked: number; active: number; lost: number }> {
+    await this.ensureSchemaReady();
     const pool = this.getPool();
     let query = 'SELECT * FROM backlinks WHERE status = $1';
     const params: any[] = ['active'];
@@ -315,7 +487,13 @@ Return JSON: { "title": string, "content": string, "wordCount": number, "backlin
       params.push(clientId);
     }
 
-    const backlinks = await pool.query(query, params);
+    let backlinks;
+    try {
+      backlinks = await pool.query(query, params);
+    } catch (err) {
+      if (this.isMissingBacklinkTable(err)) return { checked: 0, active: 0, lost: 0 };
+      throw err;
+    }
     let checked = 0;
     let active = 0;
     let lost = 0;

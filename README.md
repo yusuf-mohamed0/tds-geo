@@ -1,4 +1,4 @@
-# TDS Geo — AI Search Optimization Platform (AEO, GEO, LLMO)
+# Kivo Geo — AI Search Optimization Platform (AEO, GEO, LLMO)
 
 Multi-tenant SaaS platform that automates SEO content generation, publishing, and **AI search optimization** (AEO, GEO, LLMO) for Shopify stores. Uses AI (OpenAI GPT-4o + Ollama) to research keywords, generate high-quality blog posts, optimize for traditional and generative search engines, inject structured schema, track AI engine citations, and ping IndexNow — all with per-client rate limiting, cost tracking, and a full admin dashboard.
 
@@ -9,7 +9,7 @@ Multi-tenant SaaS platform that automates SEO content generation, publishing, an
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql)](https://postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?style=flat-square&logo=openai)](https://openai.com/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow?style=flat-square)]()
-[![CI](https://github.com/yusuf-mohamed0/tds-geo/actions/workflows/ci.yml/badge.svg)](https://github.com/yusuf-mohamed0/tds-geo/actions/workflows/ci.yml)
+[![CI](https://github.com/yusuf-mohamed0/kivo/actions/workflows/ci.yml/badge.svg)](https://github.com/yusuf-mohamed0/kivo/actions/workflows/ci.yml)
 
 ## Features
 
@@ -26,7 +26,7 @@ Multi-tenant SaaS platform that automates SEO content generation, publishing, an
 | **Content Freshness** | Automated freshness calendar — flags articles >10 months old, regenerates 3/week |
 | **Entity Consistency** | Validates canonical entity names vs variants in generated content |
 | **Shopify Publishing** | Direct publish with image upload, tags, metadata, retry with backoff, rate-limit protection |
-| **WooCommerce Publishing** | Product content generation via TDS Geo plugin API with SEO metafields |
+| **WooCommerce Publishing** | Product content generation via Kivo Geo plugin API with SEO metafields |
 | **Multi-Tenant** | Per-client Shopify stores, keyword pools, generation settings, publishing queues, budgets |
 | **JWT Authentication** | Role-based auth (admin, editor, client), login/logout, protected routes |
 | **Webhook System** | Event-driven webhooks with retry delivery, delivery history, per-webhook config |
@@ -92,7 +92,7 @@ Multi-tenant SaaS platform that automates SEO content generation, publishing, an
 
 ## Quick Start (for New Users)
 
-Follow these steps to set up TDS Geo on your own machine. No private data from the original author is included — everything uses placeholder examples.
+Follow these steps to set up Kivo Geo on your own machine. No private data from the original author is included — everything uses placeholder examples.
 
 ### Prerequisites
 
@@ -121,8 +121,8 @@ You'll need these installed on your computer:
 ### Step 1: Clone the Project
 
 ```bash
-git clone https://github.com/yusuf-mohamed0/tds-geo.git
-cd TDS Geo
+git clone https://github.com/yusuf-mohamed0/kivo.git
+cd Kivo Geo
 ```
 
 ### Step 2: Install Dependencies
@@ -174,7 +174,7 @@ psql -d ai_seo_automation -f backend/database/schema.sql
 psql -d ai_seo_automation -f backend/database/seed.sql
 ```
 
-> The seed data includes demo accounts: `admin@tds-geo.internal` / `<REDACTED_PASSWORD>`
+> The seed data includes demo accounts: `admin@kivo.internal` / `<REDACTED_PASSWORD>`
 
 ### Step 5: Start the App
 
@@ -199,7 +199,7 @@ npm run worker
 
 - **Frontend:** http://localhost:5173
 - **API:** http://localhost:3000
-- **Login:** `admin@tds-geo.internal` / `<REDACTED_PASSWORD>`
+- **Login:** `admin@kivo.internal` / `<REDACTED_PASSWORD>`
 
 ---
 
@@ -232,7 +232,7 @@ cd frontend && npm run build && cd ..
 npx pm2 start ecosystem.config.cjs
 
 # 3. Verify the server started correctly
-pm2 logs tds-geo-backend --lines 10
+pm2 logs kivo-backend --lines 10
 
 # 4. (Optional) Save PM2 config to restart on reboot
 npx pm2 save
@@ -330,7 +330,7 @@ For production, make sure to:
 POST /api/auth/login
 Content-Type: application/json
 
-{ "email": "admin@tds-geo.internal", "password": "<REDACTED_PASSWORD>" }
+{ "email": "admin@kivo.internal", "password": "<REDACTED_PASSWORD>" }
 
 # Response: { "token": "eyJhbGci...", "user": { ... } }
 ```
@@ -421,7 +421,7 @@ GitHub Actions workflows:
 9. **Schema injection at publish time** — JSON-LD is generated and injected when an article is published, not at generation time
 10. **IndexNow fires async** — After successful publish, IndexNow ping is fire-and-forget (doesn't block the response)
 11. **Master prompt in Markdown** — The actual writing prompt is `writing-system-prompt.md` loaded by `prompts/index.ts`, not embedded in code
-12. **TDS Geo plugin for WooCommerce** — WooCommerce product reads/writes use the TDS Geo plugin API (`/tds-geo/v1/posts/{id}`), not WP native REST
+12. **Kivo Geo plugin for WooCommerce** — WooCommerce product reads/writes use the Kivo Geo plugin API (`/kivo/v1/posts/{id}`), not WP native REST
 
 ## WordPress → Shopify Migration
 

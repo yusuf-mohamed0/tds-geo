@@ -117,4 +117,4 @@ Later Hamid designed a line of batch-producible outdoor furniture — chairs, ta
 - Rich product catalog (15+ products with handles)
 - Google Merchant Center likely connected
 ---
-*Generated for TDS Geo — July 12, 2026*
+*Generated for Kivo Geo — July 12, 2026*

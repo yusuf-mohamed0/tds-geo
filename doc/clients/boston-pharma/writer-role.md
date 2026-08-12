@@ -242,4 +242,4 @@ If the topic does not naturally connect to Boston Pharmaceutical Industries' pro
 
 ---
 
-*Generated for TDS Geo content system — July 2026*
+*Generated for Kivo Geo content system — July 2026*

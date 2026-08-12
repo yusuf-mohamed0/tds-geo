@@ -20,7 +20,7 @@ Provider: Shopify
 Endpoint: https://alamein-2022.myshopify.com
 Config stored in: cms_connections table (production DB)
 
-## TDS Geo Configuration
+## Kivo Geo Configuration
 
 | Setting | Value |
 |---|---|
@@ -42,9 +42,9 @@ Config stored in: cms_connections table (production DB)
 
 ## Process Manager
 
-- Managed via PM2 (process: tds-geo-backend)
+- Managed via PM2 (process: kivo-backend)
 - PM2 startup enabled (systemd)
 - Auto-restart on crash (max 10 restarts, 5s delay)
 - Health check: /health endpoint
 ---
-*Generated for TDS Geo — July 12, 2026*
+*Generated for Kivo Geo — July 12, 2026*

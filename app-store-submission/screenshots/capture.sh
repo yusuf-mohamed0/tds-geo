@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# TDS Geo — Shopify App Store Screenshot Capture Script
+# Kivo Geo - Shopify App Store Screenshot Capture Script
 #
 # Requirements:
 #   - node 18+
@@ -15,7 +15,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUT_DIR="$SCRIPT_DIR"
-APP_URL="https://traffic.16.192.29.174.nip.io"
+APP_URL="https://ai.trafficdigitalsolutions.com"
 SHOPIFY_STORE="traffic-test"
 SHOPIFY_ADMIN="https://admin.shopify.com/store/${SHOPIFY_STORE}/apps/tds-geo"
 
@@ -24,7 +24,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${YELLOW}TDS Geo — App Store Screenshot Capture${NC}"
+echo -e "${YELLOW}Kivo Geo - App Store Screenshot Capture${NC}"
 echo ""
 
 # Check if playwright is installed
@@ -41,8 +41,8 @@ import fs from 'fs';
 import path from 'path';
 
 const OUTPUT = process.argv[2] || '.';
-const APP_URL = process.argv[3] || 'https://traffic.16.192.29.174.nip.io';
-const TEST_EMAIL = process.argv[4] || 'admin@tds-geo.internal';
+const APP_URL = process.argv[3] || 'https://ai.trafficdigitalsolutions.com';
+const TEST_EMAIL = process.argv[4] || 'admin@kivo.internal';
 const TEST_PASSWORD = process.argv[5] || '';
 
 async function shot(page, name, fullPage = false) {
@@ -103,7 +103,7 @@ async function login(page) {
   // 6. GEO Analysis — content mode
   await page2.goto(`${APP_URL}/admin/geo`, { waitUntil: 'networkidle' });
   await page2.waitForTimeout(500);
-  await page2.fill('textarea', 'TDS Geo helps Shopify merchants optimize their content for Generative Engine Optimization (GEO), the practice of structuring content so AI search engines naturally cite your store as a source. AI-powered search engines are changing how customers discover products online.');
+  await page2.fill('textarea', 'Kivo Geo helps Shopify merchants optimize their content for Generative Engine Optimization (GEO), the practice of structuring content so AI search engines naturally cite your store as a source. AI-powered search engines are changing how customers discover products online.');
   await page2.click('button:has-text("Analyze")');
   await page2.waitForTimeout(3000);
   await shot(page2, '06-geo-analysis');

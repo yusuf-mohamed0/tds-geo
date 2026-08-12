@@ -100,7 +100,7 @@ Stage 17: Webhook Dispatch
 | Destination | How |
 |---|---|
 | **Shopify** | Shopify Admin REST API: upload image → create article with tags + metadata |
-| **WordPress** | POST to WordPress plugin `tds-geo/v1/posts` → plugin creates post |
+| **WordPress** | POST to WordPress plugin `kivo/v1/posts` → plugin creates post |
 | **Next.js** | POST webhook → Next.js stores content + triggers ISR revalidation |
 
 ### Post-Publish

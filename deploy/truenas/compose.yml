@@ -1,4 +1,4 @@
-name: tds-geo
+name: kivo
 
 services:
   api:
@@ -26,7 +26,7 @@ services:
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 30s
-      timeout: 5s
+      timeout: 15s
       retries: 5
       start_period: 20s
 
@@ -50,9 +50,11 @@ services:
       - ${LOG_DIR:-./logs}:/app/logs
     networks:
       - app
+    healthcheck:
+      disable: true
 
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}

@@ -1,10 +1,10 @@
 # Nextcloud Workspace Plan
 
-This file defines how Nextcloud should support the TDS Geo migration and operations without replacing the production runtime.
+This file defines how Nextcloud should support the Kivo Geo migration and operations without replacing the production runtime.
 
 ## Decision
 
-Use Nextcloud as the **company collaboration workspace** on TrueNAS. Do not run TDS Geo production as a Nextcloud app.
+Use Nextcloud as the **company collaboration workspace** on TrueNAS. Do not run Kivo Geo production as a Nextcloud app.
 
 Correct split:
 
@@ -15,7 +15,7 @@ TrueNAS SCALE
 ├── Nextcloud App
 │   └── documents, client files, approvals, schedules, reports, backup copies
 └── Ubuntu Server VM
-    └── TDS Geo production runtime
+    └── Kivo Geo production runtime
         ├── API
         ├── worker
         ├── PostgreSQL
@@ -41,7 +41,7 @@ Nextcloud ExApps/AppAPI:
 - Can use Docker deployment through an AppAPI deploy daemon.
 - May involve Docker socket or Docker socket proxy access, which is a sensitive administration surface.
 
-TDS Geo needs a normal production service layout: Node API, worker, PostgreSQL, Redis, GitHub Actions, GHCR image deploys, Shopify OAuth/webhooks, backups, and rollback. Running that through Nextcloud would add complexity and risk without improving reliability.
+Kivo Geo needs a normal production service layout: Node API, worker, PostgreSQL, Redis, GitHub Actions, GHCR image deploys, Shopify OAuth/webhooks, backups, and rollback. Running that through Nextcloud would add complexity and risk without improving reliability.
 
 ## Public Exposure Rule
 
@@ -49,7 +49,7 @@ TDS Geo needs a normal production service layout: Node API, worker, PostgreSQL, 
 
 Allowed public surfaces:
 
-- TDS Geo public HTTPS app URL.
+- Kivo Geo public HTTPS app URL.
 - Nextcloud public URL, if intentionally exposed and hardened.
 
 Not allowed publicly:
@@ -105,7 +105,7 @@ Use carefully:
 Create this in Nextcloud Team Folders:
 
 ```text
-TDS Geo/
+Kivo Geo/
 ├── 00_Admin/
 │   ├── Policies/
 │   ├── Access Requests/
@@ -189,7 +189,7 @@ Nextcloud can hold secondary copies of backup artifacts, not the only backup.
 
 Source of truth:
 
-- Production database backups remain in `/mnt/tds-geo/backups` and offsite encrypted storage.
+- Production database backups remain in `/mnt/kivo/backups` and offsite encrypted storage.
 
 Nextcloud copy purpose:
 
@@ -240,7 +240,7 @@ Once safe access is available, the work is:
 5. Create groups and Team Folders.
 6. Configure permissions and sharing policy.
 7. Set cron/background jobs for production.
-8. Create the TDS Geo folder structure.
+8. Create the Kivo Geo folder structure.
 9. Configure backup-copy workflow for selected artifacts.
 10. Document final URLs, apps, groups, and operating rules.
 

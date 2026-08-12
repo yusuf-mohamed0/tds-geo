@@ -1,4 +1,4 @@
-# LinkedIn Content System — TDS Geo / YKS Brand
+# LinkedIn Content System — Kivo Geo / YKS Brand
 
 ## Roles
 

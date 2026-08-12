@@ -48,8 +48,8 @@ Workers run as a **separate Node.js process** managed by PM2:
 
 ```
 ecosystem.config.cjs:
-  - tds-geo-backend (Express API)
-  - tds-geo-worker (BullMQ workers)
+  - kivo-backend (Express API)
+  - kivo-worker (BullMQ workers)
 ```
 
 Both processes share code from the same build. The worker process only runs the queue handlers, not the HTTP server.

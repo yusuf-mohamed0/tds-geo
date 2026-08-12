@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Traffic Digital Solutions - TDS GEO Growth Proposal
+SNEFERU - SNEFERU Geo Growth Proposal
 Client-ready proposal for AI SEO, AEO, GEO, LLMO, content automation, and citation growth.
 """
 
@@ -145,7 +145,7 @@ def create_document():
     c0.width = Cm(6.0)
     p = c0.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    r = p.add_run("TDS GEO")
+    r = p.add_run("SNEFERU Geo")
     r.bold = True
     r.font.size = Pt(22)
     r.font.color.rgb = BLACK
@@ -171,7 +171,7 @@ def create_document():
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     title.paragraph_format.space_before = Pt(18)
     title.paragraph_format.space_after = Pt(2)
-    r = title.add_run("TDS GEO GROWTH PROPOSAL")
+    r = title.add_run("SNEFERU Geo GROWTH PROPOSAL")
     r.bold = True
     r.font.size = Pt(26)
     r.font.color.rgb = BLACK
@@ -213,17 +213,17 @@ def create_document():
 
     heading(doc, 1, "EXECUTIVE SUMMARY")
     body(doc, (
-        "TDS GEO is a growth system for businesses that want to be found, cited, and trusted across Google, "
+        "SNEFERU Geo is a growth system for businesses that want to be found, cited, and trusted across Google, "
         "AI Overviews, ChatGPT, Perplexity, Gemini, Copilot, and the wider answer-engine ecosystem. "
         "The objective is not simply to publish more content. The objective is to improve qualified organic visibility, "
         "increase AI-search readiness, strengthen brand authority, reduce content production cost, and create a faster "
         "publishing operation with measurable reporting."
     ))
-    body(doc, "This quotation covers the setup, onboarding, subscription, content workflow, reporting, and support for the selected TDS GEO plan.")
+    body(doc, "This quotation covers the setup, onboarding, subscription, content workflow, reporting, and support for the selected SNEFERU Geo plan.")
 
-    heading(doc, 2, "WHAT IS TDS GEO")
+    heading(doc, 2, "WHAT IS SNEFERU Geo")
     body(doc, (
-        "TDS GEO is a SaaS-enabled AI visibility platform and managed growth workflow. It connects to your website or CMS, "
+        "SNEFERU Geo is a SaaS-enabled AI visibility platform and managed growth workflow. It connects to your website or CMS, "
         "builds a structured brand and content profile, generates SEO and AI-search-ready content, prepares metadata, supports "
         "publishing, tracks performance signals, and produces monthly actions for continuous improvement."
     ))
@@ -246,7 +246,7 @@ def create_document():
         ("Entity", "The recognized identity of your brand, products, people, locations, and topics across the web"),
     ], [Cm(3.0), Cm(13.9)])
 
-    heading(doc, 3, "HOW TDS GEO WORKS")
+    heading(doc, 3, "HOW SNEFERU Geo WORKS")
     styled_table(doc, ["Step", "Platform Flow", "Output"], [
         ("1", "Client and website connection", "CMS/API access, brand inputs, markets, languages, approval workflow"),
         ("2", "Research Engine", "Topics, keywords, content gaps, weak points, competitor and citation opportunities"),
@@ -276,8 +276,8 @@ def create_document():
         ("Better marketing visibility", "Report on output, indexing indicators, keyword growth, content gaps, and weak points"),
     ], [Cm(5.0), Cm(11.9)])
 
-    heading(doc, 5, "WHY TDS GEO")
-    styled_table(doc, ["Problem", "How TDS GEO Solves It"], [
+    heading(doc, 5, "WHY SNEFERU Geo")
+    styled_table(doc, ["Problem", "How SNEFERU Geo Solves It"], [
         ("Organic traffic is becoming less predictable", "Builds content for SEO, answer extraction, and AI citation surfaces"),
         ("AI engines summarize before users click", "Structures content so brands can be mentioned, quoted, and cited"),
         ("Manual content operations are slow", "Automates research, drafting, metadata, publishing, scheduling, and reporting"),
@@ -344,7 +344,7 @@ def create_document():
     heading(doc, 8, "PRICING")
     items = [
         ("#", "SERVICE / DELIVERABLE", "QTY", "UNIT PRICE", "TOTAL"),
-        ("1", "TDS GEO Setup and Onboarding", "1", "{SETUP_FEE}", "{SETUP_TOTAL}"),
+        ("1", "SNEFERU Geo Setup and Onboarding", "1", "{SETUP_FEE}", "{SETUP_TOTAL}"),
         ("2", "{SELECTED_PLAN} Subscription", "{BILLING_CYCLE}", "{PLAN_PRICE}", "{PLAN_TOTAL}"),
         ("3", "Brand Profile and SEO/GEO Strategy Setup", "1", "{STRATEGY_PRICE}", "{STRATEGY_TOTAL}"),
         ("4", "Content Production Add-On", "{CONTENT_ADDON_QTY}", "{CONTENT_ADDON_RATE}", "{CONTENT_ADDON_TOTAL}"),
@@ -460,7 +460,7 @@ def create_document():
         "Review and approve content within 3 business days unless another approval window is agreed",
         "Maintain active CMS, hosting, payment gateway, and third-party subscriptions",
         "Confirm whether content requires legal, medical, financial, or regulatory approval before publishing",
-        "Notify Traffic Digital Solutions of product, pricing, offer, or policy changes that affect content accuracy",
+        "Notify SNEFERU of product, pricing, offer, or policy changes that affect content accuracy",
     ]:
         bullet(doc, responsibility)
 
@@ -468,11 +468,11 @@ def create_document():
     terms = [
         ("1. Scope", "The scope is limited to the deliverables listed in this quotation and the selected plan. Any extra websites, languages, integrations, content volume, manual writing, or custom development must be quoted separately."),
         ("2. Subscription", "Monthly plans are prepaid and renew every 30 days unless cancelled according to the agreed notice period. Quarterly or annual billing may be offered by separate agreement."),
-        ("3. Payment", "Invoices are due according to the payment terms on page 1. Traffic Digital Solutions may pause platform access, publishing, and support if payment is overdue by more than 15 calendar days."),
+        ("3. Payment", "Invoices are due according to the payment terms on page 1. SNEFERU may pause platform access, publishing, and support if payment is overdue by more than 15 calendar days."),
         ("4. Content Approval", "Client remains responsible for final review and approval of all content before publication, including factual claims, regulated claims, pricing, product availability, and legal compliance."),
-        ("5. No Ranking Guarantee", "Search engines and AI platforms are third-party systems. Traffic Digital Solutions does not guarantee rankings, traffic, sales, AI mentions, citations, or inclusion in any AI-generated answer."),
-        ("6. Intellectual Property", "Client owns final approved content created specifically for the Client after full payment. Traffic Digital Solutions retains ownership of the TDS GEO platform, software, workflows, prompts, templates, methods, and reusable components."),
-        ("7. Data Protection", "Traffic Digital Solutions will process client data only for platform operation, content production, analytics, and support. Reasonable technical and organizational safeguards will be maintained."),
+        ("5. No Ranking Guarantee", "Search engines and AI platforms are third-party systems. SNEFERU does not guarantee rankings, traffic, sales, AI mentions, citations, or inclusion in any AI-generated answer."),
+        ("6. Intellectual Property", "Client owns final approved content created specifically for the Client after full payment. SNEFERU retains ownership of the SNEFERU Geo platform, software, workflows, prompts, templates, methods, and reusable components."),
+        ("7. Data Protection", "SNEFERU will process client data only for platform operation, content production, analytics, and support. Reasonable technical and organizational safeguards will be maintained."),
         ("8. Confidentiality", "Both parties agree to protect non-public business, technical, financial, customer, and strategy information disclosed during the engagement."),
         ("9. Limitation of Liability", "Total liability arising from this quotation shall not exceed the fees paid by the Client during the three months immediately preceding the claim, excluding liability that cannot be limited by law."),
         ("10. Termination", "Either party may terminate for material breach if the breach is not cured within 15 days of written notice. Upon termination, the Client must pay all amounts due for services delivered before termination."),
@@ -516,7 +516,7 @@ def create_document():
     footer = doc.add_paragraph()
     footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
     footer.paragraph_format.space_before = Pt(6)
-    r = footer.add_run("Traffic Digital Solutions  -  Villa 125, Axis 80, 5th Settlement, Cairo, Egypt\n")
+    r = footer.add_run("SNEFERU  -  Villa 125, Axis 80, 5th Settlement, Cairo, Egypt\n")
     r.font.size = Pt(7)
     r.font.color.rgb = GRAY
     r = footer.add_run("webdevelopment@trafficdigitalsolutions.com  -  trafficdigitalsolutions.com  -  +201271112396\n")
@@ -528,7 +528,7 @@ def create_document():
     r.italic = True
 
     doc.save(OUTPUT_PATH)
-    print(f"TDS GEO Growth Proposal saved to: {OUTPUT_PATH}")
+    print(f"SNEFERU Geo Growth Proposal saved to: {OUTPUT_PATH}")
     print(f"File size: {os.path.getsize(OUTPUT_PATH) / 1024:.1f} KB")
 
 

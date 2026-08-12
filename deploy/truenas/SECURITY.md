@@ -67,7 +67,7 @@ Ubuntu VM:
 GitHub runner:
 
 - Install only inside the Ubuntu VM.
-- Use labels `self-hosted,truenas,tds-geo`.
+- Use labels `self-hosted,truenas,kivo`.
 - Run as a normal deploy user, not root.
 - Keep runner work directory private.
 - Do not run public pull-request code on the self-hosted production runner.
@@ -80,7 +80,7 @@ Secrets live in these places only:
 
 | Secret Type | Location |
 |---|---|
-| Runtime app secrets | `/opt/tds-geo/deploy/truenas/.env` on the VM |
+| Runtime app secrets | `/opt/kivo/deploy/truenas/.env` on the VM |
 | GitHub build/deploy credentials | GitHub repository or environment secrets |
 | Cloudflare Tunnel token | VM-local `.env` or Cloudflare-managed tunnel config |
 | SSH private keys | Administrator machine or dedicated secret store |
@@ -166,7 +166,7 @@ Direct HTTPS mode:
 
 ## Backup Security
 
-- Local backups go to `/mnt/tds-geo/backups` or the configured backup dataset.
+- Local backups go to `/mnt/kivo/backups` or the configured backup dataset.
 - Offsite backups must be encrypted.
 - Backup access is admin-only.
 - Do not expose backup datasets over unauthenticated SMB/NFS/web shares.

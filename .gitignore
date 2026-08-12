@@ -43,3 +43,6 @@ dump.rdb
 
 # Deepwork state
 .slim/deepwork/
+
+# Generated graphify AST cache
+graphify-out/cache/ast/*.json

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { KIVO_BRAND } from '../brand/kivo';
 
 interface MetricCardProps {
   icon: ReactNode;
@@ -18,7 +19,7 @@ const waveSvg = (
   </svg>
 );
 
-export default function MetricCard({ icon, label, value, subtitle, trend, color = '#FCB900', to, onClick }: MetricCardProps) {
+export default function MetricCard({ icon, label, value, subtitle, trend, color = KIVO_BRAND.colors.gold, to, onClick }: MetricCardProps) {
   const interactive = Boolean(to || onClick);
   const card = (
     <div className={`relative card overflow-hidden${interactive ? ' group cursor-pointer transition-all duration-300 hover:border-opacity-50 hover:shadow-lg hover:shadow-black/20' : ''}`}>

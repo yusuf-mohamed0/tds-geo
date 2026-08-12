@@ -1,7 +1,15 @@
 import { LogOut, Menu } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { KIVO_BRAND } from '../brand/kivo';
 
-const avatarColors = ['#818CF8', '#34D399', '#F472B6', '#FBBF24', '#60A5FA', '#A78BFA'];
+const avatarColors = [
+  KIVO_BRAND.colors.gold,
+  KIVO_BRAND.colors.sky,
+  KIVO_BRAND.colors.amber,
+  KIVO_BRAND.colors.peach,
+  KIVO_BRAND.colors.navy,
+  KIVO_BRAND.colors.graphite,
+];
 
 function stringToColor(str: string): string {
   let hash = 0;

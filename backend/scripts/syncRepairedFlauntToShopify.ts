@@ -70,7 +70,7 @@ async function main(): Promise<void> {
             body_html: article.content_html,
             summary_html: `<p>${getExcerpt(article.content_html)}</p>`,
             tags: Array.isArray(article.tags) ? article.tags.join(', ') : article.tags || '',
-            author: 'TDS Geo',
+            author: 'Kivo Geo',
             published: false,
             published_at: null,
             metafields_global_title_tag: (article.meta_title || article.title).slice(0, 70),

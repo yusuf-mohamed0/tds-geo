@@ -73,7 +73,7 @@
 
 | Service | Status |
 |---|---|
-| TDS Geo API Key | Not configured |
+| Kivo Geo API Key | Not configured |
 | WordPress REST API | Open (no auth) |
 | Shopify | Not applicable (not a Shopify store) |
 | Google Analytics | Not detected |
@@ -88,7 +88,7 @@
 - No newsletter or email marketing integration detected
 - No social media sharing features detected
 
-## TDS Geo Integration Status
+## Kivo Geo Integration Status
 
 | Item | Status | Notes |
 |---|---|---|

@@ -3,7 +3,7 @@
 // Licensed under the ISC License.
 
 // ══════════════════════════════════════════════════════════════════
-// TDS Geo — Product Image Alt Text Generator
+// Kivo Geo — Product Image Alt Text Generator
 // Generates SEO-optimized alt text for WooCommerce product images
 // ══════════════════════════════════════════════════════════════════
 
@@ -60,7 +60,7 @@ const ALT_SYSTEM_PROMPT = `You are an SEO and accessibility specialist for an e-
 
 const WP_BASE = 'https://boston-pharma.com/wp-json';
 const WP_KEY = process.env.BOSTON_PHARMA_API_KEY || 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
-const WP_HEADERS = { 'X-TDS-GEO-Key': WP_KEY, 'Content-Type': 'application/json' };
+const WP_HEADERS = { 'X-Kivo-Key': WP_KEY, 'Content-Type': 'application/json' };
 
 async function getProducts() {
   const all = [];

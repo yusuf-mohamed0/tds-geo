@@ -76,4 +76,4 @@
 - Blog title is "posts" (generic) — consider renaming for SEO relevance
 - 84 existing posts need gap analysis before generating new content
 ---
-*Generated for TDS Geo — July 12, 2026*
+*Generated for Kivo Geo — July 12, 2026*

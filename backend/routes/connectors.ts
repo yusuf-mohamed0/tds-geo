@@ -16,7 +16,7 @@ export function createConnectorRoutes(pool: Pool): Router {
 
   const normalizeConnectorInput = (provider: string, body: Record<string, any>) => {
     const endpointUrl = body.endpointUrl || body.siteUrl || body.url || '';
-    const apiKey = body.apiKey || body.tdsGeoApiKey || body.tds_geo_api_key || body.accessToken || '';
+    const apiKey = body.apiKey || body.tdsGeoApiKey || body.kivo_api_key || body.accessToken || '';
 
     return {
       provider,

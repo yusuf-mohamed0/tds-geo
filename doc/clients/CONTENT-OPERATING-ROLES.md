@@ -1,4 +1,4 @@
-# TDS Geo Content Operating Roles
+# Kivo Geo Content Operating Roles
 
 Last updated: 2026-08-05
 

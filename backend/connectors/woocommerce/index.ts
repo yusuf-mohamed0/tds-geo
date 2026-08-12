@@ -16,7 +16,7 @@ import { WordPressConnector } from '../wordpress';
 
 export class WooCommerceConnector implements ConnectorInterface {
   readonly provider = 'woocommerce';
-  readonly name = 'TDS Geo WooCommerce';
+  readonly name = 'Kivo Geo WooCommerce';
   readonly version = '1.0.0';
 
   private readonly wordpress = new WordPressConnector();

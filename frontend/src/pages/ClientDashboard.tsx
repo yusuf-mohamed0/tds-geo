@@ -9,6 +9,7 @@ import { SUPPORTED_LOCALES, getLocaleName } from '../api/locale';
 import { getDemoStatus } from '../api/demo';
 import type { ClientAnalyticsOverview } from '../types';
 import type { DemoStatus } from '../api/demo';
+import { KIVO_BRAND } from '../brand/kivo';
 
 function labelFor(value: string) {
   return value.replace(/[-_]/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -155,7 +156,7 @@ export default function ClientDashboard() {
               <InlineStack gap="300" blockAlign="center" wrap>
                 <div style={{
                   width: 10, height: 10, borderRadius: '50%',
-                  background: demoStatus.expired ? '#ef4444' : demoStatus.days_remaining <= 3 ? '#f59e0b' : '#22C55E',
+                  background: demoStatus.expired ? KIVO_BRAND.status.danger : demoStatus.days_remaining <= 3 ? KIVO_BRAND.colors.amber : KIVO_BRAND.colors.sky,
                   flexShrink: 0,
                 }} />
                 <BlockStack gap="100">
@@ -238,9 +239,9 @@ export default function ClientDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           <MetricCard icon={<FileText size={20} />} label="Total Articles" value={pipeline.total} color={presentation.accent} to={`/admin/articles?clientId=${client.id}`} />
-          <MetricCard icon={<FileText size={20} />} label="Published" value={pipeline.published} color="#34D399" to={`/admin/articles?clientId=${client.id}&status=published`} />
-          <MetricCard icon={<Target size={20} />} label="Keywords" value={data.keywords.total || 0} color="#F472B6" onClick={openKeywordList} />
-          <MetricCard icon={<DollarSign size={20} />} label="MTD Costs" value={`$${costTotal.toFixed(2)}`} color="#FBBF24" to={`/admin/costs?clientId=${client.id}`} />
+          <MetricCard icon={<FileText size={20} />} label="Published" value={pipeline.published} color={KIVO_BRAND.colors.gold} to={`/admin/articles?clientId=${client.id}&status=published`} />
+          <MetricCard icon={<Target size={20} />} label="Keywords" value={data.keywords.total || 0} color={KIVO_BRAND.colors.sky} onClick={openKeywordList} />
+          <MetricCard icon={<DollarSign size={20} />} label="MTD Costs" value={`$${costTotal.toFixed(2)}`} color={KIVO_BRAND.colors.amber} to={`/admin/costs?clientId=${client.id}`} />
         </div>
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
@@ -305,10 +306,10 @@ export default function ClientDashboard() {
             <InlineStack gap="200" blockAlign="center"><Clock3 size={18} color={presentation.accent} /><Text as="h3" variant="headingSm">Article Pipeline</Text></InlineStack>
             <div className="grid grid-cols-2 items-end gap-3 sm:grid-cols-4" style={{ minHeight: 128 }}>
               {[
-                { label: 'Draft', value: pipeline.draft, color: '#6B7280' },
-                { label: 'Generated', value: pipeline.generated, color: '#CA8A04' },
-                { label: 'Approved', value: pipeline.approved, color: '#3B82F6' },
-                { label: 'Published', value: pipeline.published, color: '#22C55E' },
+                { label: 'Draft', value: pipeline.draft, color: KIVO_BRAND.colors.muted },
+                { label: 'Generated', value: pipeline.generated, color: KIVO_BRAND.colors.amber },
+                { label: 'Approved', value: pipeline.approved, color: KIVO_BRAND.colors.sky },
+                { label: 'Published', value: pipeline.published, color: KIVO_BRAND.colors.gold },
               ].map((stage) => {
                 const max = Math.max(pipeline.draft, pipeline.generated, pipeline.approved, pipeline.published, 1);
                 return <div key={stage.label} className="min-w-0" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--p-space-100)' }}><Text as="span" variant="headingLg" fontWeight="bold">{stage.value}</Text><div style={{ width: '100%', borderRadius: 'var(--p-space-100)', background: stage.color, height: `${Math.max((stage.value / max) * 100, 4)}%`, minHeight: 4, transition: 'height 0.3s' }} /><Text as="span" variant="bodyXs" tone="subdued">{stage.label}</Text></div>;

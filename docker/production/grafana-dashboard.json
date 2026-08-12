@@ -1,12 +1,12 @@
 {
   "__inputs": [],
   "__requires": [],
-  "title": "TDS Geo — Production Overview",
+  "title": "Kivo Geo — Production Overview",
   "uid": "tdsgeo-prod",
   "version": 1,
   "timezone": "browser",
   "editable": true,
-  "tags": ["tds-geo", "production"],
+  "tags": ["kivo", "production"],
   "refresh": "30s",
   "panels": [
     {

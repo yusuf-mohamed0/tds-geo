@@ -79,7 +79,7 @@ async function main(): Promise<void> {
           body_html: contentHtml,
           summary_html: `<p>${extractPlainText(replacement.content, 200)}</p>`,
           tags: replacement.tags.join(', '),
-          author: 'TDS Geo',
+          author: 'Kivo Geo',
           published: false,
           published_at: null,
           metafields_global_title_tag: replacement.metaTitle,

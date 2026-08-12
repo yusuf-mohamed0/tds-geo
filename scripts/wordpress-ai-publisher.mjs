@@ -5,11 +5,11 @@
 
 /**
  * ════════════════════════════════════════════════════════════════
- * Traffic Digital Solutions GEO - WordPress Article Publisher
+ * Kivo Geo - WordPress Article Publisher
  * ════════════════════════════════════════════════════════════════
  *
  * A standalone script that generates SEO-optimized articles using
- * OpenAI and publishes them to your WordPress site via the Traffic Digital Solutions GEO
+ * OpenAI and publishes them to your WordPress site via the Kivo Geo
  * WP Plugin REST API.
  *
  * No external SDK dependencies — uses raw fetch() calls throughout.
@@ -35,13 +35,13 @@
  *
  * Environment Variables (.env):
  *   OPENAI_API_KEY                  Required: Your OpenAI API key
- *   TDS_GEO_WORDPRESS_URL          Required: Your WordPress site URL
- *   TDS_GEO_WORDPRESS_API_KEY      Required: Your Traffic Digital Solutions GEO API key
+ *   KIVO_WORDPRESS_URL          Required: Your WordPress site URL
+ *   KIVO_WORDPRESS_API_KEY      Required: Your Kivo Geo API key
  *   OPENAI_MODEL                    Optional: Model name (default: gpt-4o)
  *   CONTENT_MIN_WORDS               Optional: Min word count (default: 800)
  *   CONTENT_MAX_WORDS               Optional: Max word count (default: 1500)
  *   CONTENT_TONE                    Optional: Writing tone (default: informative)
- *   TDS_GEO_DEFAULT_AUTHOR_ID      Optional: WP author ID (default: 1)
+ *   KIVO_DEFAULT_AUTHOR_ID      Optional: WP author ID (default: 1)
  *
  * ════════════════════════════════════════════════════════════════
  */
@@ -56,9 +56,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ─── Configuration ──────────────────────────────────────────────
 const CFG = {
-  wpUrl: process.env.TDS_GEO_WORDPRESS_URL || '',
-  wpApiKey: process.env.TDS_GEO_WORDPRESS_API_KEY || '',
-  apiNs: 'tds-geo/v1',
+  wpUrl: process.env.KIVO_WORDPRESS_URL || '',
+  wpApiKey: process.env.KIVO_WORDPRESS_API_KEY || '',
+  apiNs: 'kivo/v1',
   openaiKey: process.env.OPENAI_API_KEY || '',
   model: process.env.OPENAI_MODEL || 'gpt-4o',
   temperature: parseFloat(process.env.OPENAI_TEMPERATURE || '0.7'),
@@ -66,15 +66,15 @@ const CFG = {
   minWords: parseInt(process.env.CONTENT_MIN_WORDS || '800', 10),
   maxWords: parseInt(process.env.CONTENT_MAX_WORDS || '1500', 10),
   tone: process.env.CONTENT_TONE || 'informative',
-  authorId: parseInt(process.env.TDS_GEO_DEFAULT_AUTHOR_ID || '1', 10),
+  authorId: parseInt(process.env.KIVO_DEFAULT_AUTHOR_ID || '1', 10),
 };
 
 // ─── Validation ─────────────────────────────────────────────────
 function validate() {
   const missing = [];
   if (!CFG.openaiKey) missing.push('OPENAI_API_KEY');
-  if (!CFG.wpUrl) missing.push('TDS_GEO_WORDPRESS_URL');
-  if (!CFG.wpApiKey) missing.push('TDS_GEO_WORDPRESS_API_KEY');
+  if (!CFG.wpUrl) missing.push('KIVO_WORDPRESS_URL');
+  if (!CFG.wpApiKey) missing.push('KIVO_WORDPRESS_API_KEY');
   return missing;
 }
 
@@ -115,7 +115,7 @@ async function openaiChat(system, user) {
   };
 }
 
-// ─── WordPress API (Traffic Digital Solutions GEO Plugin) ────────────────────────────
+// ─── WordPress API (Kivo Geo Plugin) ────────────────────────────
 async function wp(method, endpoint, body = null) {
   const base = CFG.wpUrl.replace(/\/wp-json.*$/, '').replace(/\/$/, '');
   const url = `${base}/wp-json/${CFG.apiNs}${endpoint}`;
@@ -124,7 +124,7 @@ async function wp(method, endpoint, body = null) {
     method,
     headers: {
       'Content-Type': 'application/json',
-      'X-TDS-GEO-Key': CFG.wpApiKey,
+      'X-Kivo-Key': CFG.wpApiKey,
     },
     signal: AbortSignal.timeout(60000),
   };
@@ -327,7 +327,7 @@ function pickTopic() {
 // ─── Setup Cron ────────────────────────────────────────────────
 function setupCron() {
   const scriptPath = path.resolve(fileURLToPath(import.meta.url));
-  const logFile = '/var/log/tds-geo-publisher.log';
+  const logFile = '/var/log/kivo-publisher.log';
   const cronLine = `0 8 * * * cd ${path.dirname(path.dirname(scriptPath))} && node ${scriptPath} --keyword "$(node ${scriptPath} --pick-topic)" >> ${logFile} 2>&1\n`;
 
   console.log(`\n📋 Add this to your crontab (crontab -e):\n`);
@@ -338,7 +338,7 @@ function setupCron() {
 
 // ─── Save Backup ───────────────────────────────────────────────
 function saveBackup(article, publishResult) {
-  const dir = path.join(__dirname, '..', 'outputs', 'tds-geo');
+  const dir = path.join(__dirname, '..', 'outputs', 'kivo');
   fs.mkdirSync(dir, { recursive: true });
 
   const backup = {
@@ -463,7 +463,7 @@ async function main() {
 function help() {
   console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
-║  Traffic Digital Solutions GEO - WordPress Article Publisher                       ║
+║  Kivo Geo - WordPress Article Publisher                       ║
 ║  Generate SEO articles with AI and publish to WordPress       ║
 ╚═══════════════════════════════════════════════════════════════╝
 

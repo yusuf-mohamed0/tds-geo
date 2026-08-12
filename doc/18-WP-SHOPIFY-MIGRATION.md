@@ -62,7 +62,7 @@ A comprehensive migration engine that extracts all content from a WordPress/WooC
          ▼
 ┌─────────────────────┐  ┌─────────────────────┐
 │   WordPress Site    │  │   Shopify Store      │
-│   (via TDS Geo      │  │   (via Admin REST    │
+│   (via Kivo Geo      │  │   (via Admin REST    │
 │    plugin API +     │  │    API 2025-07)      │
 │    WC REST API)     │  │                      │
 └─────────────────────┘  └─────────────────────┘
@@ -80,7 +80,7 @@ CREATE TABLE migration_jobs (
   client_id       UUID NOT NULL REFERENCES clients(id),
   source_type     TEXT NOT NULL DEFAULT 'wordpress',
   source_url      TEXT NOT NULL,                    -- WordPress site URL
-  source_api_key  TEXT,                              -- TDS Geo API key
+  source_api_key  TEXT,                              -- Kivo Geo API key
   source_wc_key   TEXT,                              -- WooCommerce consumer key
   source_wc_secret TEXT,                             -- WooCommerce consumer secret
   destination_type TEXT NOT NULL DEFAULT 'shopify',
@@ -144,7 +144,7 @@ CREATE INDEX idx_migration_redirects_job ON migration_redirects(job_id);
 ## 4. Export Engine (`backend/engines/migration/export.ts`)
 
 ### Purpose
-Read all data from the WordPress source via the TDS Geo plugin API + WooCommerce REST API.
+Read all data from the WordPress source via the Kivo Geo plugin API + WooCommerce REST API.
 
 ### Methods
 
@@ -154,14 +154,14 @@ Orchestrator that runs all export methods in sequence.
 
 #### `exportPosts(jobId): Promise<MigrationItem[]>`
 
-- Calls `GET /wp-json/tds-geo/v1/posts?post_type=any&limit=100` with pagination
+- Calls `GET /wp-json/kivo/v1/posts?post_type=any&limit=100` with pagination
 - Handles posts, pages, and any custom post type individually
 - Extracts: title, content (rendered HTML), excerpt, status, slug, publish_date, author
 - Extracts SEO meta: meta_title, meta_description (if stored in post_meta by plugin)
 - Extracts featured image URL
 - Writes each item to `migration_items` with `item_type = 'post'|'page'`
 
-**Pagination:** TDS Geo plugin returns `limit` and `offset` params. Loop with offset+=100 until empty.
+**Pagination:** Kivo Geo plugin returns `limit` and `offset` params. Loop with offset+=100 until empty.
 
 **Edge cases:**
 - Password-protected posts → skip (can't read content)
@@ -186,7 +186,7 @@ Orchestrator that runs all export methods in sequence.
 
 #### `exportCategories(jobId): Promise<MigrationItem[]>`
 
-- Calls `GET /wp-json/tds-geo/v1/categories`
+- Calls `GET /wp-json/kivo/v1/categories`
 - Extracts: name, slug, description, parent, count
 - Writes each item with `item_type = 'category'`
 
@@ -196,13 +196,13 @@ Orchestrator that runs all export methods in sequence.
 
 #### `exportTags(jobId): Promise<MigrationItem[]>`
 
-- Calls `GET /wp-json/tds-geo/v1/tags`
+- Calls `GET /wp-json/kivo/v1/tags`
 - Extracts: name, slug, count
 - Writes each item with `item_type = 'tag'`
 
 #### `exportMedia(jobId): Promise<MigrationItem[]>`
 
-- Calls `GET /wp-json/wp/v2/media?per_page=100` (or TDS Geo plugin if it supports media listing)
+- Calls `GET /wp-json/wp/v2/media?per_page=100` (or Kivo Geo plugin if it supports media listing)
 - Extracts: URL, title, alt_text, caption, description, mime_type, file_size, width, height
 - Writes each item with `item_type = 'media'`
 - Downloads first 5KB of each image to validate URL is accessible
@@ -216,13 +216,13 @@ Orchestrator that runs all export methods in sequence.
 
 #### `exportAuthors(jobId): Promise<MigrationItem[]>`
 
-- Calls `GET /wp-json/tds-geo/v1/authors`
+- Calls `GET /wp-json/kivo/v1/authors`
 - Extracts: display_name, email
 - Stored for mapping during import
 
 #### `exportUrls(jobId): Promise<void>`
 
-- Reads `wp_options` via `GET /wp-json/tds-geo/v1/admin/db/query` or computes from post slugs + site URL
+- Reads `wp_options` via `GET /wp-json/kivo/v1/admin/db/query` or computes from post slugs + site URL
 - Builds a complete URL map: all posts, products, pages, categories, tags → their WordPress permalinks
 - Stores in `migration_redirects` for redirect generation
 
@@ -922,12 +922,12 @@ async function withRetry(fn, item, maxRetries = 3) {
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/wp-json/tds-geo/v1/posts` | GET | List all posts (any type) |
-| `/wp-json/tds-geo/v1/posts/{id}` | GET | Get single post |
-| `/wp-json/tds-geo/v1/categories` | GET | List categories |
-| `/wp-json/tds-geo/v1/tags` | GET | List tags |
-| `/wp-json/tds-geo/v1/authors` | GET | List authors |
-| `/wp-json/tds-geo/v1/media` | GET | Get media item |
+| `/wp-json/kivo/v1/posts` | GET | List all posts (any type) |
+| `/wp-json/kivo/v1/posts/{id}` | GET | Get single post |
+| `/wp-json/kivo/v1/categories` | GET | List categories |
+| `/wp-json/kivo/v1/tags` | GET | List tags |
+| `/wp-json/kivo/v1/authors` | GET | List authors |
+| `/wp-json/kivo/v1/media` | GET | Get media item |
 | `/wp-json/wc/v3/products` | GET | List WooCommerce products |
 | `/wp-json/wc/v3/products/{id}` | GET | Get single product |
 | `/wp-json/wc/v3/products/{id}/variations` | GET | Get product variations |

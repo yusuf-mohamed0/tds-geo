@@ -59,7 +59,7 @@ describe('client API', () => {
 
       const { apiFetch } = await import('./client');
       await expect(apiFetch('/api/protected')).rejects.toThrow('Unauthorized');
-      expect(localStorage.getItem('tds_geo_token')).toBeNull();
+      expect(localStorage.getItem('kivo_token')).toBeNull();
     });
 
     it('throws on non-ok response with error message', async () => {

@@ -98,7 +98,7 @@ class DemoProvisioner {
       const slug = 'getting-started-with-ai-seo-demo-' + Date.now().toString(36);
       const contentMd = `# Getting Started with AI-Powered SEO
 
-Welcome to your TDS GEO demo dashboard. This sample article shows what the platform can generate for your business.
+Welcome to your Kivo OS demo command center. This sample article shows what the platform can generate for your business.
 
 ## What is AI-Powered SEO?
 
@@ -127,7 +127,7 @@ This demo account includes 3 free article generations to help you evaluate the p
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'draft', 85, 'demo')
          RETURNING id`,
         [clientId, title, slug, contentMd, '<p>' + contentMd.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>',
-         'Getting Started with AI-Powered SEO', 'Learn how TDS GEO helps automate SEO content creation and optimization.',
+         'Getting Started with AI-Powered SEO', 'Learn how Kivo Geo helps automate SEO content creation and optimization.',
          ['seo', 'ai', 'getting-started'], 256, 'draft', 85, 'demo']
       );
     } catch (err) {

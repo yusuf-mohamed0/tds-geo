@@ -80,7 +80,7 @@ If TypeScript or application code changed, also run the repo's normal typecheck,
 ## Emergency Local VM Commands
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
+cd /opt/kivo/deploy/truenas
 docker compose --env-file .env -f compose.yml ps
 docker compose --env-file .env -f compose.yml logs --tail=200 api worker
 ./scripts/backup-db.sh

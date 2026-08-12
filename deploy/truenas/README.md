@@ -1,6 +1,6 @@
-# TDS Geo TrueNAS Production Kit
+# Kivo Geo TrueNAS Production Kit
 
-This directory defines the TrueNAS target for moving TDS Geo and supporting services off AWS while keeping the workflow:
+This directory defines the TrueNAS target for moving Kivo Geo and supporting services off AWS while keeping the workflow:
 
 ```text
 local edit -> git push -> GitHub Actions -> GHCR image -> TrueNAS deploy -> smoke test
@@ -14,9 +14,9 @@ Run this inside an Ubuntu Server VM on TrueNAS SCALE. Do not run production cont
 TrueNAS SCALE
 └── Ubuntu Server VM
     ├── Docker Engine + Compose plugin
-    ├── GitHub self-hosted runner: self-hosted,truenas,tds-geo
-    ├── TDS Geo API container
-    ├── TDS Geo worker container
+    ├── GitHub self-hosted runner: self-hosted,truenas,kivo
+    ├── Kivo Geo API container
+    ├── Kivo Geo worker container
     ├── PostgreSQL 16
     ├── Redis 7
     ├── Caddy reverse proxy
@@ -73,7 +73,7 @@ Use `.github/workflows/deploy-truenas.yml` after installing a self-hosted runner
 The runner needs labels:
 
 ```text
-self-hosted,truenas,tds-geo
+self-hosted,truenas,kivo
 ```
 
 ## Public Access

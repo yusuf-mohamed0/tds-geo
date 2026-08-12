@@ -2,7 +2,7 @@
 
 Last updated: 2026-08-05
 
-This file is the operating index for the production client process layer. Each active client has a dedicated `app-process.md` that defines how TDS Geo should onboard, verify, generate, review, publish, monitor, and recover that client.
+This file is the operating index for the production client process layer. Each active client has a dedicated `app-process.md` that defines how Kivo Geo should onboard, verify, generate, review, publish, monitor, and recover that client.
 
 Shared operating roles are in `CONTENT-OPERATING-ROLES.md`. New local drafts are indexed in `DRAFT-ARTICLE-QUEUE.md`. GEO/AEO plans live at `doc/clients/{slug}/geo-aeo-plan.md`.
 
@@ -26,7 +26,7 @@ Shared operating roles are in `CONTENT-OPERATING-ROLES.md`. New local drafts are
 
 ## Shared Production Process
 
-1. Verify client state with `npm run audit:clients` on `/opt/tds-geo/current`.
+1. Verify client state with `npm run audit:clients` on `/opt/kivo/current`.
 2. Confirm the client is active in DB and the platform connector is reachable from production.
 3. Read the client `full-profile.md`, `brand-profile.md`, `seo-content-guide.md`, `technical-reference.md`, `writer-role.md`, `geo-aeo-plan.md`, and `app-process.md` before content work.
 4. Generate only EEAT-compliant, original, source-safe content following `doc/EEAT-content-framework.md` and `CONTENT-OPERATING-ROLES.md`.
@@ -41,8 +41,8 @@ Shared operating roles are in `CONTENT-OPERATING-ROLES.md`. New local drafts are
 Before relying on app automation for any client:
 
 1. Public app health returns `200` at `https://traffic.16.192.29.174.nip.io/health`.
-2. `/opt/tds-geo/current/frontend/dist/index.html` exists.
-3. Root PM2 process `tds-geo-backend` is online and points to `/opt/tds-geo/current` or the intended release.
+2. `/opt/kivo/current/frontend/dist/index.html` exists.
+3. Root PM2 process `kivo-backend` is online and points to `/opt/kivo/current` or the intended release.
 4. `npm run audit:clients` has no unsafe pending content findings.
 5. Shopify webhook dry-run confirms only real Shopify shops and `app/uninstalled` topic management.
 

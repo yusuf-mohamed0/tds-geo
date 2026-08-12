@@ -21,4 +21,4 @@
 - Boston Vet is part of Boston Group (same parent as Boston Pharma)
 - Site likely managed by same team as Boston Pharma
 - Contact info expected to be shared with Boston Group: `info@bostongroup-eg.com`, `export@bostongroup-eg.com`, +20 15 01000681
-- Built by Traffic Digital Solutions (like Boston Pharma)
+- Built by Kivo (like Boston Pharma)

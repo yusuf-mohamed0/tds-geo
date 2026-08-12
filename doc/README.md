@@ -1,4 +1,4 @@
-# TDS Geo — Documentation
+# Kivo Geo — Documentation
 
 ## Index
 
@@ -24,7 +24,7 @@
 
 ## Quick Links
 
-- **GitHub:** https://github.com/yusuf-mohamed0/tds-geo
+- **GitHub:** https://github.com/yusuf-mohamed0/kivo
 - **App URL:** https://16.192.29.174.nip.io
 - **Test Store:** https://traffic-test.myshopify.com/admin
 - **Partner Dashboard:** https://partners.shopify.com/4956362

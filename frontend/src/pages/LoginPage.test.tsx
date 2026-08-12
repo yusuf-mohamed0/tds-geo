@@ -31,8 +31,9 @@ describe('LoginPage', () => {
 
   it('renders login form', () => {
     render(<LoginPage />);
-    expect(screen.getAllByText('TDS Geo').length).toBe(2);
-    expect(screen.getByText('Sign in to your dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Kivo OS')).toBeInTheDocument();
+    expect(screen.getByText('Kivo')).toBeInTheDocument();
+    expect(screen.getByText('Sign in to your command center')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('you@example.com')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();

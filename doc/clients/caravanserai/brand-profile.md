@@ -177,7 +177,7 @@ Notes:
 - Newsletter signup in footer
 
 ---
-*Generated for TDS Geo — July 8, 2026*
+*Generated for Kivo Geo — July 8, 2026*
 
 ---
 *See [Client Dashboard](../../DASHBOARD.md) for overall progress*

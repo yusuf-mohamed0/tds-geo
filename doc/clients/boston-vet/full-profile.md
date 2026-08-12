@@ -55,7 +55,7 @@ No direct contact person identified for Boston Vet. Site is managed by the same 
 
 ## 2. Technical Details
 
-### TDS Geo Integration
+### Kivo Geo Integration
 
 | Parameter | Value |
 |---|---|
@@ -107,7 +107,7 @@ No direct contact person identified for Boston Vet. Site is managed by the same 
 | Products | Unknown | Likely same WooCommerce structure as Boston Pharma (76+ products) |
 | Product descriptions | Unknown | Likely incomplete -- site appears to have placeholder content |
 | Sitemap pages indexed | 0 | Cannot verify -- blocked by Cloudflare |
-| TDS Geo articles generated | Unknown | Writer role created but no evidence of published pipeline output |
+| Kivo Geo articles generated | Unknown | Writer role created but no evidence of published pipeline output |
 
 Brand differentiation from Boston Pharma is lacking -- same visual identity, same parent company, same platform stack. Site may still show "Lorem ipsum" placeholder sections.
 
@@ -119,7 +119,7 @@ Brand differentiation from Boston Pharma is lacking -- same visual identity, sam
 
 | # | Issue | Detail | Fix | Priority |
 |---|---|---|---|---|
-| BV-1 | **FULLY BLOCKED by Cloudflare** | Production server IP (16.192.29.174) returns 403 on all endpoints: homepage, API, wp-admin, TDS Geo plugin, sitemap.xml. No automated or manual publishing possible. | Add IP 16.192.29.174 to Cloudflare WAF Allow list under Security -> WAF -> Tools -> IP Access Rules -> Allow. | Critical |
+| BV-1 | **FULLY BLOCKED by Cloudflare** | Production server IP (16.192.29.174) returns 403 on all endpoints: homepage, API, wp-admin, Kivo Geo plugin, sitemap.xml. No automated or manual publishing possible. | Add IP 16.192.29.174 to Cloudflare WAF Allow list under Security -> WAF -> Tools -> IP Access Rules -> Allow. | Critical |
 | BV-2 | **Cannot verify site health** | Zero diagnostic data available. Unknown: WP version, PHP version, plugin status, active theme, security patches, DB health. | After IP whitelisting, run full site audit. | Critical |
 
 ### High
@@ -128,7 +128,7 @@ Brand differentiation from Boston Pharma is lacking -- same visual identity, sam
 |---|---|---|---|---|
 | BV-3 | **Likely $0 product pricing** | Built by same team as Boston Pharma on same WooCommerce setup. Boston Pharma has 76 products at $0 price. Same issue expected here. | Log into wp-admin -> WooCommerce -> Products -> check prices. Fix per Boston Pharma playbook. | High |
 | BV-4 | **No direct client contact** | No phone, email, or named contact for Boston Vet specifically. Site owner contact is unknown. | Check wp-admin -> Users for admin email. Check site footer/contact page. | High |
-| BV-5 | **TDS Geo plugin status unknown** | Plugin may not be installed, activated, or configured. No way to verify until Cloudflare is resolved. | After IP whitelisted, check Plugins -> TDS Geo is active. Re-install if needed. | High |
+| BV-5 | **Kivo Geo plugin status unknown** | Plugin may not be installed, activated, or configured. No way to verify until Cloudflare is resolved. | After IP whitelisted, check Plugins -> Kivo Geo is active. Re-install if needed. | High |
 | BV-6 | **No content published** | Zero published articles. Unlike Boston Pharma (20+ articles), Boston Vet has no content foundation. SEO is nonexistent. | Generate and publish 12-24 articles per month using the writer role and content guide. | High |
 
 ### Medium
@@ -154,7 +154,7 @@ Brand differentiation from Boston Pharma is lacking -- same visual identity, sam
 |---|---|---|---|
 | 1 | Get IP 16.192.29.174 whitelisted in Cloudflare WAF | TDS / Client | Client action on Cloudflare dashboard |
 | 2 | Run full site audit (Lighthouse, GTmetrix, SEO audit) | TDS | After #1 |
-| 3 | Check TDS Geo plugin status -- install/activate if missing | TDS | After #1 |
+| 3 | Check Kivo Geo plugin status -- install/activate if missing | TDS | After #1 |
 | 4 | Check product pricing in WooCommerce | TDS | After #1 |
 | 5 | Verify WP version, PHP version, active plugins | TDS | After #1 |
 | 6 | Review site for placeholder/lorem content | TDS | After #1 |
@@ -169,7 +169,7 @@ Brand differentiation from Boston Pharma is lacking -- same visual identity, sam
 
 - This client is fully blocked by Cloudflare WAF as of Jul 8, 2026. No progress can be made on content, SEO, or site maintenance until the production server IP is whitelisted.
 - Boston Vet is the veterinary/animal health arm of Boston Group, sharing infrastructure, team, and likely hosting with Boston Pharma.
-- The TDS Geo backend is fully configured for this client (client ID, API key, service area, brand voice) and ready to publish as soon as the plugin is verified and the firewall is resolved.
+- The Kivo Geo backend is fully configured for this client (client ID, API key, service area, brand voice) and ready to publish as soon as the plugin is verified and the firewall is resolved.
 - All existing documentation (brand profile, technical reference, SEO content guide, writer role, contacts) was created proactively in Jul 2026 and is ready for execution.
 - The site structure is assumed to mirror Boston Pharma based on shared parent company and same development team.
 - Update `doc/DASHBOARD.md` after each session with this client.

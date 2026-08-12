@@ -1,16 +1,16 @@
-# Shopify App Store Submission — TDS Geo
+# Shopify App Store Submission — Kivo Geo
 
 ## App Identity
 
 | Field | Value |
 |---|---|
-| **App name** | TDS Geo |
-| **App URL** | `https://traffic.16.192.29.174.nip.io` |
-| **Partner Dashboard** | https://partners.shopify.com (TDS Geo app) |
+| **App name** | Kivo Geo |
+| **App URL** | `https://ai.trafficdigitalsolutions.com` |
+| **Partner Dashboard** | https://partners.shopify.com (Kivo Geo app) |
 | **Client ID** | `a178c8740049e04eec663378b6e30ad8` |
-| **Client secret** | Verify in Partner Dashboard → Apps → TDS Geo → API credentials<br>Server `.env` has: `<REDACTED_APP_SECRET>`<br>**Confirm both match before submitting** |
-| **Application URL** | `https://traffic.16.192.29.174.nip.io` |
-| **Allowed redirection URL(s)** | `https://traffic.16.192.29.174.nip.io/api/shopify/callback` |
+| **Client secret** | Verify in Partner Dashboard → Apps → Kivo Geo → API credentials<br>Server `.env` has: `<REDACTED_APP_SECRET>`<br>**Confirm both match before submitting** |
+| **Application URL** | `https://ai.trafficdigitalsolutions.com` |
+| **Allowed redirection URL(s)** | `https://ai.trafficdigitalsolutions.com/api/shopify/callback` |
 
 ## OAuth Scopes (required)
 
@@ -47,7 +47,7 @@ App Bridge React v4 (`@shopify/app-bridge-react`) is integrated:
 - [ ] No promotions or inappropriate modal launches
 
 ### 3. Security
-- [x] TLS/SSL via Let's Encrypt (auto-renewal on `traffic.16.192.29.174.nip.io`)
+- [x] TLS/SSL via production domain (`ai.trafficdigitalsolutions.com`)
 - [x] HMAC verification on all incoming webhooks (timing-safe comparison)
 - [x] OAuth HMAC verification on callback
 - [x] State nonce with 10-minute expiry stored in DB
@@ -57,14 +57,14 @@ App Bridge React v4 (`@shopify/app-bridge-react`) is integrated:
 ### 4. App Store Listing
 
 #### App Name
-TDS Geo
+Kivo Geo
 
 #### App Icon
-The Swype logo (`frontend/public/assets/Black Swype.png`, `White Swype.png`)
-Upload the Black Swype PNG to the Partner Dashboard.
+The Kivo Mark logo (`frontend/public/assets/Black Kivo Mark.png`, `White Kivo Mark.png`)
+Upload the Black Kivo Mark PNG to the Partner Dashboard.
 
 #### Detailed Description (suggested)
-> TDS Geo is an AI-powered content engine for Shopify stores. Generate SEO-optimized articles, product descriptions, and blog posts that rank. Includes GEO (Generative Engine Optimization) analysis to make your content visible in AI-powered search results like ChatGPT, Perplexity, and Google AI Overviews.
+> Kivo Geo is an AI-powered content engine for Shopify stores. Generate SEO-optimized articles, product descriptions, and blog posts that rank. Includes GEO (Generative Engine Optimization) analysis to make your content visible in AI-powered search results like ChatGPT, Perplexity, and Google AI Overviews.
 >
 > **Features:**
 > - AI article generation with EEAT content framework
@@ -95,7 +95,7 @@ Sales channels / Content & blogging
 Verify in Partner Dashboard
 
 #### Privacy policy URL
-Required by Shopify. Host at: `https://traffic.16.192.29.174.nip.io/privacy`
+Required by Shopify. Host at: `https://ai.trafficdigitalsolutions.com/privacy`
 
 ### 5. Category-specific (Content & blogging)
 - [ ] No theme app extensions needed (app operates in Shopify admin only)
@@ -106,8 +106,8 @@ Required by Shopify. Host at: `https://traffic.16.192.29.174.nip.io/privacy`
 
 | Detail | Value |
 |---|---|
-| Host | EC2 (`16.192.29.174`) |
-| Domain | `traffic.16.192.29.174.nip.io` |
+| Host | Production Kivo host |
+| Domain | `ai.trafficdigitalsolutions.com` |
 | SSL | Let's Encrypt (auto-renewal) |
 | Process manager | PM2 |
 | Backend | Node.js/Express on port 3000 |
@@ -121,13 +121,13 @@ A ready-to-use submission folder is at `app-store-submission/`:
 |---|---|
 | `SUBMISSION_DATA.md` | All Partner Dashboard fields pre-filled — copy/paste directly |
 | `screenshots/capture.sh` | Auto-captures all screenshots (1600×900 desktop + 375×812 mobile) via Playwright |
-| `screenshots/app-icon.png` | Swype logo ready to upload as app icon |
+| `screenshots/app-icon.png` | Kivo Mark logo ready to upload as app icon |
 
 Run `bash app-store-submission/screenshots/capture.sh` to capture screenshots, then follow `SUBMISSION_DATA.md` to fill every field.
 
 ## Submission Steps
 
-1. Go to https://partners.shopify.com → Apps → TDS Geo
+1. Go to https://partners.shopify.com → Apps → Kivo Geo
 2. Fill in App Store listing fields from `app-store-submission/SUBMISSION_DATA.md` (name, description, icon, screenshots, category)
 3. Set pricing to "Paid" with the 3 tiers, or "Free" initially
 4. Upload Privacy policy URL

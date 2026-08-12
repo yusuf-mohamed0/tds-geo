@@ -2,7 +2,7 @@
 
 Last researched: 2026-08-05
 
-This file captures the operating knowledge for moving TDS Geo and related services from AWS to a TrueNAS-hosted local server.
+This file captures the operating knowledge for moving Kivo Geo and related services from AWS to a TrueNAS-hosted local server.
 
 ## Core Decision
 
@@ -11,9 +11,9 @@ For our workload, use **TrueNAS SCALE as the storage/virtualization host** and r
 Reasoning:
 
 - TrueNAS is best at ZFS storage, datasets, snapshots, and VM/app hosting.
-- TDS Geo needs a normal Linux deployment environment: Docker Compose, GitHub runner, SSH, PostgreSQL tooling, Cloudflare Tunnel, and predictable package management.
+- Kivo Geo needs a normal Linux deployment environment: Docker Compose, GitHub runner, SSH, PostgreSQL tooling, Cloudflare Tunnel, and predictable package management.
 - Installing Docker directly into the TrueNAS host is not the safest long-term path because host OS updates and TrueNAS app management can conflict with manually installed services.
-- TrueNAS Apps are useful for simpler apps, but TDS Geo is a multi-service production stack with custom CI/CD, DB migration, backups, workers, and sidecars.
+- TrueNAS Apps are useful for simpler apps, but Kivo Geo is a multi-service production stack with custom CI/CD, DB migration, backups, workers, and sidecars.
 
 ## TrueNAS SCALE Apps
 
@@ -31,7 +31,7 @@ Use TrueNAS Apps for:
 - Non-critical tools.
 - Services where the TrueNAS UI lifecycle is enough.
 
-Avoid TrueNAS Apps for TDS Geo production because:
+Avoid TrueNAS Apps for Kivo Geo production because:
 
 - GitHub self-hosted runner driven deployments are easier in a normal VM.
 - We need repository-controlled Compose and scripts.
@@ -65,11 +65,11 @@ Create separate datasets for separate lifecycle and snapshot policy:
 
 | Dataset | Purpose |
 |---|---|
-| `apps/tds-geo/postgres` | PostgreSQL data. |
-| `apps/tds-geo/redis` | Redis append-only data. |
-| `apps/tds-geo/backups` | DB dumps and migration dumps. |
-| `apps/tds-geo/logs` | App logs. |
-| `apps/tds-geo/cloudflared` | Tunnel state/config if using config-file mode. |
+| `apps/kivo/postgres` | PostgreSQL data. |
+| `apps/kivo/redis` | Redis append-only data. |
+| `apps/kivo/backups` | DB dumps and migration dumps. |
+| `apps/kivo/logs` | App logs. |
+| `apps/kivo/cloudflared` | Tunnel state/config if using config-file mode. |
 
 Why separate datasets:
 
@@ -143,14 +143,14 @@ Advantages:
 Required GitHub runner labels:
 
 ```text
-self-hosted,truenas,tds-geo
+self-hosted,truenas,kivo
 ```
 
 Runner rules:
 
 - Runner user can run Docker.
 - Runner work directory is not public.
-- Secrets live in `/opt/tds-geo/deploy/truenas/.env` on the VM.
+- Secrets live in `/opt/kivo/deploy/truenas/.env` on the VM.
 - GitHub builds/pushes images; VM pulls and runs them.
 
 ## Security Rules
@@ -179,7 +179,7 @@ Use:
 
 Minimum backup policy:
 
-- Daily `pg_dump -Fc` to `/mnt/tds-geo/backups`.
+- Daily `pg_dump -Fc` to `/mnt/kivo/backups`.
 - Keep at least 14-20 recent dumps locally.
 - TrueNAS snapshots of app datasets.
 - Offsite backup to another location, cloud bucket, or external disk.
@@ -193,9 +193,9 @@ Cutover backup policy:
 - Verify health and client audit.
 - Keep AWS online for rollback.
 
-## TDS Geo Specific Notes
+## Kivo Geo Specific Notes
 
-TDS Geo needs these runtime pieces:
+Kivo Geo needs these runtime pieces:
 
 - API service.
 - Worker service.
@@ -218,7 +218,7 @@ Knowledge sources used:
 - TrueNAS official docs: creating and managing VMs.
 - TrueNAS Apps Market docs: app pool, Docker/Compose-backed apps in newer SCALE.
 - Cloudflare official docs: Tunnel architecture, outbound-only model, config-file ingress rules.
-- Current TDS Geo repo files: `docker-compose.yml`, `docker-compose.sidecars.yml`, `Dockerfile`, deployment scripts, backup scripts, production docs.
+- Current Kivo Geo repo files: `docker-compose.yml`, `docker-compose.sidecars.yml`, `Dockerfile`, deployment scripts, backup scripts, production docs.
 - Current AWS inspection: PM2 process, Docker sidecars, Nginx routes, backup cron, monthly ops cron.
 
 When exact TrueNAS behavior depends on installed SCALE version, verify against that version before applying changes.

@@ -531,7 +531,7 @@ export class ChatEngine {
     }
 
     try {
-      const systemPrompt = `You are an intent classifier for an AI SEO automation platform. Given a user message, classify it into ONE of the following actions and extract parameters.
+      const systemPrompt = `You are an intent classifier for the Kivo OS intelligence platform. Given a user message, classify it into ONE of the following actions and extract parameters.
 
 Available actions with their expected params:
 - generate_article: { keyword: string, count?: number, clientId?: string } — "generate 3 articles about plumbing"
@@ -822,7 +822,7 @@ Respond with JSON ONLY:
     dbContext: string = ''
   ): Promise<CommandResult | null> {
     const providerName = 'OpenAI';
-    const systemPrompt = `You are Buffy, a strategic full-stack AI assistant powered by ${providerName} Intelligence. You manage an entire AI SEO Automation SaaS platform. You are professional, direct, concise, and proactive.
+    const systemPrompt = `You are Buffy, a strategic full-stack AI assistant powered by ${providerName} Intelligence. You manage Kivo OS, an intelligence infrastructure platform for GEO, content, commerce, reports, automations, and client operations. You are professional, direct, concise, and proactive.
 
 ## YOUR CAPABILITIES
 

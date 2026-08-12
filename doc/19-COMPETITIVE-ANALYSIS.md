@@ -1,4 +1,4 @@
-# Competitive Analysis — AI SEO Automation (2026)
+# Competitive Analysis — Kivo OS (2026)
 
 Researched: July 2026 (Updated: July 6, 2026)
 Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing segment in martech. The field has fragmented into content generation platforms adding AI visibility features, and monitoring tools adding content generation.
@@ -48,7 +48,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 
 ## Feature Comparison Matrix
 
-| Feature | TDS Geo | Sight AI | Writesonic | BlogSEO | Profound | StoreRank |
+| Feature | Kivo Geo | Sight AI | Writesonic | BlogSEO | Profound | StoreRank |
 |---------|---------|----------|------------|---------|----------|-----------|
 | **AI Content Generation** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
 | **Auto-Publishing** | ✅ (Shopify, Woo) | ✅ (WP, Webflow, Framer, Shopify) | ✅ (WP) | ✅ (22 CMS) | ❌ | ✅ (Shopify) |
@@ -68,7 +68,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 | **Monthly Ops Pipeline** | ✅ Freshness + entity + citations | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Prompt Management** | ✅ Versioned + self-improvement | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Plugin System** | ✅ Hook-based | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **WooCommerce Support** | ✅ (TDS Geo plugin) | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **WooCommerce Support** | ✅ (Kivo Geo plugin) | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Backlink Automation** | ✅ Prospect discovery + AI outreach + guest post gen + tracking + verification | ❌ | ❌ | ✅ ABC network | ❌ | ❌ |
 | **Keyword Research** | ✅ AI clustering + intent + SERP features + opportunity scoring | ✅ Built-in | ✅ Built-in | ✅ Built-in | ❌ | ❌ |
 | **GSC/GA4 Integration** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ |
@@ -149,7 +149,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 
 ### Priority 3 — Defend (Reinforce Existing Moats)
 - **[P1] Backlink Automation** — ✅ **RESOLVED.** Competitor backlink discovery via DataForSEO + AI prospect enrichment + AI outreach email + AI guest post generation + link tracking + periodic verification. 4-tab frontend UI.
-- **[P1] WooCommerce depth** — Double down on TDS Geo plugin. No competitor does WooCommerce well.
+- **[P1] WooCommerce depth** — Double down on Kivo Geo plugin. No competitor does WooCommerce well.
 - **[P1] Open-source community** — Promote the ISC license. Add CONTRIBUTING.md, issue templates, discussion forum.
 - **[P2] Offline/Ollama mode** — Make truly offline operation seamless. Unique selling point.
 - **[P2] Multi-language prompts** — Extend writing prompts to support 10+ languages.
@@ -160,7 +160,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 
 | Platform | Entry Price | Realistic Multi-Engine GEO | Notes |
 |----------|-------------|---------------------------|-------|
-| **TDS Geo** | $0 (self-hosted) | $0 (your own API keys) | Open source, no platform fees |
+| **Kivo Geo** | $0 (self-hosted) | $0 (your own API keys) | Open source, no platform fees |
 | **Sight AI** | $99/mo | $249/mo (Pro, 6 engines) | $79/mo annual |
 | **Writesonic** | $199/mo | $199/mo (Basic GEO, 3 engines) | GEO starts at Basic tier |
 | **BlogSEO** | $97/mo | $97/mo (no GEO tracking) | GEO is basic, no multi-engine |
@@ -169,7 +169,7 @@ Market context: AI search optimization (AEO/GEO/LLMO) is the fastest-growing seg
 | **Jasper** | $59/mo | N/A (no GEO) | Content only |
 | **AEO Engine** | $1,597/mo | $1,597/mo (managed service) | Human-managed program |
 
-TDS Geo's pricing advantage is massive: $0 platform cost vs $97–$1,597/mo for comparable feature sets. The trade-off is managed infrastructure (self-hosted) vs SaaS convenience.
+Kivo Geo's pricing advantage is massive: $0 platform cost vs $97–$1,597/mo for comparable feature sets. The trade-off is managed infrastructure (self-hosted) vs SaaS convenience.
 
 ---
 

@@ -1,6 +1,6 @@
 # TrueNAS Production Requirements
 
-This file lists what must exist before TDS Geo can move from AWS to the TrueNAS/local-server environment.
+This file lists what must exist before Kivo Geo can move from AWS to the TrueNAS/local-server environment.
 
 ## Hardware Requirements
 
@@ -19,7 +19,7 @@ RAM planning:
 
 - Leave memory for TrueNAS and ZFS ARC.
 - Allocate the Ubuntu VM enough RAM for API, worker, PostgreSQL, Redis, sidecars, and backups.
-- Start with 8-16 GB VM RAM for TDS Geo, then adjust after observing real load.
+- Start with 8-16 GB VM RAM for Kivo Geo, then adjust after observing real load.
 
 ## TrueNAS Requirements
 
@@ -31,7 +31,7 @@ RAM planning:
 - TrueNAS datasets or VM disks prepared for persistent data.
 - Snapshots configured for application datasets.
 - Offsite backup destination identified.
-- Nextcloud app planned only as a collaboration workspace, not as the TDS Geo production runtime.
+- Nextcloud app planned only as a collaboration workspace, not as the Kivo Geo production runtime.
 
 ## Ubuntu VM Requirements
 
@@ -67,12 +67,12 @@ Create or mount persistent directories before production cutover.
 
 | Path | Required | Purpose |
 |---|---|---|
-| `/opt/tds-geo` | Yes | Git checkout and deployment kit |
-| `/mnt/tds-geo/postgres` | Yes | PostgreSQL data |
-| `/mnt/tds-geo/redis` | Yes | Redis data |
-| `/mnt/tds-geo/backups` | Yes | DB dumps and migration dumps |
-| `/mnt/tds-geo/logs` | Yes | Application logs |
-| `/mnt/tds-geo/cloudflared` | If tunnel config-file mode is used | Tunnel config/state |
+| `/opt/kivo` | Yes | Git checkout and deployment kit |
+| `/mnt/kivo/postgres` | Yes | PostgreSQL data |
+| `/mnt/kivo/redis` | Yes | Redis data |
+| `/mnt/kivo/backups` | Yes | DB dumps and migration dumps |
+| `/mnt/kivo/logs` | Yes | Application logs |
+| `/mnt/kivo/cloudflared` | If tunnel config-file mode is used | Tunnel config/state |
 
 ## Repository Requirements
 
@@ -96,7 +96,7 @@ Required files:
 - GitHub Actions enabled.
 - GHCR package permissions available.
 - Self-hosted runner installed in the Ubuntu VM.
-- Runner labels include `self-hosted`, `truenas`, and `tds-geo`.
+- Runner labels include `self-hosted`, `truenas`, and `kivo`.
 - Production runner must not execute untrusted public pull-request workflows.
 
 Required GitHub permissions for the workflow:
@@ -106,7 +106,7 @@ Required GitHub permissions for the workflow:
 
 ## Runtime Environment Requirements
 
-Create `/opt/tds-geo/deploy/truenas/.env` from `.env.example` on the VM only.
+Create `/opt/kivo/deploy/truenas/.env` from `.env.example` on the VM only.
 
 Required values:
 
@@ -150,7 +150,7 @@ Cloudflare Tunnel mode:
 - Domain controlled in Cloudflare.
 - Tunnel created.
 - Tunnel token available only on VM.
-- Public hostname routes to the TDS Geo API service.
+- Public hostname routes to the Kivo Geo API service.
 - Admin-only hostnames protected with Cloudflare Access.
 
 Direct HTTPS mode:

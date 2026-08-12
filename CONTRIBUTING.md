@@ -1,12 +1,12 @@
-# Contributing to TDS Geo
+# Contributing to Kivo Geo
 
 Thank you for considering contributing! Here's how to get started.
 
 ## Development Setup
 
 ```bash
-git clone https://github.com/yusuf-mohamed0/tds-geo.git
-cd TDS Geo
+git clone https://github.com/yusuf-mohamed0/kivo.git
+cd Kivo Geo
 npm install
 cd frontend && npm install && cd ..
 cp .env.example .env

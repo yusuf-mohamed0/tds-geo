@@ -8,7 +8,7 @@ Owns the target architecture.
 
 Rules:
 
-- Prefer Ubuntu VM + Docker Compose for TDS Geo production.
+- Prefer Ubuntu VM + Docker Compose for Kivo Geo production.
 - Keep TrueNAS focused on storage, datasets, snapshots, and VM hosting.
 - Do not install unmanaged Docker directly on the TrueNAS host.
 - Keep AWS available as rollback until TrueNAS is stable.

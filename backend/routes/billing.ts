@@ -82,7 +82,7 @@ export function createBillingRoutes(pool: Pool): Router {
 
       const isDevStore = shop.includes('development') || shop.includes('test');
       const result = await shopifyGraphQL(shop, accessToken, mutation, {
-        name: `TDS Geo - ${plan.name}`,
+        name: `Kivo Geo - ${plan.name}`,
         returnUrl: returnUrl || `${SHOPIFY_APP_URL}/api/billing/callback?shop=${encodeURIComponent(shop)}&plan=${planId}`,
         lineItems: [{
           plan: { appRecurringPricingDetails: { interval: plan.interval, price: { amount: plan.amount / 100, currencyCode: 'USD' } } },

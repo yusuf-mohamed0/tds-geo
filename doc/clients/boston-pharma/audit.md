@@ -1,4 +1,4 @@
-> Dashboard: [TDS Geo Dashboard](../../DASHBOARD.md)
+> Dashboard: [Kivo Geo Dashboard](../../DASHBOARD.md)
 >
 # Boston Pharmaceutical Industries — Site Audit
 
@@ -96,7 +96,7 @@
 |-------|--------|---------|
 | HTTPS | ✅ | Valid certificate, HSTS enabled (max-age=300) |
 | Platform | ✅ | WordPress 7.0, PHP 8.3.31, WooCommerce 10.9.3 |
-| REST API | ⚠️ | TDS Geo API works; WooCommerce/WP REST locked down |
+| REST API | ⚠️ | Kivo Geo API works; WooCommerce/WP REST locked down |
 | Mobile responsive | ⚠️ | Works but `user-scalable=0` prevents pinch-zoom |
 | Broken links (internal) | ⚠️ | `/contact-us`, `/news`, `/products` 404; "Offers" nav unchecked |
 | CDN | ❌ | No CDN evident — all assets served from origin |

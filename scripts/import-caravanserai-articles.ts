@@ -35,7 +35,7 @@ async function main() {
   }
   const clientId = clientResult.rows[0].id;
 
-  const articlesDir = '/home/ubuntu/tds-geo/doc/clients/caravanserai/articles';
+  const articlesDir = '/home/ubuntu/kivo/doc/clients/caravanserai/articles';
   const files = readdirSync(articlesDir).filter(f => f.endsWith('.md'));
 
   let imported = 0;

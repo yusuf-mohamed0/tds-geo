@@ -75,7 +75,7 @@ export default function ShopifyEmbeddedPage() {
 
   if (loading) {
     return (
-      <SkeletonPage title="TDS Geo">
+      <SkeletonPage title="Kivo Geo">
         <SkeletonBodyText lines={4} />
         <div style={{ paddingTop: 'var(--p-space-400)' }} />
         <SkeletonBodyText lines={6} />
@@ -85,7 +85,7 @@ export default function ShopifyEmbeddedPage() {
 
   if (error) {
     return (
-      <Page title="TDS Geo" subtitle="AI Content Engine">
+      <Page title="Kivo Geo" subtitle="AI Content Engine">
         <Banner tone="critical" title="Could not load your dashboard">
           <p>{error}</p>
         </Banner>
@@ -96,7 +96,7 @@ export default function ShopifyEmbeddedPage() {
   const pending = stats ? stats.total - stats.published : 0;
 
   return (
-    <Page title="TDS Geo" subtitle="AI Content Engine">
+    <Page title="Kivo Geo" subtitle="AI Content Engine">
       <BlockStack gap="400">
         <Card>
           <BlockStack gap="200" inlineAlign="center">
@@ -106,7 +106,7 @@ export default function ShopifyEmbeddedPage() {
             </InlineStack>
             <div style={{ textAlign: 'center' }}>
               <Text as="p" variant="bodyMd" tone="subdued">
-                TDS Geo is active on your store. AI-powered content generation, SEO optimization, and GEO analysis are running.
+                Kivo Geo is active on your store. AI-powered content generation, SEO optimization, and GEO analysis are running.
               </Text>
             </div>
           </BlockStack>
@@ -140,7 +140,7 @@ export default function ShopifyEmbeddedPage() {
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <Text as="p" variant="bodyXs" tone="subdued">TDS Geo v2.0.1</Text>
+          <Text as="p" variant="bodyXs" tone="subdued">Kivo Geo v2.0.1</Text>
         </div>
       </BlockStack>
     </Page>

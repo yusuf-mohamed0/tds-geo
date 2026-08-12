@@ -9,10 +9,10 @@ export function createWordPressClient(baseUrl: string, apiKey: string): AxiosIns
   const normalizedUrl = baseUrl.replace(/\/+$/, '');
 
   const client = axios.create({
-    baseURL: `${normalizedUrl}/wp-json/tds-geo/v1`,
+    baseURL: `${normalizedUrl}/wp-json/kivo/v1`,
     headers: {
       'Content-Type': 'application/json',
-      'X-TDS-GEO-Key': apiKey,
+      'X-Kivo-Key': apiKey,
     },
     timeout: 30000,
   });

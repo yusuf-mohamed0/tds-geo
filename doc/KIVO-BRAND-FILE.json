@@ -1,0 +1,63 @@
+{
+  "brand": {
+    "name": "Kivo",
+    "pronunciation": "KEE-vo",
+    "category": "Technical visibility infrastructure",
+    "tagline": "Make search systems see you.",
+    "positioning": "Technical visibility infrastructure for AI search, commerce content, telemetry, and automated recovery.",
+    "personality": ["technical", "calm", "operator-first", "search-native", "evidence-led"]
+  },
+  "products": {
+    "os": "Kivo OS",
+    "geo": "Kivo Geo",
+    "pulse": "Kivo Pulse",
+    "sentinel": "Kivo Sentinel",
+    "connect": "Kivo Connect",
+    "vault": "Kivo Vault",
+    "publish": "Kivo Publish"
+  },
+  "colors": {
+    "obsidian": "#071013",
+    "signal": "#22E6A8",
+    "query": "#3BB5FF",
+    "recover": "#B7FF4A",
+    "vector": "#C7B8FF",
+    "mist": "#F4FBF8",
+    "border": "#D9E8E2",
+    "graphite": "#25343A",
+    "muted": "#6D7E86",
+    "white": "#FFFFFF",
+    "danger": "#EF4444"
+  },
+  "typography": {
+    "display": "Space Grotesk",
+    "interface": "Inter",
+    "fallback": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif"
+  },
+  "assets": {
+    "markSvg": "/assets/kivo-mark.svg",
+    "manifest": "/site.webmanifest"
+  },
+  "iconSystem": {
+    "family": "Lucide React",
+    "style": "line icons, minimal color, engineering metaphors",
+    "core": {
+      "system": "Layers3",
+      "geo": "Search",
+      "pulse": "HeartPulse",
+      "sentinel": "Bot",
+      "commerce": "Store",
+      "vault": "Archive",
+      "infrastructure": "Server",
+      "activity": "Activity"
+    }
+  },
+  "messaging": {
+    "preferred": [
+      "Every signal, visible.",
+      "Track the action. Detect the fault. Recover safely.",
+      "Safe fixes run automatically. Risky fixes require approval."
+    ],
+    "avoid": ["AI hype", "magic metaphors", "unverified autonomy claims", "generic growth language"]
+  }
+}

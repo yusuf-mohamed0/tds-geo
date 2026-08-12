@@ -1,0 +1,21 @@
+{
+    "name": "kivo/wp-agent",
+    "description": "Kivo Geo WordPress connector for AI-powered GEO content operations",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Kivo",
+            "homepage": "https://trafficdigitalsolutions.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "classmap": ["includes/"]
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

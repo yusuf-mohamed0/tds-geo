@@ -36,6 +36,12 @@ function validateCsrfToken(sessionId: string, token: string): boolean {
   return true;
 }
 
+function getCsrfSessionId(req: Request): string {
+  // csrfProtection runs before route-level authentication, so use the same
+  // request-scoped key when issuing and validating browser CSRF tokens.
+  return req.ip || 'unknown';
+}
+
 export function csrfProtection(req: Request, res: Response, next: NextFunction): void {
   // Skip for safe methods
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
@@ -55,8 +61,14 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     return;
   }
 
-  const user = (req as any).user;
-  const sessionId = user?.jti || user?.id || req.ip || 'unknown';
+  // Low-risk browser beacon endpoint. Payload is strictly validated by the
+  // activity route and only appends telemetry rows.
+  if (req.originalUrl.startsWith('/api/telemetry')) {
+    next();
+    return;
+  }
+
+  const sessionId = getCsrfSessionId(req);
   const token = req.headers['x-csrf-token'] as string;
 
   if (!token) {
@@ -82,8 +94,7 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
 }
 
 export function csrfTokenHandler(req: Request, res: Response): void {
-  const user = (req as any).user;
-  const sessionId = user?.jti || user?.id || req.ip || 'unknown';
+  const sessionId = getCsrfSessionId(req);
   const token = generateCsrfToken(String(sessionId));
   res.json({ csrfToken: token, expiresIn: TOKEN_TTL / 1000 });
 }

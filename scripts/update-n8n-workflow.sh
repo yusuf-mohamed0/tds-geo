@@ -44,7 +44,7 @@ curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6
     },
     {
       "id": "login",
-      "name": "Login to Vireon",
+      "name": "Login to SNEFERU OS",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [416, 32],
@@ -79,7 +79,7 @@ curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6
         },
         "options": {
           "timeout": 30000,
-          "headerParameters": {"parameters": [{"name": "Authorization", "value": "Bearer {{ \$('Login to Vireon').item.json.token }}"}]}
+          "headerParameters": {"parameters": [{"name": "Authorization", "value": "Bearer {{ \$('Login to SNEFERU OS').item.json.token }}"}]}
         }
       }
     },
@@ -121,7 +121,7 @@ curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6
         },
         "options": {
           "timeout": 120000,
-          "headerParameters": {"parameters": [{"name": "Authorization", "value": "Bearer {{ \$('Login to Vireon').item.json.token }}"}]}
+          "headerParameters": {"parameters": [{"name": "Authorization", "value": "Bearer {{ \$('Login to SNEFERU OS').item.json.token }}"}]}
         }
       }
     },
@@ -137,15 +137,15 @@ curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6
         "authentication": "none",
         "options": {
           "timeout": 15000,
-          "headerParameters": {"parameters": [{"name": "Authorization", "value": "Bearer {{ \$('Login to Vireon').item.json.token }}"}]}
+          "headerParameters": {"parameters": [{"name": "Authorization", "value": "Bearer {{ \$('Login to SNEFERU OS').item.json.token }}"}]}
         }
       }
     }
   ],
   "connections": {
     "Schedule Trigger": {"main": [[{"node": "Set Client ID", "type": "main", "index": 0}]]},
-    "Set Client ID": {"main": [[{"node": "Login to Vireon", "type": "main", "index": 0}]]},
-    "Login to Vireon": {"main": [[{"node": "Discover Keywords", "type": "main", "index": 0}]]},
+    "Set Client ID": {"main": [[{"node": "Login to SNEFERU OS", "type": "main", "index": 0}]]},
+    "Login to SNEFERU OS": {"main": [[{"node": "Discover Keywords", "type": "main", "index": 0}]]},
     "Discover Keywords": {"main": [[{"node": "Message a model", "type": "main", "index": 0}]]},
     "Message a model": {"main": [[{"node": "Wait 30s", "type": "main", "index": 0}]]},
     "Wait 30s": {"main": [[{"node": "Generate Article", "type": "main", "index": 0}]]},

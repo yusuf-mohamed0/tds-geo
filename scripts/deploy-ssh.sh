@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────
-# TDS Geo — SSH Deploy Helper
+# SNEFERU Geo — SSH Deploy Helper
 # Usage: ./scripts/deploy-ssh.sh <staging|production> <command>
 #
 # Executes a command on the remote server via SSH.

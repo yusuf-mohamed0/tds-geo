@@ -2,7 +2,7 @@
 
 ---
 
-> **⚠️ Historical Note:** This slug was previously used for a test store (`traffic-test.myshopify.com`) under the name "Acme Maintenance Co." That test client was used for TDS Geo pipeline validation. The profile below now represents the **real, production business** — ACME Facility Maintenance, an industrial supplies distributor based in Houston, TX. The test store entry can be found in section 7 (Historical).
+> **⚠️ Historical Note:** This slug was previously used for a test store (`traffic-test.myshopify.com`) under the name "Acme Maintenance Co." That test client was used for Kivo Geo pipeline validation. The profile below now represents the **real, production business** — ACME Facility Maintenance, an industrial supplies distributor based in Houston, TX. The test store entry can be found in section 7 (Historical).
 
 ---
 
@@ -63,7 +63,7 @@
   - GoDaddy Launch
 - **Analytics:** Not configured
 - **Search Console:** Not configured
-- **TDS Geo API Key:** Not yet created
+- **Kivo Geo API Key:** Not yet created
 - **Content Pipeline:** Not yet connected
 
 **Full technical reference:** See `technical-reference.md`
@@ -132,7 +132,7 @@
 - [ ] Create blog category structure (4 pillars)
 - [ ] Establish weekly publishing cadence (Thursday, 1 PM Cairo)
 - [ ] Create first 4-8 blog articles (2 per pillar)
-- [ ] Set up TDS Geo content pipeline with API key
+- [ ] Set up Kivo Geo content pipeline with API key
 
 ### Milestone 3: Schema & Structured Data (Months 2-3)
 - [ ] Add LocalBusiness schema with address, phone, certifications
@@ -158,7 +158,7 @@
 
 ## 7. Historical: Test Store (Acme Maintenance Co.)
 
-> **Note:** The `acme-maintenance` slug in TDS Geo was originally used for a **test/development Shopify store** (`traffic-test.myshopify.com`) under the name "Acme Maintenance Co." This was a seed data client created for pipeline validation. It is now superseded by the real ACME Facility Maintenance business.
+> **Note:** The `acme-maintenance` slug in Kivo Geo was originally used for a **test/development Shopify store** (`traffic-test.myshopify.com`) under the name "Acme Maintenance Co." This was a seed data client created for pipeline validation. It is now superseded by the real ACME Facility Maintenance business.
 
 ### Test Store Details (Historical Only)
 | Field | Original Value |

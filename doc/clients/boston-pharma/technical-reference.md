@@ -1,6 +1,6 @@
 # Boston Pharma — Technical Reference
 
-## TDS Geo Integration
+## Kivo Geo Integration
 
 | Parameter | Value |
 |---|---|
@@ -23,9 +23,9 @@
 | **PHP Version** | 8.3.31 |
 | **DB Prefix** | `wp_8n1vqj9f85_` |
 | **DB Host** | `bostongr_WPKMQ` |
-| **REST Namespace** | `tds-geo/v1` |
-| **REST Base URL** | `https://boston-pharma.com/wp-json/tds-geo/v1` |
-| **Webhook URL** | `https://boston-pharma.com/wp-json/tds-geo/v1/webhook` |
+| **REST Namespace** | `kivo/v1` |
+| **REST Base URL** | `https://boston-pharma.com/wp-json/kivo/v1` |
+| **Webhook URL** | `https://boston-pharma.com/wp-json/kivo/v1/webhook` |
 | **Admin Email** | `t.murad@bostongroup-eg.com` |
 | **Connector Version** | 3.1.3 |
 | **Connector DB Version** | 2 |
@@ -58,8 +58,8 @@
 - Cart: https://boston-pharma.com/my-cart/
 - Products: https://boston-pharma.com/product-category/all/
 - Offers: https://boston-pharma.com/product-category/offers/
-- REST API: https://boston-pharma.com/wp-json/tds-geo/v1/
-- Webhook: https://boston-pharma.com/wp-json/tds-geo/v1/webhook
+- REST API: https://boston-pharma.com/wp-json/kivo/v1/
+- Webhook: https://boston-pharma.com/wp-json/kivo/v1/webhook
 - Arabic site: https://boston-pharma.com/ar/
 
 ## Active Must-Use Plugins

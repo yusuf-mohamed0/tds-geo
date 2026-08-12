@@ -1,4 +1,4 @@
-# Graph Report - tds-geo  (2026-07-13)
+# Graph Report - kivo  (2026-07-13)
 
 ## Corpus Check
 - 804 files · ~5,529,811 words
@@ -1073,7 +1073,7 @@ Nodes (16): compilerOptions, declaration, declarationMap, esModuleInterop, force
 
 ### Community 139 - "Community 139"
 Cohesion: 0.07
-Nodes (26): active, connections, Discover Keywords, Generate Article, Login to TDS Geo, Login to Vireon, Schedule Trigger, Set Client ID (+18 more)
+Nodes (26): active, connections, Discover Keywords, Generate Article, Login to Kivo Geo, Login to Vireon, Schedule Trigger, Set Client ID (+18 more)
 
 ### Community 140 - "Community 140"
 Cohesion: 0.15
@@ -1089,7 +1089,7 @@ Nodes (15): main, connections, Check if Published, Discover Keywords, Fetch Late
 
 ### Community 143 - "Community 143"
 Cohesion: 0.11
-Nodes (6): Logger, self, mb_substr(), str_contains(), tds_geo_wp_random_bytes(), wp_json_encode()
+Nodes (6): Logger, self, mb_substr(), str_contains(), kivo_wp_random_bytes(), wp_json_encode()
 
 ### Community 144 - "Community 144"
 Cohesion: 0.14
@@ -1213,7 +1213,7 @@ Nodes (6): CodeViewer(), CodeViewerProps, fallbackLanguage(), formatBytes(), Sou
 
 ### Community 177 - "Community 177"
 Cohesion: 0.39
-Nodes (8): Code Style, Contributing to TDS Geo, Contributing to Vireon, Development Setup, Project Structure, Pull Request Process, Questions?, Testing
+Nodes (8): Code Style, Contributing to Kivo Geo, Contributing to Vireon, Development Setup, Project Structure, Pull Request Process, Questions?, Testing
 
 ### Community 178 - "Community 178"
 Cohesion: 0.04
@@ -1313,7 +1313,7 @@ Nodes (6): Common Frameworks, Example Language Notes, File Patterns, Import Patt
 
 ### Community 202 - "Community 202"
 Cohesion: 0.08
-Nodes (24): 1. Set your API key, 2. Create API route files, 3. Build your blog pages, Advanced Usage, API Reference, Architecture, Debug logging, `DELETE /api/tds-geo/posts/[id]` (+16 more)
+Nodes (24): 1. Set your API key, 2. Create API route files, 3. Build your blog pages, Advanced Usage, API Reference, Architecture, Debug logging, `DELETE /api/kivo/posts/[id]` (+16 more)
 
 ### Community 203 - "Community 203"
 Cohesion: 0.29
@@ -1657,7 +1657,7 @@ Nodes (17): Acme Maintenance `acme-maintenance`, Alamein Outdoor Furniture `alam
 
 ### Community 317 - "Community 317"
 Cohesion: 0.15
-Nodes (12): Algorithm Context (2026), Body, Closing line, Content Architecture, Ending, Formats That Work, Hook (first 200 characters — 3 lines max before "see more"), LinkedIn Content System — TDS Geo / YKS Brand (+4 more)
+Nodes (12): Algorithm Context (2026), Body, Closing line, Content Architecture, Ending, Formats That Work, Hook (first 200 characters — 3 lines max before "see more"), LinkedIn Content System — Kivo Geo / YKS Brand (+4 more)
 
 ### Community 318 - "Community 318"
 Cohesion: 0.15
@@ -1853,7 +1853,7 @@ Nodes (8): Brand Voice Guidelines, Caravanserai — SEO & Content Guide, Competi
 
 ### Community 369 - "Community 369"
 Cohesion: 0.22
-Nodes (8): API Setup, Caravanserai — Technical Reference, DNS & Verification, Production Branches & Locations, Schema & Structured Data, Shopify Store Details, TDS Geo Integration, Third-Party Services
+Nodes (8): API Setup, Caravanserai — Technical Reference, DNS & Verification, Production Branches & Locations, Schema & Structured Data, Shopify Store Details, Kivo Geo Integration, Third-Party Services
 
 ### Community 370 - "Community 370"
 Cohesion: 0.22
@@ -1905,7 +1905,7 @@ Nodes (16): bre(), GA(), Hb, nl(), qa(), Ro(), th(), Ui() (+8 more)
 
 ### Community 382 - "Community 382"
 Cohesion: 0.25
-Nodes (7): 1. Fill the form, 2. Capture screenshots, 3. Upload to Partner Dashboard, 4. Verify credentials, Steps, TDS Geo — Shopify App Store Submission Kit, What's here
+Nodes (7): 1. Fill the form, 2. Capture screenshots, 3. Upload to Partner Dashboard, 4. Verify credentials, Steps, Kivo Geo — Shopify App Store Submission Kit, What's here
 
 ### Community 383 - "Community 383"
 Cohesion: 0.25
@@ -1917,7 +1917,7 @@ Nodes (7): Boston Pharmaceutical Industries — July 2026 Audit, Changes Made, I
 
 ### Community 385 - "Community 385"
 Cohesion: 0.25
-Nodes (7): Boston Vet — Technical Reference, Content Already Published, Notes, Site Structure, TDS Geo Integration, WordPress Admin Access, WordPress Site Details
+Nodes (7): Boston Vet — Technical Reference, Content Already Published, Notes, Site Structure, Kivo Geo Integration, WordPress Admin Access, WordPress Site Details
 
 ### Community 386 - "Community 386"
 Cohesion: 0.25
@@ -1957,7 +1957,7 @@ Nodes (3): ErrorBoundary, Props, State
 
 ### Community 396 - "Community 396"
 Cohesion: 0.29
-Nodes (6): Directory Structure, How Components Connect, Key Principles, System Components, TDS Geo — Architecture Overview, What TDS Geo Is
+Nodes (6): Directory Structure, How Components Connect, Key Principles, System Components, Kivo Geo — Architecture Overview, What Kivo Geo Is
 
 ### Community 397 - "Community 397"
 Cohesion: 0.29
@@ -2157,7 +2157,7 @@ Nodes (5): Definition, Part 4: LLMO — Large Language Model Optimization, Scope
 
 ### Community 448 - "Community 448"
 Cohesion: 0.40
-Nodes (4): How to Keep This Updated, Index, Quick Links, TDS Geo — Documentation
+Nodes (4): How to Keep This Updated, Index, Quick Links, Kivo Geo — Documentation
 
 ### Community 450 - "Community 450"
 Cohesion: 0.40
@@ -2233,7 +2233,7 @@ Nodes (4): dependencies, dotenv, express, pg
 
 ### Community 469 - "Community 469"
 Cohesion: 0.33
-Nodes (5): Client Profiles — Context, Current Clients, Current Clients (6), Onboarding Process, TDS Geo — Client Profiles
+Nodes (5): Client Profiles — Context, Current Clients, Current Clients (6), Onboarding Process, Kivo Geo — Client Profiles
 
 ### Community 472 - "Community 472"
 Cohesion: 0.50
@@ -2321,11 +2321,11 @@ Nodes (3): GenerateResponse, LocalLLMClient, LocalLLMHealth
 
 ### Community 528 - "Community 528"
 Cohesion: 0.29
-Nodes (6): Alamein Outdoor Furniture — Technical Reference, CMS Connection, Environment (Production), Process Manager, Shopify Integration, TDS Geo Configuration
+Nodes (6): Alamein Outdoor Furniture — Technical Reference, CMS Connection, Environment (Production), Process Manager, Shopify Integration, Kivo Geo Configuration
 
 ### Community 529 - "Community 529"
 Cohesion: 0.33
-Nodes (5): Alamein Outdoor Furniture — Contacts, Company, Shopify Store, TDS Geo, Third-Party Services
+Nodes (5): Alamein Outdoor Furniture — Contacts, Company, Shopify Store, Kivo Geo, Third-Party Services
 
 ### Community 530 - "Community 530"
 Cohesion: 0.36

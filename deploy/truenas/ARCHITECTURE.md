@@ -1,12 +1,12 @@
 # TrueNAS Production Architecture
 
-This is the target architecture for running TDS Geo on a local TrueNAS-hosted server while keeping GitHub as the source of truth.
+This is the target architecture for running Kivo Geo on a local TrueNAS-hosted server while keeping GitHub as the source of truth.
 
 ## Architecture Decision
 
-Use **TrueNAS SCALE for storage, snapshots, datasets, and VM hosting**. Run TDS Geo inside an **Ubuntu Server VM** on TrueNAS SCALE.
+Use **TrueNAS SCALE for storage, snapshots, datasets, and VM hosting**. Run Kivo Geo inside an **Ubuntu Server VM** on TrueNAS SCALE.
 
-Do not run TDS Geo production directly on the TrueNAS host OS. Do not depend on unmanaged host-level Docker installed into TrueNAS.
+Do not run Kivo Geo production directly on the TrueNAS host OS. Do not depend on unmanaged host-level Docker installed into TrueNAS.
 
 ## Deployment Flow
 
@@ -29,8 +29,8 @@ Internet
   -> Cloudflare Tunnel or HTTPS reverse proxy
   -> Ubuntu Server VM on TrueNAS SCALE
      -> Caddy reverse proxy
-     -> TDS Geo API container
-     -> TDS Geo worker container
+     -> Kivo Geo API container
+     -> Kivo Geo worker container
      -> PostgreSQL 16 container
      -> Redis 7 container
      -> Optional sidecars
@@ -53,8 +53,8 @@ Internet
 ## Ubuntu VM Responsibilities
 
 - Docker Engine and Compose plugin.
-- GitHub self-hosted runner with labels `self-hosted,truenas,tds-geo`.
-- TDS Geo production containers.
+- GitHub self-hosted runner with labels `self-hosted,truenas,kivo`.
+- Kivo Geo production containers.
 - Cloudflare Tunnel client or Caddy HTTPS reverse proxy.
 - Local `.env` secrets file.
 - Backup and restore scripts.
@@ -64,7 +64,7 @@ Internet
 
 Nextcloud may run on TrueNAS as a separate collaboration app for files, client docs, reports, approvals, calendars, tasks, and selected backup copies.
 
-Nextcloud must not replace the Ubuntu VM production runtime. Do not run the TDS Geo API, worker, PostgreSQL, Redis, GitHub runner, `.env`, or live deployment repo from Nextcloud.
+Nextcloud must not replace the Ubuntu VM production runtime. Do not run the Kivo Geo API, worker, PostgreSQL, Redis, GitHub runner, `.env`, or live deployment repo from Nextcloud.
 
 ## Application Services
 
@@ -88,11 +88,11 @@ Use separate TrueNAS-backed datasets or mount points so each area can have its o
 
 | Mount | Data | Restore Priority |
 |---|---|---|
-| `/mnt/tds-geo/postgres` | PostgreSQL data directory | Critical |
-| `/mnt/tds-geo/redis` | Redis append-only data | Medium |
-| `/mnt/tds-geo/backups` | Logical DB dumps and migration dumps | Critical |
-| `/mnt/tds-geo/logs` | API and worker logs | Medium |
-| `/mnt/tds-geo/cloudflared` | Cloudflare Tunnel config/state if using config-file mode | Medium |
+| `/mnt/kivo/postgres` | PostgreSQL data directory | Critical |
+| `/mnt/kivo/redis` | Redis append-only data | Medium |
+| `/mnt/kivo/backups` | Logical DB dumps and migration dumps | Critical |
+| `/mnt/kivo/logs` | API and worker logs | Medium |
+| `/mnt/kivo/cloudflared` | Cloudflare Tunnel config/state if using config-file mode | Medium |
 
 Logical PostgreSQL dumps are mandatory. ZFS snapshots are useful, but they are not the only database backup mechanism.
 

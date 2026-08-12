@@ -1,4 +1,4 @@
-> Dashboard: [TDS Geo Dashboard](../../DASHBOARD.md)
+> Dashboard: [Kivo Geo Dashboard](../../DASHBOARD.md)
 >
 # Boston Veterinary Pharmaceutical — Site Audit
 
@@ -134,7 +134,7 @@ United Animal Health, Idena, AF Agrofeed, Kempex, Sebattarim, Rotem, Enhalor, Fe
 ## Action Items
 
 ### Critical
-1. **Unblock Cloudflare** — Reach out to client to whitelist TDS Geo IP or set up API key authentication
+1. **Unblock Cloudflare** — Reach out to client to whitelist Kivo Geo IP or set up API key authentication
 2. **Add WordPress API key** — Configure `cms_connections` with proper credentials once access is restored
 
 ### High

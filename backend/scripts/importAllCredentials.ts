@@ -120,7 +120,7 @@ async function main() {
   // 6. Doc-based credentials (from doc/clients/*/contacts.md and technical-reference.md)
   const docCreds: CredInput[] = [
     // boston-pharma
-    { category: 'api', service: 'boston-pharma', label: 'TDS Geo API Key', username: 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1', password: '' },
+    { category: 'api', service: 'boston-pharma', label: 'Kivo Geo API Key', username: 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1', password: '' },
     { category: 'other', service: 'boston-pharma', label: 'Google Ads Conversion ID', username: 'AW-16695363279', password: '' },
     { category: 'other', service: 'boston-pharma', label: 'Google Tag Manager ID', username: 'GT-KTTRZ642', password: '' },
     { category: 'other', service: 'boston-pharma', label: 'Google Site Verification', username: 'iUvCHIei4OHpJKf9Dt6KW5ZkUfgkFMzH8iBxR4GZIlM', password: '' },
@@ -130,10 +130,10 @@ async function main() {
     { category: 'other', service: 'boston-pharma', label: 'Contact — Info Email', username: 'info@bostongroup-eg.com', password: '' },
     { category: 'other', service: 'boston-pharma', label: 'Contact — Export Email', username: 'export@bostongroup-eg.com', password: '' },
     { category: 'other', service: 'boston-pharma', label: 'Contact — TDS Web Dev', username: 'web.development@trafficdigitalsolutions.com', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'REST API Base URL', username: 'https://boston-pharma.com/wp-json/tds-geo/v1', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Webhook URL', username: 'https://boston-pharma.com/wp-json/tds-geo/v1/webhook', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'REST API Base URL', username: 'https://boston-pharma.com/wp-json/kivo/v1', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Webhook URL', username: 'https://boston-pharma.com/wp-json/kivo/v1/webhook', password: '' },
     // boston-vet
-    { category: 'api', service: 'boston-vet', label: 'TDS Geo API Key', username: 'kai_46f0d5d6cf30f13fd45463d8082e645323ead5c731b1b58f', password: '' },
+    { category: 'api', service: 'boston-vet', label: 'Kivo Geo API Key', username: 'kai_46f0d5d6cf30f13fd45463d8082e645323ead5c731b1b58f', password: '' },
     { category: 'other', service: 'boston-vet', label: 'Contact — TDS Web Dev', username: 'web.development@trafficdigitalsolutions.com', password: '' },
   ];
 
@@ -145,8 +145,8 @@ async function main() {
 
   // 7. Seed data users
   const seedUsers: CredInput[] = [
-    { category: 'other', service: 'system', label: 'Admin Panel — super_admin', username: 'admin@tds-geo.internal', password: 'TDSg30!Pr0d#2026_X9', url: '' },
-    { category: 'other', service: 'system', label: 'Admin Panel — editor', username: 'editor@tds-geo.internal', password: 'Ed1t0r!TDS#2026_X9', url: '' },
+    { category: 'other', service: 'system', label: 'Admin Panel — super_admin', username: 'admin@kivo.internal', password: 'TDSg30!Pr0d#2026_X9', url: '' },
+    { category: 'other', service: 'system', label: 'Admin Panel — editor', username: 'editor@kivo.internal', password: 'Ed1t0r!TDS#2026_X9', url: '' },
   ];
   for (const su of seedUsers) {
     if (!hasEntry(existingLookup2, su.label, su.service)) {

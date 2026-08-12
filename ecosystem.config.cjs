@@ -5,7 +5,7 @@
 module.exports = {
   apps: [
     {
-      name: 'tds-geo-backend',
+      name: 'kivo-backend',
       script: 'backend/index.ts',
       interpreter: 'npx',
       interpreter_args: 'tsx',

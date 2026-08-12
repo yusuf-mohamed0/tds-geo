@@ -1,20 +1,20 @@
-# TDS Geo — Frequently Asked Questions
+# Kivo Geo — Frequently Asked Questions
 
 ## General
 
-### What is TDS Geo?
+### What is Kivo Geo?
 
 An AI-powered SEO content automation platform. Enter a keyword → it researches, writes, fact-checks, and publishes SEO-optimized articles to your Shopify or WordPress site automatically.
 
 ### Who built it?
 
-Traffic Digital Solutions — a digital agency.
+Kivo — a digital agency.
 
 ### Who is it for?
 
 Two audiences:
 1. **Shopify merchants** — automated SEO blog content without hiring writers
-2. **Traffic Digital Solutions (you)** — manage clients, monitor quality, control the platform
+2. **Kivo (you)** — manage clients, monitor quality, control the platform
 
 ---
 
@@ -28,7 +28,7 @@ Because it's a **Shopify embedded app** — it only works inside the Shopify adm
 
 Install it through a Shopify store:
 ```
-https://traffic-test.myshopify.com/admin → Apps → TDS Geo
+https://traffic-test.myshopify.com/admin → Apps → Kivo Geo
 ```
 Or use the install URL:
 ```
@@ -44,7 +44,7 @@ https://16.192.29.174.nip.io/api/shopify/install?shop=traffic-test.myshopify.com
 
 ### What version is active?
 
-Version `tds-geo-17` was the last deployed (July 1, 2026). The app is submitted for review (Reference 121207).
+Version `kivo-17` was the last deployed (July 1, 2026). The app is submitted for review (Reference 121207).
 
 ### Is the app free?
 
@@ -102,20 +102,20 @@ PM2 is registered as a systemd service — it auto-starts on boot and launches t
 
 ### Where is the code?
 
-GitHub: `github.com/yusuf-mohamed0/tds-geo` (branch: `main`)
+GitHub: `github.com/yusuf-mohamed0/kivo` (branch: `main`)
 
 ### How do I deploy changes?
 
 ```bash
-ssh -i tds-geo.pem ubuntu@16.192.29.174
-cd /home/ubuntu/tds-geo
+ssh -i kivo.pem ubuntu@16.192.29.174
+cd /home/ubuntu/kivo
 git pull origin main
-pm2 restart tds-geo-backend
+pm2 restart kivo-backend
 ```
 
 For TOML/Shopify config changes:
 ```bash
-npx @shopify/cli@latest app deploy --config shopify.app.tds-geo.toml --allow-updates
+npx @shopify/cli@latest app deploy --config shopify.app.kivo.toml --allow-updates
 ```
 
 ### Can I turn off my device?
@@ -142,7 +142,7 @@ No. The "Core is the only brain" architecture means all AI lives in `backend/`. 
 
 ### How does the WordPress plugin authenticate?
 
-Via API keys sent in the `X-TDS-GEO-Key` header. Keys are generated in the WordPress admin.
+Via API keys sent in the `X-Kivo-Key` header. Keys are generated in the WordPress admin.
 
 ---
 
@@ -177,7 +177,7 @@ Yes. Each client can be set to:
 
 The app is restarting. Wait 10 seconds and try again. If it persists, check PM2 logs:
 ```bash
-pm2 logs tds-geo-backend --lines 20
+pm2 logs kivo-backend --lines 20
 ```
 
 ### Webhooks are failing with 401
@@ -186,7 +186,7 @@ That's correct — compliance webhooks should return 401 for invalid HMAC signat
 
 ### I can't SSH into the server
 
-Use the `tds-geo.pem` key. If it fails:
+Use the `kivo.pem` key. If it fails:
 - Try EC2 Instance Connect (AWS Console → EC2 → Instance → Connect)
 - Try tmate (interactive terminal session)
 

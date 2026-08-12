@@ -5,11 +5,11 @@ const apiKey = 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
 const endpointUrl = 'https://boston-pharma.com';
 
 async function wpFetch(path, params = {}) {
-  const baseUrl = `${endpointUrl.replace(/\/+$/, '')}/wp-json/tds-geo/v1`;
+  const baseUrl = `${endpointUrl.replace(/\/+$/, '')}/wp-json/kivo/v1`;
   const url = new URL(`${baseUrl}${path}`);
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
   const res = await fetch(url.toString(), {
-    headers: { 'X-TDS-GEO-Key': apiKey, 'Content-Type': 'application/json' },
+    headers: { 'X-Kivo-Key': apiKey, 'Content-Type': 'application/json' },
     signal: AbortSignal.timeout(30000),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => '')).slice(0, 200)}`);

@@ -103,8 +103,8 @@ export function createProductRoutes(pool: Pool): Router {
         for (const conn of connections) {
           try {
             const wpRes = await fetch(
-              `${conn.endpoint_url}/wp-json/tds-geo/v1/posts?post_type=product&limit=100`,
-              { headers: { 'X-TDS-GEO-Key': conn.api_key || '' } }
+              `${conn.endpoint_url}/wp-json/kivo/v1/posts?post_type=product&limit=100`,
+              { headers: { 'X-Kivo-Key': conn.api_key || '' } }
             );
             if (wpRes.ok) {
               const d: any = await wpRes.json();
@@ -216,7 +216,7 @@ export function createProductRoutes(pool: Pool): Router {
     }
   });
 
-  // Update product on WooCommerce (via TDS Geo plugin)
+  // Update product on WooCommerce through the Kivo Geo connector.
   router.put('/update/:clientId/woocommerce/:productId', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { clientId, productId } = req.params;
@@ -238,9 +238,9 @@ export function createProductRoutes(pool: Pool): Router {
       if (metaTitle) body.meta_title = metaTitle;
       if (metaDescription) body.meta_description = metaDescription;
 
-      const wpRes = await fetch(`${conn.endpoint_url}/wp-json/tds-geo/v1/posts/${productId}`, {
+      const wpRes = await fetch(`${conn.endpoint_url}/wp-json/kivo/v1/posts/${productId}`, {
         method: 'PUT',
-        headers: { 'X-TDS-GEO-Key': conn.api_key || '', 'Content-Type': 'application/json' },
+        headers: { 'X-Kivo-Key': conn.api_key || '', 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 

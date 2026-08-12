@@ -42,8 +42,8 @@ Use multiple backup layers because no single backup method covers every failure.
 Use this only when the current database must be replaced.
 
 ```bash
-cd /opt/tds-geo/deploy/truenas
-./scripts/restore-db.sh /mnt/tds-geo/backups/tds-geo_latest.dump
+cd /opt/kivo/deploy/truenas
+./scripts/restore-db.sh /mnt/kivo/backups/kivo_latest.dump
 ./scripts/healthcheck.sh
 ```
 
@@ -59,7 +59,7 @@ After restore:
 1. Create a new Ubuntu Server VM.
 2. Mount or restore the TrueNAS-backed datasets.
 3. Run `deploy/truenas/scripts/bootstrap-vm.sh`.
-4. Clone the GitHub repository to `/opt/tds-geo`.
+4. Clone the GitHub repository to `/opt/kivo`.
 5. Restore VM-local `.env` from the secure secret store.
 6. Start the Compose stack.
 7. Run `./scripts/healthcheck.sh`.

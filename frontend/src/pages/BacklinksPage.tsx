@@ -57,6 +57,7 @@ export default function BacklinksPage() {
   const [discovering, setDiscovering] = useState(false);
   const [targetDomain, setTargetDomain] = useState('');
   const [error, setError] = useState('');
+  const [errorTone, setErrorTone] = useState<'critical' | 'warning'>('critical');
   const [generating, setGenerating] = useState(false);
   const [guestPostResult, setGuestPostResult] = useState('');
   const [prospectId, setProspectId] = useState('');
@@ -75,6 +76,16 @@ export default function BacklinksPage() {
 
   const withClient = (path: string) => `${path}?clientId=${encodeURIComponent(clientId)}`;
 
+  const normalizeDomain = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+    try {
+      return new URL(trimmed.includes('://') ? trimmed : `https://${trimmed}`).hostname.replace(/^www\./, '');
+    } catch {
+      return trimmed.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0];
+    }
+  };
+
   useEffect(() => {
     apiFetch<{ clients: Client[] }>('/api/clients')
       .then((res) => {
@@ -82,12 +93,16 @@ export default function BacklinksPage() {
         setClients(activeClients);
         setClientId(activeClients[0]?.id || '');
       })
-      .catch(() => setError('Unable to load clients.'));
+      .catch(() => {
+        setErrorTone('critical');
+        setError('Unable to load clients.');
+      });
   }, []);
 
   const fetchData = async (tab: number) => {
     if (!clientId) return;
     setLoading(true);
+    setErrorTone('critical');
     setError('');
     try {
       if (tab === 0 || tab === 3) {
@@ -110,18 +125,22 @@ export default function BacklinksPage() {
   useEffect(() => { void fetchData(selectedTab); }, [selectedTab, clientId]);
 
   const handleDiscover = async () => {
-    if (!targetDomain.trim() || !clientId) return;
+    const normalizedDomain = normalizeDomain(targetDomain);
+    if (!normalizedDomain || !clientId) return;
     setDiscovering(true);
+    setErrorTone('critical');
     setError('');
     try {
       const data = await apiFetch<{ prospects: Prospect[]; count: number }>(withClient('/api/backlinks/discover'), {
         method: 'POST',
-        body: JSON.stringify({ targetDomain: targetDomain.trim(), limit: 20 }),
+        body: JSON.stringify({ targetDomain: normalizedDomain, limit: 20 }),
       });
       setProspects(data.prospects || []);
       setSelectedTab(0);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Discovery failed');
+      const message = err instanceof Error ? err.message : 'Discovery failed';
+      setErrorTone(message.includes('DataForSEO') ? 'warning' : 'critical');
+      setError(message);
     } finally {
       setDiscovering(false);
     }
@@ -129,6 +148,8 @@ export default function BacklinksPage() {
 
   const handleCreateOutreach = async (prospectId: string) => {
     try {
+      setErrorTone('critical');
+      setError('');
       await apiFetch(withClient('/api/backlinks/outreach'), {
         method: 'POST',
         body: JSON.stringify({ prospectId, pitchType: 'guest_post' }),
@@ -142,6 +163,7 @@ export default function BacklinksPage() {
   const handleGenerateGuestPost = async () => {
     if (!prospectId || !guestTopic.trim()) return;
     setGenerating(true);
+    setErrorTone('critical');
     setError('');
     try {
       const result = await apiFetch<{ title: string; content: string; wordCount: number }>(withClient('/api/backlinks/generate-guest-post'), {
@@ -158,6 +180,8 @@ export default function BacklinksPage() {
 
   const handleVerify = async () => {
     setVerifying(true);
+    setErrorTone('critical');
+    setError('');
     try {
       if (!clientId) return;
       const result = await apiFetch<{ checked: number; active: number; lost: number }>(withClient('/api/backlinks/verify'), {
@@ -183,13 +207,13 @@ export default function BacklinksPage() {
       }}
     >
       <BlockStack gap="400">
-        {error && <Banner tone="critical">{error}</Banner>}
+        {error && <Banner tone={errorTone}>{error}</Banner>}
         {verifyResult && <Banner tone="success">{verifyResult}</Banner>}
 
         <Card>
           <BlockStack gap="200">
             <Text as="h2" variant="headingSm">Client</Text>
-            <select aria-label="Client" className="input" value={clientId} onChange={(e) => setClientId(e.target.value)} disabled={discovering || verifying}>
+            <select aria-label="Client" className="input" value={clientId} onChange={(e) => { setError(''); setClientId(e.target.value); }} disabled={discovering || verifying}>
               <option value="">Select a client</option>
               {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
             </select>

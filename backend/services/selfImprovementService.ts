@@ -242,11 +242,21 @@ export class SelfImprovementService {
     if (!this.pool) return [];
     const suggestions: ImprovementSuggestion[] = [];
 
-    const prompts = await this.pool.query(`
-      SELECT id, name, name as slug, performance->>'avgScore' as avg_score,
-             performance->>'totalRuns' as total_runs
-      FROM prompt_templates WHERE is_active = true
-    `);
+    let prompts;
+    try {
+      prompts = await this.pool.query(`
+        SELECT id, name, COALESCE(slug, name) as slug,
+               COALESCE(performance->>'avgScore', performance->>'avg_score', '0') as avg_score,
+               COALESCE(performance->>'totalRuns', performance->>'total_runs', '0') as total_runs
+        FROM prompt_templates WHERE is_active = true
+      `);
+    } catch (err: any) {
+      if (err?.code === '42703' || err?.code === '42P01') {
+        logger.warn('Prompt performance analysis skipped; prompt template schema is incomplete', { error: err.message });
+        return [];
+      }
+      throw err;
+    }
 
     for (const p of prompts.rows) {
       const avgScore = parseFloat(p.avg_score || '0');

@@ -3,7 +3,7 @@
 // Licensed under the ISC License.
 
 /**
- * ESLint Configuration — Traffic Digital Solutions GEO Backend
+ * ESLint Configuration — Kivo Geo Backend
  */
 module.exports = {
   root: true,

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Security Scan Script — TDS Geo / AI SEO Automation
+# Security Scan Script — SNEFERU Geo / SNEFERU OS
 # Runs available Kali/security tools against the API and client targets
 # Usage: ./scripts/security-scan.sh --api http://localhost:3000 [--target https://example.com]
 

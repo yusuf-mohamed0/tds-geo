@@ -8,7 +8,7 @@ set -euo pipefail
 # ──────────────────────────────────────────────────────────
 
 echo "══════════════════════════════════════════════"
-echo "  TDS Geo — Server Provisioning"
+echo "  SNEFERU Geo — Server Provisioning"
 echo "══════════════════════════════════════════════"
 
 # ─── System ──────────────────────────────────────
@@ -97,7 +97,7 @@ mkdir -p /opt/ai-seo-staging
 
 # ─── Monitoring cron ─────────────────────────────
 cat > /etc/cron.d/tdsgeo-health << 'EOF'
-*/5 * * * * root curl -sf http://localhost:3000/health > /dev/null 2>&1 || echo "TDS Geo health check failed" | mail -s "ALERT: TDS Geo Down" admin@tdsgeo.com
+*/5 * * * * root curl -sf http://localhost:3000/health > /dev/null 2>&1 || echo "SNEFERU Geo health check failed" | mail -s "ALERT: SNEFERU Geo Down" admin@tdsgeo.com
 EOF
 
 echo ""
