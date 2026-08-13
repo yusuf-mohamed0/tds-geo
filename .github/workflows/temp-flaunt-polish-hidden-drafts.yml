@@ -1,0 +1,186 @@
+name: Temp Flaunt Polish Hidden Drafts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  polish-hidden-drafts:
+    runs-on: [self-hosted, truenas, tdsgeo]
+    timeout-minutes: 10
+    steps:
+      - name: Polish TDS Flaunt hidden drafts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/flaunt-polish-hidden-drafts.mjs <<'NODE'
+          const https = require('https');
+          const { Pool } = require('pg');
+
+          const clientSlug = 'flaunt-cosmetics-global';
+          const blogId = '116005503268';
+          const productUrl = 'https://flauntcosmetics.com/products/flaunt-eyeliner-stamp-black';
+
+          const articles = [
+            {
+              id: 635735933220,
+              title: 'Eyeliner Stamp For Beginners: A Calm First Routine',
+              metaTitle: 'Eyeliner Stamp for Beginners: Simple Winged Liner Guide',
+              metaDescription: 'A beginner-friendly Flaunt eyeliner stamp guide using Stamp. Connect. Flaunt. steps for UAE and Egypt routines.',
+              tags: ['eyeliner stamp for beginners', 'Flaunt Cosmetics', 'winged eyeliner', 'makeup for beginners', 'Beauty Tips'],
+              image: 'https://cdn.shopify.com/s/files/1/0689/9010/7940/files/Eyeliner_Stamp_Steps_Flaunt_Cosmetics.jpg?v=1721828462',
+              alt: 'Flaunt No Hassle Eyeliner Stamp Set application steps for beginner winged liner',
+              html: `
+                <p><strong>Winged eyeliner gets easier when you stop treating it like a test.</strong> Flaunt Cosmetics was created to make makeup feel empowering, not intimidating, and the No Hassle Eyeliner Stamp Set follows that idea: stamp the wing, connect the line, and perfect only what needs adjusting.</p>
+                <p>The set includes a dual-ended 10mm wing stamp pen, a felt tip eyeliner, and a precision eraser tip. That makes it especially useful for beginners who want a clear starting shape instead of drawing both wings completely freehand.</p>
+                <h2>Start With A Small Wing You Would Actually Wear</h2>
+                <p>The best first wing is not the boldest one. It is the one you can place twice, wear during a normal day, and correct without stress. Look straight into the mirror, keep your face relaxed, and place the stamp so it follows the natural lift from your lower lash line toward the end of your brow.</p>
+                <p>A small wing gives you room to learn. If you want more drama later, build it after the angle feels familiar.</p>
+                <h2>Prep For UAE And Egypt Weather</h2>
+                <p>Heat, humidity, sunscreen, and air conditioning can all change how eyeliner behaves. Let skincare settle before applying liner. If your lids get oily, press a little translucent powder near the outer corner and lash line so the stamp has a cleaner surface.</p>
+                <p>Keep concealer light on the lid. Too much cream product can make any liner move faster than expected.</p>
+                <h2>Stamp, Connect, And Perfect</h2>
+                <p>Flaunt's routine is simple: <strong>Stamp. Connect. Flaunt.</strong> Press the stamp with light, even pressure at the outer corner. Then use the felt tip liner to connect the wing to a thin lash-line stroke. If the line needs correction, use the precision eraser tip slowly instead of wiping away the whole eye.</p>
+                <p>For hooded eyes, keep most of the definition near the outer third and check placement while looking forward. For uneven eyes, aim for balance rather than exact symmetry; real faces are not mirrored.</p>
+                <h2>Make It Feel Like Your Routine</h2>
+                <p>Pair the wing with brushed brows, mascara if you like it, light skin prep, and a soft lip. The point is not perfection. The point is a routine that helps you feel ready without adding pressure to your morning.</p>
+                <p>Explore the <a href="${productUrl}">No Hassle Eyeliner Stamp Set</a>, including Cleo Black, Sahara Sandstone, Karkadé, and Gouna shades, and save this guide for your next practice session.</p>
+              `,
+            },
+            {
+              id: 635392164132,
+              title: 'A Hooded-Eyes Eyeliner Guide for Everyday Shapes',
+              metaTitle: 'Hooded Eyes Eyeliner Guide: Everyday Flaunt Wings',
+              metaDescription: 'A practical hooded-eyes eyeliner guide from Flaunt with open-eye placement, slim lines, and stamp-friendly wing tips.',
+              tags: ['hooded eyes', 'eyeliner stamp', 'Flaunt Cosmetics', 'winged eyeliner', 'eye shape guide'],
+              image: 'https://cdn.shopify.com/s/files/1/0689/9010/7940/files/63596aa5-8426-489f-957a-088d715cc6e7.jpg?v=1784656724',
+              alt: 'Flaunt eyeliner stamp product for hooded eyes winged liner routine',
+              html: `
+                <p><strong>Hooded eyes do not need fixing; they need eyeliner placement that respects how the lid naturally folds.</strong> The best wing is the one you can still see when your eyes are open and relaxed.</p>
+                <p>Flaunt's No Hassle Eyeliner Stamp Set helps by giving the outer wing a repeatable starting shape. From there, the routine is about small adjustments, not forcing your eyes into someone else's tutorial.</p>
+                <h2>Place The Wing With Your Eyes Open</h2>
+                <p>Look straight into the mirror before stamping. If you place the wing while looking down, the fold may hide the shape once your eyes open. A small outward angle usually works better than a thick upward flick.</p>
+                <p>Use light pressure with the 10mm wing stamp. Then connect only the outer third of the lash line before deciding whether the inner line needs more definition.</p>
+                <h2>Keep The Lash Line Slim</h2>
+                <p>With hooded eyes, a thick line across the mobile lid can disappear into the fold or make the eye look heavier. Keep the line slim, especially near the inner corner, and let the wing carry the shape.</p>
+                <p>If one side looks different, correct the smaller side first. Do not make both wings bigger every time you adjust.</p>
+                <h2>Use The Precision Eraser Tip Calmly</h2>
+                <p>The precision eraser tip is useful when the lower edge of the wing needs cleaning. Hold your hand steady, remove a small amount, then stop and check the shape from normal face distance.</p>
+                <p>Makeup created to empower, not intimidate means your eyeliner should give you options. It should not make your eye shape feel like a problem.</p>
+                <h2>Build Your Everyday Version</h2>
+                <p>For work, errands, or lunch, pair a small wing with mascara and soft skin prep. For evening, extend the same angle slightly instead of starting over with a new shape.</p>
+                <p>Try the method with the <a href="${productUrl}">No Hassle Eyeliner Stamp Set</a> and choose the shade that fits your everyday mood, from Cleo Black to Gouna.</p>
+              `,
+            },
+            {
+              id: 635392196900,
+              title: 'Dubai Summer Eyeliner Care: A Practical Routine',
+              metaTitle: 'Dubai Summer Eyeliner Care: Flaunt Heat Routine',
+              metaDescription: 'A UAE summer eyeliner routine with Flaunt: lid prep, stamp placement, touch-ups, and realistic heat-friendly makeup tips.',
+              tags: ['Dubai makeup', 'summer eyeliner', 'Flaunt Cosmetics', 'eyeliner stamp', 'UAE beauty tips'],
+              image: 'https://cdn.shopify.com/s/files/1/0689/9010/7940/articles/516128512_17955191756967835_7886609483278935526_n_7809a0c5-6883-4c38-8f63-bda2b20d8b73.jpg?v=1753175666',
+              alt: 'Summer eyeliner look for UAE heat with Flaunt Cosmetics',
+              html: `
+                <p><strong>Dubai summer makeup works best when the routine is realistic, light, and easy to refresh.</strong> Heat, humidity, car rides, and indoor cooling can all affect eyeliner, so the goal is not a promise of perfect wear. The goal is a calmer system.</p>
+                <p>Flaunt's approach is makeup created to empower, not intimidate. For summer eyeliner, that means fewer heavy layers, cleaner prep, and a wing shape you can touch up without starting again.</p>
+                <h2>Start With A Dry, Light Lid</h2>
+                <p>Let sunscreen and moisturizer settle before applying eye makeup. If your lids get oily, use a small amount of translucent powder near the lash line and outer corner. Avoid thick concealer on the lid because cream layers can make liner move faster.</p>
+                <p>In a hot-weather routine, less product often gives the liner a better surface.</p>
+                <h2>Choose A Wing You Can Refresh</h2>
+                <p>A small or medium wing is easier to maintain through the day than an oversized shape. Use the stamp to place the outer wing, then connect with the felt tip liner in a thin stroke. Keep the inner corner minimal if you know your makeup tends to transfer.</p>
+                <p>The precision eraser tip can clean a small edge before a dinner plan or evening stop without removing the whole look.</p>
+                <h2>Pack A Practical Touch-Up Kit</h2>
+                <p>For long UAE days, keep blotting paper or tissue, cotton buds, and your liner nearby. Blot first, then correct. Adding more liner over oil or sweat usually makes the shape less clean.</p>
+                <p>This is where Stamp. Connect. Flaunt. becomes useful: the routine is repeatable, even when the day is not.</p>
+                <h2>Keep The Look Comfortable</h2>
+                <p>Pair eyeliner with brushed brows, a light base, and a lip color you can reapply easily. Summer makeup should feel breathable, not like a full repair job waiting to happen.</p>
+                <p>See the <a href="${productUrl}">No Hassle Eyeliner Stamp Set</a> for the 3-in-1 stamp, liner, and eraser design behind the routine.</p>
+              `,
+            },
+            {
+              id: 635392229668,
+              title: 'Eyeliner Stamp vs Liquid Liner: Choose Your Approach',
+              metaTitle: 'Eyeliner Stamp vs Liquid Liner: Which Is Easier?',
+              metaDescription: 'Compare eyeliner stamp and liquid liner for beginners, symmetry, control, speed, and everyday UAE/Egypt makeup routines.',
+              tags: ['eyeliner stamp', 'liquid liner', 'Flaunt Cosmetics', 'winged eyeliner', 'makeup tips'],
+              image: 'https://cdn.shopify.com/s/files/1/0689/9010/7940/files/liners-2.png?v=1785314786',
+              alt: 'Flaunt eyeliner liner shades for comparing stamp and liquid liner routines',
+              html: `
+                <p><strong>An eyeliner stamp and a liquid liner can both create beautiful wings, but they solve different problems.</strong> A stamp gives you a starting shape. A liquid liner gives you full freehand control. The better choice depends on how you like to apply makeup.</p>
+                <p>Flaunt was built around making makeup simpler and less intimidating, so the useful question is not which tool is more impressive. It is which one helps you feel confident faster.</p>
+                <h2>Choose A Stamp If Symmetry Is The Hard Part</h2>
+                <p>If matching angles is where your eyeliner routine usually goes wrong, a stamp can help. The No Hassle Eyeliner Stamp Set includes a dual-ended 10mm wing stamp pen, so both eyes start with the same wing shape.</p>
+                <p>You still connect the wing and adjust the line yourself, but you are not inventing the outer flick from zero every time.</p>
+                <h2>Choose Liquid Liner If You Want Full Freehand Control</h2>
+                <p>Traditional liquid liner is useful when you enjoy drawing every detail by hand. It gives flexibility for very thin lines, graphic shapes, and unusual angles, but it usually asks for more practice and steadier repetition.</p>
+                <p>For some people, that control feels creative. For others, it feels like pressure. Neither reaction is wrong.</p>
+                <h2>Think About Your Morning Routine</h2>
+                <p>On a busy morning, a stamp can make the first step quicker and less stressful. For a slower makeup session, liquid liner may feel more expressive. For UAE and Egypt heat, whichever tool you choose, prep matters: let skincare settle and keep the lid lightly powdered if it gets oily.</p>
+                <p>Flaunt's kit combines the stamp with a felt tip eyeliner and precision eraser tip, which makes it easier to stamp, connect, and clean the edge in one routine.</p>
+                <h2>The Honest Answer</h2>
+                <p>If you are a beginner, have unsteady hands, or struggle with matching wings, start with a stamp. If you already enjoy freehand liner, keep liquid liner in your routine. Makeup should work for you, not the other way around.</p>
+                <p>Compare your approach with the <a href="${productUrl}">No Hassle Eyeliner Stamp Set</a> and its Cleo Black, Sahara Sandstone, Karkadé, and Gouna shades.</p>
+              `,
+            },
+            {
+              id: 635392131364,
+              title: 'A 5-Minute Office Makeup Look With Eyeliner',
+              metaTitle: '5-Minute Office Makeup With Flaunt Eyeliner',
+              metaDescription: 'A quick office makeup routine with Flaunt eyeliner: light prep, brows, stamped wing, soft color, and workday touch-up tips.',
+              tags: ['office makeup', 'quick makeup', 'Flaunt Cosmetics', 'eyeliner stamp', 'work makeup'],
+              image: 'https://cdn.shopify.com/s/files/1/0689/9010/7940/files/005A9880-1copy_tn_tn.jpg?v=1721041845',
+              alt: 'Flaunt office makeup look with easy winged eyeliner',
+              html: `
+                <p><strong>A five-minute office makeup look is not about rushing; it is about choosing the few steps that make you feel ready.</strong> Flaunt's philosophy, makeup created to empower, not intimidate, fits a work morning because the routine should support your day instead of taking it over.</p>
+                <p>This version uses light skin prep, brows, a small wing, and one soft color step. Adjust it to your face, your commute, and your schedule.</p>
+                <h2>Minute One: Set A Clean Base</h2>
+                <p>Use moisturizer and sunscreen, then give them a moment to settle. If you want coverage, keep it light: a little concealer where you need it or a sheer base that does not feel heavy by midday.</p>
+                <p>If your eyelids get oily, press a touch of powder near the lash line before eyeliner.</p>
+                <h2>Minute Two: Brush Brows And Wake Up The Face</h2>
+                <p>Brows frame the eye area quickly. Brush them up, add a small amount of product only where needed, and stop before the step becomes a full brow routine.</p>
+                <p>A cream blush or soft lip color can bring warmth back to the face without adding many products.</p>
+                <h2>Minute Three: Stamp The Wing</h2>
+                <p>Use the Flaunt wing stamp at the outer corner with light pressure. Keep the wing small for office makeup, especially if you want the look to feel polished rather than dramatic.</p>
+                <p>Connect the wing with the felt tip liner along the outer lash line. A slim line usually looks cleaner for daytime and is easier to balance on both eyes.</p>
+                <h2>Minute Four And Five: Mascara, Lip, And Check</h2>
+                <p>Add mascara if you like it, then choose a lip color that is easy to reapply after coffee or lunch. Step back from the mirror and check the overall effect rather than chasing microscopic symmetry.</p>
+                <p>Keep the precision eraser tip or a cotton bud nearby for small corrections before you leave.</p>
+                <h2>Make It Yours</h2>
+                <p>Some mornings will take five minutes. Some will take eight. The point is consistency, not a stopwatch. Stamp. Connect. Flaunt. Then get on with your day.</p>
+                <p>Build the routine around the <a href="${productUrl}">No Hassle Eyeliner Stamp Set</a>, available in Cleo Black, Sahara Sandstone, Karkadé, and Gouna.</p>
+              `,
+            },
+          ];
+
+          function text(html) { return String(html || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(); }
+          function truncate(value, max) { const chars = Array.from(String(value || '').trim()); return chars.length <= max ? chars.join('') : chars.slice(0, max - 1).join('').trimEnd() + '…'; }
+          function request(shop, version, token, method, path, payload) {
+            return new Promise((resolve, reject) => {
+              const body = payload ? JSON.stringify(payload) : null;
+              const req = https.request(`https://${shop}/admin/api/${version}${path}`, { method, headers: { 'X-Shopify-Access-Token': token, 'Content-Type': 'application/json', ...(body ? { 'Content-Length': Buffer.byteLength(body) } : {}) }, timeout: 30000 }, res => {
+                let data = ''; res.on('data', c => data += c); res.on('end', () => { let json = null; try { json = data ? JSON.parse(data) : null; } catch {} if (res.statusCode >= 200 && res.statusCode < 300) resolve(json); else reject(new Error(JSON.stringify({ status: res.statusCode, body: json || data.slice(0, 300) }))); });
+              });
+              req.on('timeout', () => req.destroy(new Error('timeout'))); req.on('error', reject); if (body) req.write(body); req.end();
+            });
+          }
+          async function main() {
+            const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+            try {
+              const { rows } = await pool.query(`select c.shopify_shop, c.shopify_api_version, cc.config from clients c join cms_connections cc on cc.client_id = c.id where c.slug = $1 and cc.provider = 'shopify' and cc.is_active = true order by cc.updated_at desc nulls last limit 1`, [clientSlug]);
+              if (!rows.length) throw new Error('no_active_flaunt_shopify_connection');
+              const row = rows[0]; const config = row.config || {}; const shop = config.shop || row.shopify_shop; const version = config.apiVersion || row.shopify_api_version || '2025-07'; const token = config.accessToken;
+              await request(shop, version, token, 'GET', '/shop.json');
+              const results = [];
+              for (const a of articles) {
+                const summary = truncate(text(a.html), 200);
+                const payload = { article: { id: a.id, title: a.title, body_html: a.html, summary_html: summary, author: 'Traffic Digital Solutions', tags: a.tags.join(', '), published: false, published_at: null, metafields_global_title_tag: truncate(a.metaTitle, 70), metafields_global_description_tag: truncate(a.metaDescription, 160), image: { src: a.image, alt: a.alt } } };
+                await request(shop, version, token, 'PUT', `/blogs/${blogId}/articles/${a.id}.json`, payload);
+                const verify = await request(shop, version, token, 'GET', `/blogs/${blogId}/articles/${a.id}.json`);
+                if (verify.article.published_at) throw new Error(`article_${a.id}_published_unexpectedly`);
+                results.push({ id: a.id, title: verify.article.title, handle: verify.article.handle, published_at: verify.article.published_at, has_image: Boolean(verify.article.image), image_alt: verify.article.image?.alt || null });
+              }
+              console.log(JSON.stringify({ ok: true, action: 'polished_tds_hidden_flaunt_drafts', shop, blogId, count: results.length, results }, null, 2));
+            } finally { await pool.end(); }
+          }
+          main().catch(error => { console.error(JSON.stringify({ ok: false, error: error.message })); process.exit(1); });
+          NODE
+          docker exec -i -w /app tds-geo-api-1 node < /tmp/flaunt-polish-hidden-drafts.mjs
