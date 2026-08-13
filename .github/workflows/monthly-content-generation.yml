@@ -1,0 +1,33 @@
+name: Monthly Content Generation
+
+on:
+  schedule:
+    - cron: '0 3 1 * *'
+  workflow_dispatch:
+
+concurrency:
+  group: monthly-content-generation
+  cancel-in-progress: false
+
+jobs:
+  monthly-content:
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Stage topics manifest inside API container
+        run: |
+          set -euo pipefail
+          docker cp "${{ github.workspace }}/backend/scripts/monthly-topics.json" tds-geo-api-1:/tmp/monthly-topics.json
+
+      - name: Generate and upload monthly hidden drafts
+        run: |
+          set -euo pipefail
+          docker exec -i -w /app tds-geo-api-1 node --input-type=module - < "${{ github.workspace }}/scripts/monthly-content-run.mjs" --topics /tmp/monthly-topics.json
+
+      - name: Verify hidden draft state
+        run: |
+          set -euo pipefail
+          docker exec -i -w /app tds-geo-api-1 node --input-type=module - < "${{ github.workspace }}/scripts/monthly-content-run.mjs" --verify

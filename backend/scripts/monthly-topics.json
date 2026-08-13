@@ -1,0 +1,1304 @@
+{
+  "schema": "monthly-topic-rotation-v1",
+  "description": "Machine-readable monthly topic rotation for the Monthly Content Generation automation (scripts/monthly-content-run.mjs). Topics per client are copied verbatim from doc/clients/ACTIVE-CLIENTS-MONTHLY-CONTENT-PLAN.md.",
+  "monthOffsetRule": "monthOffset = (UTC year * 12 + UTC month) % 12, i.e. calendar month modulo 12 (Jan=0 ... Dec=11). The workflow runs on the 1st of each month and selects the entry matching the current offset.",
+  "cycle": "Each client has a 4-topic base pool. The pool repeats across all 12 monthOffsets with a rotating order (offsets 0-3 base order, 4-7 order+1, 8-11 order+2). Repeats are explicit: the generation pipeline semantic-dedup stage may skip near-duplicate keywords, which is acceptable.",
+  "entries": [
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 0,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 1,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 2,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 3,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 4,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 5,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 6,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 7,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 8,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 9,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 10,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        },
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        }
+      ]
+    },
+    {
+      "clientSlug": "alamein-2022",
+      "monthOffset": 11,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "how to store and maintain outdoor furniture through dust and heat",
+          "titleTemplate": "How To Store And Maintain Outdoor Furniture Through Dust And Heat",
+          "angle": "Care guide grounded in the Egyptian climate: material-specific cleaning, covers, folding/stacking, and seasonal storage; avoid generic garden advice."
+        },
+        {
+          "keyword": "outdoor furniture for Egyptian cafes",
+          "titleTemplate": "Outdoor Furniture For Egyptian Cafes: Layout, Shade, And Daily Cleaning",
+          "angle": "Commercial buying guide for cafe owners and operators: traffic flow, dust, sun exposure, cleaning routines, storage, and replacement planning across outdoor seating, tables, and umbrellas."
+        },
+        {
+          "keyword": "playground equipment for schools and compounds in Egypt",
+          "titleTemplate": "Playground Equipment For Schools And Compounds In Egypt",
+          "angle": "Informational/commercial for family-conscious facility managers: layout zones, supervision sightlines, age separation, maintenance checks, and heat-aware placement without unverifiable safety promises."
+        },
+        {
+          "keyword": "outdoor fitness areas for clubs resorts and public spaces",
+          "titleTemplate": "Outdoor Fitness Areas For Clubs, Resorts, And Public Spaces",
+          "angle": "Commercial/educational: how outdoor fitness equipment fits Egyptian clubs, compounds, resorts, and municipal spaces, with shade, spacing, traffic, cleaning, and long-term durability."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 0,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 1,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 2,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 3,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 4,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 5,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 6,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 7,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 8,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 9,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 10,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        },
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        }
+      ]
+    },
+    {
+      "clientSlug": "boston-pharma",
+      "monthOffset": 11,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "GMP in pharmaceutical manufacturing why documentation matters",
+          "titleTemplate": "GMP In Pharmaceutical Manufacturing: Why Documentation Matters",
+          "angle": "B2B/export authority: formal, precise, manufacturing-floor credible; connect documentation, quality systems, inspections, and Quality Beyond Seven Stars positioning without unsupported claims."
+        },
+        {
+          "keyword": "pharmaceutical quality control in Egypt",
+          "titleTemplate": "Pharmaceutical Quality Control In Egypt: What Patients And Pharmacists Should Know",
+          "angle": "Authority/education: definition-first H2 sections; explain quality control without exaggeration; Good Manufacturing Practice (GMP), Egyptian Drug Authority (EDA), batch traceability, and patient safety boundaries."
+        },
+        {
+          "keyword": "how medicine storage conditions protect product quality",
+          "titleTemplate": "How Medicine Storage Conditions Protect Product Quality",
+          "angle": "Patient/pharmacist education: separate manufacturing, distribution, pharmacy, and home storage; no fabricated temperature claims unless documented; consult-your-healthcare-provider language where relevant."
+        },
+        {
+          "keyword": "reading dietary supplement labels safely in Egypt",
+          "titleTemplate": "Reading Dietary Supplement Labels Safely In Egypt",
+          "angle": "Product education: use supplement disclaimers; distinguish dietary supplements from registered pharmaceuticals; explain active ingredients, intended use, warnings, and professional advice."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 0,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 1,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 2,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 3,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 4,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 5,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 6,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 7,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 8,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 9,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 10,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        },
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        }
+      ]
+    },
+    {
+      "clientSlug": "caravanserai",
+      "monthOffset": 11,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "meaningful home gifts in Cairo",
+          "titleTemplate": "Meaningful Home Gifts In Cairo: Pieces That Stay Beyond The Occasion",
+          "angle": "Gift guide: gift-focused without cheap sales language; housewarmings, weddings, Ramadan/Eid where appropriate, and pieces with story and material value."
+        },
+        {
+          "keyword": "how brass changes a room styling warm metal",
+          "titleTemplate": "How Brass Changes A Room: Styling Warm Metal Without Making It Heavy",
+          "angle": "Styling/material guide: sensory and material-specific; glow, patina, weight, candlelight, and balance with wood and textiles in a Cairo home context."
+        },
+        {
+          "keyword": "choosing handmade furniture with character in Zamalek",
+          "titleTemplate": "A Zamalek Guide To Choosing Handmade Furniture With Character",
+          "angle": "Local design guide: rooted in Zamalek and Cairo design geography; distinguish true craft from mass production; construction, finish, and proportion guidance."
+        },
+        {
+          "keyword": "layering wood brass and textiles in an Egyptian living room",
+          "titleTemplate": "Layering Wood, Brass, And Textiles In An Egyptian Living Room",
+          "angle": "Room styling guide: warm, sophisticated, practical; use material vocabulary and spatial design rather than generic decor formulas."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 0,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 1,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 2,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 3,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 4,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 5,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 6,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 7,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 8,
+      "cycle": "base",
+      "topics": [
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 9,
+      "cycle": "order+1",
+      "topics": [
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 10,
+      "cycle": "order+2",
+      "topics": [
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        },
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        }
+      ]
+    },
+    {
+      "clientSlug": "flaunt-cosmetics-global",
+      "monthOffset": 11,
+      "cycle": "order+3",
+      "topics": [
+        {
+          "keyword": "stamp vs liquid eyeliner for beginners",
+          "titleTemplate": "Stamp Vs Liquid Eyeliner: Which Is Easier For Beginners?",
+          "angle": "Comparison guide: honest comparison; the stamp is useful, not magical; control, symmetry, learning curve, touch-ups, and who each format suits."
+        },
+        {
+          "keyword": "eyeliner stamp for beginners",
+          "titleTemplate": "Eyeliner Stamp For Beginners: A Calm First Routine",
+          "angle": "Beginner education: empowering, climate-aware, inclusive, and product-honest; Stamp. Connect. Flaunt. routine; no internal labels in the Shopify body."
+        },
+        {
+          "keyword": "hooded eyes and winged liner placement",
+          "titleTemplate": "Hooded Eyes And Winged Liner: How To Place The Wing So It Shows",
+          "angle": "Eye-shape tutorial: look straight ahead, thin lash-line strokes, outer-third focus, and realistic adjustment; inclusive and practical."
+        },
+        {
+          "keyword": "Dubai heat makeup eyeliner care",
+          "titleTemplate": "Dubai Heat Makeup: Keeping Eyeliner Cleaner Through Long Days",
+          "angle": "UAE/Egypt climate guide: heat and humidity prep, skincare settling, powdering oily lids, gentle correction; no guaranteed wear claims."
+        }
+      ]
+    }
+  ]
+}
