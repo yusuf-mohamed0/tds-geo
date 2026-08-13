@@ -3,6 +3,12 @@ client: flaunt-cosmetics-global
 title: "Eyeliner Stamp For Beginners: A Calm First Routine"
 status: local_draft
 publication_state: not_published
+cms_status: shopify_hidden_draft
+shopify_article_id: 635735933220
+shopify_blog_id: 116005503268
+shopify_handle: eyeliner-stamp-for-beginners-a-calm-first-routine
+scheduled: false
+published: false
 target_blog: "Shopify Beauty Tips blog, ID 116005503268"
 primary_keyword: "eyeliner stamp for beginners"
 roles:
