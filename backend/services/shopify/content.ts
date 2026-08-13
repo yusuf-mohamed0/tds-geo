@@ -8,6 +8,7 @@ import { ShopifyConfig } from '../../types';
 import { refreshIfExpired } from './auth';
 import { buildClient, getQueue } from './client';
 import { truncateWithEllipsis, generateExcerptFromHtml } from '../../utils/stringUtils';
+import { assertPublicArticleBody } from '../content/publicArticleGuard';
 
 export function getClientDefaultBlogId(client: { settings?: unknown }): number | string | null {
   let settings: Record<string, unknown> = {};
@@ -163,6 +164,8 @@ function shouldPublish(article: ShopifyArticleInput, options?: ShopifyPublishOpt
 }
 
 function buildArticlePayload(article: ShopifyArticleInput): Record<string, unknown> {
+  assertPublicArticleBody(article.contentHtml);
+
   const metaTitle = truncateWithEllipsis(article.metaTitle || article.title, SEO_TITLE_MAX);
   const metaDescription = truncateWithEllipsis(
     article.metaDescription || generateExcerptFromHtml(article.contentHtml, SEO_DESCRIPTION_MAX),

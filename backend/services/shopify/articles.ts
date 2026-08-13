@@ -18,6 +18,7 @@
 
 import { logger } from '../../utils/logger';
 import { ShopifyConfig } from '../../types';
+import { assertPublicArticleBody } from '../content/publicArticleGuard';
 import { refreshIfExpired } from './auth';
 import { buildClient, getQueue } from './client';
 
@@ -64,7 +65,10 @@ export async function updateArticle(
 
   const payload: Record<string, any> = {};
   if (updates.title !== undefined) payload.title = updates.title;
-  if (updates.contentHtml !== undefined) payload.body_html = updates.contentHtml;
+  if (updates.contentHtml !== undefined) {
+    assertPublicArticleBody(updates.contentHtml);
+    payload.body_html = updates.contentHtml;
+  }
   if (updates.summaryHtml !== undefined) payload.summary_html = updates.summaryHtml;
   if (updates.tags !== undefined) payload.tags = updates.tags.join(', ');
   if (updates.author !== undefined) payload.author = updates.author;

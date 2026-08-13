@@ -161,6 +161,15 @@ describe('shopify content — draft-first article contract', () => {
       expect(payload.article.summary_html).toBe('My custom summary');
     });
 
+    it('rejects internal planning sections before creating a Shopify draft', async () => {
+      await expect(publishArticle(shopConfig, BLOG_ID, {
+        title: 'Bad Article',
+        contentHtml: '<h2>GEO/AEO Answer Capsule</h2><p>Internal draft notes.</p><h2>Publishing Checklist</h2>',
+      })).rejects.toThrow('internal draft markers');
+
+      expect(postMock).not.toHaveBeenCalled();
+    });
+
     it('(e) live flip path: creates a draft first (published:false) then PUTs published:true', async () => {
       const result = await publishArticle(
         shopConfig,

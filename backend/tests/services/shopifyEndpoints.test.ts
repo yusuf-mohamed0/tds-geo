@@ -115,6 +115,17 @@ describe('Shopify service endpoint calls (rate-limited client)', () => {
     expect(result).toEqual({ id: 123, blog_id: 9, handle: 'hi' });
   });
 
+  it('updateArticle rejects internal planning sections before calling Shopify', async () => {
+    const { client } = setupClient();
+
+    await expect(updateArticle(shopConfig, 42, 123, {
+      title: 'Bad Article',
+      contentHtml: '<h2>Meta Draft</h2><p>Internal SEO notes.</p><h2>FAQ Opportunities</h2>',
+    })).rejects.toThrow('internal draft markers');
+
+    expect(client.put).not.toHaveBeenCalled();
+  });
+
   it('deleteArticle hits DELETE /blogs/{blog_id}/articles/{id}.json', async () => {
     const { client } = setupClient();
     client.delete.mockResolvedValue({ data: {}, headers: {} });

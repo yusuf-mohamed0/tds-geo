@@ -4,6 +4,8 @@ Last updated: 2026-08-05
 
 These are local editorial drafts only. They are not scheduled, not published, and not pushed to Shopify or WordPress until each client connector passes production audit and approval is explicit.
 
+Monthly active-client article planning now lives in `ACTIVE-CLIENTS-MONTHLY-CONTENT-PLAN.md`. That file is the required source for this month's 4-article plan per active client and includes each client's brand/style requirements.
+
 ## New Drafts Created
 
 | Client | Draft | Status | Publishing Blocker |
