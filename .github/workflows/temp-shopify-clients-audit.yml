@@ -1,0 +1,100 @@
+name: Temp Shopify Clients Audit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit-shopify-clients:
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
+    timeout-minutes: 10
+    steps:
+      - name: Audit Alamein and Caravanserai Shopify drafts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/shopify-clients-audit.mjs <<'NODE'
+          const https = require('https');
+          const { Pool } = require('pg');
+
+          const clients = [
+            { slug: 'alamein-2022', blogId: '79774056505' },
+            { slug: 'caravanserai', blogId: '78074216615' },
+          ];
+
+          function clean(html) {
+            return String(html || '')
+              .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+              .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+              .replace(/<[^>]*>/g, ' ')
+              .replace(/&nbsp;/g, ' ')
+              .replace(/&amp;/g, '&')
+              .replace(/\s+/g, ' ')
+              .trim();
+          }
+
+          function request(shop, version, token, path) {
+            return new Promise((resolve, reject) => {
+              const req = https.request(`https://${shop}/admin/api/${version}${path}`, {
+                method: 'GET',
+                headers: { 'X-Shopify-Access-Token': token, 'Content-Type': 'application/json' },
+                timeout: 30000,
+              }, res => {
+                let data = '';
+                res.on('data', c => data += c);
+                res.on('end', () => {
+                  let json = null;
+                  try { json = data ? JSON.parse(data) : null; } catch {}
+                  if (res.statusCode >= 200 && res.statusCode < 300) resolve(json);
+                  else reject(new Error(JSON.stringify({ status: res.statusCode, body: json || data.slice(0, 300) })));
+                });
+              });
+              req.on('timeout', () => req.destroy(new Error('timeout')));
+              req.on('error', reject);
+              req.end();
+            });
+          }
+
+          async function main() {
+            const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+            try {
+              const results = [];
+              for (const client of clients) {
+                const { rows } = await pool.query(`select c.slug, c.name, c.shopify_shop, c.shopify_api_version, cc.config from clients c left join cms_connections cc on cc.client_id = c.id and cc.provider = 'shopify' and cc.is_active = true where c.slug = $1 order by cc.updated_at desc nulls last limit 1`, [client.slug]);
+                if (!rows.length) throw new Error(`missing_client_${client.slug}`);
+                const row = rows[0];
+                const config = row.config || {};
+                const shop = config.shop || row.shopify_shop;
+                const version = config.apiVersion || row.shopify_api_version || '2025-07';
+                const token = config.accessToken;
+                if (!shop || !token) throw new Error(`missing_shopify_connection_${client.slug}`);
+
+                const shopJson = await request(shop, version, token, '/shop.json');
+                const blogsJson = await request(shop, version, token, '/blogs.json?limit=250&fields=id,title,handle');
+                const articlesJson = await request(shop, version, token, `/blogs/${client.blogId}/articles.json?limit=250&fields=id,title,handle,body_html,summary_html,published_at,tags,author,updated_at,image`);
+                const hidden = (articlesJson.articles || [])
+                  .filter(article => !article.published_at)
+                  .map(article => ({
+                    id: article.id,
+                    title: article.title,
+                    handle: article.handle,
+                    author: article.author,
+                    tags: article.tags,
+                    updated_at: article.updated_at,
+                    published_at: article.published_at,
+                    has_image: Boolean(article.image),
+                    image_src: article.image?.src || null,
+                    image_alt: article.image?.alt || null,
+                    summary: clean(article.summary_html).slice(0, 300),
+                    body_excerpt: clean(article.body_html).slice(0, 900),
+                  }));
+                results.push({ slug: client.slug, shop, shop_name: shopJson.shop?.name || null, blogId: client.blogId, blogs: blogsJson.blogs || [], hidden_count: hidden.length, hidden });
+              }
+              console.log(JSON.stringify({ ok: true, action: 'audited_shopify_clients', results }, null, 2));
+            } finally {
+              await pool.end();
+            }
+          }
+
+          main().catch(error => { console.error(JSON.stringify({ ok: false, error: error.message })); process.exit(1); });
+          NODE
+          docker exec -i -w /app tds-geo-api-1 node < /tmp/shopify-clients-audit.mjs
