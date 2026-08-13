@@ -20,7 +20,7 @@ jobs:
           const https = require('https');
           const { Pool } = require('pg');
 
-          const articlePath = 'doc/clients/flaunt-cosmetics-global/articles/eyeliner-stamp-beginner-guide-uae-egypt.md';
+          const articlePath = '/tmp/flaunt-draft-upload/eyeliner-stamp-beginner-guide-uae-egypt.md';
           const blogId = '116005503268';
           const clientSlug = 'flaunt-cosmetics-global';
 
@@ -169,4 +169,6 @@ jobs:
             process.exit(1);
           });
           NODE
+          docker exec tds-geo-api-1 mkdir -p /tmp/flaunt-draft-upload
+          docker cp doc/clients/flaunt-cosmetics-global/articles/eyeliner-stamp-beginner-guide-uae-egypt.md tds-geo-api-1:/tmp/flaunt-draft-upload/eyeliner-stamp-beginner-guide-uae-egypt.md
           docker exec -i -w /app tds-geo-api-1 node < /tmp/flaunt-draft-upload.mjs
