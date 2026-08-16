@@ -98,4 +98,4 @@ jobs:
           NODE
 
           docker cp /tmp/kivo-shopify-token-check.js "$api:/tmp/kivo-shopify-token-check.js"
-          docker exec "$api" node /tmp/kivo-shopify-token-check.js
+          docker exec "$api" sh -c 'cd /app && node /tmp/kivo-shopify-token-check.js'
