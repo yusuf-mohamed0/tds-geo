@@ -4,6 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 
 interface ShopifyGlobal {
   idToken?: () => Promise<string>;
+  ready?: Promise<void>;
 }
 
 declare global {
@@ -12,11 +13,12 @@ declare global {
   }
 }
 
-function getShopifyToken(): Promise<string | null> {
-  const s = window.shopify;
-  if (s?.idToken) return s.idToken().catch(() => null);
+async function getShopifyToken(): Promise<string | null> {
   const fromUrl = new URLSearchParams(window.location.search).get('id_token');
-  if (fromUrl) return Promise.resolve(fromUrl);
+  if (fromUrl) return fromUrl;
+  const s = window.shopify;
+  if (s?.ready) await s.ready.catch(() => undefined);
+  if (s?.idToken) return s.idToken().catch(() => null);
   return new Promise(resolve => {
     const check = setInterval(async () => {
       const shop = window.shopify;
