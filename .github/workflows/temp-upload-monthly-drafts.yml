@@ -202,6 +202,55 @@ jobs:
             return { url, apiKey, configKeys: Object.keys(config) };
           }
 
+          function decryptVault(ciphertext) {
+            const parts = String(ciphertext).split(':');
+            if (parts.length < 3) return '';
+            const key = process.env.CREDENTIAL_VAULT_KEY || process.env.ENCRYPTION_KEY;
+            if (!key) return '';
+            try {
+              const crypto = require('crypto');
+              const iv = Buffer.from(parts[0], 'hex');
+              const authTag = Buffer.from(parts[1], 'hex');
+              const encrypted = parts.slice(2).join(':');
+              const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(key.slice(0, 64), 'hex'), iv);
+              decipher.setAuthTag(authTag);
+              return decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+            } catch { return ''; }
+          }
+
+          async function fetchShopifyExtraTokens(pool, slug, shop) {
+            const extra = [];
+            try {
+              const sess = await pool.query(`select shop, access_token from shopify_sessions where access_token is not null and access_token <> '' and (lower(shop) = lower($1) or lower(shop) like lower('%' || $1 || '%'))`, [shop]);
+              for (const s of sess.rows) extra.push({ token: s.access_token, source: 'shopify_sessions' });
+            } catch {}
+            try {
+              const keys = await pool.query(`select key_value from api_keys where client_id = (select id from clients where slug = $1) and key_value is not null and key_value like 'shpat%'`, [slug]);
+              for (const k of keys.rows) extra.push({ token: k.key_value, source: 'api_keys' });
+            } catch {}
+            const seen = new Set();
+            return extra.filter(x => { if (seen.has(x.token)) return false; seen.add(x.token); return true; });
+          }
+
+          async function fetchWordPressExtraTokens(pool, slug) {
+            const extra = [];
+            try {
+              const keys = await pool.query(`select key_value, label from api_keys where client_id = (select id from clients where slug = $1) and key_value is not null and key_value <> ''`, [slug]);
+              for (const k of keys.rows) extra.push({ token: k.key_value, source: 'api_keys:' + (k.label || '') });
+            } catch {}
+            try {
+              const vault = await pool.query(`select username, password, label from credential_vault where deleted_at is null and (service = $1 or lower(label) like '%wordpress%' or lower(label) like '%kivo%')`, [slug]);
+              for (const v of vault.rows) {
+                const u = decryptVault(v.username);
+                const p = decryptVault(v.password);
+                if (u && u.length > 8) extra.push({ token: u, source: 'vault:' + (v.label || '') });
+                if (p && p.length > 8 && p !== u) extra.push({ token: p, source: 'vault-pass:' + (v.label || '') });
+              }
+            } catch {}
+            const seen = new Set();
+            return extra.filter(x => { if (seen.has(x.token)) return false; seen.add(x.token); return true; });
+          }
+
           async function listShopifyArticles(shop, version, token, blogId) {
             const all = [];
             let pathname = `/blogs/${blogId}/articles.json?limit=250&fields=id,title,published_at`;
@@ -259,7 +308,9 @@ jobs:
                       connCache[key] = await fetchShopifyConnection(pool, item.client);
                       if (connCache[key]) {
                         const c = connCache[key];
-                        console.log(`conn_diag_${item.client}: ${JSON.stringify({ shop: c.shop, config_shop: c.configShop, db_shop: c.dbShop, version: c.version, token_present: Boolean(c.token), token_len: c.token ? c.token.length : 0, token_source: c.tokenSource, alt_token_present: Boolean(c.altToken), config_keys: c.configKeys })}`);
+                        const extraTokens = await fetchShopifyExtraTokens(pool, item.client, c.shop);
+                        c.extraTokens = extraTokens;
+                        console.log(`conn_diag_${item.client}: ${JSON.stringify({ shop: c.shop, config_shop: c.configShop, db_shop: c.dbShop, version: c.version, token_present: Boolean(c.token), token_len: c.token ? c.token.length : 0, token_source: c.tokenSource, alt_token_present: Boolean(c.altToken), extra_token_count: extraTokens.length, extra_token_sources: extraTokens.map(t => t.source), config_keys: c.configKeys })}`);
                       }
                     }
                     const conn = connCache[key];
@@ -272,6 +323,7 @@ jobs:
                       const candidates = [conn.version, '2026-04', '2025-10', '2025-04', '2024-10', '2024-01', 'stable'];
                       const tokenCandidates = [{ token: conn.token, source: conn.tokenSource }];
                       if (conn.altToken) tokenCandidates.push({ token: conn.altToken, source: 'clients.shopify_token' });
+                      for (const t of (conn.extraTokens || [])) tokenCandidates.push(t);
                       let found = false;
                       let lastError = '';
                       for (const tc of tokenCandidates) {
@@ -323,24 +375,43 @@ jobs:
                       connCache[key] = await fetchWordPressConnection(pool, item.client);
                       if (connCache[key]) {
                         const c = connCache[key];
-                        console.log(`conn_diag_${item.client}: ${JSON.stringify({ url: c.url, apiKey_present: Boolean(c.apiKey), apiKey_len: c.apiKey ? c.apiKey.length : 0, config_keys: c.configKeys })}`);
+                        const extraTokens = await fetchWordPressExtraTokens(pool, item.client);
+                        c.extraTokens = extraTokens;
+                        console.log(`conn_diag_${item.client}: ${JSON.stringify({ url: c.url, apiKey_present: Boolean(c.apiKey), apiKey_len: c.apiKey ? c.apiKey.length : 0, extra_token_count: extraTokens.length, extra_token_sources: extraTokens.map(t => t.source), config_keys: c.configKeys })}`);
                       }
                     }
                     const conn = connCache[key];
-                    if (!conn || !conn.url || !conn.apiKey) {
-                      results.push({ client: item.client, provider: 'wordpress', file: slug, action: 'skipped', reason: 'credentials_missing' });
+                    if (!conn || !conn.url) {
+                      results.push({ client: item.client, provider: 'wordpress', file: slug, action: 'skipped', reason: 'no_active_wordpress_connection' });
                       console.log('boston_pharma_wordpress_credentials_missing');
                       continue;
                     }
                     if (!connTested[key]) {
-                      try {
-                        await request({ url: `${conn.url.replace(/\/+$/, '')}/wp-json/kivo/v1/status`, method: 'GET', headers: { 'X-Kivo-Key': conn.apiKey, 'Content-Type': 'application/json' } });
-                        connTested[key] = 'ok';
-                        console.log(`wordpress_conn_test_${item.client}: ok`);
-                      } catch (e) {
-                        connTested[key] = 'fail';
-                        console.log(`wordpress_conn_test_${item.client}: fail:${e.message}`);
+                      const apiKeyCandidates = [];
+                      if (conn.apiKey) apiKeyCandidates.push({ token: conn.apiKey, source: 'config' });
+                      for (const t of (conn.extraTokens || [])) apiKeyCandidates.push(t);
+                      let found = false;
+                      let lastError = '';
+                      for (const ac of apiKeyCandidates) {
+                        try {
+                          await request({ url: `${conn.url.replace(/\/+$/, '')}/wp-json/kivo/v1/status`, method: 'GET', headers: { 'X-Kivo-Key': ac.token, 'Content-Type': 'application/json' } });
+                          conn.apiKey = ac.token;
+                          found = true;
+                          break;
+                        } catch (e) { lastError = e.message; }
                       }
+                      if (found) {
+                        connTested[key] = 'ok';
+                        console.log(`wordpress_conn_test_${item.client}: ok (source:${apiKeyCandidates.find(c => c.token === conn.apiKey).source})`);
+                      } else {
+                        connTested[key] = 'fail';
+                        console.log(`wordpress_conn_test_${item.client}: fail:${lastError || 'no_api_key_candidates'}`);
+                      }
+                    }
+                    if (!conn.apiKey) {
+                      results.push({ client: item.client, provider: 'wordpress', file: slug, action: 'skipped', reason: 'credentials_missing' });
+                      console.log('boston_pharma_wordpress_credentials_missing');
+                      continue;
                     }
                     if (connTested[key] !== 'ok') {
                       results.push({ client: item.client, provider: 'wordpress', file: slug, action: 'skipped', reason: 'wordpress_connection_test_failed' });
