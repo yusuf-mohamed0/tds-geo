@@ -16,86 +16,74 @@ jobs:
             echo "No live API container found"
             exit 1
           fi
+          postgres="$(docker ps -q | while read -r id; do docker exec "$id" sh -c 'printenv POSTGRES_USER >/dev/null 2>&1 && printenv POSTGRES_DB >/dev/null 2>&1' >/dev/null 2>&1 && echo "$id" && break; done)"
+          if [[ -z "$postgres" ]]; then
+            echo "No live Postgres container found"
+            exit 1
+          fi
 
-          cat > /tmp/kivo-shopify-token-check.js <<'NODE'
-          const { Pool } = require('pg');
+          db_user="$(docker exec "$postgres" printenv POSTGRES_USER)"
+          db_name="$(docker exec "$postgres" printenv POSTGRES_DB)"
+          default_version="$(docker exec "$api" printenv SHOPIFY_DEFAULT_API_VERSION 2>/dev/null || true)"
+          default_version="${default_version:-2025-07}"
 
-          const targets = [
-            { slug: 'alamein-2022', shop: 'alamein-2022.myshopify.com' },
-            { slug: 'caravanserai', shop: 'caravanserai-gift-store.myshopify.com' },
-            { slug: 'flaunt-cosmetics-global', shop: 'c9d9a9.myshopify.com' },
-          ];
+          query="
+          WITH target(slug, fallback_shop) AS (
+            VALUES
+              ('alamein-2022', 'alamein-2022.myshopify.com'),
+              ('caravanserai', 'caravanserai-gift-store.myshopify.com'),
+              ('flaunt-cosmetics-global', 'c9d9a9.myshopify.com')
+          ), latest_connection AS (
+            SELECT DISTINCT ON (client_id)
+              client_id,
+              id,
+              status,
+              config
+            FROM cms_connections
+            WHERE provider = 'shopify'
+            ORDER BY client_id, id DESC
+          )
+          SELECT
+            target.slug,
+            COALESCE(c.shopify_shop, target.fallback_shop) AS shop,
+            (c.id IS NOT NULL)::text AS has_client,
+            (c.shopify_token IS NOT NULL)::text AS has_client_token,
+            (latest_connection.id IS NOT NULL)::text AS has_cms_connection,
+            COALESCE(latest_connection.status, 'none') AS cms_status,
+            ((latest_connection.config ? 'accessToken') OR (latest_connection.config ? 'access_token') OR (latest_connection.config ? 'token'))::text AS has_cms_token,
+            COALESCE(latest_connection.config->>'apiVersion', '$default_version') AS api_version,
+            COALESCE(latest_connection.config->>'accessToken', latest_connection.config->>'access_token', latest_connection.config->>'token', c.shopify_token, '') AS token
+          FROM target
+          LEFT JOIN clients c
+            ON c.slug = target.slug
+            OR c.shopify_shop = target.fallback_shop
+          LEFT JOIN latest_connection
+            ON latest_connection.client_id = c.id
+          ORDER BY target.slug;
+          "
 
-          const apiVersion = process.env.SHOPIFY_DEFAULT_API_VERSION || '2025-07';
-          const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+          failures=0
+          while IFS=$'\t' read -r slug shop has_client has_client_token has_cms_connection cms_status has_cms_token api_version token; do
+            if [[ "$has_client" != "true" ]]; then
+              echo "$slug: missing_client"
+              failures=$((failures + 1))
+              continue
+            fi
 
-          function tokenFromConfig(config) {
-            if (!config || typeof config !== 'object') return '';
-            return config.accessToken || config.access_token || config.token || '';
-          }
+            if [[ -z "$token" ]]; then
+              status="missing_token"
+            else
+              status="$(curl -sS -o /dev/null -w '%{http_code}' \
+                -H "X-Shopify-Access-Token: $token" \
+                -H 'Accept: application/json' \
+                "https://${shop}/admin/api/${api_version}/shop.json" || true)"
+            fi
 
-          async function testToken(shop, token, version) {
-            if (!shop || !token) return { ok: false, status: 'missing_token' };
-            const response = await fetch(`https://${shop}/admin/api/${version}/shop.json`, {
-              headers: {
-                'X-Shopify-Access-Token': token,
-                'Accept': 'application/json',
-              },
-            });
-            return { ok: response.ok, status: response.status };
-          }
+            if [[ "$status" != "200" ]]; then
+              failures=$((failures + 1))
+            fi
 
-          async function main() {
-            const { rows } = await pool.query(`
-              SELECT
-                c.id,
-                c.slug,
-                c.name,
-                c.shopify_shop,
-                c.shopify_token IS NOT NULL AS has_client_token,
-                c.shopify_token,
-                cc.id AS connection_id,
-                cc.status AS connection_status,
-                cc.config,
-                cc.config ? 'accessToken' AS has_cms_token
-              FROM clients c
-              LEFT JOIN cms_connections cc
-                ON cc.client_id = c.id
-               AND cc.provider = 'shopify'
-              WHERE c.slug = ANY($1)
-                 OR c.shopify_shop = ANY($2)
-              ORDER BY c.slug, cc.id DESC
-            `, [targets.map(t => t.slug), targets.map(t => t.shop)]);
+            echo "$slug: shop=$shop client_token=$has_client_token cms_connection=$has_cms_connection cms_status=$cms_status cms_token=$has_cms_token api_version=$api_version shopify_status=$status"
+          done < <(docker exec "$postgres" psql -U "$db_user" -d "$db_name" -At -F $'\t' -c "$query")
 
-            let failures = 0;
-            for (const target of targets) {
-              const row = rows.find(r => r.slug === target.slug || r.shopify_shop === target.shop);
-              if (!row) {
-                failures += 1;
-                console.log(`${target.slug}: missing_client`);
-                continue;
-              }
-
-              const shop = row.shopify_shop || target.shop;
-              const cmsToken = tokenFromConfig(row.config);
-              const token = cmsToken || row.shopify_token || '';
-              const version = row.config?.apiVersion || apiVersion;
-              const result = await testToken(shop, token, version);
-
-              if (!result.ok) failures += 1;
-              console.log(`${target.slug}: shop=${shop} client_token=${Boolean(row.has_client_token)} cms_connection=${Boolean(row.connection_id)} cms_status=${row.connection_status || 'none'} cms_token=${Boolean(row.has_cms_token || cmsToken)} api_version=${version} shopify_status=${result.status}`);
-            }
-
-            await pool.end();
-            process.exit(failures === 0 ? 0 : 2);
-          }
-
-          main().catch(async (error) => {
-            console.error(error.message);
-            await pool.end().catch(() => {});
-            process.exit(1);
-          });
-          NODE
-
-          docker cp /tmp/kivo-shopify-token-check.js "$api:/tmp/kivo-shopify-token-check.js"
-          docker exec "$api" sh -c 'cd /app && node /tmp/kivo-shopify-token-check.js'
+          exit "$failures"
