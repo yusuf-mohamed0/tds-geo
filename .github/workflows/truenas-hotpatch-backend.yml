@@ -1,0 +1,41 @@
+name: TrueNAS Hotpatch Backend
+
+on:
+  workflow_dispatch:
+
+jobs:
+  hotpatch:
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend
+        run: npm ci --legacy-peer-deps --ignore-scripts && npm run build
+
+      - name: Patch live backend containers
+        run: |
+          set -euo pipefail
+          targets=""
+          for id in $(docker ps -q); do
+            if docker exec "$id" sh -c 'test -f /app/dist/backend/routes/shopifyInstall.js || test -f /app/dist/backend/services/shopify/auth.js' >/dev/null 2>&1; then
+              targets="$targets $id"
+            fi
+          done
+          if [[ -z "$targets" ]]; then
+            echo "No backend containers found"
+            docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Names}}\t{{.Status}}'
+            exit 1
+          fi
+          for id in $targets; do
+            echo "Patching $id"
+            docker exec "$id" sh -c 'mkdir -p /tmp/kivo-backup/backend-routes /tmp/kivo-backup/backend-shopify && cp -a /app/dist/backend/routes/shopifyInstall.js /tmp/kivo-backup/backend-routes/shopifyInstall.js.$(date -u +%Y%m%d%H%M%S) 2>/dev/null || true && cp -a /app/dist/backend/services/shopify/auth.js /tmp/kivo-backup/backend-shopify/auth.js.$(date -u +%Y%m%d%H%M%S) 2>/dev/null || true'
+            docker cp dist/backend/routes/shopifyInstall.js "$id:/app/dist/backend/routes/shopifyInstall.js"
+            docker cp dist/backend/services/shopify/auth.js "$id:/app/dist/backend/services/shopify/auth.js"
+            docker exec "$id" sh -c "! grep -q \"expiring: '1'\|expiring: \\\"1\\\"\" /app/dist/backend/routes/shopifyInstall.js"
+            docker exec "$id" sh -c "grep -n 'cms_connections' /app/dist/backend/services/shopify/auth.js | sed -n '1,20p'"
+          done
+          docker restart $targets
+          sleep 8
+          api="$(docker ps -q | while read -r id; do docker exec "$id" sh -c 'test -f /app/dist/backend/index.js' >/dev/null 2>&1 && echo "$id" && break; done)"
+          docker exec "$api" sh -c "node -e \"require('http').get('http://127.0.0.1:3000/health', r => { console.log('api_health_status=' + r.statusCode); process.exit(r.statusCode === 200 ? 0 : 1); }).on('error', e => { console.error(e.message); process.exit(1); })\""
