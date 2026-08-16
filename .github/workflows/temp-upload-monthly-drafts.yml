@@ -14,7 +14,8 @@ jobs:
       - name: Stage monthly draft articles inside API container
         run: |
           set -euo pipefail
-          mkdir -p /tmp/monthly-drafts
+          STAGE_DIR="/tmp/monthly-drafts-${GITHUB_RUN_ID}"
+          mkdir -p "$STAGE_DIR"
           for f in \
             doc/clients/alamein-2022/articles/alamein-egyptian-cafes-outdoor-furniture.md \
             doc/clients/alamein-2022/articles/alamein-playground-equipment-schools-compounds.md \
@@ -33,12 +34,12 @@ jobs:
             doc/clients/boston-pharma/articles/boston-pharma-reading-supplement-labels-egypt.md \
             doc/clients/boston-pharma/articles/boston-pharma-gmp-documentation-matters.md
           do
-            dir="/tmp/monthly-drafts/$(dirname "$f")"
+            dir="$STAGE_DIR/$(dirname "$f")"
             mkdir -p "$dir"
             cp "$GITHUB_WORKSPACE/$f" "$dir/"
           done
-          docker exec tds-geo-api-1 sh -c 'rm -rf /tmp/monthly-drafts && mkdir -p /tmp/monthly-drafts'
-          docker cp /tmp/monthly-drafts/. tds-geo-api-1:/tmp/monthly-drafts/
+          docker exec tds-geo-api-1 sh -c "mkdir -p $STAGE_DIR"
+          docker cp "$STAGE_DIR/." tds-geo-api-1:"$STAGE_DIR/"
 
       - name: Upload 16 hidden monthly drafts to client CMS
         shell: bash
@@ -354,4 +355,4 @@ jobs:
           }
           main().catch(error => { console.error(JSON.stringify({ ok: false, error: error.message })); process.exit(1); });
           NODE
-          docker exec -i -e DRAFTS_DIR=/tmp/monthly-drafts -w /app tds-geo-api-1 node < /tmp/upload-monthly-drafts.mjs
+          docker exec -i -e DRAFTS_DIR=/tmp/monthly-drafts-${GITHUB_RUN_ID} -w /app tds-geo-api-1 node < /tmp/upload-monthly-drafts.mjs
