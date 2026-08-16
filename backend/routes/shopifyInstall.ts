@@ -93,7 +93,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
     }
 
     try {
-      // Step 1: Exchange OAuth code for expiring offline access token
+      // Step 1: Exchange OAuth code for an offline access token.
       const params = new URLSearchParams({
         client_id: SHOPIFY_API_KEY,
         client_secret: SHOPIFY_API_SECRET,
