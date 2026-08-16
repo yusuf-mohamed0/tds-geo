@@ -28,7 +28,7 @@ docker compose --env-file .env -f compose.yml exec -T postgres \
   pg_dump -U "${DB_USER}" -d "${DB_NAME}" --format=custom --compress=9 --no-owner --no-privileges \
   > "$BACKUP_FILE"
 
-pg_restore --list "$BACKUP_FILE" >/dev/null
+docker compose --env-file .env -f compose.yml exec -T postgres pg_restore --list < "$BACKUP_FILE" >/dev/null
 ln -sf "$BACKUP_FILE" "$LATEST_LINK"
 
 find "$BACKUP_DIR" -name 'tds-geo_*.dump' -type f -mtime "+${RETENTION_DAYS}" -delete

@@ -106,12 +106,20 @@ Required GitHub permissions for the workflow:
 
 ## Runtime Environment Requirements
 
-Create `/opt/kivo/deploy/truenas/.env` from `.env.example` on the VM only.
+Create the TrueNAS runtime `.env` on the runner only. The deploy workflow stores it at `$HOME/tds-geo-deploy/deploy/truenas/.env` with `600` permissions and never commits it.
+
+Supported bootstrap sources, in priority order:
+
+- Existing `$HOME/tds-geo-deploy/deploy/truenas/.env`.
+- GitHub secret `TRUENAS_ENV_B64`, containing the complete `.env` file base64-encoded.
+- GitHub secret `TRUENAS_ENV`, containing the complete shell-valid `.env` file.
+- Existing legacy runner paths `/opt/kivo/deploy/truenas/.env` or `/opt/tds-geo/kivo-source/deploy/truenas/.env`.
+- Current live Docker containers, used once to bootstrap from the already-running production environment while preserving existing Postgres and Redis mount paths.
 
 Required values:
 
 - `TDS_IMAGE`.
-- `PUBLIC_BASE_URL`.
+- `TDS_PUBLIC_URL`.
 - `DB_USER`.
 - `DB_PASSWORD`.
 - `DB_NAME`.

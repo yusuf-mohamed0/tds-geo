@@ -46,25 +46,25 @@ jobs:
     needs: build
     runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
     steps:
       - uses: actions/checkout@v4
 
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Sync repository to runner deploy directory
+        env:
+          TRUENAS_ENV: ${{ secrets.TRUENAS_ENV }}
+          TRUENAS_ENV_B64: ${{ secrets.TRUENAS_ENV_B64 }}
         run: |
           DEPLOY_ROOT="$HOME/tds-geo-deploy"
-          mkdir -p "$DEPLOY_ROOT"
-
-          if [[ ! -f "$DEPLOY_ROOT/deploy/truenas/.env" ]]; then
-            for candidate in \
-              /opt/kivo/deploy/truenas/.env \
-              /opt/tds-geo/kivo-source/deploy/truenas/.env; do
-              if [[ -r "$candidate" ]]; then
-                mkdir -p "$DEPLOY_ROOT/deploy/truenas"
-                cp "$candidate" "$DEPLOY_ROOT/deploy/truenas/.env"
-                break
-              fi
-            done
-          fi
+          DEPLOY_ROOT="$DEPLOY_ROOT" ./deploy/truenas/scripts/prepare-env.sh
 
           rsync -a --delete \
             --exclude '.git' \
