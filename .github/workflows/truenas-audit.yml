@@ -1,0 +1,46 @@
+name: TrueNAS Audit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit live TrueNAS runtime
+        run: |
+          set -euo pipefail
+          echo "IDENTITY"
+          id
+          hostname
+          echo "GIT_CHECKOUT"
+          git rev-parse --short HEAD
+          git status --short | sed -n '1,80p'
+          echo "PORTS"
+          ss -ltnp 2>/dev/null | grep -E ':(80|443|3000|3001|3100|5432|6379)' || true
+          echo "SSH_TUNNELS"
+          ps -eo pid,user,cmd | grep -E 'ssh .* -R .*3100|ssh .*3100' | grep -v grep || true
+          echo "DOCKER_PS"
+          docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Names}}\t{{.Status}}\t{{.Ports}}'
+          echo "CONTAINERS"
+          for id in $(docker ps -q); do
+            echo "CONTAINER $id $(docker inspect --format '{{.Name}} {{.Config.Image}} {{.State.Status}} {{.State.Health.Status}}' "$id" 2>/dev/null || true)"
+          done
+          echo "LIVE_API_CONTAINER"
+          API_CONTAINER="$(docker ps -q | while read -r id; do docker exec "$id" sh -c 'test -f /app/dist/backend/index.js' >/dev/null 2>&1 && echo "$id" && break; done)"
+          echo "${API_CONTAINER:-missing}"
+          if [[ -n "${API_CONTAINER:-}" ]]; then
+            docker exec "$API_CONTAINER" sh -c "node -e \"require('http').get('http://127.0.0.1:3000/health', r => { console.log('api_health_status=' + r.statusCode); process.exit(r.statusCode === 200 ? 0 : 1); }).on('error', e => { console.error(e.message); process.exit(1); })\""
+            docker exec "$API_CONTAINER" sh -c "grep -c \"expiring: '1'\" /app/dist/backend/routes/shopifyInstall.js || true"
+            docker exec "$API_CONTAINER" sh -c "grep -n 'shopify-api-key\|app-bridge' /app/dist/backend/public/index.html | sed -n '1,10p'"
+          fi
+          echo "DEPLOY_PATHS"
+          for d in /home/tdsdeploy/tds-geo-deploy /opt/tds-geo/kivo-source /opt/tds-geo/source; do
+            [ -d "$d" ] || continue
+            echo "PATH $d"
+            [ -f "$d/deploy/truenas/.env" ] && echo "env_present" || echo "env_missing"
+            [ -d "$d/.git" ] && git -C "$d" rev-parse --short HEAD || true
+          done
