@@ -178,11 +178,16 @@ jobs:
           }
 
           async function fetchShopifyConnection(pool, slug) {
-            const { rows } = await pool.query(`select c.shopify_shop, c.shopify_api_version, cc.config from clients c join cms_connections cc on cc.client_id = c.id where c.slug = $1 and cc.provider = 'shopify' and cc.is_active = true order by cc.updated_at desc nulls last limit 1`, [slug]);
+            const { rows } = await pool.query(`select c.shopify_shop, c.shopify_api_version, c.shopify_token, cc.config from clients c join cms_connections cc on cc.client_id = c.id where c.slug = $1 and cc.provider = 'shopify' and cc.is_active = true order by cc.updated_at desc nulls last limit 1`, [slug]);
             if (!rows.length) return null;
             const row = rows[0];
             const config = typeof row.config === 'string' ? JSON.parse(row.config) : (row.config || {});
-            return { shop: config.shop || row.shopify_shop, version: config.apiVersion || row.shopify_api_version || '2025-07', token: config.accessToken };
+            const shop = config.shop || row.shopify_shop;
+            const version = config.apiVersion || row.shopify_api_version || '2025-07';
+            const fromConfig = config.accessToken || config.apiKey || config.access_token || '';
+            const token = fromConfig || row.shopify_token || '';
+            const tokenSource = fromConfig ? (config.accessToken ? 'config.accessToken' : config.apiKey ? 'config.apiKey' : 'config.access_token') : (row.shopify_token ? 'clients.shopify_token' : 'none');
+            return { shop, version, token, tokenSource, configKeys: Object.keys(config) };
           }
 
           async function fetchWordPressConnection(pool, slug) {
@@ -192,7 +197,7 @@ jobs:
             const config = typeof row.config === 'string' ? JSON.parse(row.config) : (row.config || {});
             const url = config.url || config.endpointUrl || config.endpoint_url || config.siteUrl || config.site_url || row.endpoint_url || '';
             const apiKey = config.apiKey || config.api_key || config.tdsGeoApiKey || config.kivo_api_key || config.accessToken || config.access_token || '';
-            return { url, apiKey };
+            return { url, apiKey, configKeys: Object.keys(config) };
           }
 
           async function listShopifyArticles(shop, version, token, blogId) {
@@ -214,83 +219,137 @@ jobs:
             const pool = new Pool({ connectionString: process.env.DATABASE_URL });
             const results = [];
             const connCache = {};
+            const connTested = {};
+            let uploaded = 0;
             try {
               for (const item of MANIFEST) {
-                const rel = item.file;
-                const filePath = path.join(draftsDir, rel);
-                const slug = path.basename(rel).replace(/\.md$/, '');
-                const md = fs.readFileSync(filePath, 'utf8');
-                const fm = parseFrontmatter(md);
-                const body = stripInternalSections(stripFrontmatter(md));
-                const html = mdToHtml(body);
-                const markers = findMarkers(html);
-                if (markers.length) {
-                  results.push({ client: item.client, provider: item.provider, file: slug, action: 'skipped', guard: markers });
-                  console.log(`article_${slug}_guard_hit:${markers.join(',')}`);
-                  continue;
-                }
-                const summary = truncate(text(html), 200);
-                const tags = buildTags(fm.primary_keyword);
-                const payload = {
-                  title: fm.title,
-                  body_html: html,
-                  summary_html: summary,
-                  author: 'Traffic Digital Solutions',
-                  tags: tags.join(', '),
-                  published: false,
-                  published_at: null,
-                  metafields_global_title_tag: truncate(fm.seo_title || fm.title, 70),
-                  metafields_global_description_tag: truncate(fm.meta_description || '', 160),
-                };
+                try {
+                  const rel = item.file;
+                  const filePath = path.join(draftsDir, rel);
+                  const slug = path.basename(rel).replace(/\.md$/, '');
+                  const md = fs.readFileSync(filePath, 'utf8');
+                  const fm = parseFrontmatter(md);
+                  const body = stripInternalSections(stripFrontmatter(md));
+                  const html = mdToHtml(body);
+                  const markers = findMarkers(html);
+                  if (markers.length) {
+                    results.push({ client: item.client, provider: item.provider, file: slug, action: 'skipped', guard: markers });
+                    console.log(`article_${slug}_guard_hit:${markers.join(',')}`);
+                    continue;
+                  }
+                  const summary = truncate(text(html), 200);
+                  const tags = buildTags(fm.primary_keyword);
+                  const payload = {
+                    title: fm.title,
+                    body_html: html,
+                    summary_html: summary,
+                    author: 'Traffic Digital Solutions',
+                    tags: tags.join(', '),
+                    published: false,
+                    published_at: null,
+                    metafields_global_title_tag: truncate(fm.seo_title || fm.title, 70),
+                    metafields_global_description_tag: truncate(fm.meta_description || '', 160),
+                  };
 
-                if (item.provider === 'shopify') {
-                  const key = `shopify:${item.client}`;
-                  if (!connCache[key]) connCache[key] = await fetchShopifyConnection(pool, item.client);
-                  const conn = connCache[key];
-                  if (!conn || !conn.shop || !conn.token) {
-                    results.push({ client: item.client, provider: 'shopify', file: slug, action: 'skipped', reason: 'no_active_shopify_connection' });
-                    console.log(`article_${slug}_shopify_credentials_missing`);
-                    continue;
+                  if (item.provider === 'shopify') {
+                    const key = `shopify:${item.client}`;
+                    if (!connCache[key]) {
+                      connCache[key] = await fetchShopifyConnection(pool, item.client);
+                      if (connCache[key]) {
+                        const c = connCache[key];
+                        console.log(`conn_diag_${item.client}: ${JSON.stringify({ shop: c.shop, version: c.version, token_present: Boolean(c.token), token_len: c.token ? c.token.length : 0, token_source: c.tokenSource, config_keys: c.configKeys })}`);
+                      }
+                    }
+                    const conn = connCache[key];
+                    if (!conn || !conn.shop || !conn.token) {
+                      results.push({ client: item.client, provider: 'shopify', file: slug, action: 'skipped', reason: 'no_active_shopify_connection' });
+                      console.log(`article_${slug}_shopify_credentials_missing`);
+                      continue;
+                    }
+                    if (!connTested[key]) {
+                      try {
+                        await request({ url: `https://${conn.shop}/admin/api/${conn.version}/shop.json`, method: 'GET', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' } });
+                        connTested[key] = 'ok';
+                        console.log(`shopify_conn_test_${item.client}: ok`);
+                      } catch (e) {
+                        connTested[key] = 'fail';
+                        console.log(`shopify_conn_test_${item.client}: fail:${e.message}`);
+                      }
+                    }
+                    if (connTested[key] !== 'ok') {
+                      results.push({ client: item.client, provider: 'shopify', file: slug, action: 'skipped', reason: 'shopify_connection_test_failed' });
+                      continue;
+                    }
+                    const existing = await listShopifyArticles(conn.shop, conn.version, conn.token, item.blogId);
+                    const match = existing.find(a => String(a.title).trim().toLowerCase() === String(payload.title).trim().toLowerCase() && !a.published_at);
+                    let record;
+                    if (match) {
+                      const putRes = await request({ url: `https://${conn.shop}/admin/api/${conn.version}/blogs/${item.blogId}/articles/${match.id}.json`, method: 'PUT', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' }, body: JSON.stringify({ article: { ...payload, id: match.id } }) });
+                      record = putRes.json.article;
+                      record.action = 'update';
+                    } else {
+                      const postRes = await request({ url: `https://${conn.shop}/admin/api/${conn.version}/blogs/${item.blogId}/articles.json`, method: 'POST', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' }, body: JSON.stringify({ article: payload }) });
+                      record = postRes.json.article;
+                      record.action = 'create';
+                    }
+                    await sleep(500);
+                    const verify = await request({ url: `https://${conn.shop}/admin/api/${conn.version}/blogs/${item.blogId}/articles/${record.id}.json`, method: 'GET', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' } });
+                    if (verify.json.article.published_at) throw new Error(`article_${slug}_published_unexpectedly`);
+                    results.push({ client: item.client, provider: 'shopify', file: slug, id: record.id, title: record.title, handle: record.handle, published_at: verify.json.article.published_at, action: record.action });
+                    uploaded++;
+                    await sleep(500);
+                  } else if (item.provider === 'wordpress') {
+                    const key = `wordpress:${item.client}`;
+                    if (!connCache[key]) {
+                      connCache[key] = await fetchWordPressConnection(pool, item.client);
+                      if (connCache[key]) {
+                        const c = connCache[key];
+                        console.log(`conn_diag_${item.client}: ${JSON.stringify({ url: c.url, apiKey_present: Boolean(c.apiKey), apiKey_len: c.apiKey ? c.apiKey.length : 0, config_keys: c.configKeys })}`);
+                      }
+                    }
+                    const conn = connCache[key];
+                    if (!conn || !conn.url || !conn.apiKey) {
+                      results.push({ client: item.client, provider: 'wordpress', file: slug, action: 'skipped', reason: 'credentials_missing' });
+                      console.log('boston_pharma_wordpress_credentials_missing');
+                      continue;
+                    }
+                    if (!connTested[key]) {
+                      try {
+                        await request({ url: `${conn.url.replace(/\/+$/, '')}/wp-json/kivo/v1/status`, method: 'GET', headers: { 'X-Kivo-Key': conn.apiKey, 'Content-Type': 'application/json' } });
+                        connTested[key] = 'ok';
+                        console.log(`wordpress_conn_test_${item.client}: ok`);
+                      } catch (e) {
+                        connTested[key] = 'fail';
+                        console.log(`wordpress_conn_test_${item.client}: fail:${e.message}`);
+                      }
+                    }
+                    if (connTested[key] !== 'ok') {
+                      results.push({ client: item.client, provider: 'wordpress', file: slug, action: 'skipped', reason: 'wordpress_connection_test_failed' });
+                      continue;
+                    }
+                    const endpoint = `${conn.url.replace(/\/+$/, '')}/wp-json/kivo/v1/posts`;
+                    const postRes = await request({ url: endpoint, method: 'POST', headers: { 'X-Kivo-Key': conn.apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ title: payload.title, content_html: html, status: 'draft', tags, meta_title: payload.metafields_global_title_tag, meta_description: payload.metafields_global_description_tag, author_email: 'Traffic Digital Solutions' }) });
+                    const data = postRes.json && postRes.json.data ? postRes.json.data : postRes.json;
+                    const postId = data.post_id || data.id;
+                    await sleep(500);
+                    const verify = await request({ url: `${conn.url.replace(/\/+$/, '')}/wp-json/kivo/v1/posts/${postId}`, method: 'GET', headers: { 'X-Kivo-Key': conn.apiKey, 'Content-Type': 'application/json' } });
+                    const vdata = verify.json && verify.json.data ? verify.json.data : verify.json;
+                    if (vdata.status && vdata.status !== 'draft') throw new Error(`article_${slug}_wp_status_${vdata.status}`);
+                    results.push({ client: item.client, provider: 'wordpress', file: slug, id: postId, title: vdata.title || payload.title, handle: vdata.slug || null, published_at: null, status: vdata.status || 'draft', action: 'create' });
+                    uploaded++;
+                    await sleep(500);
                   }
-                  const existing = await listShopifyArticles(conn.shop, conn.version, conn.token, item.blogId);
-                  const match = existing.find(a => String(a.title).trim().toLowerCase() === String(payload.title).trim().toLowerCase() && !a.published_at);
-                  let record;
-                  if (match) {
-                    const putRes = await request({ url: `https://${conn.shop}/admin/api/${conn.version}/blogs/${item.blogId}/articles/${match.id}.json`, method: 'PUT', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' }, body: JSON.stringify({ article: { ...payload, id: match.id } }) });
-                    record = putRes.json.article;
-                    record.action = 'update';
-                  } else {
-                    const postRes = await request({ url: `https://${conn.shop}/admin/api/${conn.version}/blogs/${item.blogId}/articles.json`, method: 'POST', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' }, body: JSON.stringify({ article: payload }) });
-                    record = postRes.json.article;
-                    record.action = 'create';
-                  }
-                  await sleep(500);
-                  const verify = await request({ url: `https://${conn.shop}/admin/api/${conn.version}/blogs/${item.blogId}/articles/${record.id}.json`, method: 'GET', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' } });
-                  if (verify.json.article.published_at) throw new Error(`article_${slug}_published_unexpectedly`);
-                  results.push({ client: item.client, provider: 'shopify', file: slug, id: record.id, title: record.title, handle: record.handle, published_at: verify.json.article.published_at, action: record.action });
-                  await sleep(500);
-                } else if (item.provider === 'wordpress') {
-                  const key = `wordpress:${item.client}`;
-                  if (!connCache[key]) connCache[key] = await fetchWordPressConnection(pool, item.client);
-                  const conn = connCache[key];
-                  if (!conn || !conn.url || !conn.apiKey) {
-                    results.push({ client: item.client, provider: 'wordpress', file: slug, action: 'skipped', reason: 'credentials_missing' });
-                    console.log('boston_pharma_wordpress_credentials_missing');
-                    continue;
-                  }
-                  const endpoint = `${conn.url.replace(/\/+$/, '')}/wp-json/kivo/v1/posts`;
-                  const postRes = await request({ url: endpoint, method: 'POST', headers: { 'X-Kivo-Key': conn.apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ title: payload.title, content_html: html, status: 'draft', tags, meta_title: payload.metafields_global_title_tag, meta_description: payload.metafields_global_description_tag, author_email: 'Traffic Digital Solutions' }) });
-                  const data = postRes.json && postRes.json.data ? postRes.json.data : postRes.json;
-                  const postId = data.post_id || data.id;
-                  await sleep(500);
-                  const verify = await request({ url: `${conn.url.replace(/\/+$/, '')}/wp-json/kivo/v1/posts/${postId}`, method: 'GET', headers: { 'X-Kivo-Key': conn.apiKey, 'Content-Type': 'application/json' } });
-                  const vdata = verify.json && verify.json.data ? verify.json.data : verify.json;
-                  if (vdata.status && vdata.status !== 'draft') throw new Error(`article_${slug}_wp_status_${vdata.status}`);
-                  results.push({ client: item.client, provider: 'wordpress', file: slug, id: postId, title: vdata.title || payload.title, handle: vdata.slug || null, published_at: null, status: vdata.status || 'draft', action: 'create' });
-                  await sleep(500);
+                } catch (e) {
+                  console.log(`article_${path.basename(item.file).replace(/\.md$/, '')}_error:${e.message}`);
+                  results.push({ client: item.client, provider: item.provider, file: path.basename(item.file).replace(/\.md$/, ''), action: 'failed', error: e.message });
                 }
               }
-              console.log(JSON.stringify({ ok: true, action: 'uploaded_monthly_drafts_hidden', count: results.filter(r => r.action === 'create' || r.action === 'update').length, results }, null, 2));
+              if (uploaded === 0) {
+                console.error(JSON.stringify({ ok: false, error: 'no_articles_uploaded', results }, null, 2));
+                process.exitCode = 1;
+              } else {
+                console.log(JSON.stringify({ ok: true, action: 'uploaded_monthly_drafts_hidden', count: uploaded, results }, null, 2));
+              }
             } finally { await pool.end(); }
           }
           main().catch(error => { console.error(JSON.stringify({ ok: false, error: error.message })); process.exit(1); });
