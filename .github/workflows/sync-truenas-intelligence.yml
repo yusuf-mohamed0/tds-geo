@@ -12,7 +12,7 @@ concurrency:
 jobs:
   sync:
     name: Sync Source, n8n Exports, and GitNexus
-    runs-on: [self-hosted, truenas, kivo]
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4

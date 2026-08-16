@@ -44,7 +44,7 @@ jobs:
   deploy:
     name: Deploy On TrueNAS Runner
     needs: build
-    runs-on: [self-hosted, truenas, kivo]
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
