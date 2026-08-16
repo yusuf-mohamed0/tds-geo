@@ -1,0 +1,29 @@
+name: TrueNAS Live Diagnostics
+
+on:
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inspect live service paths
+        run: |
+          set -euo pipefail
+          echo "USER=$(id -un) HOME=$HOME PWD=$PWD"
+          echo "HOST=$(hostname)"
+          echo "PORTS"
+          ss -ltnp 2>/dev/null | grep -E ':(3000|3001|3100|3456|8080|5173)' || true
+          echo "PROCS"
+          ps -eo pid,user,cmd | grep -E 'node|tsx|vite|docker|ssh .*3100|dist/backend' | grep -v grep | sed -n '1,120p'
+          echo "INDEX_LOCATIONS"
+          for d in "$HOME" "$HOME/tds-geo-deploy" /opt/tds-geo /opt/kivo /opt/tds-geo/kivo-source /home/tdsdeploy /home/ubuntu; do
+            [ -d "$d" ] || continue
+            find "$d" -maxdepth 5 -path '*/frontend/dist/index.html' -o -path '*/backend/public/index.html' 2>/dev/null | while read -r f; do
+              echo "FILE $f"
+              grep -n 'shopify-api-key\|app-bridge\|assets/index' "$f" | sed -n '1,10p' || true
+            done
+          done
