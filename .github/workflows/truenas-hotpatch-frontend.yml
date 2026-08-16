@@ -1,0 +1,34 @@
+name: TrueNAS Hotpatch Frontend
+
+on:
+  workflow_dispatch:
+
+jobs:
+  hotpatch:
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch live frontend assets
+        run: |
+          set -euo pipefail
+          API_CONTAINER="$(docker ps -q | while read -r id; do
+            if docker exec "$id" sh -c 'test -f /app/dist/backend/index.js' >/dev/null 2>&1; then
+              echo "$id"
+              break
+            fi
+          done)"
+
+          if [[ -z "$API_CONTAINER" ]]; then
+            echo "Could not locate live API container"
+            docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Names}}\t{{.Ports}}'
+            exit 1
+          fi
+
+          echo "Patching container $API_CONTAINER"
+          docker exec "$API_CONTAINER" sh -c 'mkdir -p /tmp/kivo-backup && cp -a /app/dist/backend/public /tmp/kivo-backup/public-$(date -u +%Y%m%d%H%M%S) && mkdir -p /app/frontend/dist'
+          docker cp backend/public/. "$API_CONTAINER:/app/dist/backend/public/"
+          docker cp backend/public/. "$API_CONTAINER:/app/frontend/dist/"
+          docker exec "$API_CONTAINER" sh -c "grep -n 'shopify-api-key\|app-bridge' /app/dist/backend/public/index.html && grep -n 'shopify-api-key\|app-bridge' /app/frontend/dist/index.html"
+          docker exec "$API_CONTAINER" sh -c "node -e \"require('http').get('http://127.0.0.1:3000/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""
