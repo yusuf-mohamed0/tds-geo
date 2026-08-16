@@ -49,19 +49,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Sync repository to /opt/kivo
+      - name: Sync repository to runner deploy directory
         run: |
-          sudo mkdir -p /opt/kivo
-          sudo rsync -a --delete \
+          DEPLOY_ROOT="$HOME/tds-geo-deploy"
+          mkdir -p "$DEPLOY_ROOT"
+
+          if [[ ! -f "$DEPLOY_ROOT/deploy/truenas/.env" ]]; then
+            for candidate in \
+              /opt/kivo/deploy/truenas/.env \
+              /opt/tds-geo/kivo-source/deploy/truenas/.env; do
+              if [[ -r "$candidate" ]]; then
+                mkdir -p "$DEPLOY_ROOT/deploy/truenas"
+                cp "$candidate" "$DEPLOY_ROOT/deploy/truenas/.env"
+                break
+              fi
+            done
+          fi
+
+          rsync -a --delete \
             --exclude '.git' \
             --exclude 'node_modules' \
             --exclude 'frontend/node_modules' \
             --exclude 'kivo-nextjs/node_modules' \
             --exclude 'deploy/truenas/.env' \
             --exclude 'deploy/truenas/.previous-image' \
-            ./ /opt/kivo/
+            ./ "$DEPLOY_ROOT/"
 
       - name: Deploy Compose stack
         run: |
-          cd /opt/kivo/deploy/truenas
+          cd "$HOME/tds-geo-deploy/deploy/truenas"
           TDS_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:truenas" ./scripts/deploy.sh
