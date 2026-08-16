@@ -59,6 +59,19 @@ export async function refreshIfExpired(shopConfig: ShopifyConfig): Promise<Shopi
           [data.access_token, data.refresh_token || row.shopify_refresh_token, expiresAt, shopConfig.shop]
         );
 
+        await pool.query(
+          `UPDATE cms_connections cc
+             SET config = jsonb_set(
+               jsonb_set(COALESCE(cc.config, '{}'::jsonb), '{accessToken}', to_jsonb($1::text), true),
+               '{apiVersion}', to_jsonb(COALESCE($2::text, '2025-07')), true
+             )
+            FROM clients c
+           WHERE cc.client_id = c.id
+             AND cc.provider = 'shopify'
+             AND c.shopify_shop = $3`,
+          [data.access_token, shopConfig.apiVersion || '2025-07', shopConfig.shop]
+        );
+
         logger.info('Shopify token refreshed', { shop: shopConfig.shop });
         return { ...shopConfig, accessToken: data.access_token };
       } else {

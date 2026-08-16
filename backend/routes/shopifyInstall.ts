@@ -98,7 +98,6 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
         client_id: SHOPIFY_API_KEY,
         client_secret: SHOPIFY_API_SECRET,
         code,
-        expiring: '1',
       });
       const tokenResp = await fetch(`https://${shop}/admin/oauth/access_token`, {
         method: 'POST',
