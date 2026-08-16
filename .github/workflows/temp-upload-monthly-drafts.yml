@@ -187,8 +187,9 @@ jobs:
             const version = config.apiVersion || row.shopify_api_version || '2025-07';
             const fromConfig = config.accessToken || config.apiKey || config.access_token || '';
             const token = fromConfig || row.shopify_token || '';
+            const altToken = (row.shopify_token && row.shopify_token !== token) ? row.shopify_token : '';
             const tokenSource = fromConfig ? (config.accessToken ? 'config.accessToken' : config.apiKey ? 'config.apiKey' : 'config.access_token') : (row.shopify_token ? 'clients.shopify_token' : 'none');
-            return { shop, version, token, tokenSource, configKeys: Object.keys(config) };
+            return { shop, configShop: config.shop || '', dbShop: row.shopify_shop || '', version, token, altToken, tokenSource, configKeys: Object.keys(config) };
           }
 
           async function fetchWordPressConnection(pool, slug) {
@@ -197,7 +198,7 @@ jobs:
             const row = rows[0];
             const config = typeof row.config === 'string' ? JSON.parse(row.config) : (row.config || {});
             const url = config.url || config.endpointUrl || config.endpoint_url || config.siteUrl || config.site_url || row.endpoint_url || '';
-            const apiKey = config.apiKey || config.api_key || config.tdsGeoApiKey || config.kivo_api_key || config.accessToken || config.access_token || '';
+            const apiKey = config.apiKey || config.api_key || config.tdsGeoApiKey || config.kivo_api_key || config.wp_api_key || config.accessToken || config.access_token || '';
             return { url, apiKey, configKeys: Object.keys(config) };
           }
 
@@ -258,7 +259,7 @@ jobs:
                       connCache[key] = await fetchShopifyConnection(pool, item.client);
                       if (connCache[key]) {
                         const c = connCache[key];
-                        console.log(`conn_diag_${item.client}: ${JSON.stringify({ shop: c.shop, version: c.version, token_present: Boolean(c.token), token_len: c.token ? c.token.length : 0, token_source: c.tokenSource, config_keys: c.configKeys })}`);
+                        console.log(`conn_diag_${item.client}: ${JSON.stringify({ shop: c.shop, config_shop: c.configShop, db_shop: c.dbShop, version: c.version, token_present: Boolean(c.token), token_len: c.token ? c.token.length : 0, token_source: c.tokenSource, alt_token_present: Boolean(c.altToken), config_keys: c.configKeys })}`);
                       }
                     }
                     const conn = connCache[key];
@@ -271,10 +272,23 @@ jobs:
                       try {
                         await request({ url: `https://${conn.shop}/admin/api/${conn.version}/shop.json`, method: 'GET', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' } });
                         connTested[key] = 'ok';
-                        console.log(`shopify_conn_test_${item.client}: ok`);
+                        console.log(`shopify_conn_test_${item.client}: ok (source:${conn.tokenSource})`);
                       } catch (e) {
-                        connTested[key] = 'fail';
-                        console.log(`shopify_conn_test_${item.client}: fail:${e.message}`);
+                        if (conn.altToken) {
+                          try {
+                            await request({ url: `https://${conn.shop}/admin/api/${conn.version}/shop.json`, method: 'GET', headers: { 'X-Shopify-Access-Token': conn.altToken, 'Content-Type': 'application/json' } });
+                            conn.token = conn.altToken;
+                            conn.tokenSource = 'clients.shopify_token';
+                            connTested[key] = 'ok';
+                            console.log(`shopify_conn_test_${item.client}: ok (source:clients.shopify_token)`);
+                          } catch (e2) {
+                            connTested[key] = 'fail';
+                            console.log(`shopify_conn_test_${item.client}: fail:${e2.message}`);
+                          }
+                        } else {
+                          connTested[key] = 'fail';
+                          console.log(`shopify_conn_test_${item.client}: fail:${e.message}`);
+                        }
                       }
                     }
                     if (connTested[key] !== 'ok') {
