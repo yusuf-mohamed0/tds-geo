@@ -19,14 +19,51 @@ install_env() {
   chmod 600 "$ENV_PATH"
 }
 
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+quote_env_value() {
+  local value="${1//$'\r'/}"
+  value="${value//$'\n'/}"
+  printf "'%s'" "${value//\'/\'\\\'\'}"
+}
+
+set_env_pair() {
+  local path="$1"
+  local key="$2"
+  local value="$3"
+  local escaped
+
+  [[ -n "$value" ]] || return 0
+  escaped="$(quote_env_value "$value")"
+
+  if grep -qE "^${key}=" "$path"; then
+    local update_script="s|^${key}=.*|${key}=${escaped}|"
+    sed -i "$update_script" "$path"
+  else
+    printf '%s=%s\n' "$key" "$escaped" >> "$path"
+  fi
+}
+
+repair_existing_env() {
+  local path="$1"
+  local production_model="${TRUENAS_PRODUCTION_MODEL:-ministral-3:14b}"
+
+  if ! grep -qE '^OLLAMA_MODEL=' "$path" || grep -qE '^OLLAMA_MODEL=["'"'']?llama3\.1:8b["'"'']?$' "$path"; then
+    set_env_pair "$path" OLLAMA_MODEL "$production_model"
+  fi
+
+  if ! grep -qE '^OPENAI_MODEL=' "$path" || grep -qE '^OPENAI_MODEL=["'"'']?llama3\.1:8b["'"'']?$' "$path"; then
+    set_env_pair "$path" OPENAI_MODEL "$production_model"
+  fi
+}
+
 if [[ -s "$ENV_PATH" ]]; then
+  repair_existing_env "$ENV_PATH"
   chmod 600 "$ENV_PATH"
   echo "truenas_env_ready existing"
   exit 0
 fi
-
-tmp="$(mktemp)"
-trap 'rm -f "$tmp"' EXIT
 
 if [[ -n "${TRUENAS_ENV_B64:-}" ]]; then
   printf '%s' "$TRUENAS_ENV_B64" | base64 -d > "$tmp"
@@ -74,12 +111,6 @@ if [[ -z "$api_id" ]]; then
   exit 1
 fi
 
-quote_env_value() {
-  local value="${1//$'\r'/}"
-  value="${value//$'\n'/}"
-  printf "'%s'" "${value//\'/\'\\\'\'}"
-}
-
 write_pair() {
   local key="$1"
   local value="$2"
@@ -113,7 +144,8 @@ write_pair PORT "3000"
 for key in \
   JWT_SECRET CREDENTIAL_VAULT_KEY ENCRYPTION_KEY DATABASE_URL REDIS_URL \
   OPENAI_API_KEY OPENAI_BASE_URL OPENAI_FALLBACK_KEY OPENAI_MODEL OPENAI_MAX_TOKENS \
-  AI_PROVIDER OLLAMA_BASE_URL OLLAMA_API_KEY SERPAPI_API_KEY DATAFORSEO_API_KEY \
+  AI_PROVIDER OLLAMA_BASE_URL OLLAMA_API_KEY OLLAMA_MODEL OLLAMA_MAX_TOKENS OLLAMA_TEMPERATURE \
+  SERPAPI_API_KEY DATAFORSEO_API_KEY \
   DATAFORSEO_LOGIN DATAFORSEO_PASSWORD SHOPIFY_API_KEY SHOPIFY_API_SECRET \
   SHOPIFY_APP_URL SHOPIFY_DEFAULT_SHOP SHOPIFY_DEFAULT_ACCESS_TOKEN \
   SHOPIFY_DEFAULT_API_VERSION GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET GOOGLE_REDIRECT_URI \
@@ -147,4 +179,5 @@ write_pair ENABLE_DIRECT_HTTPS "${ENABLE_DIRECT_HTTPS:-false}"
 write_pair CLOUDFLARED_TOKEN "${CLOUDFLARED_TOKEN:-}"
 
 install_env "$tmp"
+repair_existing_env "$ENV_PATH"
 echo "truenas_env_ready bootstrapped_from_live_containers"
