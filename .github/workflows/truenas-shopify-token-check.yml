@@ -62,8 +62,15 @@ jobs:
           ORDER BY target.slug;
           "
 
+          rows="$(docker exec "$postgres" psql -U "$db_user" -d "$db_name" -At -F $'\t' -c "$query")"
+          if [[ -z "$rows" ]]; then
+            echo "No Shopify token rows returned"
+            exit 1
+          fi
+
           failures=0
           while IFS=$'\t' read -r slug shop has_client has_client_token has_cms_connection cms_status has_cms_token api_version token; do
+            [[ -n "$slug" ]] || continue
             if [[ "$has_client" != "true" ]]; then
               echo "$slug: missing_client"
               failures=$((failures + 1))
@@ -84,6 +91,6 @@ jobs:
             fi
 
             echo "$slug: shop=$shop client_token=$has_client_token cms_connection=$has_cms_connection cms_status=$cms_status cms_token=$has_cms_token api_version=$api_version shopify_status=$status"
-          done < <(docker exec "$postgres" psql -U "$db_user" -d "$db_name" -At -F $'\t' -c "$query")
+          done <<< "$rows"
 
           exit "$failures"
