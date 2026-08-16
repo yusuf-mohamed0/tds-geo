@@ -269,26 +269,30 @@ jobs:
                       continue;
                     }
                     if (!connTested[key]) {
-                      try {
-                        await request({ url: `https://${conn.shop}/admin/api/${conn.version}/shop.json`, method: 'GET', headers: { 'X-Shopify-Access-Token': conn.token, 'Content-Type': 'application/json' } });
-                        connTested[key] = 'ok';
-                        console.log(`shopify_conn_test_${item.client}: ok (source:${conn.tokenSource})`);
-                      } catch (e) {
-                        if (conn.altToken) {
+                      const candidates = [conn.version, '2026-04', '2025-10', '2025-04', '2024-10', '2024-01', 'stable'];
+                      const tokenCandidates = [{ token: conn.token, source: conn.tokenSource }];
+                      if (conn.altToken) tokenCandidates.push({ token: conn.altToken, source: 'clients.shopify_token' });
+                      let found = false;
+                      let lastError = '';
+                      for (const tc of tokenCandidates) {
+                        for (const v of candidates) {
                           try {
-                            await request({ url: `https://${conn.shop}/admin/api/${conn.version}/shop.json`, method: 'GET', headers: { 'X-Shopify-Access-Token': conn.altToken, 'Content-Type': 'application/json' } });
-                            conn.token = conn.altToken;
-                            conn.tokenSource = 'clients.shopify_token';
-                            connTested[key] = 'ok';
-                            console.log(`shopify_conn_test_${item.client}: ok (source:clients.shopify_token)`);
-                          } catch (e2) {
-                            connTested[key] = 'fail';
-                            console.log(`shopify_conn_test_${item.client}: fail:${e2.message}`);
-                          }
-                        } else {
-                          connTested[key] = 'fail';
-                          console.log(`shopify_conn_test_${item.client}: fail:${e.message}`);
+                            await request({ url: `https://${conn.shop}/admin/api/${v}/shop.json`, method: 'GET', headers: { 'X-Shopify-Access-Token': tc.token, 'Content-Type': 'application/json' } });
+                            conn.version = v;
+                            conn.token = tc.token;
+                            conn.tokenSource = tc.source;
+                            found = true;
+                            break;
+                          } catch (e) { lastError = e.message; }
                         }
+                        if (found) break;
+                      }
+                      if (found) {
+                        connTested[key] = 'ok';
+                        console.log(`shopify_conn_test_${item.client}: ok (version:${conn.version}, source:${conn.tokenSource})`);
+                      } else {
+                        connTested[key] = 'fail';
+                        console.log(`shopify_conn_test_${item.client}: fail:${lastError}`);
                       }
                     }
                     if (connTested[key] !== 'ok') {
