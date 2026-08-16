@@ -1,0 +1,101 @@
+name: TrueNAS Shopify Token Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: [self-hosted, Linux, X64, truenas, tdsgeo]
+    timeout-minutes: 10
+    steps:
+      - name: Check live Shopify tokens
+        run: |
+          set -euo pipefail
+          api="$(docker ps -q | while read -r id; do docker exec "$id" sh -c 'test -f /app/dist/backend/index.js' >/dev/null 2>&1 && echo "$id" && break; done)"
+          if [[ -z "$api" ]]; then
+            echo "No live API container found"
+            exit 1
+          fi
+
+          cat > /tmp/kivo-shopify-token-check.js <<'NODE'
+          const { Pool } = require('pg');
+
+          const targets = [
+            { slug: 'alamein-2022', shop: 'alamein-2022.myshopify.com' },
+            { slug: 'caravanserai', shop: 'caravanserai-gift-store.myshopify.com' },
+            { slug: 'flaunt-cosmetics-global', shop: 'c9d9a9.myshopify.com' },
+          ];
+
+          const apiVersion = process.env.SHOPIFY_DEFAULT_API_VERSION || '2025-07';
+          const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+          function tokenFromConfig(config) {
+            if (!config || typeof config !== 'object') return '';
+            return config.accessToken || config.access_token || config.token || '';
+          }
+
+          async function testToken(shop, token, version) {
+            if (!shop || !token) return { ok: false, status: 'missing_token' };
+            const response = await fetch(`https://${shop}/admin/api/${version}/shop.json`, {
+              headers: {
+                'X-Shopify-Access-Token': token,
+                'Accept': 'application/json',
+              },
+            });
+            return { ok: response.ok, status: response.status };
+          }
+
+          async function main() {
+            const { rows } = await pool.query(`
+              SELECT
+                c.id,
+                c.slug,
+                c.name,
+                c.shopify_shop,
+                c.shopify_token IS NOT NULL AS has_client_token,
+                c.shopify_token,
+                cc.id AS connection_id,
+                cc.status AS connection_status,
+                cc.config,
+                cc.config ? 'accessToken' AS has_cms_token
+              FROM clients c
+              LEFT JOIN cms_connections cc
+                ON cc.client_id = c.id
+               AND cc.provider = 'shopify'
+              WHERE c.slug = ANY($1)
+                 OR c.shopify_shop = ANY($2)
+              ORDER BY c.slug, cc.id DESC
+            `, [targets.map(t => t.slug), targets.map(t => t.shop)]);
+
+            let failures = 0;
+            for (const target of targets) {
+              const row = rows.find(r => r.slug === target.slug || r.shopify_shop === target.shop);
+              if (!row) {
+                failures += 1;
+                console.log(`${target.slug}: missing_client`);
+                continue;
+              }
+
+              const shop = row.shopify_shop || target.shop;
+              const cmsToken = tokenFromConfig(row.config);
+              const token = cmsToken || row.shopify_token || '';
+              const version = row.config?.apiVersion || apiVersion;
+              const result = await testToken(shop, token, version);
+
+              if (!result.ok) failures += 1;
+              console.log(`${target.slug}: shop=${shop} client_token=${Boolean(row.has_client_token)} cms_connection=${Boolean(row.connection_id)} cms_status=${row.connection_status || 'none'} cms_token=${Boolean(row.has_cms_token || cmsToken)} api_version=${version} shopify_status=${result.status}`);
+            }
+
+            await pool.end();
+            process.exit(failures === 0 ? 0 : 2);
+          }
+
+          main().catch(async (error) => {
+            console.error(error.message);
+            await pool.end().catch(() => {});
+            process.exit(1);
+          });
+          NODE
+
+          docker cp /tmp/kivo-shopify-token-check.js "$api:/tmp/kivo-shopify-token-check.js"
+          docker exec "$api" node /tmp/kivo-shopify-token-check.js
