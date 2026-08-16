@@ -28,28 +28,28 @@ jobs:
             echo "Patching $id"
             docker exec "$id" sh -c 'mkdir -p /tmp/kivo-backup/backend-routes /tmp/kivo-backup/backend-shopify && cp -a /app/dist/backend/routes/shopifyInstall.js /tmp/kivo-backup/backend-routes/shopifyInstall.js.$(date -u +%Y%m%d%H%M%S) 2>/dev/null || true && cp -a /app/dist/backend/services/shopify/auth.js /tmp/kivo-backup/backend-shopify/auth.js.$(date -u +%Y%m%d%H%M%S) 2>/dev/null || true'
             docker exec "$id" node - <<'NODE'
-const fs = require('fs');
+            const fs = require('fs');
 
-const installPath = '/app/dist/backend/routes/shopifyInstall.js';
-if (fs.existsSync(installPath)) {
-  let source = fs.readFileSync(installPath, 'utf8');
-  source = source.replace(/^\s*expiring:\s*['"]1['"],?\n/gm, '');
-  source = source.replace('Exchange OAuth code for expiring offline access token', 'Exchange OAuth code for an offline access token.');
-  fs.writeFileSync(installPath, source);
-}
+            const installPath = '/app/dist/backend/routes/shopifyInstall.js';
+            if (fs.existsSync(installPath)) {
+              let source = fs.readFileSync(installPath, 'utf8');
+              source = source.replace(/^\s*expiring:\s*['"]1['"],?\n/gm, '');
+              source = source.replace('Exchange OAuth code for expiring offline access token', 'Exchange OAuth code for an offline access token.');
+              fs.writeFileSync(installPath, source);
+            }
 
-const authPath = '/app/dist/backend/services/shopify/auth.js';
-if (fs.existsSync(authPath)) {
-  let source = fs.readFileSync(authPath, 'utf8');
-  if (!source.includes('UPDATE cms_connections cc')) {
-    source = source.replace(
-      /await pool\.query\(`UPDATE clients SET shopify_token = \$1, shopify_refresh_token = \$2, shopify_token_expires_at = \$3 WHERE shopify_shop = \$4`,\s*\[data\.access_token, data\.refresh_token \|\| row\.shopify_refresh_token, expiresAt, shopConfig\.shop\]\);/,
-      `$&\n                await pool.query(\`UPDATE cms_connections cc\n             SET config = jsonb_set(\n               jsonb_set(COALESCE(cc.config, '{}'::jsonb), '{accessToken}', to_jsonb($1::text), true),\n               '{apiVersion}', to_jsonb(COALESCE($2::text, '2025-07')), true\n             )\n            FROM clients c\n           WHERE cc.client_id = c.id\n             AND cc.provider = 'shopify'\n             AND c.shopify_shop = $3\`, [data.access_token, shopConfig.apiVersion || '2025-07', shopConfig.shop]);`
-    );
-  }
-  fs.writeFileSync(authPath, source);
-}
-NODE
+            const authPath = '/app/dist/backend/services/shopify/auth.js';
+            if (fs.existsSync(authPath)) {
+              let source = fs.readFileSync(authPath, 'utf8');
+              if (!source.includes('UPDATE cms_connections cc')) {
+                source = source.replace(
+                  /await pool\.query\(`UPDATE clients SET shopify_token = \$1, shopify_refresh_token = \$2, shopify_token_expires_at = \$3 WHERE shopify_shop = \$4`,\s*\[data\.access_token, data\.refresh_token \|\| row\.shopify_refresh_token, expiresAt, shopConfig\.shop\]\);/,
+                  `$&\n                await pool.query(\`UPDATE cms_connections cc\n             SET config = jsonb_set(\n               jsonb_set(COALESCE(cc.config, '{}'::jsonb), '{accessToken}', to_jsonb($1::text), true),\n               '{apiVersion}', to_jsonb(COALESCE($2::text, '2025-07')), true\n             )\n            FROM clients c\n           WHERE cc.client_id = c.id\n             AND cc.provider = 'shopify'\n             AND c.shopify_shop = $3\`, [data.access_token, shopConfig.apiVersion || '2025-07', shopConfig.shop]);`
+                );
+              }
+              fs.writeFileSync(authPath, source);
+            }
+            NODE
             docker exec "$id" sh -c "! grep -q \"expiring: '1'\|expiring: \\\"1\\\"\" /app/dist/backend/routes/shopifyInstall.js"
             docker exec "$id" sh -c "grep -n 'cms_connections' /app/dist/backend/services/shopify/auth.js | sed -n '1,20p'"
           done
