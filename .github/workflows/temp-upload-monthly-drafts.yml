@@ -181,30 +181,34 @@ jobs:
           }
 
           async function fetchShopifyBase(pool, slug) {
-            const { rows } = await pool.query(`select c.shopify_shop, c.shopify_api_version, c.shopify_token, cc.config from clients c join cms_connections cc on cc.client_id = c.id where c.slug = $1 and cc.provider = 'shopify' and cc.is_active = true order by cc.updated_at desc nulls last limit 1`, [slug]);
-            if (!rows.length) return null;
-            const row = rows[0];
-            const config = typeof row.config === 'string' ? JSON.parse(row.config) : (row.config || {});
-            return {
-              config,
-              shop: config.shop || row.shopify_shop || '',
-              version: config.apiVersion || row.shopify_api_version || '',
-              token: config.accessToken || config.access_token || '',
-              tokenFrom: config.accessToken ? 'config.accessToken' : (config.access_token ? 'config.access_token' : ''),
-              shopifyToken: row.shopify_token || '',
-            };
+            try {
+              const { rows } = await pool.query(`select c.shopify_shop, c.shopify_api_version, c.shopify_token, cc.config from clients c join cms_connections cc on cc.client_id = c.id where c.slug = $1 and cc.provider = 'shopify' and cc.is_active = true order by cc.updated_at desc nulls last limit 1`, [slug]);
+              if (!rows.length) return null;
+              const row = rows[0];
+              const config = typeof row.config === 'string' ? JSON.parse(row.config) : (row.config || {});
+              return {
+                config,
+                shop: config.shop || row.shopify_shop || '',
+                version: config.apiVersion || row.shopify_api_version || '',
+                token: config.accessToken || config.access_token || '',
+                tokenFrom: config.accessToken ? 'config.accessToken' : (config.access_token ? 'config.access_token' : ''),
+                shopifyToken: row.shopify_token || '',
+              };
+            } catch { return null; }
           }
 
           async function fetchShopifySessions(pool, shop) {
-            const { rows } = await pool.query(`select shop, access_token, is_active, updated_at from shopify_sessions where access_token is not null and access_token <> '' order by updated_at desc nulls last`);
-            const seen = new Set();
-            const out = [];
-            for (const s of rows) {
-              if (seen.has(s.access_token)) continue;
-              const match = shop ? String(s.shop).toLowerCase() === String(shop).toLowerCase() : true;
-              if (match) { seen.add(s.access_token); out.push({ shop: s.shop, token: s.access_token }); }
-            }
-            return out;
+            try {
+              const { rows } = await pool.query(`select shop, access_token, is_active, updated_at from shopify_sessions where access_token is not null and access_token <> '' order by updated_at desc nulls last`);
+              const seen = new Set();
+              const out = [];
+              for (const s of rows) {
+                if (seen.has(s.access_token)) continue;
+                const match = shop ? String(s.shop).toLowerCase() === String(shop).toLowerCase() : true;
+                if (match) { seen.add(s.access_token); out.push({ shop: s.shop, token: s.access_token }); }
+              }
+              return out;
+            } catch { return []; }
           }
 
           async function fetchShopifyApiKeys(pool, slug) {
@@ -290,13 +294,15 @@ jobs:
           }
 
           async function fetchWordPressConnection(pool, slug) {
-            const { rows } = await pool.query(`select cc.endpoint_url, cc.config from clients c join cms_connections cc on cc.client_id = c.id where c.slug = $1 and cc.provider = 'wordpress' and cc.is_active = true order by cc.updated_at desc nulls last limit 1`, [slug]);
-            if (!rows.length) return null;
-            const row = rows[0];
-            const config = typeof row.config === 'string' ? JSON.parse(row.config) : (row.config || {});
-            const url = config.url || config.endpointUrl || config.endpoint_url || config.siteUrl || config.site_url || row.endpoint_url || '';
-            const apiKey = config.apiKey || config.api_key || config.tdsGeoApiKey || config.kivo_api_key || config.wp_api_key || config.accessToken || config.access_token || '';
-            return { url, apiKey };
+            try {
+              const { rows } = await pool.query(`select cc.endpoint_url, cc.config from clients c join cms_connections cc on cc.client_id = c.id where c.slug = $1 and cc.provider = 'wordpress' and cc.is_active = true order by cc.updated_at desc nulls last limit 1`, [slug]);
+              if (!rows.length) return null;
+              const row = rows[0];
+              const config = typeof row.config === 'string' ? JSON.parse(row.config) : (row.config || {});
+              const url = config.url || config.endpointUrl || config.endpoint_url || config.siteUrl || config.site_url || row.endpoint_url || '';
+              const apiKey = config.apiKey || config.api_key || config.tdsGeoApiKey || config.kivo_api_key || config.wp_api_key || config.accessToken || config.access_token || '';
+              return { url, apiKey };
+            } catch { return null; }
           }
 
           async function listShopifyArticles(shop, version, token, blogId) {
