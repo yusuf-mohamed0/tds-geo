@@ -37,7 +37,6 @@ jobs:
             SELECT DISTINCT ON (client_id)
               client_id,
               id,
-              status,
               config
             FROM cms_connections
             WHERE provider = 'shopify'
@@ -49,7 +48,6 @@ jobs:
             (c.id IS NOT NULL)::text AS has_client,
             (c.shopify_token IS NOT NULL)::text AS has_client_token,
             (latest_connection.id IS NOT NULL)::text AS has_cms_connection,
-            COALESCE(latest_connection.status, 'none') AS cms_status,
             ((latest_connection.config ? 'accessToken') OR (latest_connection.config ? 'access_token') OR (latest_connection.config ? 'token'))::text AS has_cms_token,
             COALESCE(latest_connection.config->>'apiVersion', '$default_version') AS api_version,
             COALESCE(latest_connection.config->>'accessToken', latest_connection.config->>'access_token', latest_connection.config->>'token', c.shopify_token, '') AS token
@@ -69,7 +67,7 @@ jobs:
           fi
 
           failures=0
-          while IFS=$'\t' read -r slug shop has_client has_client_token has_cms_connection cms_status has_cms_token api_version token; do
+          while IFS=$'\t' read -r slug shop has_client has_client_token has_cms_connection has_cms_token api_version token; do
             [[ -n "$slug" ]] || continue
             if [[ "$has_client" != "true" ]]; then
               echo "$slug: missing_client"
@@ -90,7 +88,7 @@ jobs:
               failures=$((failures + 1))
             fi
 
-            echo "$slug: shop=$shop client_token=$has_client_token cms_connection=$has_cms_connection cms_status=$cms_status cms_token=$has_cms_token api_version=$api_version shopify_status=$status"
+            echo "$slug: shop=$shop client_token=$has_client_token cms_connection=$has_cms_connection cms_token=$has_cms_token api_version=$api_version shopify_status=$status"
           done <<< "$rows"
 
           exit "$failures"
