@@ -22,7 +22,7 @@ export class ConnectorManager {
   private connectors = new Map<string, RegisteredConnector>();
   private healthCheckInterval: NodeJS.Timeout | null = null;
 
-  async initialize(pool: any): Promise<void> {
+  async initialize(_pool: any): Promise<void> {
     logger.info('ConnectorManager initialized');
   }
 
