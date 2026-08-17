@@ -28,6 +28,8 @@
     "n8n:export": "node scripts/export-n8n-workflows.mjs",
     "audit:clients": "node scripts/audit-clients.mjs",
     "eval:pages": "node scripts/evaluate-frontend-pages.mjs",
+    "inventory:architecture": "node scripts/generate-architecture-contracts.mjs",
+    "inventory:architecture:check": "npm run inventory:architecture && git ls-files --error-unmatch doc/architecture/ROUTE-AUTH-MATRIX.md doc/architecture/ROLE-ACTION-MATRIX.md doc/architecture/STORAGE-OWNERSHIP.md doc/architecture/JOB-WORKFLOW-MATRIX.md doc/architecture/INTEGRATION-CREDENTIAL-MATRIX.md >/dev/null && git diff --exit-code -- doc/architecture",
     "test": "vitest run",
     "test:py": "python -m pytest backend/services/vectorStore/test_server.py backend/services/localLLM/test_airllm.py -q",
     "test:all": "vitest run && python -m pytest backend/services/vectorStore/test_server.py backend/services/localLLM/test_airllm.py -q",
