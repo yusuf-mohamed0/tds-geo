@@ -91,7 +91,7 @@ export const FRONTEND_WORKSPACE_CONTRACT: FrontendWorkspaceArchitectureContract 
           safetyNotes: ['Client scoping must come from backend auth and route loaders, not from hiding links.'],
         },
       ],
-      currentLimits: ['The frontend has no centralized route guard for client-scoped workspace routing yet.'],
+      currentLimits: ['Client route redirection exists in the app shell; backend authorization remains the tenant-isolation boundary.'],
     },
     {
       id: 'content-production',

@@ -4,20 +4,27 @@ import {
   DollarSign, CheckSquare, Search, ScrollText, Lightbulb, Link as LinkIcon, X, BarChart3,
   BriefcaseBusiness,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Logo from './Logo';
+import { clientWorkspacePath } from '../architecture/workspaceRouting';
+import { useAuth } from '../contexts/AuthContext';
+import type { FrontendRole } from '../architecture/workspaceContract';
 
-const navItems = [
-  { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
-  { to: '/admin/clients', icon: Users, label: 'Clients' },
-  { to: '/admin/articles', icon: FileText, label: 'Articles' },
-  { to: '/admin/geo', icon: Search, label: 'GEO Analysis' },
-  { to: '/admin/gsc', icon: BarChart3, label: 'Search Console' },
-  { to: '/admin/citations', icon: ScrollText, label: 'Citations' },
-  { to: '/admin/costs', icon: DollarSign, label: 'Costs' },
-  { to: '/admin/ads-reports', icon: BriefcaseBusiness, label: 'Ads Reports' },
-  { to: '/admin/quality', icon: CheckSquare, label: 'Quality' },
-  { to: '/admin/keywords', icon: Lightbulb, label: 'Keywords' },
-  { to: '/admin/backlinks', icon: LinkIcon, label: 'Backlinks' },
+type NavItem = { to: string; icon: LucideIcon; label: string; end?: boolean; roles: readonly FrontendRole[] };
+
+const navItems: NavItem[] = [
+  { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true, roles: ['super_admin', 'admin'] },
+  { to: '/admin/clients', icon: Users, label: 'Clients', roles: ['super_admin', 'admin'] },
+  { to: '/admin/articles', icon: FileText, label: 'Articles', roles: ['super_admin', 'admin', 'editor'] },
+  { to: '/admin/geo', icon: Search, label: 'GEO Analysis', roles: ['super_admin', 'admin', 'editor'] },
+  { to: '/admin/gsc', icon: BarChart3, label: 'Search Console', roles: ['super_admin', 'admin', 'editor'] },
+  { to: '/admin/citations', icon: ScrollText, label: 'Citations', roles: ['super_admin', 'admin', 'editor'] },
+  { to: '/admin/costs', icon: DollarSign, label: 'Costs', roles: ['super_admin', 'admin'] },
+  { to: '/admin/ads-reports', icon: BriefcaseBusiness, label: 'Ads Reports', roles: ['super_admin', 'admin'] },
+  { to: '/admin/quality', icon: CheckSquare, label: 'Quality', roles: ['super_admin', 'admin', 'editor'] },
+  { to: '/admin/keywords', icon: Lightbulb, label: 'Keywords', roles: ['super_admin', 'admin', 'editor'] },
+  { to: '/admin/backlinks', icon: LinkIcon, label: 'Backlinks', roles: ['super_admin', 'admin', 'editor'] },
+  { to: '', icon: Users, label: 'My workspace', roles: ['client'] },
 ];
 
 type SidebarProps = {
@@ -26,6 +33,12 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
+  const { user } = useAuth();
+  const items = navItems
+    .filter((item) => !user || item.roles.includes(user.role))
+    .map((item) => ({ ...item, to: item.label === 'My workspace' && user ? clientWorkspacePath(user) : item.to }))
+    .filter((item): item is NavItem => Boolean(item.to));
+
   return (
     <aside className={`fixed inset-y-0 left-0 z-40 flex h-screen w-60 flex-col overflow-y-auto border-r border-brand-border bg-brand-surface transition-transform duration-200 md:static md:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="flex items-center justify-between border-b border-brand-border p-5">
@@ -35,7 +48,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </button>
       </div>
       <nav className="flex-1 p-3 space-y-0.5">
-        {navItems.map((item) => (
+        {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

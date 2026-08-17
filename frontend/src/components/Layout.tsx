@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ErrorBoundary from './ErrorBoundary';
 import { isEmbedded } from '../lib/embedded';
+import { redirectPathForWorkspace } from '../architecture/workspaceRouting';
 
 export default function Layout() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (loading) {
@@ -27,6 +29,11 @@ export default function Layout() {
 
   if (!isAuthenticated) {
     return <Navigate to="/login?redirect=/admin" replace />;
+  }
+
+  const workspaceRedirect = redirectPathForWorkspace(user, location.pathname);
+  if (workspaceRedirect) {
+    return <Navigate to={workspaceRedirect} replace />;
   }
 
   return (
