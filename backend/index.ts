@@ -185,6 +185,10 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
   frameguard: false
 }));
+app.use((_req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), fullscreen=(self)');
+  next();
+});
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
   : ['http://localhost:5173', 'https://16.192.29.174.nip.io'];

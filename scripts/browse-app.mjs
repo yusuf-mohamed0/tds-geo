@@ -4,7 +4,10 @@
 
 import { chromium } from 'playwright';
 
-const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyODQ2Yzk0Zi1mYjYyLTQ3NzUtYjhkMy1jMWM1MWY3ZWViZWYiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sZSI6ImFkbWluIiwiY2xpZW50SWQiOm51bGwsImlhdCI6MTc3OTg1ODUyMSwiZXhwIjoxNzc5OTQ0OTIxfQ.3rZZTKhoIhONoA_iM77VA7HnRcYKVBZTyzbotNEFkZw';
+const TOKEN = process.env.KIVO_TEST_TOKEN;
+if (!TOKEN) {
+  throw new Error('KIVO_TEST_TOKEN is required. Do not hard-code auth tokens in source.');
+}
 
 const browser = await chromium.launch({ 
   headless: true,

@@ -69,6 +69,12 @@ interface OperatingArea {
   links: OperatingAreaLink[];
 }
 
+type HealthWithStats = HealthStatus & {
+  stats?: {
+    queued_jobs?: number;
+  };
+};
+
 const operatingAreas: OperatingArea[] = [
   {
     title: 'Client Growth OS',
@@ -332,7 +338,7 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="rounded-xl bg-black/20 p-3"><span className="block text-brand-muted">Active clients</span><strong>{clients.active}</strong></div>
                   <div className="rounded-xl bg-black/20 p-3"><span className="block text-brand-muted">Published</span><strong>{articles.published}</strong></div>
-                  <div className="rounded-xl bg-black/20 p-3"><span className="block text-brand-muted">Queued jobs</span><strong>{String((health as any)?.stats?.queued_jobs ?? 0)}</strong></div>
+                  <div className="rounded-xl bg-black/20 p-3"><span className="block text-brand-muted">Queued jobs</span><strong>{String((health as HealthWithStats | null)?.stats?.queued_jobs ?? 0)}</strong></div>
                   <div className="rounded-xl bg-black/20 p-3"><span className="block text-brand-muted">MTD cost</span><strong>${Number(costs.total_cost_mtd || 0).toFixed(2)}</strong></div>
                 </div>
               </BlockStack>
@@ -447,7 +453,7 @@ export default function AdminDashboard() {
                             {area.links.map((link) => link.route ? (
                               <Button key={link.label} size="slim" variant="tertiary" onClick={() => navigate(link.route)}>{link.label}</Button>
                             ) : (
-                              <Button key={link.label} size="slim" variant="tertiary" url={link.href} target="_blank">{link.label}</Button>
+                              <Button key={link.label} size="slim" variant="tertiary" url={link.href} target="_blank" accessibilityLabel={link.label}>{link.label}</Button>
                             ))}
                           </InlineStack>
                         </BlockStack>
