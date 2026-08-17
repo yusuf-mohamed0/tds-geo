@@ -10,7 +10,7 @@ HEALTH_URL="${KIVO_HEALTH_URL:-https://ai.trafficdigitalsolutions.com/health}"
 
 if [ -d "$SOURCE_DIR/.git" ]; then
   commit="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
-  dirty="$(git -C "$SOURCE_DIR" status --short | grep -Ev '^( M|\?\?) (CLAUDE\.md|AGENTS\.md|\.claude/|\.agents/|\.gitnexus/)' || true)"
+  dirty="$(git -C "$SOURCE_DIR" status --short | grep -Ev '^( M|\?\?) (CLAUDE\.md|AGENTS\.md|\.source-commit|\.claude/|\.agents/|\.gitnexus/)' || true)"
 else
   commit="$(tr -d '[:space:]' < "$SOURCE_DIR/.source-commit")"
   dirty=""
@@ -39,6 +39,10 @@ printf 'workflow_manifest=%s\n' "$MANIFEST"
 printf 'workflow_count=%s\n' "$workflow_count"
 printf 'gitnexus_commit=%s\n' "$gitnexus_commit"
 printf 'production_health=%s\n' "$health_status"
+
+if [ -n "$dirty" ]; then
+  printf 'unexpected_source_drift_detail=\n%s\n' "$dirty" >&2
+fi
 
 test -z "$dirty"
 test "$workflow_count" != "missing"
