@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Page, Card, Text, Badge, Banner, BlockStack, InlineStack, Button, SkeletonPage, SkeletonBodyText, TextField } from '@shopify/polaris';
-import { ShieldCheck, FileText, PlayCircle, Users } from 'lucide-react';
+import { ShieldCheck, FileText, Users } from 'lucide-react';
 import {
   dryRunAdsReport,
   fetchAdsReportingStatus,
@@ -128,7 +128,7 @@ export default function AdsReportsPage() {
                 </label>
                 <TextField label="Month" value={month} onChange={setMonth} autoComplete="off" helpText="Use YYYY-MM" />
                 <div className="flex items-end gap-2">
-                  <Button icon={PlayCircle} loading={running === 'dry-run'} onClick={() => run('dry-run')}>Dry-run</Button>
+                  <Button loading={running === 'dry-run'} onClick={() => run('dry-run')}>Dry-run</Button>
                   <Button variant="primary" loading={running === 'generate'} onClick={() => run('generate')}>Generate PDF</Button>
                 </div>
               </div>
