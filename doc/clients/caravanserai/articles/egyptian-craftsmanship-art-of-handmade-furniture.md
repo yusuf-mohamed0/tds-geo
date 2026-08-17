@@ -4,7 +4,11 @@ meta_title: "Egyptian Handmade Furniture | Artisanal Craftsmanship Guide | Carav
 meta_description: "Discover the tradition of Egyptian furniture craftsmanship. Learn about hand-carved wood, brass finishing, and what makes artisanal furniture superior to mass-produced pieces."
 keyword: "egyptian handmade furniture craftsmanship"
 word_count: 960
-status: draft
+status: local_draft
+publication_state: not_published
+cms_status: not_uploaded
+scheduled: false
+published: false
 client_slug: caravanserai
 created_at: 2026-07-08
 ---

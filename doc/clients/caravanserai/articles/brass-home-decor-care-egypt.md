@@ -4,7 +4,11 @@ meta_title: "Brass Home Decor Care | Handcrafted Metal Care Guide | Caravanserai
 meta_description: "Learn how to care for handcrafted brass home decor. Expert guide on cleaning, patina preservation, and styling brass pieces in Egyptian interiors."
 keyword: "brass home decor care egypt"
 word_count: 1020
-status: draft
+status: local_draft
+publication_state: not_published
+cms_status: not_uploaded
+scheduled: false
+published: false
 client_slug: caravanserai
 created_at: 2026-07-08
 ---

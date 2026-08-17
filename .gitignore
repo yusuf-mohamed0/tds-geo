@@ -46,3 +46,4 @@ dump.rdb
 
 # Generated graphify AST cache
 graphify-out/cache/ast/*.json
+graphify-out/20*/

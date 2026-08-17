@@ -4,7 +4,11 @@ meta_title: "Zamalek Cairo Home Decor | Handcrafted Furniture District Guide | C
 meta_description: "Discover Zamalek, Cairo's premier destination for handcrafted furniture and artisanal home decor. Guide to showrooms, workshops, and design studios."
 keyword: "zamalek cairo home decor handmade"
 word_count: 870
-status: draft
+status: local_draft
+publication_state: not_published
+cms_status: not_uploaded
+scheduled: false
+published: false
 client_slug: caravanserai
 created_at: 2026-07-08
 ---

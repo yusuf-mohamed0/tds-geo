@@ -4,7 +4,11 @@ meta_title: "Welcoming Guests Home Decor | Egyptian Hospitality Guide | Caravans
 meta_description: "Simple ways to prepare your home for guests. Learn how to create welcoming spaces with seating, lighting, and handcrafted Egyptian decor."
 keyword: "welcoming guests home preparation egypt"
 word_count: 980
-status: draft
+status: local_draft
+publication_state: not_published
+cms_status: not_uploaded
+scheduled: false
+published: false
 client_slug: caravanserai
 created_at: 2026-07-08
 ---
