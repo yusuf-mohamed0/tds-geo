@@ -233,16 +233,32 @@ jobs:
             FAILED=0
 
             echo -n "Health endpoint: "
-            curl -sf http://localhost:3000/health > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health 2>/dev/null || true)
+            [ "$STATUS" = "200" ] && echo "PASS" || { echo "FAIL (HTTP $STATUS, expected 200)"; FAILED=1; }
 
             echo -n "API clients: "
-            curl -sf http://localhost:3000/api/clients > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+            if [ -n "${SMOKE_TEST_TOKEN:-}" ]; then
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $SMOKE_TEST_TOKEN" http://localhost:3000/api/clients 2>/dev/null || true)
+              EXPECTED=200
+            else
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/clients 2>/dev/null || true)
+              EXPECTED=401
+            fi
+            [ "$STATUS" = "$EXPECTED" ] && echo "PASS" || { echo "FAIL (HTTP $STATUS, expected $EXPECTED)"; FAILED=1; }
 
             echo -n "API articles: "
-            curl -sf http://localhost:3000/api/articles > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+            if [ -n "${SMOKE_TEST_TOKEN:-}" ]; then
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $SMOKE_TEST_TOKEN" http://localhost:3000/api/articles 2>/dev/null || true)
+              EXPECTED=200
+            else
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/articles 2>/dev/null || true)
+              EXPECTED=401
+            fi
+            [ "$STATUS" = "$EXPECTED" ] && echo "PASS" || { echo "FAIL (HTTP $STATUS, expected $EXPECTED)"; FAILED=1; }
 
             echo -n "Nginx frontend: "
-            curl -sf http://localhost:80/ > /dev/null 2>&1 && echo "PASS" || { echo "FAIL"; FAILED=1; }
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/ 2>/dev/null || true)
+            [ "$STATUS" = "200" ] && echo "PASS" || { echo "FAIL (HTTP $STATUS, expected 200)"; FAILED=1; }
 
             # Database connectivity check
             echo -n "Database: "

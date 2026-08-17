@@ -37,8 +37,14 @@ check_http() {
   local name="$1"
   local url="$2"
   local expected="${3:-200}"
+  local token="${4:-}"
   local status
-  status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
+  if [[ -n "$token" ]]; then
+    status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -H "Authorization: Bearer $token" "$url" 2>/dev/null || true)
+  else
+    status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || true)
+  fi
+  status="${status:-000}"
   if [[ "$status" == "$expected" ]]; then
     pass "$name (HTTP $status)"
   else
@@ -72,12 +78,16 @@ check_json "Health status" "$BASE_URL/health" "status"
 
 # ─── API Endpoints ─────────────────────────────
 echo "--- API Endpoints ---"
-check_http "Clients list" "$BASE_URL/api/clients"
-check_http "Articles list" "$BASE_URL/api/articles"
+check_http "Clients list (unauthenticated)" "$BASE_URL/api/clients" 401
+check_http "Articles list (unauthenticated)" "$BASE_URL/api/articles" 401
+if [[ -n "${SMOKE_TEST_TOKEN:-}" ]]; then
+  check_http "Clients list (authenticated)" "$BASE_URL/api/clients" 200 "$SMOKE_TEST_TOKEN"
+  check_http "Articles list (authenticated)" "$BASE_URL/api/articles" 200 "$SMOKE_TEST_TOKEN"
+fi
 
 # ─── Database ──────────────────────────────────
 echo "--- Database ---"
-if command -v docker &>/dev/null; then
+if [[ "${SMOKE_TEST_DOCKER:-false}" == "true" ]] && command -v docker &>/dev/null; then
   DB_CHECK=$(docker compose exec -T postgres pg_isready -U postgres 2>/dev/null || echo "FAILED")
   if echo "$DB_CHECK" | grep -q "accepting connections"; then
     pass "PostgreSQL accepting connections"
@@ -92,7 +102,7 @@ if command -v docker &>/dev/null; then
     fail "Redis not responding"
   fi
 else
-  echo "  ⚠️  Docker not available — skipping database checks"
+  echo "  ⚠️  Docker checks disabled — skipping database checks"
 fi
 
 # ─── Nginx / Frontend ─────────────────────────

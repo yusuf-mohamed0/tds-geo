@@ -69,7 +69,8 @@ jobs:
     needs: build
     if: |
       github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true')
+      github.event_name == 'workflow_dispatch' &&
+      inputs.deploy == true
     runs-on: ubuntu-latest
 
     steps:
@@ -154,15 +155,31 @@ jobs:
 
             echo "=== Smoke tests ==="
             FAILED=0
-            for endpoint in /health /api/clients /api/articles; do
-              CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000$endpoint" 2>/dev/null || echo "000")
-              if [ "$CODE" = "200" ]; then
-                echo "  ✅ $endpoint (HTTP $CODE)"
+            check_smoke_endpoint() {
+              ENDPOINT="$1"
+              EXPECTED="$2"
+              TOKEN="${3:-}"
+              if [ -n "$TOKEN" ]; then
+                CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" "http://localhost:3000$ENDPOINT" 2>/dev/null || echo "000")
               else
-                echo "  ❌ $endpoint (HTTP $CODE)"
+                CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000$ENDPOINT" 2>/dev/null || echo "000")
+              fi
+              if [ "$CODE" = "$EXPECTED" ]; then
+                echo "  ✅ $ENDPOINT (HTTP $CODE)"
+              else
+                echo "  ❌ $ENDPOINT expected HTTP $EXPECTED, got $CODE"
                 FAILED=1
               fi
-            done
+            }
+
+            check_smoke_endpoint /health 200
+            if [ -n "${SMOKE_TEST_TOKEN:-}" ]; then
+              check_smoke_endpoint /api/clients 200 "$SMOKE_TEST_TOKEN"
+              check_smoke_endpoint /api/articles 200 "$SMOKE_TEST_TOKEN"
+            else
+              check_smoke_endpoint /api/clients 401
+              check_smoke_endpoint /api/articles 401
+            fi
 
             if [ "$FAILED" = "1" ]; then
               echo "  ❌ Smoke tests failed — rolling back"
