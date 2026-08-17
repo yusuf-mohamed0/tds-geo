@@ -16,6 +16,7 @@ import GeoPage from './pages/GeoPage';
 import GscPage from './pages/GscPage';
 import CitationsPage from './pages/CitationsPage';
 import CostsPage from './pages/CostsPage';
+import AdsReportsPage from './pages/AdsReportsPage';
 import QualityPage from './pages/QualityPage';
 import KeywordResearchPage from './pages/KeywordResearchPage';
 import BacklinksPage from './pages/BacklinksPage';
@@ -91,6 +92,7 @@ export default function App() {
               <Route path="gsc" element={<GscPage />} />
               <Route path="citations" element={<CitationsPage />} />
               <Route path="costs" element={<CostsPage />} />
+              <Route path="ads-reports" element={<AdsReportsPage />} />
               <Route path="quality" element={<QualityPage />} />
               <Route path="keywords" element={<KeywordResearchPage />} />
               <Route path="backlinks" element={<BacklinksPage />} />

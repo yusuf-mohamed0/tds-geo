@@ -118,10 +118,10 @@ const operatingAreas: OperatingArea[] = [
     description: 'Monthly ads reports, n8n workflows, heartbeat alerts, and operational runbooks should feed back into the same client timeline.',
     icon: BarChart3,
     tone: KIVO_BRAND.colors.peach,
-    route: '/admin/costs',
-    cta: 'View spend',
+    route: '/admin/ads-reports',
+    cta: 'Open reports',
     links: [
-      { label: 'Activity', route: '/admin' },
+      { label: 'Reports', route: '/admin/ads-reports' },
       { label: 'Docs', href: '/documentation' },
       { label: 'Quality', route: '/admin/quality' },
     ],
@@ -171,7 +171,7 @@ const integrationMilestones = [
   { label: 'Production app unified under /admin', state: 'Live', icon: CheckCircle2 },
   { label: 'Shopify and embedded app flows', state: 'Connected in core', icon: Store },
   { label: 'WordPress and Next.js connectors', state: 'Available packages', icon: LinkIcon },
-  { label: 'Reports app ingestion', state: 'Needs import job', icon: Newspaper },
+  { label: 'Paid ads reporting', state: 'Controlled in app', icon: Newspaper },
   { label: 'GSC OAuth', state: 'Waiting for secret', icon: BarChart3 },
   { label: 'Sidecar AI tools', state: 'Optional/offline', icon: Boxes },
 ];

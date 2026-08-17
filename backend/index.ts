@@ -153,6 +153,7 @@ import citationTracker from './services/citationTracker';
 // ═══ Google Search Console ══════════════════
 import gscService from './services/googleSearchConsole';
 import { createGscRoutes } from './routes/googleSearchConsole';
+import { createAdsReportRoutes } from './routes/adsReports';
 
 // ═══ Demo / Free Trial ══════════════════════
 import demoProvisioner from './services/demoProvisioner';
@@ -609,6 +610,9 @@ app.use('/api/vault', createCredentialVaultRoutes(pool));
 
 // ═══════ Google Search Console Routes ════════════
 app.use('/api/gsc', createGscRoutes(pool));
+
+// ═══════ Paid Ads Reporting Routes ════════════════
+app.use('/api/ads-reports', createAdsReportRoutes(pool));
 
 // ═══════ Demo / Free Trial Routes ════════════════
 app.use('/api/demo', createDemoRoutes(pool));

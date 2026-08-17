@@ -1,10 +1,10 @@
 # Client App Processes
 
-Last updated: 2026-08-05
+Last updated: 2026-08-17
 
 This file is the operating index for the production client process layer. Each active client has a dedicated `app-process.md` that defines how Kivo Geo should onboard, verify, generate, review, publish, monitor, and recover that client.
 
-Shared operating roles are in `CONTENT-OPERATING-ROLES.md`. New local drafts are indexed in `DRAFT-ARTICLE-QUEUE.md`. GEO/AEO plans live at `doc/clients/{slug}/geo-aeo-plan.md`.
+Shared operating roles are in `CONTENT-OPERATING-ROLES.md`. New local drafts are indexed in `DRAFT-ARTICLE-QUEUE.md`. GEO/AEO plans live at `doc/clients/{slug}/geo-aeo-plan.md`. Paid Meta/Google Ads reporting readiness is tracked in `doc/ADS-REPORTING-READINESS.md`.
 
 ## Production Clients
 
@@ -45,6 +45,10 @@ Before relying on app automation for any client:
 3. Root PM2 process `kivo-backend` is online and points to `/opt/kivo/current` or the intended release.
 4. `npm run audit:clients` has no unsafe pending content findings.
 5. Shopify webhook dry-run confirms only real Shopify shops and `app/uninstalled` topic management.
+
+## Paid Ads Reporting
+
+Meta Business Suite, Meta Ads, and Google Ads monthly PDF reporting is controlled from Kivo Geo at `/admin/ads-reports` and backed by the local worker at `/root/tds-ads-reporting-automation`. Use `doc/ADS-REPORTING-READINESS.md` before promising or running paid ads reports. Generated PDFs stay internal until the reporting review gates are complete.
 
 ## 2026-08-05 Connector Repair Notes
 

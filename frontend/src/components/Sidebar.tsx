@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, FileText,
   DollarSign, CheckSquare, Search, ScrollText, Lightbulb, Link as LinkIcon, X, BarChart3,
+  BriefcaseBusiness,
 } from 'lucide-react';
 import Logo from './Logo';
 
@@ -13,6 +14,7 @@ const navItems = [
   { to: '/admin/gsc', icon: BarChart3, label: 'Search Console' },
   { to: '/admin/citations', icon: ScrollText, label: 'Citations' },
   { to: '/admin/costs', icon: DollarSign, label: 'Costs' },
+  { to: '/admin/ads-reports', icon: BriefcaseBusiness, label: 'Ads Reports' },
   { to: '/admin/quality', icon: CheckSquare, label: 'Quality' },
   { to: '/admin/keywords', icon: Lightbulb, label: 'Keywords' },
   { to: '/admin/backlinks', icon: LinkIcon, label: 'Backlinks' },
