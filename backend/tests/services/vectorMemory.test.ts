@@ -27,13 +27,15 @@ const {
 }));
 
 vi.mock('openai', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    embeddings: {
-      create: vi.fn().mockResolvedValue({
-        data: [{ embedding: Array.from({ length: 1536 }, (_, i) => i / 1536) }],
-      }),
-    },
-  })),
+  default: vi.fn().mockImplementation(function () {
+    return {
+      embeddings: {
+        create: vi.fn().mockResolvedValue({
+          data: [{ embedding: Array.from({ length: 1536 }, (_, i) => i / 1536) }],
+        }),
+      },
+    };
+  }),
 }));
 
 vi.mock('../../services/vectorStoreClient', () => ({

@@ -254,15 +254,15 @@ describe('shopify content — draft-first article contract', () => {
 
       expect(result.id).toBe(123);
       expect(result.url).toBe('https://test-shop.myshopify.com/blogs/news/test-article');
-      const insertCall = mockQuery.mock.calls.find(([sql]: [string]) => sql.includes('INSERT INTO publishing_history'));
-      expect(insertCall).toBeTruthy();
+      const insertCall = mockQuery.mock.calls.find((call) => String(call[0]).includes('INSERT INTO publishing_history'));
+      expect(insertCall).toBeDefined();
       // [article_id, client_id, shopify_article_id, shopify_blog_id, published_url, status, published_at]
-      expect(insertCall[1][4]).toBe('https://test-shop.myshopify.com/blogs/news/test-article');
-      expect(insertCall[1][5]).toBe('pending');
-      expect(insertCall[1][6]).toBeNull();
+      expect(insertCall![1][4]).toBe('https://test-shop.myshopify.com/blogs/news/test-article');
+      expect(insertCall![1][5]).toBe('pending');
+      expect(insertCall![1][6]).toBeNull();
 
       // Draft creation must NOT mark the article published.
-      const updateCall = mockQuery.mock.calls.find(([sql]: [string]) => sql.includes('UPDATE articles'));
+      const updateCall = mockQuery.mock.calls.find((call) => String(call[0]).includes('UPDATE articles'));
       expect(updateCall).toBeFalsy();
     });
 
@@ -283,11 +283,12 @@ describe('shopify content — draft-first article contract', () => {
       expect(postMock).toHaveBeenCalledTimes(1);
       expect(putMock).toHaveBeenCalledTimes(1);
 
-      const insertCall = mockQuery.mock.calls.find(([sql]: [string]) => sql.includes('INSERT INTO publishing_history'));
-      expect(insertCall[1][5]).toBe('published');
-      expect(insertCall[1][6]).toBeTruthy();
+      const insertCall = mockQuery.mock.calls.find((call) => String(call[0]).includes('INSERT INTO publishing_history'));
+      expect(insertCall).toBeDefined();
+      expect(insertCall![1][5]).toBe('published');
+      expect(insertCall![1][6]).toBeTruthy();
 
-      const updateCall = mockQuery.mock.calls.find(([sql]: [string]) => sql.includes('UPDATE articles'));
+      const updateCall = mockQuery.mock.calls.find((call) => String(call[0]).includes('UPDATE articles'));
       expect(updateCall).toBeTruthy();
     });
 
@@ -307,14 +308,14 @@ describe('shopify content — draft-first article contract', () => {
       expect(postMock).toHaveBeenCalledTimes(1);
       expect(putMock).toHaveBeenCalledTimes(1);
 
-      const insertCall = mockQuery.mock.calls.find(([sql]: [string]) => sql.includes('INSERT INTO publishing_history'));
-      expect(insertCall).toBeTruthy();
-      expect(insertCall[1][5]).toBe('published');
-      expect(insertCall[1][6]).toBeTruthy();
+      const insertCall = mockQuery.mock.calls.find((call) => String(call[0]).includes('INSERT INTO publishing_history'));
+      expect(insertCall).toBeDefined();
+      expect(insertCall![1][5]).toBe('published');
+      expect(insertCall![1][6]).toBeTruthy();
 
-      const updateCall = mockQuery.mock.calls.find(([sql]: [string]) => sql.includes('UPDATE articles'));
-      expect(updateCall).toBeTruthy();
-      expect(String(updateCall[0])).toContain("status = 'published'");
+      const updateCall = mockQuery.mock.calls.find((call) => String(call[0]).includes('UPDATE articles'));
+      expect(updateCall).toBeDefined();
+      expect(String(updateCall![0])).toContain("status = 'published'");
     });
   });
 });

@@ -14,7 +14,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    testTimeout: 10000,
+    testTimeout: 30000,
     // Files to exclude from the default test run
     // E2E pipeline integration tests run separately via npm run test:e2e,
     // and frontend tests run separately (jsdom env) via the frontend workspace

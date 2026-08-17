@@ -1,5 +1,5 @@
 # ─── Backend Build Stage ────────────────────────
-FROM node:20-alpine AS backend-builder
+FROM node:20.19-alpine AS backend-builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ COPY backend/ ./backend/
 RUN npm run build
 
 # ─── Frontend Build Stage ──────────────────────
-FROM node:20-alpine AS frontend-builder
+FROM node:20.19-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
@@ -55,7 +55,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 
 # ─── Backend Production Stage ──────────────────
 # Keep this stage last so plain `docker build` produces the API image used by Compose.
-FROM node:20-alpine AS production
+FROM node:20.19-alpine AS production
 
 WORKDIR /app
 

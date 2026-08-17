@@ -13,7 +13,8 @@ import request from 'supertest';
 
 // ─── Mock pg BEFORE importing the app ─────────
 vi.mock('pg', () => {
-  const MockPool = vi.fn(() => ({
+  const MockPool = vi.fn().mockImplementation(function () {
+    return {
     query: vi.fn().mockImplementation((text: string) => {
       if (text.trim() === 'SELECT 1') {
         return Promise.resolve({ rows: [{ '?column?': 1 }], rowCount: 1 });
@@ -44,7 +45,8 @@ vi.mock('pg', () => {
     }),
     end: vi.fn().mockResolvedValue(undefined),
     on: vi.fn(),
-  }));
+    };
+  });
   return { Pool: MockPool };
 });
 
