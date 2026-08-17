@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { AppProvider } from '@shopify/polaris';
-import { render, screen, waitFor } from '../test/test-utils';
+import { fireEvent, render, screen, waitFor } from '../test/test-utils';
 import AdsReportsPage from './AdsReportsPage';
 
 function renderWithPolaris(ui: React.ReactElement) {
@@ -20,6 +20,13 @@ vi.mock('../api/adsReports', () => ({
         platforms: ['meta'],
         metaAccounts: ['act_272954367455662'],
         googleCustomers: [],
+      },
+      {
+        id: 'caravanserai',
+        name: 'Caravanserai',
+        platforms: ['meta', 'google_ads'],
+        metaAccounts: ['act_326559196172852'],
+        googleCustomers: ['1234567890'],
       },
     ],
     roles: [
@@ -41,8 +48,17 @@ describe('AdsReportsPage', () => {
     });
 
     expect(screen.getByText('Runner')).toBeInTheDocument();
-    expect(screen.getByText('Alamein 2022')).toBeInTheDocument();
+    expect(screen.getByLabelText('Client')).toHaveValue('alamein-2022');
     expect(screen.getByRole('button', { name: 'Dry-run' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate PDF' })).toBeInTheDocument();
+  });
+
+  it('updates the selected client from the client selector', async () => {
+    renderWithPolaris(<AdsReportsPage />);
+
+    const select = await screen.findByLabelText('Client');
+    fireEvent.change(select, { target: { value: 'caravanserai' } });
+
+    expect(screen.getByText('Platforms: meta, google_ads | Meta: 1 | Google Ads: 1')).toBeInTheDocument();
   });
 });

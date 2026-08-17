@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Page, Card, Text, Badge, Banner, BlockStack, InlineStack, Button, SkeletonPage, SkeletonBodyText, TextField } from '@shopify/polaris';
+import { Page, Card, Text, Badge, Banner, BlockStack, InlineStack, Button, SkeletonPage, SkeletonBodyText, TextField, Select } from '@shopify/polaris';
 import { ShieldCheck, FileText, Users } from 'lucide-react';
 import {
   dryRunAdsReport,
@@ -43,6 +43,11 @@ export default function AdsReportsPage() {
   const client = useMemo<AdsReportingClient | undefined>(
     () => status?.clients.find((entry) => entry.id === selectedClient),
     [selectedClient, status?.clients],
+  );
+
+  const clientOptions = useMemo(
+    () => status?.clients.map((entry) => ({ label: entry.name, value: entry.id })) ?? [],
+    [status?.clients],
   );
 
   const run = async (mode: 'dry-run' | 'generate') => {
@@ -120,12 +125,13 @@ export default function AdsReportsPage() {
             <BlockStack gap="400">
               <Text as="h2" variant="headingMd">Generate Internal Report</Text>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <label className="block">
-                  <Text as="span" variant="bodySm" tone="subdued">Client</Text>
-                  <select className="mt-1 w-full rounded-md border border-brand-border bg-white px-3 py-2" value={selectedClient} onChange={(event) => setSelectedClient(event.target.value)}>
-                    {status.clients.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
-                  </select>
-                </label>
+                <Select
+                  label="Client"
+                  value={selectedClient}
+                  onChange={setSelectedClient}
+                  options={clientOptions}
+                  disabled={!clientOptions.length}
+                />
                 <TextField label="Month" value={month} onChange={setMonth} autoComplete="off" helpText="Use YYYY-MM" />
                 <div className="flex items-end gap-2">
                   <Button loading={running === 'dry-run'} onClick={() => run('dry-run')}>Dry-run</Button>
