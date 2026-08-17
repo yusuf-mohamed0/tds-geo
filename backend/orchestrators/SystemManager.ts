@@ -183,7 +183,7 @@ export const SYSTEM_ARCHITECTURE_CONTRACT: SystemArchitectureContract = {
       routePrefixes: ['/api/auth', '/api/devices', '/api/security'],
       storageTables: ['users', 'api_keys', 'device_registry', 'employee_sessions', 'permission_matrix', 'audit_log'],
       credentialNames: ['JWT_SECRET', 'JWT_EXPIRES_IN', 'SESSION_TTL_HOURS', 'DEVICE_FINGERPRINT_SALT'],
-      currentLimits: ['Frontend role union does not include super_admin; connector is synthetic API-key auth.'],
+      currentLimits: ['Frontend role union includes super_admin; connector is synthetic API-key auth.'],
       safetyRules: withSafetyRules(),
       nextPhase: 'Centralize route permission assertions before changing RBAC behavior.',
     },
