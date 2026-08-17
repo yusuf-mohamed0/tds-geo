@@ -34,6 +34,7 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "@rollup/rollup-linux-x64-gnu"
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
 
