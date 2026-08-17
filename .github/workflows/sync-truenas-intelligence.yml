@@ -19,17 +19,19 @@ jobs:
 
       - name: Sync clean analysis checkout
         run: |
-          sudo mkdir -p /opt/tds-geo/kivo-source
-          sudo chown -R "$USER:$USER" /opt/tds-geo/kivo-source
+          mkdir -p "$HOME/tds-geo/kivo-source"
           rsync -a --delete \
             --exclude 'node_modules' \
             --exclude 'frontend/node_modules' \
             --exclude 'kivo-nextjs/node_modules' \
             --exclude 'deploy/truenas/.env' \
-            ./ /opt/tds-geo/kivo-source/
-          git rev-parse HEAD > /opt/tds-geo/kivo-source/.source-commit
+            ./ "$HOME/tds-geo/kivo-source/"
+          git rev-parse HEAD > "$HOME/tds-geo/kivo-source/.source-commit"
 
       - name: Refresh GitNexus pairing
         run: |
-          KIVO_SOURCE_DIR=/opt/tds-geo/kivo-source \
-          /opt/tds-geo/kivo-source/deploy/truenas/scripts/sync-intelligence.sh
+          KIVO_SOURCE_DIR="$HOME/tds-geo/kivo-source" \
+          GITNEXUS_DATA_DIR="$HOME/tds-geo/gitnexus-data" \
+          GITNEXUS_STATUS_FILE="$HOME/tds-geo/gitnexus-status.json" \
+          GITNEXUS_LOG_FILE="$HOME/tds-geo/logs/gitnexus-refresh.log" \
+          "$HOME/tds-geo/kivo-source/deploy/truenas/scripts/sync-intelligence.sh"

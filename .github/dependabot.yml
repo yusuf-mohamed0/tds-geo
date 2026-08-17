@@ -32,6 +32,8 @@ updates:
           - "minor"
           - "patch"
     ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
 
@@ -56,6 +58,8 @@ updates:
           - "minor"
           - "patch"
     ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
       - dependency-name: "react"
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
@@ -75,6 +79,8 @@ updates:
     assignees:
       - "yusuf-mohamed0"
     ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
       - dependency-name: "node"
         update-types: ["version-update:semver-major"]
 
@@ -89,3 +95,6 @@ updates:
     open-pull-requests-limit: 1
     assignees:
       - "yusuf-mohamed0"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
