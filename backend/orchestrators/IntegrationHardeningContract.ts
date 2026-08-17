@@ -265,10 +265,10 @@ export const INTEGRATION_HARDENING_CONTRACT: IntegrationHardeningArchitectureCon
       tenantScopeRule: 'Sanitized DB export only includes non-secret client columns; no tenant secrets or cross-tenant data.',
       currentRisks: [
         'Account master password is used by sync scripts instead of an app password.',
-        'doc/clients/*/technical-reference.md, contacts.md, full-profile.md, and brand-profile.md are credential-bearing and staged wholesale; the safe-sync exclusion list does not currently cover them.',
+        'doc/clients/*/technical-reference.md, contacts.md, full-profile.md, and brand-profile.md are credential-bearing; the safe-sync exclusion list was extended to strip them before upload (verified 2026-08-17).',
       ],
       requiredInvariants: ['Nextcloud artifacts must never contain env, keys, tokens, clients.yaml, credential vault material, or credential-bearing client doc files.'],
-      nextHardeningStep: 'Extend the safe-sync exclusion list to strip credential-bearing client doc files (or scrub them before staging) and switch to a Nextcloud app password; keep the exclusion list under test.',
+      nextHardeningStep: 'Switch sync to a Nextcloud app password and keep the safe-sync exclusion list under test.',
     },
     {
       id: 'credential-vault',

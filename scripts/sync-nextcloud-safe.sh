@@ -94,7 +94,8 @@ fi
 make_sanitized_db_export
 
 find "$STAGE_DIR" \
-  \( -name '.env' -o -name '*.pem' -o -name '*.key' -o -name '*token*' -o -name 'clients.yaml' -o -path '*/credential_vault*' \) \
+  \( -name '.env' -o -name '*.pem' -o -name '*.key' -o -name '*token*' -o -name 'clients.yaml' -o -path '*/credential_vault*' \
+     -o -name 'technical-reference.md' -o -name 'contacts.md' -o -name 'full-profile.md' -o -name 'brand-profile.md' \) \
   -print -delete > "$WORK_DIR/excluded-sensitive-files.txt"
 
 (cd "$STAGE_DIR" && find . -type f | sort) > "$MANIFEST"
