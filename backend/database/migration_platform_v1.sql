@@ -245,6 +245,12 @@ INSERT INTO prompt_templates (name, slug, description, category, system_prompt, 
 ON CONFLICT DO NOTHING;
 
 -- ─── Seed System Plugins ─────────────────────
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'plugin_registry' AND column_name = 'entry_point'
+  ) THEN
 INSERT INTO plugin_registry (name, slug, description, version, author, entry_point, config_schema, default_config, hooks, is_system) VALUES
   (
     'SEO Content Agent',
@@ -307,3 +313,6 @@ INSERT INTO plugin_registry (name, slug, description, version, author, entry_poi
     true
   )
 ON CONFLICT DO NOTHING;
+  END IF;
+END
+$$;
