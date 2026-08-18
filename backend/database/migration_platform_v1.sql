@@ -198,7 +198,7 @@ INSERT INTO system_config (key, value, description, category, is_public) VALUES
   ('content.default_max_words', '2500', 'Default maximum article word count', 'content', false),
   ('analytics.retention_days', '365', 'Analytics data retention period', 'analytics', false),
   ('monitoring.alert_email', '""', 'System alert email address', 'monitoring', false)
-ON CONFLICT (key) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 -- ─── Seed Default Prompt Templates ───────────
 INSERT INTO prompt_templates (name, slug, description, category, system_prompt, user_template, variables, is_system) VALUES
@@ -242,7 +242,7 @@ INSERT INTO prompt_templates (name, slug, description, category, system_prompt, 
     ARRAY['topic', 'tone', 'keyword', 'targetWords', 'originalContent'],
     true
   )
-ON CONFLICT (slug) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 -- ─── Seed System Plugins ─────────────────────
 INSERT INTO plugin_registry (name, slug, description, version, author, entry_point, config_schema, default_config, hooks, is_system) VALUES
@@ -306,4 +306,4 @@ INSERT INTO plugin_registry (name, slug, description, version, author, entry_poi
     ARRAY['on_schedule', 'after_publish', 'on_performance_update'],
     true
   )
-ON CONFLICT (slug) DO NOTHING;
+ON CONFLICT DO NOTHING;
