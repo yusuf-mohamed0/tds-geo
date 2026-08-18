@@ -119,6 +119,7 @@ import { createMetaRoutes } from './routes/meta';
 // ═══ Credential Vault ═══════════════════════════
 import { createCredentialVaultRoutes } from './routes/credentialVault';
 import { maybeDecrypt } from './services/credentialEncryption';
+import { hardenShopifyTokensAtBoot } from './services/shopifyTokenVault';
 
 // ═══ Quality Evaluation Routes (Prompt Phase 2) ═══
 import { createQualityRoutes } from './routes/quality';
@@ -978,6 +979,9 @@ async function start(): Promise<void> {
     // ═══════ Connectors ═════════════════════════════
     connectorManager.initialize(pool);
     registerBuiltinConnectors(pool);
+
+    // Encrypt any legacy plaintext Shopify tokens and ensure vault policy rows
+    await hardenShopifyTokensAtBoot(pool);
 
     // Auto-connect connectors from active CMS connections
     try {
