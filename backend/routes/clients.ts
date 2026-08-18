@@ -12,6 +12,7 @@ import { authenticate, authorize, authorizeClientAccess } from '../middleware/au
 import { validate } from '../validators/index';
 import { createClientSchema, updateClientSchema } from '../validators/index';
 import { logger } from '../utils/logger';
+import { encrypt } from '../services/credentialEncryption';
 
 export function createClientRoutes(pool: Pool): Router {
   const router = Router();
@@ -60,7 +61,7 @@ export function createClientRoutes(pool: Pool): Router {
          RETURNING id, name, slug, shopify_shop, brand_voice, service_area,
                    timezone, publish_frequency, approval_mode, is_active, created_at`,
         [
-          data.name, data.slug, data.shopifyShop, data.shopifyToken,
+          data.name, data.slug, data.shopifyShop, encrypt(data.shopifyToken || ''),
           data.shopifyApiVersion || '2025-07', data.brandVoice || null,
           data.serviceArea || null, data.timezone || 'UTC',
           data.publishFrequency || 'daily', data.preferredPublishHour || 10,
@@ -123,7 +124,9 @@ export function createClientRoutes(pool: Pool): Router {
       for (const [key, column] of Object.entries(fieldMap)) {
         if ((data as any)[key] !== undefined) {
           fields.push(`${column} = $${paramIndex++}`);
-          values.push((data as any)[key]);
+          let value = (data as any)[key];
+          if (column === 'shopify_token') value = encrypt(value || '');
+          values.push(value);
         }
       }
 

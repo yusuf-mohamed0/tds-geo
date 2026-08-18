@@ -4,6 +4,7 @@
 
 import { logger } from '../../utils/logger';
 import { ShopifyConfig } from '../../types';
+import { encrypt, maybeDecrypt } from '../credentialEncryption';
 
 let pool: any = null;
 
@@ -25,8 +26,9 @@ export async function refreshIfExpired(shopConfig: ShopifyConfig): Promise<Shopi
   const row = result.rows[0];
 
   // Always use the latest token from the database, even if not expired
-  if (row.shopify_token && row.shopify_token !== shopConfig.accessToken) {
-    shopConfig = { ...shopConfig, accessToken: row.shopify_token };
+  const dbToken = maybeDecrypt(row.shopify_token);
+  if (dbToken && dbToken !== shopConfig.accessToken) {
+    shopConfig = { ...shopConfig, accessToken: dbToken };
   }
 
   const now = new Date();
@@ -43,7 +45,7 @@ export async function refreshIfExpired(shopConfig: ShopifyConfig): Promise<Shopi
             client_id: process.env.SHOPIFY_API_KEY || '',
             client_secret: process.env.SHOPIFY_API_SECRET || '',
             grant_type: 'refresh_token',
-            refresh_token: row.shopify_refresh_token,
+            refresh_token: maybeDecrypt(row.shopify_refresh_token) || '',
           }).toString(),
         }
       );
@@ -54,23 +56,19 @@ export async function refreshIfExpired(shopConfig: ShopifyConfig): Promise<Shopi
           ? new Date(Date.now() + data.expires_in * 1000).toISOString()
           : null;
 
+        // Keep the prior stored refresh token when the refresh response omits one.
+        const refreshToken = data.refresh_token ? encrypt(data.refresh_token) : row.shopify_refresh_token;
+
         await pool.query(
           `UPDATE clients SET shopify_token = $1, shopify_refresh_token = $2, shopify_token_expires_at = $3 WHERE shopify_shop = $4`,
-          [data.access_token, data.refresh_token || row.shopify_refresh_token, expiresAt, shopConfig.shop]
+          [encrypt(data.access_token), refreshToken, expiresAt, shopConfig.shop]
         );
 
         await pool.query(
-          `UPDATE cms_connections cc
-             SET config = jsonb_set(
-               jsonb_set(COALESCE(cc.config, '{}'::jsonb), '{accessToken}', to_jsonb($1::text), true),
-               '{apiVersion}', to_jsonb(COALESCE($2::text, '2025-07')), true
-             )
-            FROM clients c
-           WHERE cc.client_id = c.id
-             AND cc.provider = 'shopify'
-             AND c.shopify_shop = $3`,
-          [data.access_token, shopConfig.apiVersion || '2025-07', shopConfig.shop]
-        );
+          `INSERT INTO credential_access_log (credential_id, user_id, action, ip_address, metadata)
+           VALUES (NULL, NULL, 'refresh', NULL, $1)`,
+          [JSON.stringify({ resource: 'clients.shopify_token', shop: shopConfig.shop })]
+        ).catch(() => {});
 
         logger.info('Shopify token refreshed', { shop: shopConfig.shop });
         return { ...shopConfig, accessToken: data.access_token };

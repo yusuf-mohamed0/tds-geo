@@ -9,6 +9,7 @@ import { clientRateLimit } from "../middleware/rateLimiter";
 import multiCmsPublisher from "../services/multiCmsPublisher";
 import { WordPressConnector } from "../connectors/wordpress";
 import { CmsConnection } from "../types";
+import { maybeDecrypt } from "../services/credentialEncryption";
 
 function parseConnectionConfig(connection: CmsConnection): Record<string, any> {
   const rawConfig = (connection as any).config;
@@ -54,7 +55,24 @@ async function testCustomRestConnection(connection: CmsConnection): Promise<bool
   }
 }
 
-async function testStoredConnection(connection: CmsConnection): Promise<boolean> {
+async function testStoredConnection(connection: CmsConnection, pool?: Pool): Promise<boolean> {
+  // Shopify tokens no longer live in cms_connections.config — enrich the
+  // in-memory config with the decrypted client token before building the
+  // connector config. Other providers keep their apiKey in config untouched.
+  if (connection.provider === 'shopify' && pool) {
+    try {
+      const clientResult = await pool.query(
+        'SELECT shopify_token FROM clients WHERE id = $1 AND is_active = true',
+        [connection.client_id]
+      );
+      if (clientResult.rows.length === 0) return false;
+      const config = parseConnectionConfig(connection);
+      (connection as any).config = { ...config, accessToken: maybeDecrypt(clientResult.rows[0].shopify_token) || '' };
+    } catch {
+      return false;
+    }
+  }
+
   if (connection.provider === 'custom_rest') {
     return testCustomRestConnection(connection);
   }
@@ -159,7 +177,7 @@ export function createCmsRoutes(pool: Pool): Router {
       const connection = connections.find((c: any) => c.id === req.params.connectionId);
       if (!connection) return res.status(404).json({ success: false, error: "Connection not found" });
 
-      const result = await testStoredConnection(connection);
+      const result = await testStoredConnection(connection, pool);
       res.json({ success: true, data: { connected: result } });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });

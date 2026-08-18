@@ -118,6 +118,7 @@ import { createMetaRoutes } from './routes/meta';
 
 // ═══ Credential Vault ═══════════════════════════
 import { createCredentialVaultRoutes } from './routes/credentialVault';
+import { maybeDecrypt } from './services/credentialEncryption';
 
 // ═══ Quality Evaluation Routes (Prompt Phase 2) ═══
 import { createQualityRoutes } from './routes/quality';
@@ -981,21 +982,26 @@ async function start(): Promise<void> {
     // Auto-connect connectors from active CMS connections
     try {
       const cmsResult = await pool.query(
-        `SELECT provider, endpoint_url, config FROM cms_connections WHERE is_active = true`
+        `SELECT cc.provider, cc.endpoint_url, cc.config, cc.client_id, c.shopify_token AS client_token, c.shopify_shop AS client_shop
+         FROM cms_connections cc LEFT JOIN clients c ON c.id = cc.client_id WHERE cc.is_active = true`
       );
       for (const row of cmsResult.rows) {
         try {
           const cfg = typeof row.config === 'string' ? JSON.parse(row.config) : row.config;
-          const endpointUrl = row.endpoint_url
-            || (cfg.shop ? `https://${cfg.shop}` : undefined)
-            || cfg.endpointUrl
-            || cfg.endpoint_url
-            || cfg.siteUrl;
-          const apiKey = cfg.accessToken
+          const endpointUrl = row.provider === 'shopify' && row.client_shop
+            ? `https://${row.client_shop}`
+            : (row.endpoint_url
+              || (cfg.shop ? `https://${cfg.shop}` : undefined)
+              || cfg.endpointUrl
+              || cfg.endpoint_url
+              || cfg.siteUrl);
+          const rawToken = cfg.accessToken
             || cfg.apiKey
             || cfg.tdsGeoApiKey
             || cfg.kivo_api_key
-            || cfg.wpAppPassword;
+            || cfg.wpAppPassword
+            || (row.provider === 'shopify' ? row.client_token : undefined);
+          const apiKey = maybeDecrypt(rawToken) || '';
           const connector = connectorManager.get(row.provider);
           if (connector && endpointUrl && apiKey) {
             await connector.connect({ provider: row.provider, endpointUrl, apiKey });

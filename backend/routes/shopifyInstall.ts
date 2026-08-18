@@ -8,6 +8,7 @@ import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import { sitesService } from '../services/sitesService';
 import { SHOPIFY_COMPLIANCE_WEBHOOKS, verifyShopifyOAuthHmac } from '../utils/shopifyWebhook';
+import { encrypt } from '../services/credentialEncryption';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
@@ -131,7 +132,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
                 shopify_api_version = '2025-07', is_active = true
           WHERE shopify_shop = $4
           RETURNING id`,
-        [accessToken, refreshToken, tokenExpiresAt, shop]
+        [encrypt(accessToken), encrypt(refreshToken || ''), tokenExpiresAt, shop]
       );
 
       if (clientResult.rows.length === 0) {
@@ -147,7 +148,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
              shopify_api_version = EXCLUDED.shopify_api_version,
              is_active = true
            RETURNING id`,
-          [shop.replace('.myshopify.com', ''), baseSlug, shop, accessToken, refreshToken, tokenExpiresAt]
+          [shop.replace('.myshopify.com', ''), baseSlug, shop, encrypt(accessToken), encrypt(refreshToken || ''), tokenExpiresAt]
         );
       }
 
@@ -159,7 +160,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
           [clientId]
         );
         const storeName = shop.replace('.myshopify.com', '').replace(/^[a-z0-9]-/, match => match.toUpperCase());
-        const connConfig = JSON.stringify({ shop, accessToken, apiVersion: '2025-07' });
+        const connConfig = JSON.stringify({ shop, apiVersion: '2025-07' });
         const fullUrl = `https://${shop}`;
         if (existingConn.rows.length > 0) {
           await pool.query(
@@ -207,7 +208,7 @@ export function createShopifyInstallRoutes(pool: Pool): Router {
         domain: shop,
         owner_name: storeName,
         connector_id: clientId,
-        encrypted_credentials: accessToken,
+        encrypted_credentials: encrypt(accessToken),
         connection_status: 'connected',
       });
 

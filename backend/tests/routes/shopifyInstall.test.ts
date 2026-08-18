@@ -166,6 +166,32 @@ describe('Shopify Install Routes', () => {
       expect(res.headers.location).toContain('error?msg=invalid_state');
     });
 
+    it('stores encrypted tokens in clients and no token keys in cms_connections.config', async () => {
+      const q = buildCallbackQuery();
+      const res = await request(app).get('/api/shopify/callback').query(q);
+
+      expect(res.status).toBe(302);
+
+      // clients.shopify_token / shopify_refresh_token are stored as ciphertext.
+      const updateClients = mockQuery.mock.calls.find(
+        ([sql]) => String(sql).includes('UPDATE clients') && String(sql).includes('shopify_token')
+      );
+      expect(updateClients).toBeTruthy();
+      const params = updateClients![1];
+      expect(params[0]).toMatch(/^[0-9a-f]{32}:[0-9a-f]{32}:/);
+      expect(params[1]).toMatch(/^[0-9a-f]{32}:[0-9a-f]{32}:/);
+
+      // cms_connections.config holds only non-secret fields.
+      const connUpdate = mockQuery.mock.calls.find(([sql]) => String(sql).includes('UPDATE cms_connections'));
+      expect(connUpdate).toBeTruthy();
+      const config = JSON.parse(connUpdate![1][1]);
+      expect(config.shop).toBe(SHOP);
+      expect(config.apiVersion).toBe('2025-07');
+      expect(config).not.toHaveProperty('accessToken');
+      expect(config).not.toHaveProperty('access_token');
+      expect(config).not.toHaveProperty('token');
+    });
+
     it('rejects a state token that was issued for a different shop', async () => {
       mockQuery.mockImplementation((sql: string) => {
         if (sql.includes('DELETE FROM shopify_oauth_states')) {

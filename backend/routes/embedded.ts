@@ -23,6 +23,7 @@ import { publisherEngine } from '../engines/publisher';
 import { countArticleWords, getMinimumArticleWords } from '../services/contentLength';
 import { getArticleSafetyIssues } from '../services/articleSafety';
 import { presentArticleHtml } from '../services/articlePresentation';
+import { maybeDecrypt } from '../services/credentialEncryption';
 
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
 
@@ -101,16 +102,19 @@ export function createEmbeddedRoutes(pool: Pool): Router {
 
     try {
       const conn = await pool.query(
-        `SELECT config FROM cms_connections
-         WHERE client_id = $1 AND provider = 'shopify' AND is_active = true LIMIT 1`,
+        `SELECT cc.config, c.shopify_token AS token, c.shopify_shop AS shop
+         FROM cms_connections cc JOIN clients c ON c.id = cc.client_id
+         WHERE cc.client_id = $1 AND cc.provider = 'shopify' AND cc.is_active = true LIMIT 1`,
         [auth.clientId]
       );
       if (conn.rows.length === 0) {
         res.json({ blogs: [] });
         return;
       }
-      const { shop, accessToken, apiVersion } = conn.rows[0].config;
-      const shopifyRes = await fetch(`https://${shop}/admin/api/${apiVersion || '2025-07'}/blogs.json`, {
+      const accessToken = maybeDecrypt(conn.rows[0].token) || '';
+      const shop = conn.rows[0].shop || conn.rows[0].config?.shop;
+      const apiVersion = conn.rows[0].config?.apiVersion || '2025-07';
+      const shopifyRes = await fetch(`https://${shop}/admin/api/${apiVersion}/blogs.json`, {
         headers: { 'X-Shopify-Access-Token': accessToken },
       });
       const data: any = await shopifyRes.json();
@@ -124,11 +128,18 @@ export function createEmbeddedRoutes(pool: Pool): Router {
   async function syncFromShopify(clientId: string): Promise<void> {
     try {
       const conn = await pool.query(
-        `SELECT config FROM cms_connections WHERE client_id = $1 AND provider = 'shopify' AND is_active = true LIMIT 1`,
+        `SELECT cc.config, c.shopify_token AS token, c.shopify_shop AS shop
+         FROM cms_connections cc JOIN clients c ON c.id = cc.client_id
+         WHERE cc.client_id = $1 AND cc.provider = 'shopify' AND cc.is_active = true LIMIT 1`,
         [clientId]
       );
       if (conn.rows.length === 0) return;
-      const config = conn.rows[0].config;
+      const row = conn.rows[0];
+      const config = {
+        ...row.config,
+        accessToken: maybeDecrypt(row.token) || '',
+        shop: row.shop || row.config.shop,
+      };
 
       const shopifyRes = await fetch(
         `https://${config.shop}/admin/api/${config.apiVersion || '2025-07'}/articles.json?limit=250&fields=id,title,body_html,summary_html,handle,published_at,updated_at,tags,author`,
@@ -319,13 +330,20 @@ export function createEmbeddedRoutes(pool: Pool): Router {
       const client = clientResult.rows[0];
 
       const blogResult = await pool.query(
-        `SELECT config FROM cms_connections WHERE client_id = $1 AND provider = 'shopify' AND is_active = true LIMIT 1`,
+        `SELECT cc.config, c.shopify_token AS token, c.shopify_shop AS shop
+         FROM cms_connections cc JOIN clients c ON c.id = cc.client_id
+         WHERE cc.client_id = $1 AND cc.provider = 'shopify' AND cc.is_active = true LIMIT 1`,
         [auth.clientId]
       );
       let blogId: number | string | null = getClientDefaultBlogId(client);
       if (blogResult.rows.length > 0) {
         try {
-          const blogs = await shopifyService.fetchBlogs(blogResult.rows[0].config);
+          const config = {
+            ...blogResult.rows[0].config,
+            accessToken: maybeDecrypt(blogResult.rows[0].token) || '',
+            shop: blogResult.rows[0].shop || blogResult.rows[0].config.shop,
+          };
+          const blogs = await shopifyService.fetchBlogs(config);
           blogId = blogId || blogs[0]?.id || null;
         } catch { /* */ }
       }
@@ -359,14 +377,20 @@ export function createEmbeddedRoutes(pool: Pool): Router {
 
     try {
       const conn = await pool.query(
-        `SELECT config FROM cms_connections WHERE client_id = $1 AND provider = 'shopify' AND is_active = true LIMIT 1`,
+        `SELECT cc.config, c.shopify_token AS token, c.shopify_shop AS shop
+         FROM cms_connections cc JOIN clients c ON c.id = cc.client_id
+         WHERE cc.client_id = $1 AND cc.provider = 'shopify' AND cc.is_active = true LIMIT 1`,
         [auth.clientId]
       );
       if (conn.rows.length === 0) {
         res.status(404).json({ error: 'No Shopify connection found' });
         return;
       }
-      const config = conn.rows[0].config;
+      const config = {
+        ...conn.rows[0].config,
+        accessToken: maybeDecrypt(conn.rows[0].token) || '',
+        shop: conn.rows[0].shop || conn.rows[0].config.shop,
+      };
 
       const shopifyArticles = await shopifyService.fetchArticles(config);
       let synced = 0;

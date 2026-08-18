@@ -44,3 +44,18 @@ export function mask(value: string): string {
   if (value.length <= 8) return value;
   return value.slice(0, 4) + '...' + value.slice(-4);
 }
+
+// Returns the decrypted value if it looks like ciphertext, else returns the value as-is.
+// NEVER throw on plaintext passthrough; DO throw loudly if value looks like ciphertext but fails to decrypt.
+export function maybeDecrypt(value: string | null | undefined): string | null {
+  if (!value) return null;
+  if (/^[0-9a-f]{32}:[0-9a-f]{32}:/.test(value)) {
+    return decrypt(value); // decrypt() already throws on bad tag → loud failure is desired
+  }
+  return value;
+}
+
+export function maybeMask(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return mask(value);
+}

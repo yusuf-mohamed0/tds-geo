@@ -6,6 +6,7 @@
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import bcrypt from 'bcryptjs';
+import { encrypt } from './credentialEncryption';
 
 export interface DemoSignupRequest {
   email: string;
@@ -56,12 +57,13 @@ class DemoProvisioner {
          brand_voice, service_area, timezone, publish_frequency, approval_mode,
          monthly_token_limit, monthly_cost_limit, locale, settings, is_active,
          is_demo, trial_ends_at)
-       VALUES ($1, $2, 'demo-' || $2 || '.myshopify.com', 'demo-token', '2025-07',
+       VALUES ($1, $2, 'demo-' || $2 || '.myshopify.com', $6, '2025-07',
          'professional and educational', 'demo', 'UTC', 'manual', 'manual',
-         $3, $4, 'en', $5, true, true, $6)
+         $3, $4, 'en', $5, true, true, $7)
        RETURNING id`,
       [req.name, slug, DEMO_TOKENS_LIMIT, DEMO_COST_LIMIT,
        JSON.stringify({ isDemo: true, demoCreatedAt: new Date().toISOString() }),
+       encrypt('demo-token'),
        trialEnd.toISOString()]
     );
 
@@ -268,7 +270,7 @@ This demo account includes 3 free article generations to help you evaluate the p
          monthly_cost_limit = 100.00,
          settings = settings || '{"upgradedFromDemo": true}'::jsonb
        WHERE id = $1 AND is_demo = true`,
-      [clientId, shopifyShop, shopifyToken]
+      [clientId, shopifyShop, encrypt(shopifyToken)]
     );
 
     await this.pool.query(

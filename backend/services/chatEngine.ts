@@ -14,6 +14,7 @@ import { generateSlug } from '../utils/stringUtils';
 import { addJob, getJobStatus } from '../utils/queue';
 import { QueueNames, JobTypes } from '../queues/definitions';
 import openaiService from './openai';
+import { encrypt } from './credentialEncryption';
 
 interface ParsedCommand {
   action: string;
@@ -389,7 +390,7 @@ export class ChatEngine {
         const result = await this.pool.query(
           `INSERT INTO clients (name, slug, shopify_shop, shopify_token)
            VALUES ($1, $2, $3, $4) RETURNING id, name`,
-          [name, slug, shop || '', token || '']
+          [name, slug, shop || '', encrypt(String(token || ''))]
         );
         return { success: true, message: `🏢 Client created: ${result.rows[0].name} (${result.rows[0].id})`, requiresApproval: false };
       }

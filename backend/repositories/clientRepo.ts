@@ -8,6 +8,7 @@
 
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
+import { encrypt } from '../services/credentialEncryption';
 
 export interface ClientRecord {
   id: string;
@@ -68,7 +69,7 @@ export function createClientRepo(pool: Pool) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
        RETURNING *`,
       [
-        data.name, data.slug, data.shopify_shop, data.shopify_token,
+        data.name, data.slug, data.shopify_shop, encrypt(data.shopify_token || ''),
         data.shopify_api_version || '2025-07', data.brand_voice || null,
         data.service_area || null, data.timezone || 'UTC',
         data.publish_frequency || 'daily', data.preferred_publish_hour || 10,
@@ -102,7 +103,9 @@ export function createClientRepo(pool: Pool) {
     for (const [key, column] of Object.entries(fieldMap)) {
       if ((data as any)[key] !== undefined) {
         fields.push(`${column} = $${paramIndex++}`);
-        values.push((data as any)[key]);
+        let value = (data as any)[key];
+        if (column === 'shopify_token') value = encrypt(value || '');
+        values.push(value);
       }
     }
 

@@ -6,6 +6,7 @@ import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import { validate, createBillingSchema } from '../validators/index';
+import { maybeDecrypt } from '../services/credentialEncryption';
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
@@ -64,7 +65,7 @@ export function createBillingRoutes(pool: Pool): Router {
       }
 
       const client = clientResult.rows[0];
-      const accessToken = client.shopify_token;
+      const accessToken = maybeDecrypt(client.shopify_token) || '';
 
       const mutation = `
         mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $lineItems: [AppSubscriptionLineItemInput!]!, $test: Boolean) {
@@ -137,7 +138,7 @@ export function createBillingRoutes(pool: Pool): Router {
       }
 
       const client = clientResult.rows[0];
-      const accessToken = client.shopify_token;
+      const accessToken = maybeDecrypt(client.shopify_token) || '';
 
       // Confirm the charge via GraphQL
       if (chargeId) {
