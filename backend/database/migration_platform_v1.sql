@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS api_keys (
   UNIQUE(client_id, service, label)
 );
 
-CREATE INDEX idx_api_keys_client ON api_keys(client_id);
-CREATE INDEX idx_api_keys_service ON api_keys(service);
-CREATE INDEX idx_api_keys_active ON api_keys(is_active);
+CREATE INDEX IF NOT EXISTS idx_api_keys_client ON api_keys(client_id);
+CREATE INDEX IF NOT EXISTS idx_api_keys_service ON api_keys(service);
+CREATE INDEX IF NOT EXISTS idx_api_keys_active ON api_keys(is_active);
 
 -- ─── Plugin Registry ─────────────────────────
 CREATE TABLE IF NOT EXISTS plugin_registry (
@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS plugin_registry (
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_plugin_active ON plugin_registry(is_active);
-CREATE INDEX idx_plugin_slug ON plugin_registry(slug);
+CREATE INDEX IF NOT EXISTS idx_plugin_active ON plugin_registry(is_active);
+CREATE INDEX IF NOT EXISTS idx_plugin_slug ON plugin_registry(slug);
 
 -- ─── Plugin Instances (per client) ───────────
 CREATE TABLE IF NOT EXISTS plugin_instances (
@@ -68,8 +68,8 @@ CREATE TABLE IF NOT EXISTS plugin_instances (
   UNIQUE(plugin_id, client_id)
 );
 
-CREATE INDEX idx_pi_plugin ON plugin_instances(plugin_id);
-CREATE INDEX idx_pi_client ON plugin_instances(client_id);
+CREATE INDEX IF NOT EXISTS idx_pi_plugin ON plugin_instances(plugin_id);
+CREATE INDEX IF NOT EXISTS idx_pi_client ON plugin_instances(client_id);
 
 -- ─── Prompt Templates ────────────────────────
 CREATE TABLE IF NOT EXISTS prompt_templates (
@@ -93,8 +93,8 @@ CREATE TABLE IF NOT EXISTS prompt_templates (
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_pt_category ON prompt_templates(category);
-CREATE INDEX idx_pt_active ON prompt_templates(is_active);
+CREATE INDEX IF NOT EXISTS idx_pt_category ON prompt_templates(category);
+CREATE INDEX IF NOT EXISTS idx_pt_active ON prompt_templates(is_active);
 
 -- ─── Prompt Template Versions (history) ──────
 CREATE TABLE IF NOT EXISTS prompt_template_versions (
@@ -123,8 +123,8 @@ CREATE TABLE IF NOT EXISTS chat_sessions (
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_cs_user ON chat_sessions(user_id);
-CREATE INDEX idx_cs_active ON chat_sessions(is_active);
+CREATE INDEX IF NOT EXISTS idx_cs_user ON chat_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_cs_active ON chat_sessions(is_active);
 
 -- ─── Chat Messages ───────────────────────────
 CREATE TABLE IF NOT EXISTS chat_messages (
@@ -138,8 +138,8 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_cm_session ON chat_messages(session_id);
-CREATE INDEX idx_cm_created ON chat_messages(created_at);
+CREATE INDEX IF NOT EXISTS idx_cm_session ON chat_messages(session_id);
+CREATE INDEX IF NOT EXISTS idx_cm_created ON chat_messages(created_at);
 
 -- ─── System Configuration ────────────────────
 CREATE TABLE IF NOT EXISTS system_config (
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS system_config (
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_sc_category ON system_config(category);
+CREATE INDEX IF NOT EXISTS idx_sc_category ON system_config(category);
 
 -- ─── Notification Settings ───────────────────
 CREATE TABLE IF NOT EXISTS notification_settings (
@@ -182,9 +182,9 @@ CREATE TABLE IF NOT EXISTS improvement_logs (
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_il_category ON improvement_logs(category);
-CREATE INDEX idx_il_metric ON improvement_logs(metric);
-CREATE INDEX idx_il_created ON improvement_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_il_category ON improvement_logs(category);
+CREATE INDEX IF NOT EXISTS idx_il_metric ON improvement_logs(metric);
+CREATE INDEX IF NOT EXISTS idx_il_created ON improvement_logs(created_at);
 
 -- ─── Seed Default System Configs ─────────────
 INSERT INTO system_config (key, value, description, category, is_public) VALUES

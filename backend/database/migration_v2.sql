@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_users_client ON users(client_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS idx_users_client ON users(client_id);
 
 -- ─── Client Extended Settings ────────────────
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS brand_voice TEXT DEFAULT 'professional and educational';
@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS article_images (
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_ai_article ON article_images(article_id);
-CREATE INDEX idx_ai_client ON article_images(client_id);
+CREATE INDEX IF NOT EXISTS idx_ai_article ON article_images(article_id);
+CREATE INDEX IF NOT EXISTS idx_ai_client ON article_images(client_id);
 
 -- ─── Schedules ───────────────────────────────
 CREATE TABLE IF NOT EXISTS schedules (
@@ -76,8 +76,8 @@ CREATE TABLE IF NOT EXISTS schedules (
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_schedules_client ON schedules(client_id);
-CREATE INDEX idx_schedules_next_run ON schedules(next_run_at);
+CREATE INDEX IF NOT EXISTS idx_schedules_client ON schedules(client_id);
+CREATE INDEX IF NOT EXISTS idx_schedules_next_run ON schedules(next_run_at);
 
 -- ─── Webhooks ────────────────────────────────
 CREATE TABLE IF NOT EXISTS webhooks (
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS webhooks (
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_webhooks_client ON webhooks(client_id);
+CREATE INDEX IF NOT EXISTS idx_webhooks_client ON webhooks(client_id);
 
 -- ─── Webhook Deliveries ──────────────────────
 CREATE TABLE IF NOT EXISTS webhook_deliveries (
@@ -113,8 +113,8 @@ CREATE TABLE IF NOT EXISTS webhook_deliveries (
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_wd_webhook ON webhook_deliveries(webhook_id);
-CREATE INDEX idx_wd_status ON webhook_deliveries(status);
+CREATE INDEX IF NOT EXISTS idx_wd_webhook ON webhook_deliveries(webhook_id);
+CREATE INDEX IF NOT EXISTS idx_wd_status ON webhook_deliveries(status);
 
 -- ─── Content Embeddings (Vector Memory) ──────
 CREATE TABLE IF NOT EXISTS content_embeddings (
@@ -130,8 +130,8 @@ CREATE TABLE IF NOT EXISTS content_embeddings (
 
 -- Requires pgvector extension: CREATE EXTENSION IF NOT EXISTS vector;
 -- CREATE INDEX idx_ce_embedding ON content_embeddings USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
-CREATE INDEX idx_ce_client ON content_embeddings(client_id);
-CREATE INDEX idx_ce_article ON content_embeddings(article_id);
+CREATE INDEX IF NOT EXISTS idx_ce_client ON content_embeddings(client_id);
+CREATE INDEX IF NOT EXISTS idx_ce_article ON content_embeddings(article_id);
 
 -- ─── Cost Tracking ───────────────────────────
 CREATE TABLE IF NOT EXISTS cost_tracking (
@@ -149,9 +149,9 @@ CREATE TABLE IF NOT EXISTS cost_tracking (
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_ct_client ON cost_tracking(client_id);
-CREATE INDEX idx_ct_article ON cost_tracking(article_id);
-CREATE INDEX idx_ct_created ON cost_tracking(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ct_client ON cost_tracking(client_id);
+CREATE INDEX IF NOT EXISTS idx_ct_article ON cost_tracking(article_id);
+CREATE INDEX IF NOT EXISTS idx_ct_created ON cost_tracking(created_at DESC);
 
 -- ─── SEO Analytics ───────────────────────────
 CREATE TABLE IF NOT EXISTS seo_analytics (
@@ -170,8 +170,8 @@ CREATE TABLE IF NOT EXISTS seo_analytics (
   UNIQUE(article_id, tracked_date)
 );
 
-CREATE INDEX idx_sa_client ON seo_analytics(client_id);
-CREATE INDEX idx_sa_date ON seo_analytics(tracked_date DESC);
+CREATE INDEX IF NOT EXISTS idx_sa_client ON seo_analytics(client_id);
+CREATE INDEX IF NOT EXISTS idx_sa_date ON seo_analytics(tracked_date DESC);
 
 -- ─── Jobs / Queue History ────────────────────
 CREATE TABLE IF NOT EXISTS jobs (
@@ -191,9 +191,9 @@ CREATE TABLE IF NOT EXISTS jobs (
   completed_at    TIMESTAMPTZ
 );
 
-CREATE INDEX idx_jobs_client ON jobs(client_id);
-CREATE INDEX idx_jobs_type ON jobs(type);
-CREATE INDEX idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_jobs_client ON jobs(client_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_type ON jobs(type);
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
 
 -- ─── Triggers for updated_at columns ─────────
 DROP TRIGGER IF EXISTS trg_users_updated_at ON users;
