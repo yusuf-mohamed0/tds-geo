@@ -12,6 +12,7 @@ import { Pool } from 'pg';
 import { logger } from '../utils/logger';
 import { Webhook } from '../types';
 import { decrypt } from './credentialEncryption';
+import { redactJsonString } from '../utils/redact';
 
 class WebhookService {
   private pool: Pool | null = null;
@@ -109,7 +110,7 @@ class WebhookService {
     const result = await this.pool!.query(
       `INSERT INTO webhook_deliveries (webhook_id, event, payload, status)
        VALUES ($1, $2, $3, 'pending') RETURNING id`,
-      [webhookId, event, JSON.stringify(payload)]
+      [webhookId, event, redactJsonString(payload)]
     );
     return result.rows[0].id;
   }

@@ -15,6 +15,7 @@ import { Pool } from 'pg';
 import path from 'path';
 
 import { logger, initLogBuffer, closeLogBuffer } from './utils/logger';
+import { redactJsonString } from './utils/redact';
 import { checkRedisHealth, closeRedis } from './utils/redisHealth';
 import { authenticate, authorize, authorizeClientAccess, requireDeviceAuth } from './middleware/auth';
 import { requireVpnAccess, ipWhitelist } from './middleware/network';
@@ -640,7 +641,7 @@ app.post('/api/n8n/log', authenticate, async (req: Request, res: Response, next:
     await pool.query(
       `INSERT INTO activity_logs (client_id, action, entity_type, level, message, metadata)
        VALUES ($1, $2, 'pipeline', $3, $4, $5)`,
-      [user?.clientId || null, event, level, message, metadata ? JSON.stringify(metadata) : null]
+      [user?.clientId || null, event, level, message, metadata ? redactJsonString(metadata) : null]
     );
 
     res.json({ logged: true });
@@ -690,7 +691,7 @@ app.post('/api/webhooks/events/receive', async (req: Request, res: Response) => 
     await pool.query(
       `INSERT INTO activity_logs (client_id, action, entity_type, level, message, metadata)
        VALUES (NULL, $1, 'webhook', 'info', $2, $3) RETURNING id`,
-      [event?.event || 'unknown', `Webhook received: ${event?.event || 'unknown'}`, JSON.stringify(event || {})]
+      [event?.event || 'unknown', `Webhook received: ${event?.event || 'unknown'}`, redactJsonString(event || {})]
     );
 
     res.status(200).json({ received: true });

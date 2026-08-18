@@ -17,6 +17,7 @@ import { authenticate, authorize } from '../middleware/auth';
 import activityTracker, { ActivityEvent, ActivitySurface, ActivityActorType } from '../services/activityTracker';
 import autoFixService from '../services/autoFixService';
 import { logger } from '../utils/logger';
+import { redactJson } from '../utils/redact';
 
 const TELEMETRY_RATE_WINDOW = 60_000;
 const TELEMETRY_RATE_MAX = 60;
@@ -60,7 +61,7 @@ function cleanEvent(raw: any): ActivityEvent | null {
     userAgent: typeof raw.userAgent === 'string' ? raw.userAgent.slice(0, 500) : null,
     errorType: typeof raw.errorType === 'string' ? raw.errorType.slice(0, 200) : null,
     errorMessage: typeof raw.errorMessage === 'string' ? raw.errorMessage.slice(0, 4000) : null,
-    metadata: raw.metadata && typeof raw.metadata === 'object' ? raw.metadata : {}
+    metadata: redactJson(raw.metadata && typeof raw.metadata === 'object' ? raw.metadata : {}) as Record<string, unknown>
   };
 }
 

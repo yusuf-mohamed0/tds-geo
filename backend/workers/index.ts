@@ -11,6 +11,7 @@ import 'dotenv/config';
 import { Job } from 'bullmq';
 import { Pool } from 'pg';
 import { logger, logActivity, initLogBuffer, closeLogBuffer } from '../utils/logger';
+import { redactJsonString } from '../utils/redact';
 import clientScraper from '../services/clientScraper';
 import {
   QueueNames,
@@ -869,7 +870,7 @@ async function handleDeadLetter(job: Job): Promise<void> {
        VALUES (NULL, 'dead_letter', 'job', 'error', $1, $2)`,
       [
         `Job ${originalJobId} from ${originalQueue} failed permanently`,
-        JSON.stringify({ originalJobId, originalQueue, payload, error })
+        redactJsonString({ originalJobId, originalQueue, payload, error })
       ]
     );
   } catch (err) {

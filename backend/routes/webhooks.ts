@@ -15,6 +15,7 @@ import { logger } from '../utils/logger';
 import crypto from 'crypto';
 import { encrypt as encryptSecret, decrypt as decryptSecret } from '../services/credentialEncryption';
 import { normalizeWebhookBody, verifyShopifyWebhookHmac } from '../utils/shopifyWebhook';
+import { redactJsonString } from '../utils/redact';
 
 export function createWebhookRoutes(pool: Pool): Router {
   const router = Router();
@@ -226,7 +227,7 @@ export function createWebhookRoutes(pool: Pool): Router {
       const result = await pool.query(
         `INSERT INTO activity_logs (client_id, action, entity_type, level, message, metadata)
          VALUES (NULL, $1, 'webhook', 'info', $2, $3) RETURNING id`,
-        [event.event || 'unknown', `Webhook received: ${event.event || 'unknown'}`, JSON.stringify(event)]
+        [event.event || 'unknown', `Webhook received: ${event.event || 'unknown'}`, redactJsonString(event)]
       );
 
       res.status(200).json({ received: true, id: result.rows[0]?.id });
