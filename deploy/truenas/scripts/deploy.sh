@@ -34,6 +34,7 @@ fi
 docker compose --env-file .env -f compose.yml pull api worker
 docker compose --env-file .env -f compose.yml pull caddy || true
 docker compose --env-file .env -f compose.yml up -d postgres redis
+./scripts/migrate-db.sh
 ./scripts/sync-shopify-tokens.sh
 docker compose --env-file .env -f compose.yml up -d api worker caddy db-backup
 

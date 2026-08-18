@@ -207,6 +207,35 @@ CREATE INDEX IF NOT EXISTS idx_pub_history_article ON publishing_history(article
 CREATE INDEX IF NOT EXISTS idx_pub_history_client ON publishing_history(client_id);
 CREATE INDEX IF NOT EXISTS idx_pub_history_status ON publishing_history(status);
 
+-- ─── Ads Report Artifact Registry ───────────
+CREATE TABLE IF NOT EXISTS ads_artifact_registry (
+  id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  client_id         UUID REFERENCES clients(id) ON DELETE CASCADE,
+  month             VARCHAR(7) NOT NULL,
+
+  file_name         TEXT NOT NULL,
+  file_path         TEXT NOT NULL,
+  size_bytes        BIGINT DEFAULT 0,
+  sha256            TEXT,
+
+  status            VARCHAR(20) DEFAULT 'generated'
+                    CHECK (status IN ('generated', 'in_review', 'approved', 'rejected', 'delivered')),
+
+  approved_by       UUID REFERENCES users(id) ON DELETE SET NULL,
+  approved_at       TIMESTAMPTZ,
+  rejection_reason  TEXT,
+
+  delivered_to      TEXT,
+  delivered_at      TIMESTAMPTZ,
+
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (client_id, month, file_name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_ads_artifact_client_month ON ads_artifact_registry(client_id, month);
+CREATE INDEX IF NOT EXISTS idx_ads_artifact_status ON ads_artifact_registry(status);
+
 -- ─── Publishing Queue ────────────────────────
 CREATE TABLE IF NOT EXISTS publishing_queue (
   id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
