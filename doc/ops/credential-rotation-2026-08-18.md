@@ -55,10 +55,19 @@ REVOKED: do not reuse. If any consumer still holds the old values, they will fai
 ## Known issue (pre-existing)
 `GET /api/vault/:id` decrypts to empty for entries created before this rotation (import ran under a different CREDENTIAL_VAULT_KEY). Rotated entries now decrypt OK. Follow-up: re-import/re-encrypt legacy vault entries under the current key.
 
-## Nextcloud: swap master password for an app password (PENDING)
-Sync script uses WebDAV basic auth (`remote.php/dav/files/traffic`); app password works transparently. No OCS API exists to create app passwords — manual step:
-1. Login https://cloud.trafficdigitalsolutions.com as `traffic` (master password from /root/my-project/local-credentials/nextcloud.env)
-2. Settings → Security → App passwords → name e.g. `kivo-sync-2026-08-18` → create
-3. Save the generated token into /root/my-project/local-credentials/nextcloud.env as NEXTCLOUD_PASSWORD (keep file 0600)
-4. Verify: PROPFIND on /remote.php/dav/files/traffic/ returns 207 with the new password
-5. Optionally revoke the master password or the old token once stable
+## Nextcloud: swap master password for an app password (DONE 2026-08-18)
+Sync script uses WebDAV basic auth (`remote.php/dav/files/traffic`); app password works transparently. No OCS API exists to create app passwords; created via web UI (headless Chromium via Playwright 1.60, module resolved from n8n's global deps).
+
+App password created:
+- Name: `kivo-sync-2026-08-18`
+- Stored in /root/my-project/local-credentials/nextcloud.env as NEXTCLOUD_USER/NEXTCLOUD_PASSWORD (file 0600). Login is `traffic`; the password is the 29-char app token (shown once at creation).
+- Verification: PROPFIND `/remote.php/dav/files/traffic/` → HTTP 207; `scripts/sync-nextcloud-safe.sh` ran clean → uploaded `kivo-20260818T091020Z.tar.gz` to `Kivo/traffic/`.
+
+Notes for future headless runs:
+- Login URL is `/index.php/login` (bare `/login` is 404). App-password creation form is `#generate-app-token-section`; creation requires a password-confirm dialog (`input[type=password]` + Confirm). Result token lives in the `New app password` modal (`.token-dialog__name input`, `.token-dialog__password input`).
+- Web UI login requires the master password — app passwords only authenticate API/WebDAV, not the browser UI.
+- Revoking a token requires clicking the row's Device-settings menu → Revoke → confirm, then re-authenticate in the "Authentication required" dialog.
+
+Orphaned test tokens created during automation (ids 821, 823, 825, 827) were revoked. Only `kivo-sync-2026-08-18` remains.
+
+Master password (`Lucky@2024`, in Next cloude/credintials backup) no longer used by the sync path; keep as web-UI login only.
