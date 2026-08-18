@@ -98,7 +98,7 @@ The content should position this as a premium-quality product from an Egyptian G
 // ─── WordPress API ──────────────────────────────────────────────
 
 const WP_BASE = 'https://boston-pharma.com/wp-json';
-const WP_PLUGIN_KEY = process.env.BOSTON_PHARMA_API_KEY || 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
+const WP_PLUGIN_KEY = process.env.BOSTON_PHARMA_API_KEY || '';
 const WP_HEADERS = { 'X-TDS-Geo-Key': WP_PLUGIN_KEY, 'Content-Type': 'application/json' };
 
 async function getWooProducts() {

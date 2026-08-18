@@ -59,7 +59,7 @@ const ALT_SYSTEM_PROMPT = `You are an SEO and accessibility specialist for an e-
 - One line only, no quotes around it`;
 
 const WP_BASE = 'https://boston-pharma.com/wp-json';
-const WP_KEY = process.env.BOSTON_PHARMA_API_KEY || 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
+const WP_KEY = process.env.BOSTON_PHARMA_API_KEY || '';
 const WP_HEADERS = { 'X-Kivo-Key': WP_KEY, 'Content-Type': 'application/json' };
 
 async function getProducts() {

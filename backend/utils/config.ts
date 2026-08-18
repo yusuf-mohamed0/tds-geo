@@ -36,7 +36,7 @@ export const config = {
   shopify: {
     defaultShop: env('SHOPIFY_DEFAULT_SHOP'),
     defaultAccessToken: env('SHOPIFY_DEFAULT_ACCESS_TOKEN'),
-    apiKey: env('SHOPIFY_API_KEY', 'a178c8740049e04eec663378b6e30ad8'),
+    apiKey: env('SHOPIFY_API_KEY', ''),
     apiSecret: env('SHOPIFY_API_SECRET'),
   },
 

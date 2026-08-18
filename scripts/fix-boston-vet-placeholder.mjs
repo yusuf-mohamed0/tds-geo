@@ -8,7 +8,7 @@
 // ══════════════════════════════════════════════════════════════════
 
 const BASE = 'https://boston-vet.com/wp-json/kivo/v1';
-const API_KEY = process.env.BV_API_KEY || 'kai_46f0d5d6cf30f13fd45463d8082e645323ead5c731b1b58f';
+const API_KEY = process.env.BV_API_KEY || '';
 const HEADERS = { 'X-TDS-Geo-Key': API_KEY, 'Content-Type': 'application/json' };
 
 const PLACEHOLDER_PATTERNS = [

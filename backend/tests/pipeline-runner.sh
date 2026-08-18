@@ -24,7 +24,7 @@ PIPELINE_START=$(date +%s%N)
 echo -e "\n${CYAN}─── Step 1/8: Authentication ─────────────────────────────${NC}"
 TOKEN=$(curl -s -X POST "$BASE_URL/api/auth/login" \
   -H 'Content-Type: application/json' \
-  -d '{"email":"admin@tds-geo.internal","password":"TDSg30!Pr0d#2026_X9"}' | \
+  -d '{"email":"admin@tds-geo.internal","password":"${ADMIN_PASSWORD:?set ADMIN_PASSWORD}"}' | \
   python -c "import sys,json; print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
 [ -z "$TOKEN" ] && { echo -e "${RED}✗ Auth failed${NC}"; exit 1; }
 echo -e "${GREEN}✓ Authenticated as admin${NC}"

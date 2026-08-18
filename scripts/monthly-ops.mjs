@@ -354,7 +354,7 @@ async function checkDiskAndMemory() {
 
 async function verifyPluginHealth() {
   log('info', 'Checking Kivo Geo plugin health on WordPress sites');
-  const apiKey = process.env.BOSTON_PHARMA_API_KEY || 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
+  const apiKey = process.env.BOSTON_PHARMA_API_KEY || '';
   try {
     const res = await fetch('https://boston-pharma.com/wp-json/kivo/v1/status', {
       headers: { 'X-TDS-Geo-Key': apiKey },

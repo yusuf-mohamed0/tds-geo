@@ -103,12 +103,12 @@ async function main() {
     }
   } catch { console.log('(shopify_sessions table not available, skipping)'); }
 
-  // 5. System credentials
+  // 5. System credentials (values come from env, never hardcoded)
   const systemCreds: CredInput[] = [
-    { category: 'database', service: 'system', label: 'PostgreSQL — ai_seo_automation', username: 'postgres', password: 'postgres' },
-    { category: 'database', service: 'system', label: 'PostgreSQL Connection String', username: 'postgresql://postgres:postgres@localhost:5432/ai_seo_automation', password: '' },
-    { category: 'api', service: 'system', label: 'JWT Secret', username: 'dev-jwt-secret-change-in-production', password: '' },
-    { category: 'api', service: 'system', label: 'Shopify API Key (hardcoded fallback)', username: 'a178c8740049e04eec663378b6e30ad8', password: '' },
+    { category: 'database', service: 'system', label: 'PostgreSQL — ai_seo_automation', username: process.env.IMPORT_DB_USER || '', password: process.env.IMPORT_DB_PASSWORD || '' },
+    { category: 'database', service: 'system', label: 'PostgreSQL Connection String', username: process.env.DATABASE_URL || '', password: '' },
+    { category: 'api', service: 'system', label: 'JWT Secret', username: process.env.JWT_SECRET || '', password: '' },
+    { category: 'api', service: 'system', label: 'Shopify API Key (env)', username: process.env.SHOPIFY_API_KEY || '', password: '' },
     { category: 'api', service: 'system', label: 'Credential Vault Encryption Key', username: process.env.CREDENTIAL_VAULT_KEY || '', password: '' },
   ];
   for (const sc of systemCreds) {
@@ -118,23 +118,25 @@ async function main() {
   }
 
   // 6. Doc-based credentials (from doc/clients/*/contacts.md and technical-reference.md)
+  //    Values come from env; the env reference file lives in the operator's local
+  //    credential store, never committed to source.
   const docCreds: CredInput[] = [
     // boston-pharma
-    { category: 'api', service: 'boston-pharma', label: 'Kivo Geo API Key', username: 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Google Ads Conversion ID', username: 'AW-16695363279', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Google Tag Manager ID', username: 'GT-KTTRZ642', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Google Site Verification', username: 'iUvCHIei4OHpJKf9Dt6KW5ZkUfgkFMzH8iBxR4GZIlM', password: '' },
-    { category: 'database', service: 'boston-pharma', label: 'MySQL DB Prefix', username: 'wp_8n1vqj9f85_', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Phone — General', username: '+20 15 01000681', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Phone — Alternate', username: '+20 1550643720', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Contact — Info Email', username: 'info@bostongroup-eg.com', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Contact — Export Email', username: 'export@bostongroup-eg.com', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Contact — TDS Web Dev', username: 'web.development@trafficdigitalsolutions.com', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'REST API Base URL', username: 'https://boston-pharma.com/wp-json/kivo/v1', password: '' },
-    { category: 'other', service: 'boston-pharma', label: 'Webhook URL', username: 'https://boston-pharma.com/wp-json/kivo/v1/webhook', password: '' },
+    { category: 'api', service: 'boston-pharma', label: 'Kivo Geo API Key', username: process.env.BOSTON_PHARMA_KIVO_KEY || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Google Ads Conversion ID', username: process.env.BOSTON_PHARMA_GADS_CONVERSION_ID || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Google Tag Manager ID', username: process.env.BOSTON_PHARMA_GTM_ID || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Google Site Verification', username: process.env.BOSTON_PHARMA_GSC_VERIFICATION || '', password: '' },
+    { category: 'database', service: 'boston-pharma', label: 'MySQL DB Prefix', username: process.env.BOSTON_PHARMA_DB_PREFIX || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Phone — General', username: process.env.BOSTON_PHARMA_PHONE_GENERAL || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Phone — Alternate', username: process.env.BOSTON_PHARMA_PHONE_ALT || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Contact — Info Email', username: process.env.BOSTON_PHARMA_EMAIL_INFO || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Contact — Export Email', username: process.env.BOSTON_PHARMA_EMAIL_EXPORT || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Contact — TDS Web Dev', username: process.env.TDS_WEB_DEV_EMAIL || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'REST API Base URL', username: process.env.BOSTON_PHARMA_API_BASE_URL || '', password: '' },
+    { category: 'other', service: 'boston-pharma', label: 'Webhook URL', username: process.env.BOSTON_PHARMA_WEBHOOK_URL || '', password: '' },
     // boston-vet
-    { category: 'api', service: 'boston-vet', label: 'Kivo Geo API Key', username: 'kai_46f0d5d6cf30f13fd45463d8082e645323ead5c731b1b58f', password: '' },
-    { category: 'other', service: 'boston-vet', label: 'Contact — TDS Web Dev', username: 'web.development@trafficdigitalsolutions.com', password: '' },
+    { category: 'api', service: 'boston-vet', label: 'Kivo Geo API Key', username: process.env.BOSTON_VET_KIVO_KEY || '', password: '' },
+    { category: 'other', service: 'boston-vet', label: 'Contact — TDS Web Dev', username: process.env.TDS_WEB_DEV_EMAIL || '', password: '' },
   ];
 
   for (const dc of docCreds) {
@@ -143,10 +145,10 @@ async function main() {
     }
   }
 
-  // 7. Seed data users
+  // 7. Seed data users (credentials come from env, never hardcoded)
   const seedUsers: CredInput[] = [
-    { category: 'other', service: 'system', label: 'Admin Panel — super_admin', username: 'admin@kivo.internal', password: 'TDSg30!Pr0d#2026_X9', url: '' },
-    { category: 'other', service: 'system', label: 'Admin Panel — editor', username: 'editor@kivo.internal', password: 'Ed1t0r!TDS#2026_X9', url: '' },
+    { category: 'other', service: 'system', label: 'Admin Panel — super_admin', username: process.env.SEED_ADMIN_EMAIL || '', password: process.env.SEED_ADMIN_PASSWORD || '', url: '' },
+    { category: 'other', service: 'system', label: 'Admin Panel — editor', username: process.env.SEED_EDITOR_EMAIL || '', password: process.env.SEED_EDITOR_PASSWORD || '', url: '' },
   ];
   for (const su of seedUsers) {
     if (!hasEntry(existingLookup2, su.label, su.service)) {

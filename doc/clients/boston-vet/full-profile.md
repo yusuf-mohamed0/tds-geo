@@ -60,7 +60,7 @@ No direct contact person identified for Boston Vet. Site is managed by the same 
 | Parameter | Value |
 |---|---|
 | Client ID | 74a7bf73-315f-4ad5-a5ec-f4f1ba4ecd8d |
-| API Key | kai_46f0d5d6cf30f13fd45463d8082e645323ead5c731b1b58f |
+| API Key | <redacted — see local credential store> |
 | Auth Header | X-TDS-Geo-Key |
 | Publish Frequency | manual |
 | Approval Mode | auto |

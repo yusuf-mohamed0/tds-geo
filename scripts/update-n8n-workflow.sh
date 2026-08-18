@@ -9,7 +9,7 @@ CLIENT_ID="${N8N_CLIENT_ID:-38e6e8da-b1c7-436c-809d-03bb46b42a1d}"
 CRED_ID="${N8N_CRED_ID:-wUyDyyJNGFlrdFIH}"
 N8N_USER_ID="${N8N_USER_ID:-08a7ba98-26a5-4c27-9aef-e78ae2c589ce}"
 N8N_ADMIN_EMAIL="${N8N_ADMIN_EMAIL:-admin@tds-geo.internal}"
-N8N_ADMIN_PASSWORD="${N8N_ADMIN_PASSWORD:-TDSg30!Pr0d#2026_X9}"
+N8N_ADMIN_PASSWORD="${N8N_ADMIN_PASSWORD:?set N8N_ADMIN_PASSWORD}"
 
 # Build the fixed workflow JSON and update via API
 curl -s -b /tmp/n8n-cookies.txt -X PUT "http://localhost:5678/rest/workflows/fe6d6e24-8afa-4d72-a127-4aeec5a687bc" \

@@ -1,7 +1,7 @@
 import pg from 'pg';
 
 const clientId = '7034f84d-25db-48ce-9577-c4f8b959e202';
-const apiKey = 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
+const apiKey = process.env.BOSTON_PHARMA_API_KEY || '';
 const endpointUrl = 'https://boston-pharma.com';
 
 async function wpFetch(path, params = {}) {

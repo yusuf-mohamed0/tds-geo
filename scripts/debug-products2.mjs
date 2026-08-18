@@ -4,7 +4,7 @@
 
 import 'dotenv/config';
 
-const WP_KEY = 'kai_021761d9b88ecca6842877e5bdc651b794024a08fc8d09e1';
+const WP_KEY = process.env.BOSTON_PHARMA_API_KEY || '';
 const HEADERS = { 'X-Kivo-Key': WP_KEY, 'Content-Type': 'application/json' };
 
 async function main() {

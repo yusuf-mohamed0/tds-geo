@@ -11,7 +11,7 @@
 | **Timezone** | `Africa/Cairo` |
 | **Publish Frequency** | `manual` |
 | **Approval Mode** | `auto` |
-| **API Key** | `kai_46f0d5d6cf30f13fd45463d8082e645323ead5c731b1b58f` |
+| **API Key** | `<redacted — see local credential store>` |
 | **Auth Header** | `X-TDS-Geo-Key` |
 
 ## WordPress Site Details

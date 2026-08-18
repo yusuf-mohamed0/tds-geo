@@ -8,7 +8,7 @@
 -- Run: psql -d ai_seo_automation -f backend/database/seed.sql
 
 -- ─── Admin User ──────────────────────────────
--- Password: TDSg30!Pr0d#2026_X9 (bcrypt hash)
+-- Password: <redacted — see local credential store> (bcrypt hash)
 INSERT INTO users (email, password_hash, name, role, is_active)
 VALUES (
   'admin@tds-geo.internal',
@@ -191,6 +191,6 @@ WHERE a.status = 'published'
 -- ══════════════════════════════════════════════
 -- Seed Complete
 -- ══════════════════════════════════════════════
--- Users: admin@tds-geo.internal / TDSg30!Pr0d#2026_X9, editor@tds-geo.internal / Ed1t0r!TDS#2026_X9
--- Password hash generated via bcrypt.hashSync('TDSg30!Pr0d#2026_X9', 12)
+-- Users: admin@tds-geo.internal / <redacted>, editor@tds-geo.internal / <redacted> (see local credential store)
+-- Password hash generated via bcrypt.hashSync('<redacted>', 12)
 -- Client: Acme Maintenance Co. with 10 keywords, articles, activity logs
