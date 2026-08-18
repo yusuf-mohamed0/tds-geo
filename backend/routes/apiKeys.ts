@@ -32,11 +32,28 @@ export function createApiKeyRoutes(pool: Pool): Router {
   const router = Router();
   router.use(authenticate);
 
+  // Detect whether the api_keys table has the optional expires_at column.
+  // Older schemas (schema.sql) omit it; migration_platform_v1.sql adds it.
+  let hasExpiresAt: boolean | null = null;
+  async function expiresAtAvailable(): Promise<boolean> {
+    if (hasExpiresAt !== null) return hasExpiresAt;
+    const res = await pool.query(
+      `SELECT EXISTS (
+         SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'api_keys' AND column_name = 'expires_at'
+       ) AS exist`
+    );
+    hasExpiresAt = res.rows[0]?.exist === true;
+    return hasExpiresAt;
+  }
+
   // GET /api/clients/:clientId/api-keys — list keys
   router.get('/:clientId/api-keys', authorizeClientAccess, async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const withExpires = await expiresAtAvailable();
       const result = await pool.query(
-        `SELECT id, service, label, masked_value, permissions, is_active, last_used_at, expires_at, created_at
+        `SELECT id, service, label, masked_value, permissions, is_active, last_used_at, created_at
+         ${withExpires ? ', expires_at' : ''}
          FROM api_keys WHERE client_id = $1 ORDER BY created_at DESC`,
         [req.params.clientId]
       );
@@ -54,11 +71,14 @@ export function createApiKeyRoutes(pool: Pool): Router {
       }
       const encrypted = encrypt(keyValue);
       const masked = maskValue(keyValue);
+      const withExpires = await expiresAtAvailable();
       const result = await pool.query(
-        `INSERT INTO api_keys (client_id, service, label, key_value, masked_value, permissions, expires_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `INSERT INTO api_keys (client_id, service, label, key_value, masked_value, permissions${withExpires ? ', expires_at' : ''})
+         VALUES ($1, $2, $3, $4, $5, $6${withExpires ? ', $7' : ''})
          RETURNING id, service, label, masked_value, permissions, is_active, created_at`,
-        [req.params.clientId, service, label, encrypted, masked, permissions || [], expiresAt || null]
+        withExpires
+          ? [req.params.clientId, service, label, encrypted, masked, permissions || [], expiresAt || null]
+          : [req.params.clientId, service, label, encrypted, masked, permissions || []]
       );
       await logActivity(pool, {
         clientId: req.params.clientId,

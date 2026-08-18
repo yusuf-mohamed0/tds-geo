@@ -546,6 +546,26 @@ describe('Platform Expansion Routes', () => {
         expect(registeredPaths).toContain(path);
       }
     });
+
+    it('lists API keys without requiring an expires_at column', async () => {
+      const pool = createMockPoolWithData();
+      const mod = await import('../../routes/apiKeys');
+      const routes = mod.createApiKeyRoutes(pool);
+
+      const express = await import('express');
+      const supertestMod = await import('supertest');
+      const app = express.default();
+      app.use('/api/clients', routes);
+      app.use((err: any, _req: any, res: any, _next: any) => res.status(500).json({ error: String(err?.message || err) }));
+
+      const res = await supertestMod.default(app)
+        .get('/api/clients/test-client-id/api-keys')
+        .set('Authorization', 'Bearer test-jwt-token');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('keys');
+      expect(res.body.total).toBe(0);
+    });
   });
 
   describe('Plugin Routes', () => {
