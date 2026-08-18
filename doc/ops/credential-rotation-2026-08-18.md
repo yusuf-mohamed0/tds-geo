@@ -54,3 +54,11 @@ REVOKED: do not reuse. If any consumer still holds the old values, they will fai
 
 ## Known issue (pre-existing)
 `GET /api/vault/:id` decrypts to empty for entries created before this rotation (import ran under a different CREDENTIAL_VAULT_KEY). Rotated entries now decrypt OK. Follow-up: re-import/re-encrypt legacy vault entries under the current key.
+
+## Nextcloud: swap master password for an app password (PENDING)
+Sync script uses WebDAV basic auth (`remote.php/dav/files/traffic`); app password works transparently. No OCS API exists to create app passwords — manual step:
+1. Login https://cloud.trafficdigitalsolutions.com as `traffic` (master password from /root/my-project/local-credentials/nextcloud.env)
+2. Settings → Security → App passwords → name e.g. `kivo-sync-2026-08-18` → create
+3. Save the generated token into /root/my-project/local-credentials/nextcloud.env as NEXTCLOUD_PASSWORD (keep file 0600)
+4. Verify: PROPFIND on /remote.php/dav/files/traffic/ returns 207 with the new password
+5. Optionally revoke the master password or the old token once stable
