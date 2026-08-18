@@ -10,23 +10,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import { authenticate, authorize, authorizeClientAccess } from '../middleware/auth';
 import { logger, logActivity } from '../utils/logger';
-import crypto from 'crypto';
-
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
-
-function encrypt(text: string): string {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(ENCRYPTION_KEY.slice(0, 32), 'hex'), iv);
-  let encrypted = cipher.update(text, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
-  const authTag = cipher.getAuthTag().toString('hex');
-  return `${iv.toString('hex')}:${authTag}:${encrypted}`;
-}
-
-function maskValue(value: string): string {
-  if (value.length <= 8) return '****' + value.slice(-4);
-  return value.slice(0, 4) + '...' + value.slice(-4);
-}
+import { encrypt, decrypt, mask } from '../services/credentialEncryption';
 
 export function createApiKeyRoutes(pool: Pool): Router {
   const router = Router();
@@ -70,7 +54,7 @@ export function createApiKeyRoutes(pool: Pool): Router {
         return;
       }
       const encrypted = encrypt(keyValue);
-      const masked = maskValue(keyValue);
+      const masked = mask(keyValue);
       const withExpires = await expiresAtAvailable();
       const result = await pool.query(
         `INSERT INTO api_keys (client_id, service, label, key_value, masked_value, permissions${withExpires ? ', expires_at' : ''})
