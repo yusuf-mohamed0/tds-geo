@@ -148,8 +148,8 @@ export const INTEGRATION_HARDENING_CONTRACT: IntegrationHardeningArchitectureCon
       rotationRevocation: ['Token refresh on expiry via refreshIfExpired; compliance uninstall flow removes store data.'],
       tenantScopeRule: 'Every Shopify route and worker must keep client_id and shop domain scoping from backend auth and route loaders.',
       currentRisks: [
-        'Shopify OAuth callback logs a tokenPrefix and writes raw token JSON into cms_connections.config.',
-        'Legacy token columns remain on clients alongside vault surfaces.',
+        'Shopify OAuth callback logs a tokenPrefix (masked) and no longer writes raw token JSON into cms_connections.config.',
+        'Legacy token columns remain on clients alongside vault surfaces (encrypted at rest; vault policy rows are masked-only anchors).',
         'Defined but unregistered queues (default, cost-optimization, observability, odoo-*) must not be assumed executable.',
       ],
       requiredInvariants: [
@@ -157,7 +157,7 @@ export const INTEGRATION_HARDENING_CONTRACT: IntegrationHardeningArchitectureCon
         'Scheduled articles must not publish before scheduled_at.',
         'Token values must never be exposed in responses, logs, docs, or Nextcloud artifacts.',
       ],
-      nextHardeningStep: 'Move Shopify token storage behind a rotation policy and remove raw token JSON from cms_connections.config with explicit audit coverage.',
+      nextHardeningStep: 'Add an on-demand OAuth-refresh rotate endpoint (POST /api/shopify/rotate) and a scheduled rotation-policy check flagging tokens older than rotation_days.',
     },
     {
       id: 'ads-reporting',
@@ -196,7 +196,7 @@ export const INTEGRATION_HARDENING_CONTRACT: IntegrationHardeningArchitectureCon
       tenantScopeRule: 'Ads report generation is keyed by clientId and restricted to admin/super_admin; no client-facing delivery.',
       currentRisks: ['Registry exists but approval decisions still rely on human review of the PDF; delivery marks state only and does not enforce an external delivery audit.'],
       requiredInvariants: ['Keep ads reporting internal-only with no email or client delivery until explicit approval.'],
-      nextHardeningStep: 'Rotate Shopify/connector tokens behind the credential vault with explicit audit coverage.',
+      nextHardeningStep: 'Add an on-demand OAuth-refresh rotate endpoint (POST /api/shopify/rotate) and a scheduled rotation-policy check flagging tokens older than rotation_days.',
     },
     {
       id: 'google-search-console',
