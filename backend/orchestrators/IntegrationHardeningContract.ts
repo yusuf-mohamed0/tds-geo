@@ -157,7 +157,7 @@ export const INTEGRATION_HARDENING_CONTRACT: IntegrationHardeningArchitectureCon
         'Scheduled articles must not publish before scheduled_at.',
         'Token values must never be exposed in responses, logs, docs, or Nextcloud artifacts.',
       ],
-      nextHardeningStep: 'Add an on-demand OAuth-refresh rotate endpoint (POST /api/shopify/rotate) and a scheduled rotation-policy check flagging tokens older than rotation_days.',
+      nextHardeningStep: 'Add operator-facing vault policy compliance reporting (tokens older than rotation_days flagged by credential age) and a documented manual rotation runbook tied to POST /api/admin/shopify/rotate.',
     },
     {
       id: 'ads-reporting',
@@ -196,7 +196,7 @@ export const INTEGRATION_HARDENING_CONTRACT: IntegrationHardeningArchitectureCon
       tenantScopeRule: 'Ads report generation is keyed by clientId and restricted to admin/super_admin; no client-facing delivery.',
       currentRisks: ['Registry exists but approval decisions still rely on human review of the PDF; delivery marks state only and does not enforce an external delivery audit.'],
       requiredInvariants: ['Keep ads reporting internal-only with no email or client delivery until explicit approval.'],
-      nextHardeningStep: 'Add an on-demand OAuth-refresh rotate endpoint (POST /api/shopify/rotate) and a scheduled rotation-policy check flagging tokens older than rotation_days.',
+      nextHardeningStep: 'Add operator-facing vault policy compliance reporting (tokens older than rotation_days flagged by credential age) and a documented manual rotation runbook tied to POST /api/admin/shopify/rotate.',
     },
     {
       id: 'google-search-console',
@@ -366,7 +366,7 @@ export const INTEGRATION_HARDENING_CONTRACT: IntegrationHardeningArchitectureCon
         'HMAC verification must remain mandatory before any webhook-triggered effect.',
         'Compliance GDPR and uninstall semantics remain unchanged.',
       ],
-      nextHardeningStep: 'Redact sensitive fields from stored webhook event JSON while preserving verification integrity.',
+      nextHardeningStep: 'Extend redaction to any new webhook/activity persistence sites as they are added; keep PII-redaction guarantee under test.',
     },
     {
       id: 'observability-health',

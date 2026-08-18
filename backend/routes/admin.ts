@@ -14,6 +14,7 @@ import { checkRedisHealth } from '../utils/redisHealth';
 import { validate, adminNotifySchema } from '../validators/index';
 import { sitesService } from '../services/sitesService';
 import { encrypt, mask } from '../services/credentialEncryption';
+import { forceRefreshToken } from '../services/shopify/auth';
 
 export function createAdminRoutes(pool: Pool): Router {
   const router = Router();
@@ -95,6 +96,99 @@ export function createAdminRoutes(pool: Pool): Router {
 
   // Remaining admin routes require admin role
   router.use(authorize('admin'));
+
+  // ═══════ Shopify Token Rotation (admin only) ═══════
+
+  // POST /api/admin/shopify/rotate
+  // On-demand OAuth-refresh token rotation. Accepts an optional `shop` body
+  // field; without it, rotates every active client that has a refresh token.
+  // Per-shop failures are non-fatal — the aggregate call still returns 200.
+  router.post('/shopify/rotate', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const hasShop = req.body && 'shop' in req.body;
+
+      if (hasShop) {
+        const shop = typeof req.body.shop === 'string' ? req.body.shop.trim() : '';
+        if (!shop) {
+          res.status(400).json({ error: 'shop must be a non-empty string' });
+          return;
+        }
+
+        const result = await forceRefreshToken(shop);
+        if (result.success) {
+          res.json({ success: true, data: { shop: result.shop, rotatedAt: result.rotatedAt } });
+        } else {
+          res.status(400).json({ error: result.error });
+        }
+        return;
+      }
+
+      // No shop → rotate all active clients with a stored refresh token.
+      const clients = await pool.query(
+        `SELECT shopify_shop FROM clients
+         WHERE is_active = true
+           AND shopify_shop IS NOT NULL AND shopify_shop <> ''
+           AND shopify_refresh_token IS NOT NULL`
+      );
+
+      const results: Array<{ shop: string; success: boolean; rotatedAt?: string; error?: string }> = [];
+      for (const client of clients.rows) {
+        results.push(await forceRefreshToken(client.shopify_shop));
+      }
+      const rotated = results.filter(r => r.success).length;
+
+      res.json({
+        success: true,
+        data: {
+          results,
+          rotated,
+          failed: results.length - rotated,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // GET /api/admin/shopify/rotation-status
+  // Returns active clients whose Shopify token is due for rotation:
+  //   dueNow  — expires within 5 minutes (effectively expired)
+  //   dueSoon — expires within 7 days (rotation policy window)
+  // Read-only status; actual rotation stays manual via POST /shopify/rotate.
+  router.get('/shopify/rotation-status', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await pool.query(
+        `SELECT c.shopify_shop, c.shopify_token_expires_at,
+                COALESCE(v.rotation_days, 30) AS rotation_days
+         FROM clients c
+         LEFT JOIN credential_vault v
+           ON v.client_id = c.id AND v.service = 'shopify' AND v.deleted_at IS NULL
+         WHERE c.is_active = true
+           AND c.shopify_shop IS NOT NULL AND c.shopify_shop <> ''
+           AND c.shopify_token_expires_at IS NOT NULL
+           AND c.shopify_token_expires_at < NOW() + INTERVAL '7 days'
+         ORDER BY c.shopify_token_expires_at ASC`
+      );
+
+      const dueNow: Array<{ shop: string; expiresAt: string; rotationDays?: number }> = [];
+      const dueSoon: Array<{ shop: string; expiresAt: string; rotationDays?: number }> = [];
+      const fiveMinFromNow = Date.now() + 5 * 60 * 1000;
+
+      for (const row of result.rows) {
+        const expiresAt = row.shopify_token_expires_at;
+        const entry = { shop: row.shopify_shop, expiresAt, rotationDays: row.rotation_days };
+        if (new Date(expiresAt).getTime() <= fiveMinFromNow) {
+          dueNow.push(entry);
+        } else {
+          dueSoon.push(entry);
+        }
+      }
+
+      res.json({ success: true, data: { dueNow, dueSoon } });
+    } catch (err) {
+      next(err);
+    }
+  });
 
   // ─── List all errors (system-wide) ──────────
   router.get('/errors', async (req: Request, res: Response, next: NextFunction) => {

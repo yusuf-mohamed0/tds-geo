@@ -879,6 +879,65 @@ async function handleDeadLetter(job: Job): Promise<void> {
 }
 
 // ══════════════════════════════════════════════
+// Shopify Rotation-Policy Check (scheduled)
+// ══════════════════════════════════════════════
+
+let rotationPolicyTimer: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * Scheduled rotation-policy check: flags (logs a warning) any active Shopify
+ * client whose token is due for rotation (expires within 7 days). Read-only —
+ * it never rotates. Rotation stays a manual/admin action via
+ * POST /api/admin/shopify/rotate.
+ */
+async function checkShopifyRotationPolicy(): Promise<void> {
+  try {
+    const result = await pool.query(
+      `SELECT c.shopify_shop, c.shopify_token_expires_at,
+              COALESCE(v.rotation_days, 30) AS rotation_days
+       FROM clients c
+       LEFT JOIN credential_vault v
+         ON v.client_id = c.id AND v.service = 'shopify' AND v.deleted_at IS NULL
+       WHERE c.is_active = true
+         AND c.shopify_shop IS NOT NULL AND c.shopify_shop <> ''
+         AND c.shopify_token_expires_at IS NOT NULL
+         AND c.shopify_token_expires_at < NOW() + INTERVAL '7 days'
+       ORDER BY c.shopify_token_expires_at ASC`
+    );
+
+    if (result.rows.length > 0) {
+      logger.warn('Shopify token rotation policy: token(s) due for rotation', {
+        count: result.rows.length,
+        due: result.rows.map((row) => ({
+          shop: row.shopify_shop,
+          expiresAt: row.shopify_token_expires_at,
+        })),
+      });
+    }
+  } catch (err) {
+    logger.warn('Shopify rotation policy check failed (non-fatal)', {
+      error: (err as Error).message,
+    });
+  }
+}
+
+/**
+ * Starts the 5-minute rotation-policy check with an immediate first run.
+ * Guarded by a module-level flag so it can never be started twice, and the
+ * timer is unref'd so it never keeps the process alive on its own.
+ */
+function startShopifyRotationPolicyCheck(): void {
+  if (!pool) return;
+  if (rotationPolicyTimer) return;
+
+  void checkShopifyRotationPolicy();
+  rotationPolicyTimer = setInterval(() => {
+    void checkShopifyRotationPolicy();
+  }, 5 * 60 * 1000);
+  rotationPolicyTimer.unref();
+}
+
+// ══════════════════════════════════════════════
 // Start
 // ══════════════════════════════════════════════
 
@@ -887,6 +946,7 @@ async function start(): Promise<void> {
 
   initializeServices();
   registerWorkers();
+  startShopifyRotationPolicyCheck();
 
   logger.info('BullMQ workers ready. Awaiting jobs...');
 }
