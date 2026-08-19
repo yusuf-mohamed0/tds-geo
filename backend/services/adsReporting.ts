@@ -17,7 +17,6 @@ export interface AdsReportingClient {
   name: string;
   platforms: string[];
   metaAccounts: string[];
-  googleCustomers: string[];
 }
 
 export interface AdsReportArtifact {
@@ -96,13 +95,11 @@ async function readClients(): Promise<AdsReportingClient[]> {
     const id = (entry.match(/^([^\n]+)/)?.[1] || '').trim();
     const name = (entry.match(/\n\s{4}name:\s*"?([^"\n]+)"?/)?.[1] || id).trim();
     const metaAccounts = parseListBlock(entry, 'ad_accounts');
-    const googleCustomers = parseListBlock(entry, 'customer_ids');
     return {
       id,
       name,
-      platforms: [metaAccounts.length ? 'meta' : '', googleCustomers.length ? 'google_ads' : ''].filter(Boolean),
+      platforms: metaAccounts.length ? ['meta'] : [],
       metaAccounts,
-      googleCustomers,
     };
   }).filter((client) => client.id);
 }
@@ -141,7 +138,7 @@ async function runReporter(args: string[]): Promise<{ stdout: string; stderr: st
 export const adsReportingService = {
   roles: [
     { role: 'CEO / final approver', owns: 'Approves internal PDFs before any email leaves the company.' },
-    { role: 'Ads analyst', owns: 'Runs Meta and Google data pulls, checks spend, results, CTR, CPC, and campaign tables.' },
+    { role: 'Ads analyst', owns: 'Runs Meta data pulls, checks spend, results, CTR, CPC, and campaign tables.' },
     { role: 'Data QA reviewer', owns: 'Compares generated figures against platform UI for the same month and attribution settings.' },
     { role: 'Account manager', owns: 'Adds budget, VAT, scope, insights, recommendations, and client-safe narrative.' },
     { role: 'Automation operator', owns: 'Runs dry-runs, generates internal PDFs, and records failures without exposing secrets.' },
@@ -152,7 +149,6 @@ export const adsReportingService = {
     'Generated PDFs are internal until CEO/final approval.',
     'One client failure must not block other client reports.',
     'Secrets stay in the local reporting runner .env and never enter API responses.',
-    'Google Ads reports remain blocked until Google Ads API credentials and customer IDs exist.',
     'Full Business Suite sections remain blocked until Page and Instagram assets are mapped.',
   ],
 

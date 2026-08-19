@@ -5,7 +5,6 @@ export interface AdsReportingClient {
   name: string;
   platforms: string[];
   metaAccounts: string[];
-  googleCustomers: string[];
 }
 
 export interface AdsReportArtifact {

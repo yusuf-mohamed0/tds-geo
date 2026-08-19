@@ -24,9 +24,8 @@ vi.mock('../api/adsReports', () => ({
       {
         id: 'caravanserai',
         name: 'Caravanserai',
-        platforms: ['meta', 'google_ads'],
+        platforms: ['meta'],
         metaAccounts: ['act_326559196172852'],
-        googleCustomers: ['1234567890'],
       },
     ],
     roles: [
@@ -59,6 +58,6 @@ describe('AdsReportsPage', () => {
     const select = await screen.findByLabelText('Client');
     fireEvent.change(select, { target: { value: 'caravanserai' } });
 
-    expect(screen.getByText('Platforms: meta, google_ads | Meta: 1 | Google Ads: 1')).toBeInTheDocument();
+    expect(screen.getByText('Platforms: meta | Meta: 1')).toBeInTheDocument();
   });
 });

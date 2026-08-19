@@ -77,7 +77,7 @@ export default function AdsReportsPage() {
   }
 
   return (
-    <Page title="Ads Reports" subtitle="Internal Meta and Google Ads report control room with strict review gates">
+    <Page title="Ads Reports" subtitle="Internal Meta report control room with strict review gates">
       <BlockStack gap="500">
         {error && <Banner tone="critical">{error}</Banner>}
 
@@ -138,7 +138,7 @@ export default function AdsReportsPage() {
                   <Button variant="primary" loading={running === 'generate'} onClick={() => run('generate')}>Generate PDF</Button>
                 </div>
               </div>
-              {client && <Text as="p" variant="bodySm" tone="subdued">Platforms: {client.platforms.join(', ') || 'none'} | Meta: {client.metaAccounts.length} | Google Ads: {client.googleCustomers.length}</Text>}
+              {client && <Text as="p" variant="bodySm" tone="subdued">Platforms: {client.platforms.join(', ') || 'none'} | Meta: {client.metaAccounts.length}</Text>}
               {output && <pre className="overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100">{output}</pre>}
             </BlockStack>
           </Card>
