@@ -79,3 +79,43 @@ jobs:
         run: |
           cd "$HOME/tds-geo-deploy/deploy/truenas"
           TDS_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:truenas" ./scripts/deploy.sh
+
+      - name: Deploy reporting runner (Meta mediabuying reports)
+        if: ${{ secrets.GH_PAT_REPORTING != '' && secrets.META_SYSTEM_USER_TOKEN != '' }}
+        continue-on-error: true
+        env:
+          GH_PAT: ${{ secrets.GH_PAT_REPORTING }}
+          META_SYSTEM_USER_TOKEN: ${{ secrets.META_SYSTEM_USER_TOKEN }}
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_API_VERSION: ${{ secrets.META_API_VERSION }}
+          REPORT_RECIPIENT: ${{ secrets.REPORT_RECIPIENT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_SENDER: ${{ secrets.SMTP_SENDER }}
+        run: |
+          RUNNER_ROOT="$HOME/tds-ads-reporting-automation"
+          mkdir -p "$RUNNER_ROOT"
+          if [[ -d "$RUNNER_ROOT/.git" ]]; then
+            git -C "$RUNNER_ROOT" -c credential.helper= fetch --depth 1 origin main && git -C "$RUNNER_ROOT" reset --hard FETCH_HEAD
+          else
+            git clone --depth 1 "https://x-access-token:${GH_PAT}@github.com/yusuf-mohamed0/tds-ads-reporting-automation.git" "$RUNNER_ROOT"
+          fi
+          cd "$RUNNER_ROOT"
+          python3 -m venv .venv 2>/dev/null || true
+          ./.venv/bin/pip install --quiet -r requirements.txt || true
+          mkdir -p logs reports data configs
+          [[ -f configs/clients.yaml ]] || cp configs/clients.example.yaml configs/clients.yaml
+          {
+            printf 'META_SYSTEM_USER_TOKEN=%s\n' "$META_SYSTEM_USER_TOKEN"
+            printf 'META_API_VERSION=%s\n' "${META_API_VERSION:-v26.0}"
+            [[ -n "$META_PAGE_ACCESS_TOKEN" ]] && printf 'META_PAGE_ACCESS_TOKEN=%s\n' "$META_PAGE_ACCESS_TOKEN"
+            printf 'REPORT_RECIPIENT=%s\n' "${REPORT_RECIPIENT:-reports@trafficdigitalsolutions.com}"
+            [[ -n "$SMTP_HOST" ]] && printf 'SMTP_HOST=%s\nSMTP_PORT=%s\nSMTP_USER=%s\nSMTP_PASSWORD=%s\nSMTP_SENDER=%s\nSMTP_STARTTLS=%s\n' "$SMTP_HOST" "${SMTP_PORT:-587}" "$SMTP_USER" "$SMTP_PASSWORD" "$SMTP_SENDER" "${SMTP_STARTTLS:-true}"
+            printf 'REPORTS_DIR=%s/reports\n' "$RUNNER_ROOT"
+            printf 'LOGS_DIR=%s/logs\n' "$RUNNER_ROOT"
+            printf 'SQLITE_PATH=%s/data/reporting.sqlite\n' "$RUNNER_ROOT"
+          } > .env
+          ./scripts/install-monthly-cron.sh || true
+          echo "Reporting runner deployed to $RUNNER_ROOT"
