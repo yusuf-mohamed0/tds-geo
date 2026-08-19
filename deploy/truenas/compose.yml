@@ -12,6 +12,7 @@ services:
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
+      ADS_REPORTING_PROJECT: /app/data/ads-reporting
     depends_on:
       postgres:
         condition: service_healthy
@@ -19,8 +20,7 @@ services:
         condition: service_healthy
     volumes:
       - ${LOG_DIR:-./logs}:/app/logs
-      - ${ADS_REPORTING_ROOT:-$HOME/tds-ads-reporting-automation}:/root/tds-ads-reporting-automation
-      - ${ADS_REPORTING_OUTPUT:-$HOME/tds-ads-reporting-automation/reports}:/app/data/ads-reports
+      - ${ADS_REPORTING_ROOT:-$HOME/tds-ads-reporting-automation}:/app/data/ads-reporting
     expose:
       - "3000"
     networks:
