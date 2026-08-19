@@ -124,12 +124,12 @@ async function listArtifacts(): Promise<AdsReportArtifact[]> {
   return artifacts.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
-async function runReporter(args: string[]): Promise<{ stdout: string; stderr: string }> {
+async function runReporter(args: string[], timeoutMs = 180000): Promise<{ stdout: string; stderr: string }> {
   const env = { ...process.env, PYTHONPATH: 'src' };
   const { stdout, stderr } = await execFileAsync(PYTHON_BIN, ['-m', 'tds_ads_reporting.app', ...args], {
     cwd: REPORTING_ROOT,
     env,
-    timeout: 180000,
+    timeout: timeoutMs,
     maxBuffer: 1024 * 1024,
   });
   return { stdout: stdout.trim(), stderr: stderr.trim() };
@@ -188,7 +188,7 @@ export const adsReportingService = {
 
   async runAll(month: string) {
     assertSafeMonth(month);
-    const result = await runReporter(['run-all', '--month', month, '--no-cache']);
+    const result = await runReporter(['run-all', '--month', month, '--no-cache'], 900000);
     return { ...result, artifacts: await listArtifacts() };
   },
 

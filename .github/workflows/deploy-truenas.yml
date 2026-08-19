@@ -108,7 +108,13 @@ jobs:
             [[ -e .venv/bin/python ]] || ln -sf "$(command -v python3)" .venv/bin/python
             [[ -e .venv/bin/pip ]] || ln -sf "$(command -v pip3)" .venv/bin/pip
           fi
+          # Bootstrap pip inside the venv so packages live in the runner dir
+          # (world-readable for the non-root api container, unlike ~/.local).
+          if ! ./.venv/bin/python -c 'import pip' >/dev/null 2>&1; then
+            curl -fsSL https://bootstrap.pypa.io/get-pip.py | ./.venv/bin/python - >/dev/null 2>&1 || true
+          fi
           ./.venv/bin/pip install --quiet -r requirements.txt 2>/dev/null || pip3 install --user --quiet -r requirements.txt 2>/dev/null || true
+          chmod -R o+rX "$RUNNER_ROOT/.venv" "$RUNNER_ROOT/src" "$RUNNER_ROOT/configs" 2>/dev/null || true
           mkdir -p logs reports data configs
           [[ -f configs/clients.yaml ]] || cp configs/clients.example.yaml configs/clients.yaml
           # Reuse the heartbeat Gmail SMTP credentials already configured on the host.
