@@ -75,12 +75,6 @@ jobs:
             --exclude 'deploy/truenas/.previous-image' \
             ./ "$DEPLOY_ROOT/"
 
-      - name: Deploy Compose stack
-        run: |
-          cd "$HOME/tds-geo-deploy/deploy/truenas"
-          export ADS_REPORTING_ROOT="${HOME}/tds-ads-reporting-automation"
-          TDS_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:truenas" ./scripts/deploy.sh
-
       - name: Deploy reporting runner (Meta mediabuying reports)
         continue-on-error: true
         env:
@@ -108,7 +102,13 @@ jobs:
           fi
           cd "$RUNNER_ROOT"
           python3 -m venv .venv 2>/dev/null || true
-          ./.venv/bin/pip install --quiet -r requirements.txt || true
+          if [[ ! -x .venv/bin/python ]]; then
+            python3 -m venv --without-pip .venv 2>/dev/null || true
+            mkdir -p .venv/bin
+            [[ -e .venv/bin/python ]] || ln -sf "$(command -v python3)" .venv/bin/python
+            [[ -e .venv/bin/pip ]] || ln -sf "$(command -v pip3)" .venv/bin/pip
+          fi
+          ./.venv/bin/pip install --quiet -r requirements.txt 2>/dev/null || pip3 install --user --quiet -r requirements.txt 2>/dev/null || true
           mkdir -p logs reports data configs
           [[ -f configs/clients.yaml ]] || cp configs/clients.example.yaml configs/clients.yaml
           # Reuse the heartbeat Gmail SMTP credentials already configured on the host.
@@ -137,3 +137,9 @@ jobs:
           } > .env
           ./scripts/install-monthly-cron.sh || true
           echo "Reporting runner deployed to $RUNNER_ROOT"
+
+      - name: Deploy Compose stack
+        run: |
+          cd "$HOME/tds-geo-deploy/deploy/truenas"
+          export ADS_REPORTING_ROOT="${HOME}/tds-ads-reporting-automation"
+          TDS_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:truenas" ./scripts/deploy.sh
