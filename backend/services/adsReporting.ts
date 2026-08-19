@@ -102,15 +102,29 @@ async function readClients(): Promise<AdsReportingClient[]> {
 async function listArtifacts(): Promise<AdsReportArtifact[]> {
   const reportsDir = path.join(REPORTING_ROOT, 'reports');
   if (!(await exists(reportsDir))) return [];
-  const files = await fs.readdir(reportsDir);
-  const artifacts = await Promise.all(files.filter((file) => file.endsWith('.pdf')).map(async (file) => {
-    const filePath = path.join(reportsDir, file);
+  const files: string[] = [];
+  const stack = [reportsDir];
+  while (stack.length) {
+    const dir = stack.pop() as string;
+    let entries: import('fs').Dirent[] = [];
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) stack.push(full);
+      else if (entry.isFile() && entry.name.endsWith('.pdf')) files.push(full);
+    }
+  }
+  const artifacts = await Promise.all(files.map(async (filePath) => {
     const stat = await fs.stat(filePath);
-    const match = file.match(/^(.+)_(\d{4}-\d{2})\.pdf$/);
+    const match = path.basename(filePath).match(/^(.+)_(\d{4}-\d{2})\.pdf$/);
     return {
       clientId: match?.[1] || '',
       month: match?.[2] || '',
-      fileName: file,
+      fileName: path.basename(filePath),
       path: filePath,
       sizeBytes: stat.size,
       updatedAt: stat.mtime.toISOString(),
