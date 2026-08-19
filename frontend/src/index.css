@@ -6,21 +6,21 @@
 
 @layer base {
   :root {
-    --kivo-obsidian: #071013;
-    --kivo-signal: #22E6A8;
-    --kivo-signal-rgb: 34, 230, 168;
-    --kivo-mist: #F4FBF8;
-    --kivo-graphite: #25343A;
-    --kivo-muted: #6D7E86;
-    --kivo-navy: #0B1F3A;
-    --kivo-query: #3BB5FF;
-    --kivo-vector: #C7B8FF;
-    --kivo-recover: #B7FF4A;
-    --kivo-signal-active: #17bf89;
-    --kivo-link: #047857;
-    --kivo-link-hover: #065f46;
-    --kivo-border: #D9E8E2;
-    --kivo-gradient-command: radial-gradient(circle at top left, rgba(var(--kivo-signal-rgb), .22), transparent 34%), radial-gradient(circle at 80% 20%, rgba(59,181,255,.16), transparent 28%), linear-gradient(135deg, #071013 0%, #0B1F3A 62%, #132E32 100%);
+    --kivo-obsidian: #09060B;
+    --kivo-signal: #B93CFC;
+    --kivo-signal-rgb: 185, 60, 252;
+    --kivo-mist: #F3EBF5;
+    --kivo-graphite: #222124;
+    --kivo-muted: #222124;
+    --kivo-navy: #09060B;
+    --kivo-query: #8109F5;
+    --kivo-vector: #B93CFC;
+    --kivo-recover: #B93CFC;
+    --kivo-signal-active: #8109F5;
+    --kivo-link: #8109F5;
+    --kivo-link-hover: #B93CFC;
+    --kivo-border: #D8CEE0;
+    --kivo-gradient-command: radial-gradient(circle at top left, rgba(185,60,252,.18), transparent 34%), radial-gradient(circle at 80% 20%, rgba(129,9,245,.16), transparent 28%), linear-gradient(135deg, #09060B 0%, #09060B 62%, #222124 100%);
   }
 
   /* Let Polaris own its own reset and box model — a global margin/padding
