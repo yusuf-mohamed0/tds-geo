@@ -143,3 +143,13 @@ jobs:
           cd "$HOME/tds-geo-deploy/deploy/truenas"
           export ADS_REPORTING_ROOT="${HOME}/tds-ads-reporting-automation"
           TDS_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:truenas" ./scripts/deploy.sh
+
+      - name: Verify reporting mount (diagnostic)
+        continue-on-error: true
+        run: |
+          echo "=== runner dir on host ==="
+          ls -la "$HOME/tds-ads-reporting-automation" | head -12
+          echo "=== api container mounts ==="
+          docker inspect tds-geo-api-1 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}' 2>/dev/null || true
+          echo "=== inside container ==="
+          docker exec tds-geo-api-1 ls -la /root/tds-ads-reporting-automation 2>&1 | head -8 || true
