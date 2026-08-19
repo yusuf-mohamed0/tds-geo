@@ -107,12 +107,26 @@ jobs:
           ./.venv/bin/pip install --quiet -r requirements.txt || true
           mkdir -p logs reports data configs
           [[ -f configs/clients.yaml ]] || cp configs/clients.example.yaml configs/clients.yaml
+          # Reuse the heartbeat Gmail SMTP credentials already configured on the host.
+          # Secret-provided values are kept as fallback when the host file is absent.
+          SMTP_USER_SECRET="${SMTP_USER:-}"
+          SMTP_PASSWORD_SECRET="${SMTP_PASSWORD:-}"
+          TRUENAS_ENV_FILE="$HOME/tds-geo-deploy/deploy/truenas/.env"
+          if [[ -f "$TRUENAS_ENV_FILE" ]]; then
+            set -a; . "$TRUENAS_ENV_FILE"; set +a
+          fi
+          REPORT_RECIPIENT="${REPORT_RECIPIENT:-${HEARTBEAT_EMAIL_TO:-reports@trafficdigitalsolutions.com}}"
+          SMTP_HOST="${SMTP_HOST:-smtp.gmail.com}"
+          SMTP_PORT="${SMTP_PORT:-587}"
+          SMTP_USER="${SMTP_USER:-$SMTP_USER_SECRET}"
+          SMTP_PASSWORD="${SMTP_PASSWORD:-${SMTP_PASS:-$SMTP_PASSWORD_SECRET}}"
+          SMTP_SENDER="${SMTP_SENDER:-$SMTP_USER}"
           {
             printf 'META_SYSTEM_USER_TOKEN=%s\n' "$META_SYSTEM_USER_TOKEN"
             printf 'META_API_VERSION=%s\n' "${META_API_VERSION:-v26.0}"
             [[ -n "$META_PAGE_ACCESS_TOKEN" ]] && printf 'META_PAGE_ACCESS_TOKEN=%s\n' "$META_PAGE_ACCESS_TOKEN"
-            printf 'REPORT_RECIPIENT=%s\n' "${REPORT_RECIPIENT:-reports@trafficdigitalsolutions.com}"
-            [[ -n "$SMTP_HOST" ]] && printf 'SMTP_HOST=%s\nSMTP_PORT=%s\nSMTP_USER=%s\nSMTP_PASSWORD=%s\nSMTP_SENDER=%s\nSMTP_STARTTLS=%s\n' "$SMTP_HOST" "${SMTP_PORT:-587}" "$SMTP_USER" "$SMTP_PASSWORD" "$SMTP_SENDER" "${SMTP_STARTTLS:-true}"
+            printf 'REPORT_RECIPIENT=%s\n' "$REPORT_RECIPIENT"
+            printf 'SMTP_HOST=%s\nSMTP_PORT=%s\nSMTP_USER=%s\nSMTP_PASSWORD=%s\nSMTP_SENDER=%s\nSMTP_STARTTLS=%s\n' "$SMTP_HOST" "$SMTP_PORT" "$SMTP_USER" "${SMTP_PASSWORD:-$SMTP_PASS}" "$SMTP_SENDER" "${SMTP_STARTTLS:-true}"
             printf 'REPORTS_DIR=%s/reports\n' "$RUNNER_ROOT"
             printf 'LOGS_DIR=%s/logs\n' "$RUNNER_ROOT"
             printf 'SQLITE_PATH=%s/data/reporting.sqlite\n' "$RUNNER_ROOT"
