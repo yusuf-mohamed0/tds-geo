@@ -81,7 +81,6 @@ jobs:
           TDS_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:truenas" ./scripts/deploy.sh
 
       - name: Deploy reporting runner (Meta mediabuying reports)
-        if: ${{ secrets.GH_PAT_REPORTING != '' && secrets.META_SYSTEM_USER_TOKEN != '' }}
         continue-on-error: true
         env:
           GH_PAT: ${{ secrets.GH_PAT_REPORTING }}
@@ -95,6 +94,10 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           SMTP_SENDER: ${{ secrets.SMTP_SENDER }}
         run: |
+          if [[ -z "${META_SYSTEM_USER_TOKEN:-}" ]]; then
+            echo "Skipping reporting runner deploy: META_SYSTEM_USER_TOKEN secret not set"
+            exit 0
+          fi
           RUNNER_ROOT="$HOME/tds-ads-reporting-automation"
           mkdir -p "$RUNNER_ROOT"
           if [[ -d "$RUNNER_ROOT/.git" ]]; then
