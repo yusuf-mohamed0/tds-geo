@@ -157,5 +157,7 @@ jobs:
           ls -la "$HOME/tds-ads-reporting-automation" | head -12
           echo "=== api container mounts ==="
           docker inspect tds-geo-api-1 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}' 2>/dev/null || true
-          echo "=== inside container ==="
-          docker exec tds-geo-api-1 ls -la /root/tds-ads-reporting-automation 2>&1 | head -8 || true
+          echo "=== inside container: reporter entrypoint ==="
+          docker exec tds-geo-api-1 sh -c 'ls -la /app/data/ads-reporting/.venv/bin/ 2>&1 | head -8; echo ---; /app/data/ads-reporting/.venv/bin/python -c "import tds_ads_reporting" 2>&1 | head -3; echo ---; cd /app/data/ads-reporting && PYTHONPATH=src ./.venv/bin/python -m tds_ads_reporting.app --help 2>&1 | head -8' 2>&1 | head -30 || true
+          echo "=== api container recent logs ==="
+          docker logs --tail 30 tds-geo-api-1 2>&1 | tail -30 || true
