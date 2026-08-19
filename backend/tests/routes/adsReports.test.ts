@@ -94,7 +94,7 @@ describe('Ads Report Registry Routes', () => {
   });
 
   it('POST /run-all generates the combined portfolio report and syncs registry', async () => {
-    vi.spyOn(adsReportingService, 'runAll').mockResolvedValue({ stdout: 'ok combined (33/33 clients)', stderr: '' });
+    vi.spyOn(adsReportingService, 'runAll').mockResolvedValue({ stdout: 'ok combined (33/33 clients)', stderr: '', artifacts: [] });
     vi.spyOn(adsReportingService, 'syncRegistry').mockResolvedValue({ inserted: 34, updated: 0, total: 34 });
     const res = await request(app).post('/api/ads-reports/run-all').send({ month: '2026-07' });
     expect(res.status).toBe(200);
