@@ -101,20 +101,22 @@ jobs:
             git clone --depth 1 "https://x-access-token:${GH_PAT}@github.com/yusuf-mohamed0/tds-ads-reporting-automation.git" "$RUNNER_ROOT"
           fi
           cd "$RUNNER_ROOT"
-          python3 -m venv .venv 2>/dev/null || true
+          rm -rf .venv
+          python3 -m venv --without-pip .venv 2>/dev/null || true
           if [[ ! -x .venv/bin/python ]]; then
-            python3 -m venv --without-pip .venv 2>/dev/null || true
-            mkdir -p .venv/bin
-            [[ -e .venv/bin/python ]] || ln -sf "$(command -v python3)" .venv/bin/python
-            [[ -e .venv/bin/pip ]] || ln -sf "$(command -v pip3)" .venv/bin/pip
+            mkdir -p .venv/bin .venv/lib/python3/site-packages
+            ln -sf "$(command -v python3)" .venv/bin/python
+            printf '[venv]\ninclude-system-site-packages = false\n' > .venv/pyvenv.cfg
           fi
           # Bootstrap pip inside the venv so packages live in the runner dir
           # (world-readable for the non-root api container, unlike ~/.local).
           if ! ./.venv/bin/python -c 'import pip' >/dev/null 2>&1; then
             curl -fsSL https://bootstrap.pypa.io/get-pip.py | ./.venv/bin/python - >/dev/null 2>&1 || true
           fi
-          ./.venv/bin/pip install --quiet -r requirements.txt 2>/dev/null || pip3 install --user --quiet -r requirements.txt 2>/dev/null || true
+          ./.venv/bin/python -m pip install --quiet -r requirements.txt 2>/dev/null || ./.venv/bin/pip install --quiet -r requirements.txt 2>/dev/null || pip3 install --user --quiet -r requirements.txt 2>/dev/null || true
           chmod -R o+rX "$RUNNER_ROOT/.venv" "$RUNNER_ROOT/src" "$RUNNER_ROOT/configs" 2>/dev/null || true
+          echo "venv check:"; ls -la .venv/bin/ | head -6
+          ./.venv/bin/python -c 'import facebook_business, weasyprint; print("venv imports OK")' 2>&1 | tail -1 || true
           mkdir -p logs reports data configs
           [[ -f configs/clients.yaml ]] || cp configs/clients.example.yaml configs/clients.yaml
           # Reuse the heartbeat Gmail SMTP credentials already configured on the host.
