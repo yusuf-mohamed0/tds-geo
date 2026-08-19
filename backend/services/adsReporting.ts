@@ -1,14 +1,9 @@
-import { execFile } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
-import { promisify } from 'util';
 import crypto from 'crypto';
 import type { Pool } from 'pg';
 
-const execFileAsync = promisify(execFile);
-
 const REPORTING_ROOT = process.env.ADS_REPORTING_PROJECT || '/root/tds-ads-reporting-automation';
-const PYTHON_BIN = process.env.ADS_REPORTING_PYTHON || path.join(REPORTING_ROOT, '.venv/bin/python');
 const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 const CLIENT_RE = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -124,15 +119,55 @@ async function listArtifacts(): Promise<AdsReportArtifact[]> {
   return artifacts.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
-async function runReporter(args: string[], timeoutMs = 180000): Promise<{ stdout: string; stderr: string }> {
-  const env = { ...process.env, PYTHONPATH: 'src' };
-  const { stdout, stderr } = await execFileAsync(PYTHON_BIN, ['-m', 'tds_ads_reporting.app', ...args], {
-    cwd: REPORTING_ROOT,
-    env,
-    timeout: timeoutMs,
-    maxBuffer: 1024 * 1024,
+async function writeTrigger(trigger: Record<string, unknown>): Promise<void> {
+  const triggerPath = path.join(REPORTING_ROOT, 'data/trigger.json');
+  await fs.mkdir(path.dirname(triggerPath), { recursive: true }).catch(() => {});
+  await fs.writeFile(triggerPath, JSON.stringify(trigger), { mode: 0o666 });
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// The api container (Alpine, no python) cannot run the reporter itself, so we
+// write a trigger file into the shared mount and poll for the host-side
+// watcher's result. The host runs the generation as its own user (see the
+// runner repo's scripts/watch-trigger.sh).
+async function requestRunnerRun(options: {
+  command: 'run-all' | 'run';
+  month: string;
+  client?: string;
+  dryRun?: boolean;
+}): Promise<{ ok: boolean; exitCode: number; stdout: string; stderr: string }> {
+  const runId = crypto.randomUUID();
+  await writeTrigger({
+    id: runId,
+    command: options.command,
+    month: options.month,
+    ...(options.client ? { client: options.client } : {}),
+    dryRun: Boolean(options.dryRun),
   });
-  return { stdout: stdout.trim(), stderr: stderr.trim() };
+
+  const lastRunPath = path.join(REPORTING_ROOT, 'data/last_run.json');
+  const deadline = Date.now() + 15 * 60 * 1000;
+  while (Date.now() < deadline) {
+    try {
+      const raw = await fs.readFile(lastRunPath, 'utf8');
+      const data = JSON.parse(raw);
+      if (data.id === runId) {
+        return {
+          ok: Boolean(data.ok),
+          exitCode: Number(data.exitCode ?? 0),
+          stdout: String(data.stdout ?? ''),
+          stderr: String(data.stderr ?? ''),
+        };
+      }
+    } catch {
+      // last_run missing or not ours yet — keep polling
+    }
+    await sleep(5000);
+  }
+  throw new Error('Timed out waiting for the host reporting runner to finish.');
 }
 
 export const adsReportingService = {
@@ -176,19 +211,19 @@ export const adsReportingService = {
   async dryRun(clientId: string, month: string) {
     assertSafeClientId(clientId);
     assertSafeMonth(month);
-    return runReporter(['run', '--client', clientId, '--month', month, '--dry-run']);
+    return requestRunnerRun({ command: 'run', client: clientId, month, dryRun: true });
   },
 
   async generateInternal(clientId: string, month: string) {
     assertSafeClientId(clientId);
     assertSafeMonth(month);
-    const result = await runReporter(['run', '--client', clientId, '--month', month]);
+    const result = await requestRunnerRun({ command: 'run', client: clientId, month });
     return { ...result, artifacts: await listArtifacts() };
   },
 
   async runAll(month: string) {
     assertSafeMonth(month);
-    const result = await runReporter(['run-all', '--month', month, '--no-cache'], 900000);
+    const result = await requestRunnerRun({ command: 'run-all', month });
     return { ...result, artifacts: await listArtifacts() };
   },
 
