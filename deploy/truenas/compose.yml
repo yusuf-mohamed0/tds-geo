@@ -19,6 +19,8 @@ services:
         condition: service_healthy
     volumes:
       - ${LOG_DIR:-./logs}:/app/logs
+      - ${ADS_REPORTING_ROOT:-$HOME/tds-ads-reporting-automation}:/root/tds-ads-reporting-automation
+      - ${ADS_REPORTING_OUTPUT:-$HOME/tds-ads-reporting-automation/reports}:/app/data/ads-reports
     expose:
       - "3000"
     networks:
