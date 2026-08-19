@@ -35,6 +35,17 @@ export function createAdsReportRoutes(_pool: Pool): Router {
     }
   });
 
+  router.post('/run-all', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const month = String(req.body?.month || '');
+      const result = await adsReportingService.runAll(month);
+      const synced = await adsReportingService.syncRegistry(_pool);
+      res.json({ ...result, synced });
+    } catch (err) {
+      next(err);
+    }
+  });
+
   // ─── Artifact approval/delivery registry ───
   router.post('/registry/sync', async (req: Request, res: Response, next: NextFunction) => {
     try {

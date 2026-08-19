@@ -19,7 +19,6 @@ vi.mock('../api/adsReports', () => ({
         name: 'Alamein 2022',
         platforms: ['meta'],
         metaAccounts: ['act_272954367455662'],
-        googleCustomers: [],
       },
       {
         id: 'caravanserai',
@@ -34,8 +33,26 @@ vi.mock('../api/adsReports', () => ({
     reviewGates: ['No client email from Kivo Geo without explicit approval'],
     artifacts: [],
   }),
+  fetchAdsRegistry: vi.fn().mockResolvedValue([
+    {
+      id: '1',
+      clientId: 'alamein-2022',
+      month: '2026-07',
+      fileName: 'alamein-2022_2026-07.pdf',
+      filePath: '/reports/alamein-2022_2026-07.pdf',
+      sizeBytes: 102400,
+      status: 'in_review',
+      createdAt: '2026-08-01T09:00:00.000Z',
+      updatedAt: '2026-08-01T09:00:00.000Z',
+    },
+  ]),
+  syncAdsRegistry: vi.fn().mockResolvedValue({ inserted: 1, updated: 0, total: 1 }),
   dryRunAdsReport: vi.fn(),
   generateInternalAdsReport: vi.fn(),
+  runAllAdsReports: vi.fn(),
+  approveRegistryEntry: vi.fn().mockResolvedValue({}),
+  rejectRegistryEntry: vi.fn().mockResolvedValue({}),
+  deliverRegistryEntry: vi.fn().mockResolvedValue({}),
 }));
 
 describe('AdsReportsPage', () => {
@@ -43,13 +60,26 @@ describe('AdsReportsPage', () => {
     renderWithPolaris(<AdsReportsPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Generate Internal Report')).toBeInTheDocument();
+      expect(screen.getByText('Generate Monthly Report')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Runner')).toBeInTheDocument();
+    expect(screen.getByText('Pipeline')).toBeInTheDocument();
+    expect(screen.getByText('Portfolio')).toBeInTheDocument();
     expect(screen.getByLabelText('Client')).toHaveValue('alamein-2022');
     expect(screen.getByRole('button', { name: 'Dry-run' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate PDF' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Generate all clients' })).toBeInTheDocument();
+    expect(screen.getByText('Artifact Registry')).toBeInTheDocument();
+  });
+
+  it('shows registry entries with approve/reject actions', async () => {
+    renderWithPolaris(<AdsReportsPage />);
+
+    const fileName = await screen.findByText('alamein-2022_2026-07.pdf');
+    expect(fileName).toBeInTheDocument();
+    expect(screen.getAllByText('in_review').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('button', { name: 'Approve' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reject' })).toBeInTheDocument();
   });
 
   it('updates the selected client from the client selector', async () => {

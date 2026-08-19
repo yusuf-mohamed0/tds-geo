@@ -92,4 +92,14 @@ describe('Ads Report Registry Routes', () => {
     expect(adsReportingService.reviewGates.length).toBeGreaterThan(0);
     expect(adsReportingService.roles.some((r) => r.role.includes('CEO'))).toBe(true);
   });
+
+  it('POST /run-all generates the combined portfolio report and syncs registry', async () => {
+    vi.spyOn(adsReportingService, 'runAll').mockResolvedValue({ stdout: 'ok combined (33/33 clients)', stderr: '' });
+    vi.spyOn(adsReportingService, 'syncRegistry').mockResolvedValue({ inserted: 34, updated: 0, total: 34 });
+    const res = await request(app).post('/api/ads-reports/run-all').send({ month: '2026-07' });
+    expect(res.status).toBe(200);
+    expect(res.body.stdout).toContain('combined');
+    expect(res.body.synced.total).toBe(34);
+    expect(adsReportingService.runAll).toHaveBeenCalledWith('2026-07');
+  });
 });

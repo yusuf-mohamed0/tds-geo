@@ -186,6 +186,12 @@ export const adsReportingService = {
     return { ...result, artifacts: await listArtifacts() };
   },
 
+  async runAll(month: string) {
+    assertSafeMonth(month);
+    const result = await runReporter(['run-all', '--month', month, '--no-cache']);
+    return { ...result, artifacts: await listArtifacts() };
+  },
+
   async syncRegistry(pool: Pool): Promise<{ inserted: number; updated: number; total: number }> {
     const artifacts = await listArtifacts();
     let inserted = 0;
