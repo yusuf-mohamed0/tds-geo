@@ -78,6 +78,7 @@ jobs:
       - name: Deploy Compose stack
         run: |
           cd "$HOME/tds-geo-deploy/deploy/truenas"
+          export ADS_REPORTING_ROOT="${HOME}/tds-ads-reporting-automation"
           TDS_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:truenas" ./scripts/deploy.sh
 
       - name: Deploy reporting runner (Meta mediabuying reports)
