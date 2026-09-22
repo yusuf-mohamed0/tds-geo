@@ -8,6 +8,7 @@
 *.env*
 !.env.example
 !frontend/.env.example
+local-credentials/
 
 # ─── Secrets / Credentials ──────────────────
 *.pem
